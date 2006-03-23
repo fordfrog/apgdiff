@@ -1,0 +1,373 @@
+/*
+ * PgDumpLoader.java
+ *
+ * Created on 23. bøezen 2006, 13:33
+ *
+ * To change this template, choose Tools | Template Manager
+ * and open the template in the editor.
+ */
+package cz.startnet.utils.pgdiff;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+
+
+/**
+ * Loads PostgreSQL dump into classes.
+ * @author fordfrog
+ */
+public class PgDumpLoader {
+    /**
+     * Creates a new instance of PgDumpLoader.
+     */
+    private PgDumpLoader() {
+    }
+
+    /**
+     * Loads schema from dump file.
+     * @param file name of file containing the dump
+     */
+    public static PgSchema loadSchema(String file) {
+        PgSchema schema = new PgSchema();
+        BufferedReader reader = null;
+
+        try {
+            reader =
+                new BufferedReader(
+                        new InputStreamReader(
+                                new FileInputStream(file),
+                                "UTF-8"));
+        } catch (UnsupportedEncodingException ex) {
+            ex.printStackTrace();
+            throw new RuntimeException("Unsupported encoding");
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+            throw new RuntimeException("File '" + file + "' not found");
+        }
+
+        String line = null;
+
+        try {
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+
+                if (line.length() == 0) {
+                    continue;
+                } else if (line.startsWith("--")) {
+                    processDashComment(schema, reader, line);
+                } else if (line.startsWith("SET ")) {
+                    processSet(schema, reader, line);
+                } else if (line.startsWith("COMMENT ")) {
+                    processComment(schema, reader, line);
+                } else if (line.startsWith("CREATE TABLE ")) {
+                    processCreateTable(schema, reader, line);
+                } else if (line.startsWith("ALTER TABLE ")) {
+                    processAlterTable(schema, reader, line);
+                } else if (line.startsWith("CREATE SEQUENCE ")) {
+                    processCreateSequence(schema, reader, line);
+                } else if (line.startsWith("SELECT ")) {
+                    processSelect(schema, reader, line);
+                } else if (line.startsWith("INSERT INTO ")) {
+                    processInsertInto(schema, reader, line);
+                } else if (line.startsWith("CREATE INDEX ")) {
+                    processCreateIndex(schema, reader, line);
+                } else if (line.startsWith("REVOKE ")) {
+                    processRevoke(schema, reader, line);
+                } else if (line.startsWith("GRANT ")) {
+                    processGrant(schema, reader, line);
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            throw new RuntimeException("IO exception");
+        }
+
+        return schema;
+    }
+
+    /**
+     * Reads current reader till end of command is reached.
+     * @param reader reader to be read
+     */
+    private static void moveToEndOfCommand(BufferedReader reader) {
+        String line = null;
+
+        try {
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().endsWith(";")) {
+                    break;
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            throw new RuntimeException("IO exception");
+        }
+    }
+
+    /**
+     * Processes ALTER TABLE command.
+     * @param schema schema to be filled
+     * @param reader reader of the dump file
+     * @param line first line read
+     */
+    private static void processAlterTable(
+        PgSchema schema,
+        BufferedReader reader,
+        String line) {
+        if (line.matches("^ALTER TABLE .* OWNER TO .*;$")) {
+            return;
+        }
+
+        String tableName = null;
+
+        if (line.startsWith("ALTER TABLE ONLY ")) {
+            tableName = line.substring("ALTER TABLE ONLY ".length()).trim();
+        } else {
+            tableName = line.substring("ALTER TABLE ".length()).trim();
+        }
+
+        PgTable table = schema.getTable(tableName);
+
+        try {
+            while ((line = reader.readLine()) != null) {
+                boolean last = false;
+                line = line.trim();
+
+                if (line.endsWith(";")) {
+                    last = true;
+                    line = line.substring(0, line.length() - 1);
+                }
+
+                if (line.startsWith("ADD CONSTRAINT ")) {
+                    line = line.substring("ADD CONSTRAINT ".length()).trim();
+
+                    String constraintName =
+                        line.substring(0, line.indexOf(" ")).trim();
+                    PgConstraint constraint =
+                        table.getConstraint(constraintName);
+                    constraint.setDefinition(
+                            line.substring(line.indexOf(" ")).trim());
+                }
+
+                if (last) {
+                    break;
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            throw new RuntimeException("IO exception");
+        }
+    }
+
+    /**
+     * Processes COMMENT command.
+     * @param schema schema to be filled
+     * @param reader reader of the dump file
+     * @param line first line read
+     */
+    private static void processComment(
+        PgSchema schema,
+        BufferedReader reader,
+        String line) {
+        if (!line.endsWith(";")) {
+            moveToEndOfCommand(reader);
+        }
+    }
+
+    /**
+     * Processes CREATE INDEX command.
+     * @param schema schema to be filled
+     * @param reader reader of the dump file
+     * @param line first line read
+     */
+    private static void processCreateIndex(
+        PgSchema schema,
+        BufferedReader reader,
+        String line) {
+        line = line.substring("CREATE INDEX ".length()).trim();
+
+        if (line.endsWith(";")) {
+            line = line.substring(0, line.length() - 1).trim();
+        }
+
+        String indexName = line.substring(0, line.indexOf(" ")).trim();
+        line = line.substring(indexName.length()).trim();
+
+        if (line.startsWith("ON ")) {
+            line = line.substring("ON ".length()).trim();
+        }
+
+        String tableName = line.substring(0, line.indexOf(" ")).trim();
+        String definition = line.substring(tableName.length()).trim();
+        schema.getTable(tableName).getIndex(indexName).setDefinition(
+                definition);
+    }
+
+    /**
+     * Processes CREATE SEQUENCE command.
+     * @param schema schema to be filled
+     * @param reader reader of the dump file
+     * @param line first line read
+     */
+    private static void processCreateSequence(
+        PgSchema schema,
+        BufferedReader reader,
+        String line) {
+        String sequenceName =
+            line.substring("CREATE SEQUENCE ".length()).trim();
+        StringBuilder sbDefinition = new StringBuilder();
+
+        try {
+            while ((line = reader.readLine()) != null) {
+                boolean last = false;
+                line = line.trim();
+
+                if (line.endsWith(";")) {
+                    last = true;
+                    line = line.substring(0, line.length() - 1);
+                }
+
+                sbDefinition.append(line + " ");
+
+                if (last) {
+                    break;
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            throw new RuntimeException("IO exception");
+        }
+
+        schema.getSequence(sequenceName)
+              .setDefinition(sbDefinition.toString().trim());
+    }
+
+    /**
+     * Processes CREATE TABLE command.
+     * @param schema schema to be filled
+     * @param reader reader of the dump file
+     * @param line first line read
+     */
+    private static void processCreateTable(
+        PgSchema schema,
+        BufferedReader reader,
+        String line) {
+        String tableName = line.substring("CREATE TABLE ".length()).trim();
+
+        if (tableName.endsWith("(")) {
+            tableName = tableName.substring(0, tableName.length() - 1).trim();
+        }
+
+        PgTable table = schema.getTable(tableName);
+
+        try {
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+
+                if (line.contentEquals(");")) {
+                    break;
+                } else if (line.endsWith(",")) {
+                    line = line.substring(0, line.length() - 1).trim();
+                }
+
+                String columnName = line.substring(0, line.indexOf(" "));
+                PgColumn column = table.getColumn(columnName);
+                column.setDefinition(line.substring(line.indexOf(" ")).trim());
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            throw new RuntimeException("IO exception");
+        }
+    }
+
+    /**
+     * Processes '--' comment.
+     * @param schema schema to be filled
+     * @param reader reader of the dump file
+     * @param line first line read
+     */
+    private static void processDashComment(
+        PgSchema schema,
+        BufferedReader reader,
+        String line) {
+    }
+
+    /**
+     * Processes GRANT command.
+     * @param schema schema to be filled
+     * @param reader reader of the dump file
+     * @param line first line read
+     */
+    private static void processGrant(
+        PgSchema schema,
+        BufferedReader reader,
+        String line) {
+        if (!line.endsWith(";")) {
+            moveToEndOfCommand(reader);
+        }
+    }
+
+    /**
+     * Processes INSERT INTO command.
+     * @param schema schema to be filled
+     * @param reader reader of the dump file
+     * @param line first line read
+     */
+    private static void processInsertInto(
+        PgSchema schema,
+        BufferedReader reader,
+        String line) {
+        if (!line.endsWith(";")) {
+            moveToEndOfCommand(reader);
+        }
+    }
+
+    /**
+     * Processes REVOKE command.
+     * @param schema schema to be filled
+     * @param reader reader of the dump file
+     * @param line first line read
+     */
+    private static void processRevoke(
+        PgSchema schema,
+        BufferedReader reader,
+        String line) {
+        if (!line.endsWith(";")) {
+            moveToEndOfCommand(reader);
+        }
+    }
+
+    /**
+     * Processes SELECT command.
+     * @param schema schema to be filled
+     * @param reader reader of the dump file
+     * @param line first line read
+     */
+    private static void processSelect(
+        PgSchema schema,
+        BufferedReader reader,
+        String line) {
+        if (!line.endsWith(";")) {
+            moveToEndOfCommand(reader);
+        }
+    }
+
+    /**
+     * Processes SET command.
+     * @param schema schema to be filled
+     * @param reader reader of the dump file
+     * @param line first line read
+     */
+    private static void processSet(
+        PgSchema schema,
+        BufferedReader reader,
+        String line) {
+        if (!line.endsWith(";")) {
+            moveToEndOfCommand(reader);
+        }
+    }
+}
