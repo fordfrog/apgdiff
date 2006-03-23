@@ -26,7 +26,7 @@ public class Main {
      */
     public static void main(String[] args) {
         if (args.length != 2) {
-            System.out.println("Usage: pgdiff <old_dump> <new_dump>");
+            System.out.println("Usage: apgdiff <old_dump> <new_dump>");
         } else {
             PgDiff.createDiff(args[0], args[1]);
         }
