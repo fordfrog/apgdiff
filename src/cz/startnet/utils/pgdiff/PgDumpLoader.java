@@ -131,10 +131,12 @@ public class PgDumpLoader {
         }
 
         PgTable table = schema.getTable(tableName);
+        String origLine = null;
 
         try {
             while ((line = reader.readLine()) != null) {
                 boolean last = false;
+                origLine = line;
                 line = line.trim();
 
                 if (line.endsWith(";")) {
@@ -160,6 +162,11 @@ public class PgDumpLoader {
         } catch (IOException ex) {
             ex.printStackTrace();
             throw new RuntimeException("IO exception");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException(
+                    "Cannot parse ALTER TABLE '" + tableName + "', line '"
+                    + origLine + "'");
         }
     }
 
@@ -188,17 +195,27 @@ public class PgDumpLoader {
         PgSchema schema,
         BufferedReader reader,
         String line) {
-        line = line.substring("CREATE INDEX ".length()).trim();
+        String origLine = line;
+        String indexName = null;
 
-        if (line.endsWith(";")) {
-            line = line.substring(0, line.length() - 1).trim();
-        }
+        try {
+            line = line.substring("CREATE INDEX ".length()).trim();
 
-        String indexName = line.substring(0, line.indexOf(" ")).trim();
-        line = line.substring(indexName.length()).trim();
+            if (line.endsWith(";")) {
+                line = line.substring(0, line.length() - 1).trim();
+            }
 
-        if (line.startsWith("ON ")) {
-            line = line.substring("ON ".length()).trim();
+            indexName = line.substring(0, line.indexOf(" ")).trim();
+            line = line.substring(indexName.length()).trim();
+
+            if (line.startsWith("ON ")) {
+                line = line.substring("ON ".length()).trim();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException(
+                    "Cannot parse CREATE INDEX '" + indexName + "', line '"
+                    + origLine + "'");
         }
 
         String tableName = line.substring(0, line.indexOf(" ")).trim();
@@ -220,10 +237,12 @@ public class PgDumpLoader {
         String sequenceName =
             line.substring("CREATE SEQUENCE ".length()).trim();
         StringBuilder sbDefinition = new StringBuilder();
+        String origLine = null;
 
         try {
             while ((line = reader.readLine()) != null) {
                 boolean last = false;
+                origLine = line;
                 line = line.trim();
 
                 if (line.endsWith(";")) {
@@ -240,6 +259,11 @@ public class PgDumpLoader {
         } catch (IOException ex) {
             ex.printStackTrace();
             throw new RuntimeException("IO exception");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException(
+                    "Cannot parse CREATE SEQUENCE '" + sequenceName
+                    + "', line '" + origLine + "'");
         }
 
         schema.getSequence(sequenceName)
@@ -263,15 +287,21 @@ public class PgDumpLoader {
         }
 
         PgTable table = schema.getTable(tableName);
+        String origLine = null;
 
         try {
             while ((line = reader.readLine()) != null) {
+                origLine = line;
                 line = line.trim();
 
                 if (line.contentEquals(");")) {
                     break;
                 } else if (line.endsWith(",")) {
                     line = line.substring(0, line.length() - 1).trim();
+                }
+
+                if (line.length() == 0) {
+                    continue;
                 }
 
                 String columnName = line.substring(0, line.indexOf(" "));
@@ -281,6 +311,11 @@ public class PgDumpLoader {
         } catch (IOException ex) {
             ex.printStackTrace();
             throw new RuntimeException("IO exception");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException(
+                    "Cannot parse CREATE TABLE '" + tableName + "', line '"
+                    + origLine + "'");
         }
     }
 
