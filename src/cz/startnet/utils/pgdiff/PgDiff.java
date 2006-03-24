@@ -5,6 +5,8 @@
  */
 package cz.startnet.utils.pgdiff;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -261,41 +263,123 @@ public class PgDiff {
                     tables2.get(tableName).getColumns();
                 Set<String> columnNames1 = columns1.keySet();
                 Set<String> columnNames2 = columns2.keySet();
+                List<String> commands = new ArrayList<String>();
 
                 // Check what columns should be dropped
                 for (String columnName : columnNames1) {
                     if (!columnNames2.contains(columnName)) {
-                        System.out.println("\nALTER TABLE " + tableName);
-                        System.out.println("\tDROP COLUMN " + columnName + ";");
+                        commands.add("\tDROP COLUMN " + columnName);
                     }
                 }
 
                 // Check what columns should be created
                 for (String columnName : columnNames2) {
                     if (!columnNames1.contains(columnName)) {
-                        System.out.println("\nALTER TABLE " + tableName);
-                        System.out.println(
+                        commands.add(
                                 "\tADD COLUMN "
-                                + columns2.get(columnName).getFullDefinition()
-                                + ";");
+                                + columns2.get(columnName).getFullDefinition());
                     }
                 }
 
                 // Check what columns should be modified
                 for (String columnName : columnNames1) {
-                    if (
-                        columnNames2.contains(columnName)
-                            && !columns1.get(columnName).getDefinition().contentEquals(
-                                    columns2.get(columnName).getDefinition())) {
-                        System.out.println(
-                                "\nMODIFIED COLUMN " + columnName
-                                + " IN TABLE " + tableName);
-                        System.out.println(
-                                "ORIGINAL: "
-                                + columns1.get(columnName).getDefinition());
-                        System.out.println(
-                                "NEW: "
-                                + columns2.get(columnName).getDefinition());
+                    if (columnNames2.contains(columnName)) {
+                        PgColumn column1 = columns1.get(columnName);
+                        PgColumn column2 = columns2.get(columnName);
+
+                        if (!column1.getType().contentEquals(column2.getType())) {
+                            commands.add(
+                                    "\tALTER COLUMN " + columnName + " TYPE "
+                                    + column2.getType());
+                        }
+
+                        String defaultValue1 = column1.getDefaultValue();
+                        String defaultValue2 = column2.getDefaultValue();
+
+                        if (
+                            (defaultValue1 != null)
+                                && (defaultValue1.length() == 0)) {
+                            defaultValue1 = null;
+                        }
+
+                        if (
+                            (defaultValue2 != null)
+                                && (defaultValue2.length() == 0)) {
+                            defaultValue2 = null;
+                        }
+
+                        if ((defaultValue1 != null) && (defaultValue2 == null)) {
+                            commands.add(
+                                    "\tALTER COLUMN " + columnName
+                                    + " DROP DEFAULT");
+                        } else if (
+                            ((defaultValue1 == null) && (defaultValue2 != null))
+                                || ((defaultValue1 != null)
+                                && (defaultValue2 != null)
+                                && !defaultValue1.contentEquals(defaultValue2))) {
+                            commands.add(
+                                    "\tALTER COLUMN " + columnName
+                                    + " SET DEFAULT " + defaultValue2);
+                        }
+
+                        if (column1.getNullValue() != column2.getNullValue()) {
+                            if (column2.getNullValue()) {
+                                commands.add(
+                                        "\tALTER COLUMN " + columnName
+                                        + " DROP NOT NULL");
+                            } else {
+                                commands.add(
+                                        "\tALTER COLUMN " + columnName
+                                        + " SET NOT NULL");
+                            }
+                        }
+
+                        String constraint1 = column1.getConstraint();
+                        String constraint2 = column2.getConstraint();
+
+                        if (
+                            (constraint1 != null)
+                                && (constraint1.length() == 0)) {
+                            constraint1 = null;
+                        }
+
+                        if (
+                            (constraint2 != null)
+                                && (constraint2.length() == 0)) {
+                            constraint2 = null;
+                        }
+
+                        if (
+                            ((constraint1 == null) && (constraint2 != null))
+                                || ((constraint1 != null)
+                                && (constraint2 == null))
+                                || ((constraint1 != null)
+                                && (constraint2 != null)
+                                && !constraint1.contentEquals(constraint2))) {
+                            System.out.println(
+                                    "\nMODIFIED CONSTRAINT ON COLUMN "
+                                    + columnName + " IN TABLE " + tableName);
+                            System.out.println(
+                                    "ORIGINAL: "
+                                    + ((constraint1 != null) ? constraint1 : ""));
+                            System.out.println(
+                                    "NEW: "
+                                    + ((constraint2 != null) ? constraint2 : ""));
+                        }
+                    }
+                }
+
+                if (commands.size() > 0) {
+                    System.out.println("\nALTER TABLE " + tableName);
+
+                    for (int i = 0; i < commands.size(); i++) {
+                        System.out.print(commands.get(i));
+
+                        if ((i + 1) < commands.size()) {
+                            System.out.println(",");
+                        } else {
+                            System.out.println(";");
+                        }
                     }
                 }
             }
