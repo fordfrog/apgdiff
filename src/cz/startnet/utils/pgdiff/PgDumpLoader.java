@@ -291,6 +291,7 @@ public class PgDumpLoader {
 
         try {
             while ((line = reader.readLine()) != null) {
+                boolean last = false;
                 origLine = line;
                 line = line.trim();
 
@@ -298,6 +299,9 @@ public class PgDumpLoader {
                     break;
                 } else if (line.endsWith(",")) {
                     line = line.substring(0, line.length() - 1).trim();
+                } else if (line.endsWith(");")) {
+                    line = line.substring(0, line.length() - 2).trim();
+                    last = true;
                 }
 
                 if (line.length() == 0) {
@@ -306,7 +310,12 @@ public class PgDumpLoader {
 
                 String columnName = line.substring(0, line.indexOf(" "));
                 PgColumn column = table.getColumn(columnName);
-                column.setDefinition(line.substring(line.indexOf(" ")).trim());
+                column.parseDefinition(
+                        line.substring(line.indexOf(" ")).trim());
+
+                if (last) {
+                    break;
+                }
             }
         } catch (IOException ex) {
             ex.printStackTrace();
