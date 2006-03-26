@@ -76,7 +76,7 @@ public class PgDiff {
                         || !constraintNames1.contains(constraintName)) {
                     System.out.println("\nALTER TABLE " + tableName);
                     System.out.println(
-                            "\tCREATE CONSTRAINT " + constraintName + " "
+                            "\tADD CONSTRAINT " + constraintName + " "
                             + constraints2.get(constraintName).getDefinition()
                             + ";");
                 }
