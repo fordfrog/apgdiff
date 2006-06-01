@@ -1,10 +1,5 @@
 /*
- * PgDumpLoader.java
- *
- * Created on 23. bøezen 2006, 13:33
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
+ * $CVSHeader$
  */
 package cz.startnet.utils.pgdiff;
 
@@ -18,7 +13,9 @@ import java.io.UnsupportedEncodingException;
 
 /**
  * Loads PostgreSQL dump into classes.
+ *
  * @author fordfrog
+ * @version $CVSHeader$
  */
 public class PgDumpLoader {
     /**
@@ -29,7 +26,15 @@ public class PgDumpLoader {
 
     /**
      * Loads schema from dump file.
+     *
      * @param file name of file containing the dump
+     *
+     * @return schema from dump file
+     *
+     * @throws UnsupportedOperationException Thrown if encoding is not
+     *         supported.
+     * @throws RuntimeException Thrown if file not found or problem occured
+     *         while reading the file.
      */
     public static PgSchema loadSchema(String file) {
         PgSchema schema = new PgSchema();
@@ -43,7 +48,7 @@ public class PgDumpLoader {
                                 "UTF-8"));
         } catch (UnsupportedEncodingException ex) {
             ex.printStackTrace();
-            throw new RuntimeException("Unsupported encoding");
+            throw new UnsupportedOperationException("Unsupported encoding");
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
             throw new RuntimeException("File '" + file + "' not found");
@@ -91,7 +96,11 @@ public class PgDumpLoader {
 
     /**
      * Reads current reader till end of command is reached.
+     *
      * @param reader reader to be read
+     *
+     * @throws RuntimeException Thrown if problem occured while reading the
+     *         file.
      */
     private static void moveToEndOfCommand(BufferedReader reader) {
         String line = null;
@@ -110,9 +119,13 @@ public class PgDumpLoader {
 
     /**
      * Processes ALTER TABLE command.
+     *
      * @param schema schema to be filled
      * @param reader reader of the dump file
      * @param line first line read
+     *
+     * @throws RuntimeException Thrown if problem occured while reading the
+     *         file or while parsing the file.
      */
     private static void processAlterTable(
         PgSchema schema,
@@ -172,6 +185,7 @@ public class PgDumpLoader {
 
     /**
      * Processes COMMENT command.
+     *
      * @param schema schema to be filled
      * @param reader reader of the dump file
      * @param line first line read
@@ -187,9 +201,13 @@ public class PgDumpLoader {
 
     /**
      * Processes CREATE INDEX command.
+     *
      * @param schema schema to be filled
      * @param reader reader of the dump file
      * @param line first line read
+     *
+     * @throws RuntimeException Thrown if problem occured while parsing the
+     *         command.
      */
     private static void processCreateIndex(
         PgSchema schema,
@@ -226,9 +244,13 @@ public class PgDumpLoader {
 
     /**
      * Processes CREATE SEQUENCE command.
+     *
      * @param schema schema to be filled
      * @param reader reader of the dump file
      * @param line first line read
+     *
+     * @throws RuntimeException Thrown if problem occured while parsing the
+     *         command.
      */
     private static void processCreateSequence(
         PgSchema schema,
@@ -272,9 +294,13 @@ public class PgDumpLoader {
 
     /**
      * Processes CREATE TABLE command.
+     *
      * @param schema schema to be filled
      * @param reader reader of the dump file
      * @param line first line read
+     *
+     * @throws RuntimeException Thrown if problem occured while parsing the
+     *         command.
      */
     private static void processCreateTable(
         PgSchema schema,
@@ -330,6 +356,7 @@ public class PgDumpLoader {
 
     /**
      * Processes '--' comment.
+     *
      * @param schema schema to be filled
      * @param reader reader of the dump file
      * @param line first line read
@@ -342,6 +369,7 @@ public class PgDumpLoader {
 
     /**
      * Processes GRANT command.
+     *
      * @param schema schema to be filled
      * @param reader reader of the dump file
      * @param line first line read
@@ -357,6 +385,7 @@ public class PgDumpLoader {
 
     /**
      * Processes INSERT INTO command.
+     *
      * @param schema schema to be filled
      * @param reader reader of the dump file
      * @param line first line read
@@ -372,6 +401,7 @@ public class PgDumpLoader {
 
     /**
      * Processes REVOKE command.
+     *
      * @param schema schema to be filled
      * @param reader reader of the dump file
      * @param line first line read
@@ -387,6 +417,7 @@ public class PgDumpLoader {
 
     /**
      * Processes SELECT command.
+     *
      * @param schema schema to be filled
      * @param reader reader of the dump file
      * @param line first line read
@@ -402,6 +433,7 @@ public class PgDumpLoader {
 
     /**
      * Processes SET command.
+     *
      * @param schema schema to be filled
      * @param reader reader of the dump file
      * @param line first line read

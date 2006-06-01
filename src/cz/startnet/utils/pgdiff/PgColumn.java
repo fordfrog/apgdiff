@@ -1,20 +1,38 @@
 /*
- * PgColumn.java
- *
- * Created on 23. bøezen 2006, 9:58
+ * $CVSHeader$
  */
 package cz.startnet.utils.pgdiff;
 
-
 /**
  * Stores column information.
+ *
  * @author fordfrog
+ * @version $CVSHeader$
  */
 public class PgColumn {
+    /**
+     * Column constraint.
+     */
     private String constraint = null;
+
+    /**
+     * Default value of the column.
+     */
     private String defaultValue = null;
+
+    /**
+     * Name of the column.
+     */
     private String name = null;
+
+    /**
+     * Type of the column.
+     */
     private String type = null;
+
+    /**
+     * Determines whether null value is allowed in the column.
+     */
     private boolean nullValue = true;
 
     /**
@@ -23,26 +41,56 @@ public class PgColumn {
     public PgColumn() {
     }
 
+    /**
+     * Creates a new PgColumn object.
+     *
+     * @param name name of the column
+     */
     public PgColumn(String name) {
         this.name = name;
     }
 
+    /**
+     * Setter for {@link #constraint constraint}.
+     *
+     * @param constraint {@link #constraint constraint}
+     */
     public void setConstraint(String constraint) {
         this.constraint = constraint;
     }
 
+    /**
+     * Getter for {@link #constraint constraint}.
+     *
+     * @return {@link #constraint constraint}
+     */
     public String getConstraint() {
         return constraint;
     }
 
+    /**
+     * Setter for {@link #defaultValue defaultValue}.
+     *
+     * @param defaultValue {@link #defaultValue defaultValue}
+     */
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
     }
 
+    /**
+     * Getter for {@link #defaultValue defaultValue}.
+     *
+     * @return {@link #defaultValue defaultValue}
+     */
     public String getDefaultValue() {
         return defaultValue;
     }
 
+    /**
+     * Returns full definition of the column.
+     *
+     * @return full definition of the column
+     */
     public String getFullDefinition() {
         StringBuilder sbDefinition = new StringBuilder();
         sbDefinition.append(name + " " + type);
@@ -62,30 +110,65 @@ public class PgColumn {
         return sbDefinition.toString();
     }
 
+    /**
+     * Setter for {@link #name name}.
+     *
+     * @param name {@link #name name}
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Getter for {@link #name name}.
+     *
+     * @return {@link #name name}
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Setter for {@link #nullValue nullValue}.
+     *
+     * @param nullValue {@link #nullValue nullValue}
+     */
     public void setNullValue(boolean nullValue) {
         this.nullValue = nullValue;
     }
 
+    /**
+     * Getter for {@link #nullValue nullValue}.
+     *
+     * @return {@link #nullValue nullValue}
+     */
     public boolean getNullValue() {
         return nullValue;
     }
 
+    /**
+     * Setter for {@link #type type}.
+     *
+     * @param type {@link #type type}
+     */
     public void setType(String type) {
         this.type = type;
     }
 
+    /**
+     * Getter for {@link #type type}.
+     *
+     * @return {@link #type type}
+     */
     public String getType() {
         return type;
     }
 
+    /**
+     * Parses definition of the column
+     *
+     * @param definition definition of the column
+     */
     public void parseDefinition(String definition) {
         if (definition.startsWith("timestamp without time zone")) {
             type = "timestamp without time zone";

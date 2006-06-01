@@ -1,7 +1,5 @@
 /*
- * PgDiff.java
- *
- * Created on 22. bøezen 2006, 20:59
+ * $CVSHeader$
  */
 package cz.startnet.utils.pgdiff;
 
@@ -13,7 +11,9 @@ import java.util.Set;
 
 /**
  * Creates diff of two schemas.
+ *
  * @author fordfrog
+ * @version $CVSHeader$
  */
 public class PgDiff {
     /**
@@ -24,6 +24,7 @@ public class PgDiff {
 
     /**
      * Creates diff on the two schemas.
+     *
      * @param file1 name of file containing dump of the original schema
      * @param file2 name of file containing dump of the new schema
      */
@@ -35,6 +36,7 @@ public class PgDiff {
 
     /**
      * Creates diff of table constraints.
+     *
      * @param schema1 original schema
      * @param schema2 new schema
      */
@@ -110,6 +112,7 @@ public class PgDiff {
 
     /**
      * Creates diff of table indexes.
+     *
      * @param schema1 original schema
      * @param schema2 new schema
      */
@@ -175,6 +178,7 @@ public class PgDiff {
 
     /**
      * Creates diff from comparison of two schemas.
+     *
      * @param schema1 original schema
      * @param schema2 new schema
      */
@@ -187,6 +191,7 @@ public class PgDiff {
 
     /**
      * Creates diff of table sequences.
+     *
      * @param schema1 original schema
      * @param schema2 new schema
      */
@@ -231,6 +236,7 @@ public class PgDiff {
 
     /**
      * Creates diff of tables.
+     *
      * @param schema1 original schema
      * @param schema2 new schema
      */
