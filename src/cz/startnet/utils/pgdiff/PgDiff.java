@@ -136,7 +136,7 @@ public class PgDiff {
             if (tableNames1.contains(tableName)) {
                 for (String indexName : indexNames1) {
                     if (!indexNames2.contains(indexName)) {
-                        System.out.println("DROP INDEX " + indexName + ";");
+                        System.out.println("\nDROP INDEX " + indexName + ";");
                     }
                 }
             }
