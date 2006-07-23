@@ -1,0 +1,202 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+        
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>cz.startnet.utils.apgdiff</groupId>
+    <artifactId>apgdiff</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0.0_beta6</version>
+    <name>Another PostgreSQL Diff Tool</name>
+    <description>Simple PostgreSQL diff tool that is useful for schema upgrades. The tool compares two schema dump files and creates output file that is (after some hand-made modifications) suitable for upgrade of old schema.</description>
+    <url>http://apgdiff.sourceforge.net</url>
+    <inceptionYear>2006</inceptionYear>
+    
+    <organization>
+        <name>StartNet s.r.o.</name>
+        <url>http://www.startnet.cz</url>
+    </organization>
+    
+    <issueManagement>
+        <system>SouceForge Tracker</system>
+        <url>http://sourceforge.net/tracker/?group_id=163508</url>
+    </issueManagement>
+    
+    <scm>
+        <connection>scm:cvs:pserver:anonymous@apgdiff.cvs.sourceforge.net:/cvsroot/apgdiff:apgdiff</connection>
+        <developerConnection>scm:cvs:ext:username@apgdiff.cvs.sourceforge.net:/cvsroot/apgdiff/:apgdiff</developerConnection>
+        <url>http://apgdiff.cvs.sourceforge.net/apgdiff</url>
+    </scm>
+    
+    <licenses>
+        <license>
+            <name>Another PostgreSQL Diff Tool License</name>
+            <url>http://apgdiff.sourceforge.net/license.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    
+    <developers>
+        <developer>
+            <id>fordfrog</id>
+            <email>miroslav.sulc@startnet.cz</email>
+            <name>Miroslav Šulc</name>
+            <organization>StartNet s.r.o.</organization>
+            <organizationUrl>http://www.startnet.cz</organizationUrl>
+            <roles>
+                <role>main developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+            <!--
+            <plugin>
+               <groupId>org.codehaus.mojo</groupId>
+               <artifactId>jalopy-maven-plugin</artifactId>
+            </plugin>
+            -->
+        </plugins>
+    </build>
+    
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <minmemory>128m</minmemory>
+                    <maxmemory>512</maxmemory>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                    <tags>
+                        <tag>
+                            <name>todo</name>
+                            <placement>a</placement>
+                            <head>To do something:</head>
+                        </tag>
+                    </tags>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <configuration>
+                    <sourceEncoding>utf-8</sourceEncoding>
+                    <targetJdk>1.5</targetJdk>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>taglist-maven-plugin</artifactId>
+                <!--
+                <configuration>
+                    <tags>TODO,@todo,FIXME,@deprecated</tags>
+                </configuration>
+                -->
+            </plugin>
+            <!--
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jdepend-maven-plugin</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </plugin>
+            -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>changelog-maven-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <id>all-reports</id>
+                        <configuration>
+                        <type>range</type>
+                        <range>30</range>
+                        </configuration>
+                        <reports>
+                            <report>changelog</report>
+                            <report>file-activity</report>
+                            <report>dev-activity</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
+            <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-jxr-plugin</artifactId>
+                  <configuration>
+                      <inputEncoding>UTF-8</inputEncoding>
+                      <outputEncoding>UTF-8</outputEncoding>
+                  </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <configuration>
+                    <threshold>Ignore</threshold>
+                    <effort>Max</effort>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+    
+    <pluginRepositories>
+        <pluginRepository>
+            <id>codehaus-plugins</id>
+            <name>codehaus-plugins</name>
+            <url>http://repository.codehaus.org/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+        <pluginRepository>
+            <id>codehaus-snapshot-plugins</id>
+            <name>codehaus-shapshot-plugins</name>
+            <url>http://snapshots.repository.codehaus.org/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
+    
+    <distributionManagement>
+        <site>
+            <id>website</id>
+            <name>SourceForge.Net</name>
+            <url>scp://shell.sourceforge.net/home/groups/a/ap/apgdiff/htdocs/</url>
+        </site>
+    </distributionManagement>
+    
+</project>
