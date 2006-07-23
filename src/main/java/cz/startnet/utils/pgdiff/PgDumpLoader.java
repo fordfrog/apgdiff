@@ -19,6 +19,11 @@ import java.io.UnsupportedEncodingException;
  */
 public class PgDumpLoader {
     /**
+     * Info text for IO exception.
+     */
+    private static final String IO_EXCEPTION = "IO exception";
+
+    /**
      * Creates a new instance of PgDumpLoader.
      */
     private PgDumpLoader() {
@@ -60,14 +65,13 @@ public class PgDumpLoader {
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
 
+                // '--' comments are ignored
                 if (line.length() == 0) {
                     continue;
-                } else if (line.startsWith("--")) {
-                    processDashComment(schema, reader, line);
                 } else if (line.startsWith("SET ")) {
-                    processSet(schema, reader, line);
+                    processSet(reader, line);
                 } else if (line.startsWith("COMMENT ")) {
-                    processComment(schema, reader, line);
+                    processComment(reader, line);
                 } else if (line.startsWith("CREATE TABLE ")) {
                     processCreateTable(schema, reader, line);
                 } else if (line.startsWith("ALTER TABLE ")) {
@@ -75,20 +79,20 @@ public class PgDumpLoader {
                 } else if (line.startsWith("CREATE SEQUENCE ")) {
                     processCreateSequence(schema, reader, line);
                 } else if (line.startsWith("SELECT ")) {
-                    processSelect(schema, reader, line);
+                    processSelect(reader, line);
                 } else if (line.startsWith("INSERT INTO ")) {
-                    processInsertInto(schema, reader, line);
+                    processInsertInto(reader, line);
                 } else if (line.startsWith("CREATE INDEX ")) {
-                    processCreateIndex(schema, reader, line);
+                    processCreateIndex(schema, line);
                 } else if (line.startsWith("REVOKE ")) {
-                    processRevoke(schema, reader, line);
+                    processRevoke(reader, line);
                 } else if (line.startsWith("GRANT ")) {
-                    processGrant(schema, reader, line);
+                    processGrant(reader, line);
                 }
             }
         } catch (IOException ex) {
             ex.printStackTrace();
-            throw new RuntimeException("IO exception");
+            throw new RuntimeException(IO_EXCEPTION);
         }
 
         return schema;
@@ -113,7 +117,7 @@ public class PgDumpLoader {
             }
         } catch (IOException ex) {
             ex.printStackTrace();
-            throw new RuntimeException("IO exception");
+            throw new RuntimeException(IO_EXCEPTION);
         }
     }
 
@@ -174,7 +178,7 @@ public class PgDumpLoader {
             }
         } catch (IOException ex) {
             ex.printStackTrace();
-            throw new RuntimeException("IO exception");
+            throw new RuntimeException(IO_EXCEPTION);
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new RuntimeException(
@@ -186,14 +190,10 @@ public class PgDumpLoader {
     /**
      * Processes COMMENT command.
      *
-     * @param schema schema to be filled
      * @param reader reader of the dump file
      * @param line first line read
      */
-    private static void processComment(
-        PgSchema schema,
-        BufferedReader reader,
-        String line) {
+    private static void processComment(BufferedReader reader, String line) {
         if (!line.endsWith(";")) {
             moveToEndOfCommand(reader);
         }
@@ -203,16 +203,12 @@ public class PgDumpLoader {
      * Processes CREATE INDEX command.
      *
      * @param schema schema to be filled
-     * @param reader reader of the dump file
      * @param line first line read
      *
      * @throws RuntimeException Thrown if problem occured while parsing the
      *         command.
      */
-    private static void processCreateIndex(
-        PgSchema schema,
-        BufferedReader reader,
-        String line) {
+    private static void processCreateIndex(PgSchema schema, String line) {
         String origLine = line;
         String indexName = null;
 
@@ -280,7 +276,7 @@ public class PgDumpLoader {
             }
         } catch (IOException ex) {
             ex.printStackTrace();
-            throw new RuntimeException("IO exception");
+            throw new RuntimeException(IO_EXCEPTION);
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new RuntimeException(
@@ -345,7 +341,7 @@ public class PgDumpLoader {
             }
         } catch (IOException ex) {
             ex.printStackTrace();
-            throw new RuntimeException("IO exception");
+            throw new RuntimeException(IO_EXCEPTION);
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new RuntimeException(
@@ -355,29 +351,12 @@ public class PgDumpLoader {
     }
 
     /**
-     * Processes '--' comment.
-     *
-     * @param schema schema to be filled
-     * @param reader reader of the dump file
-     * @param line first line read
-     */
-    private static void processDashComment(
-        PgSchema schema,
-        BufferedReader reader,
-        String line) {
-    }
-
-    /**
      * Processes GRANT command.
      *
-     * @param schema schema to be filled
      * @param reader reader of the dump file
      * @param line first line read
      */
-    private static void processGrant(
-        PgSchema schema,
-        BufferedReader reader,
-        String line) {
+    private static void processGrant(BufferedReader reader, String line) {
         if (!line.endsWith(";")) {
             moveToEndOfCommand(reader);
         }
@@ -386,14 +365,10 @@ public class PgDumpLoader {
     /**
      * Processes INSERT INTO command.
      *
-     * @param schema schema to be filled
      * @param reader reader of the dump file
      * @param line first line read
      */
-    private static void processInsertInto(
-        PgSchema schema,
-        BufferedReader reader,
-        String line) {
+    private static void processInsertInto(BufferedReader reader, String line) {
         if (!line.endsWith(";")) {
             moveToEndOfCommand(reader);
         }
@@ -402,14 +377,10 @@ public class PgDumpLoader {
     /**
      * Processes REVOKE command.
      *
-     * @param schema schema to be filled
      * @param reader reader of the dump file
      * @param line first line read
      */
-    private static void processRevoke(
-        PgSchema schema,
-        BufferedReader reader,
-        String line) {
+    private static void processRevoke(BufferedReader reader, String line) {
         if (!line.endsWith(";")) {
             moveToEndOfCommand(reader);
         }
@@ -418,14 +389,10 @@ public class PgDumpLoader {
     /**
      * Processes SELECT command.
      *
-     * @param schema schema to be filled
      * @param reader reader of the dump file
      * @param line first line read
      */
-    private static void processSelect(
-        PgSchema schema,
-        BufferedReader reader,
-        String line) {
+    private static void processSelect(BufferedReader reader, String line) {
         if (!line.endsWith(";")) {
             moveToEndOfCommand(reader);
         }
@@ -434,14 +401,10 @@ public class PgDumpLoader {
     /**
      * Processes SET command.
      *
-     * @param schema schema to be filled
      * @param reader reader of the dump file
      * @param line first line read
      */
-    private static void processSet(
-        PgSchema schema,
-        BufferedReader reader,
-        String line) {
+    private static void processSet(BufferedReader reader, String line) {
         if (!line.endsWith(";")) {
             moveToEndOfCommand(reader);
         }
