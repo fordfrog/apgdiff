@@ -49,6 +49,9 @@
           <target>1.5</target>
         </configuration>
       </plugin>
+      <plugin>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+      </plugin>
     </plugins>
   </build>
   <profiles>
@@ -118,7 +121,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.1</version>
+      <version>4.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
