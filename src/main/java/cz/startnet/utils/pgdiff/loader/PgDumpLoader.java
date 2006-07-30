@@ -7,6 +7,7 @@ import cz.startnet.utils.pgdiff.schema.PgColumn;
 import cz.startnet.utils.pgdiff.schema.PgConstraint;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -20,6 +21,8 @@ import java.io.UnsupportedEncodingException;
  *
  * @author fordfrog
  * @version $CVSHeader$
+ *
+ * @todo Needs review.
  */
 public class PgDumpLoader {
     /**
