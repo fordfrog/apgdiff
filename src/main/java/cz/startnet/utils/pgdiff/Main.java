@@ -12,9 +12,10 @@ package cz.startnet.utils.pgdiff;
  */
 public class Main {
     /**
-     * Creates a new instance of Main.
+     * Creates a new Main object.
      */
-    public Main() {
+    private Main() {
+        super();
     }
 
     /**
@@ -22,11 +23,11 @@ public class Main {
      *
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-        if (args.length != 2) {
-            System.out.println("Usage: apgdiff <old_dump> <new_dump>");
-        } else {
+    public static void main(final String[] args) {
+        if (args.length == 2) {
             PgDiff.createDiff(args[0], args[1]);
+        } else {
+            System.out.println("Usage: apgdiff <old_dump> <new_dump>");
         }
     }
 }
