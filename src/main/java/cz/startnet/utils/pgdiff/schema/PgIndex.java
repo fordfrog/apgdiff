@@ -1,7 +1,7 @@
 /*
  * $CVSHeader$
  */
-package cz.startnet.utils.pgdiff;
+package cz.startnet.utils.pgdiff.schema;
 
 /**
  * Stores table index information.
@@ -21,18 +21,12 @@ public class PgIndex {
     private String name = null;
 
     /**
-     * Creates a new instance of PgIndex.
-     */
-    public PgIndex() {
-    }
-
-    /**
      * Creates a new PgIndex object.
      *
      * @param name name of the index
      */
-    public PgIndex(String name) {
-        this.setName(name);
+    public PgIndex(final String name) {
+        this.name = name;
     }
 
     /**
@@ -40,7 +34,7 @@ public class PgIndex {
      *
      * @param definition {@link #definition definition}
      */
-    public void setDefinition(String definition) {
+    public void setDefinition(final String definition) {
         this.definition = definition;
     }
 
@@ -58,7 +52,7 @@ public class PgIndex {
      *
      * @param name {@link #name name}
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 

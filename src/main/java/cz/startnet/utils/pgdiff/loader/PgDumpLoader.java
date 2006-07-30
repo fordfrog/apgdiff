@@ -1,8 +1,12 @@
 /*
  * $CVSHeader$
  */
-package cz.startnet.utils.pgdiff;
+package cz.startnet.utils.pgdiff.loader;
 
+import cz.startnet.utils.pgdiff.schema.PgColumn;
+import cz.startnet.utils.pgdiff.schema.PgConstraint;
+import cz.startnet.utils.pgdiff.schema.PgSchema;
+import cz.startnet.utils.pgdiff.schema.PgTable;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,6 +31,7 @@ public class PgDumpLoader {
      * Creates a new instance of PgDumpLoader.
      */
     private PgDumpLoader() {
+        super();
     }
 
     /**
@@ -41,8 +46,8 @@ public class PgDumpLoader {
      * @throws RuntimeException Thrown if file not found or problem occured
      *         while reading the file.
      */
-    public static PgSchema loadSchema(String file) {
-        PgSchema schema = new PgSchema();
+    public static PgSchema loadSchema(final String file) {
+        final PgSchema schema = new PgSchema();
         BufferedReader reader = null;
 
         try {
@@ -52,21 +57,21 @@ public class PgDumpLoader {
                                 new FileInputStream(file),
                                 "UTF-8"));
         } catch (UnsupportedEncodingException ex) {
-            ex.printStackTrace();
-            throw new UnsupportedOperationException("Unsupported encoding");
+            throw new UnsupportedOperationException("Unsupported encoding", ex);
         } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-            throw new RuntimeException("File '" + file + "' not found");
+            throw new RuntimeException("File '" + file + "' not found", ex);
         }
 
-        String line = null;
-
         try {
-            while ((line = reader.readLine()) != null) {
+            String line = reader.readLine();
+
+            while (line != null) {
                 line = line.trim();
 
                 // '--' comments are ignored
                 if (line.length() == 0) {
+                    line = reader.readLine();
+
                     continue;
                 } else if (line.startsWith("SET ")) {
                     processSet(reader, line);
@@ -89,10 +94,11 @@ public class PgDumpLoader {
                 } else if (line.startsWith("GRANT ")) {
                     processGrant(reader, line);
                 }
+
+                line = reader.readLine();
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
-            throw new RuntimeException(IO_EXCEPTION);
+            throw new RuntimeException(IO_EXCEPTION, ex);
         }
 
         return schema;
@@ -106,18 +112,21 @@ public class PgDumpLoader {
      * @throws RuntimeException Thrown if problem occured while reading the
      *         file.
      */
-    private static void moveToEndOfCommand(BufferedReader reader) {
+    private static void moveToEndOfCommand(final BufferedReader reader) {
         String line = null;
 
         try {
-            while ((line = reader.readLine()) != null) {
+            line = reader.readLine();
+
+            while (line != null) {
                 if (line.trim().endsWith(";")) {
                     break;
                 }
+
+                line = reader.readLine();
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
-            throw new RuntimeException(IO_EXCEPTION);
+            throw new RuntimeException(IO_EXCEPTION, ex);
         }
     }
 
@@ -132,14 +141,14 @@ public class PgDumpLoader {
      *         file or while parsing the file.
      */
     private static void processAlterTable(
-        PgSchema schema,
-        BufferedReader reader,
-        String line) {
+        final PgSchema schema,
+        final BufferedReader reader,
+        final String line) {
         if (line.matches("^ALTER TABLE .* OWNER TO .*;$")) {
             return;
         }
 
-        String tableName = null;
+        final String tableName;
 
         if (line.startsWith("ALTER TABLE ONLY ")) {
             tableName = line.substring("ALTER TABLE ONLY ".length()).trim();
@@ -147,43 +156,47 @@ public class PgDumpLoader {
             tableName = line.substring("ALTER TABLE ".length()).trim();
         }
 
-        PgTable table = schema.getTable(tableName);
+        final PgTable table = schema.getTable(tableName);
         String origLine = null;
 
         try {
-            while ((line = reader.readLine()) != null) {
-                boolean last = false;
-                origLine = line;
-                line = line.trim();
+            String newLine = reader.readLine();
 
-                if (line.endsWith(";")) {
+            while (newLine != null) {
+                boolean last = false;
+                origLine = newLine;
+                newLine = newLine.trim();
+
+                if (newLine.endsWith(";")) {
                     last = true;
-                    line = line.substring(0, line.length() - 1);
+                    newLine = newLine.substring(0, newLine.length() - 1);
                 }
 
-                if (line.startsWith("ADD CONSTRAINT ")) {
-                    line = line.substring("ADD CONSTRAINT ".length()).trim();
+                if (newLine.startsWith("ADD CONSTRAINT ")) {
+                    newLine = newLine.substring("ADD CONSTRAINT ".length())
+                                     .trim();
 
-                    String constraintName =
-                        line.substring(0, line.indexOf(" ")).trim();
-                    PgConstraint constraint =
+                    final String constraintName =
+                        newLine.substring(0, newLine.indexOf(' ')).trim();
+                    final PgConstraint constraint =
                         table.getConstraint(constraintName);
                     constraint.setDefinition(
-                            line.substring(line.indexOf(" ")).trim());
+                            newLine.substring(newLine.indexOf(' ')).trim());
                 }
 
                 if (last) {
                     break;
                 }
+
+                newLine = reader.readLine();
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
-            throw new RuntimeException(IO_EXCEPTION);
+            throw new RuntimeException(IO_EXCEPTION, ex);
         } catch (Exception ex) {
-            ex.printStackTrace();
             throw new RuntimeException(
                     "Cannot parse ALTER TABLE '" + tableName + "', line '"
-                    + origLine + "'");
+                    + origLine + "'",
+                    ex);
         }
     }
 
@@ -193,7 +206,9 @@ public class PgDumpLoader {
      * @param reader reader of the dump file
      * @param line first line read
      */
-    private static void processComment(BufferedReader reader, String line) {
+    private static void processComment(
+        final BufferedReader reader,
+        final String line) {
         if (!line.endsWith(";")) {
             moveToEndOfCommand(reader);
         }
@@ -208,32 +223,36 @@ public class PgDumpLoader {
      * @throws RuntimeException Thrown if problem occured while parsing the
      *         command.
      */
-    private static void processCreateIndex(PgSchema schema, String line) {
-        String origLine = line;
+    private static void processCreateIndex(
+        final PgSchema schema,
+        final String line) {
+        final String origLine = line;
         String indexName = null;
+        String newLine = line;
 
         try {
-            line = line.substring("CREATE INDEX ".length()).trim();
+            newLine = newLine.substring("CREATE INDEX ".length()).trim();
 
-            if (line.endsWith(";")) {
-                line = line.substring(0, line.length() - 1).trim();
+            if (newLine.endsWith(";")) {
+                newLine = newLine.substring(0, newLine.length() - 1).trim();
             }
 
-            indexName = line.substring(0, line.indexOf(" ")).trim();
-            line = line.substring(indexName.length()).trim();
+            indexName = newLine.substring(0, newLine.indexOf(' ')).trim();
+            newLine = newLine.substring(indexName.length()).trim();
 
-            if (line.startsWith("ON ")) {
-                line = line.substring("ON ".length()).trim();
+            if (newLine.startsWith("ON ")) {
+                newLine = newLine.substring("ON ".length()).trim();
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
             throw new RuntimeException(
                     "Cannot parse CREATE INDEX '" + indexName + "', line '"
-                    + origLine + "'");
+                    + origLine + "'",
+                    ex);
         }
 
-        String tableName = line.substring(0, line.indexOf(" ")).trim();
-        String definition = line.substring(tableName.length()).trim();
+        final String tableName =
+            newLine.substring(0, newLine.indexOf(' ')).trim();
+        final String definition = newLine.substring(tableName.length()).trim();
         schema.getTable(tableName).getIndex(indexName).setDefinition(
                 definition);
     }
@@ -249,39 +268,42 @@ public class PgDumpLoader {
      *         command.
      */
     private static void processCreateSequence(
-        PgSchema schema,
-        BufferedReader reader,
-        String line) {
-        String sequenceName =
+        final PgSchema schema,
+        final BufferedReader reader,
+        final String line) {
+        final String sequenceName =
             line.substring("CREATE SEQUENCE ".length()).trim();
-        StringBuilder sbDefinition = new StringBuilder();
+        final StringBuilder sbDefinition = new StringBuilder();
         String origLine = null;
 
         try {
-            while ((line = reader.readLine()) != null) {
-                boolean last = false;
-                origLine = line;
-                line = line.trim();
+            String newLine = reader.readLine();
 
-                if (line.endsWith(";")) {
+            while (newLine != null) {
+                boolean last = false;
+                origLine = newLine;
+                newLine = newLine.trim();
+
+                if (newLine.endsWith(";")) {
                     last = true;
-                    line = line.substring(0, line.length() - 1);
+                    newLine = newLine.substring(0, newLine.length() - 1);
                 }
 
-                sbDefinition.append(line + " ");
+                sbDefinition.append(newLine + " ");
 
                 if (last) {
                     break;
                 }
+
+                newLine = reader.readLine();
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
-            throw new RuntimeException(IO_EXCEPTION);
+            throw new RuntimeException(IO_EXCEPTION, ex);
         } catch (Exception ex) {
-            ex.printStackTrace();
             throw new RuntimeException(
                     "Cannot parse CREATE SEQUENCE '" + sequenceName
-                    + "', line '" + origLine + "'");
+                    + "', line '" + origLine + "'",
+                    ex);
         }
 
         schema.getSequence(sequenceName)
@@ -299,54 +321,60 @@ public class PgDumpLoader {
      *         command.
      */
     private static void processCreateTable(
-        PgSchema schema,
-        BufferedReader reader,
-        String line) {
+        final PgSchema schema,
+        final BufferedReader reader,
+        final String line) {
         String tableName = line.substring("CREATE TABLE ".length()).trim();
 
         if (tableName.endsWith("(")) {
             tableName = tableName.substring(0, tableName.length() - 1).trim();
         }
 
-        PgTable table = schema.getTable(tableName);
+        final PgTable table = schema.getTable(tableName);
         String origLine = null;
 
         try {
-            while ((line = reader.readLine()) != null) {
-                boolean last = false;
-                origLine = line;
-                line = line.trim();
+            String newLine = reader.readLine();
 
-                if (line.contentEquals(");")) {
+            while (newLine != null) {
+                boolean last = false;
+                origLine = newLine;
+                newLine = newLine.trim();
+
+                if (newLine.contentEquals(");")) {
                     break;
-                } else if (line.endsWith(",")) {
-                    line = line.substring(0, line.length() - 1).trim();
-                } else if (line.endsWith(");")) {
-                    line = line.substring(0, line.length() - 2).trim();
+                } else if (newLine.endsWith(",")) {
+                    newLine = newLine.substring(0, newLine.length() - 1).trim();
+                } else if (newLine.endsWith(");")) {
+                    newLine = newLine.substring(0, newLine.length() - 2).trim();
                     last = true;
                 }
 
-                if (line.length() == 0) {
+                if (newLine.length() == 0) {
+                    newLine = reader.readLine();
+
                     continue;
                 }
 
-                String columnName = line.substring(0, line.indexOf(" "));
-                PgColumn column = table.getColumn(columnName);
+                final String columnName =
+                    newLine.substring(0, newLine.indexOf(' '));
+                final PgColumn column = table.getColumn(columnName);
                 column.parseDefinition(
-                        line.substring(line.indexOf(" ")).trim());
+                        newLine.substring(newLine.indexOf(' ')).trim());
 
                 if (last) {
                     break;
                 }
+
+                newLine = reader.readLine();
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
-            throw new RuntimeException(IO_EXCEPTION);
+            throw new RuntimeException(IO_EXCEPTION, ex);
         } catch (Exception ex) {
-            ex.printStackTrace();
             throw new RuntimeException(
                     "Cannot parse CREATE TABLE '" + tableName + "', line '"
-                    + origLine + "'");
+                    + origLine + "'",
+                    ex);
         }
     }
 
@@ -356,7 +384,9 @@ public class PgDumpLoader {
      * @param reader reader of the dump file
      * @param line first line read
      */
-    private static void processGrant(BufferedReader reader, String line) {
+    private static void processGrant(
+        final BufferedReader reader,
+        final String line) {
         if (!line.endsWith(";")) {
             moveToEndOfCommand(reader);
         }
@@ -368,7 +398,9 @@ public class PgDumpLoader {
      * @param reader reader of the dump file
      * @param line first line read
      */
-    private static void processInsertInto(BufferedReader reader, String line) {
+    private static void processInsertInto(
+        final BufferedReader reader,
+        final String line) {
         if (!line.endsWith(";")) {
             moveToEndOfCommand(reader);
         }
@@ -380,7 +412,9 @@ public class PgDumpLoader {
      * @param reader reader of the dump file
      * @param line first line read
      */
-    private static void processRevoke(BufferedReader reader, String line) {
+    private static void processRevoke(
+        final BufferedReader reader,
+        final String line) {
         if (!line.endsWith(";")) {
             moveToEndOfCommand(reader);
         }
@@ -392,7 +426,9 @@ public class PgDumpLoader {
      * @param reader reader of the dump file
      * @param line first line read
      */
-    private static void processSelect(BufferedReader reader, String line) {
+    private static void processSelect(
+        final BufferedReader reader,
+        final String line) {
         if (!line.endsWith(";")) {
             moveToEndOfCommand(reader);
         }
@@ -404,7 +440,9 @@ public class PgDumpLoader {
      * @param reader reader of the dump file
      * @param line first line read
      */
-    private static void processSet(BufferedReader reader, String line) {
+    private static void processSet(
+        final BufferedReader reader,
+        final String line) {
         if (!line.endsWith(";")) {
             moveToEndOfCommand(reader);
         }

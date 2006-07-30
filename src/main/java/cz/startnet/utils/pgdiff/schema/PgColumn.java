@@ -1,7 +1,7 @@
 /*
  * $CVSHeader$
  */
-package cz.startnet.utils.pgdiff;
+package cz.startnet.utils.pgdiff.schema;
 
 /**
  * Stores column information.
@@ -36,12 +36,6 @@ public class PgColumn {
     private boolean nullValue = true;
 
     /**
-     * Creates a new instance of PgColumn.
-     */
-    public PgColumn() {
-    }
-
-    /**
      * Creates a new PgColumn object.
      *
      * @param name name of the column
@@ -55,7 +49,7 @@ public class PgColumn {
      *
      * @param constraint {@link #constraint constraint}
      */
-    public void setConstraint(String constraint) {
+    public void setConstraint(final String constraint) {
         this.constraint = constraint;
     }
 
@@ -73,7 +67,7 @@ public class PgColumn {
      *
      * @param defaultValue {@link #defaultValue defaultValue}
      */
-    public void setDefaultValue(String defaultValue) {
+    public void setDefaultValue(final String defaultValue) {
         this.defaultValue = defaultValue;
     }
 
@@ -81,6 +75,8 @@ public class PgColumn {
      * Getter for {@link #defaultValue defaultValue}.
      *
      * @return {@link #defaultValue defaultValue}
+     *
+     * @todo Rewrite and improve.
      */
     public String getDefaultValue() {
         return defaultValue;
@@ -92,7 +88,7 @@ public class PgColumn {
      * @return full definition of the column
      */
     public String getFullDefinition() {
-        StringBuilder sbDefinition = new StringBuilder();
+        final StringBuilder sbDefinition = new StringBuilder();
         sbDefinition.append(name + " " + type);
 
         if ((defaultValue != null) && (defaultValue.length() > 0)) {
@@ -115,7 +111,7 @@ public class PgColumn {
      *
      * @param name {@link #name name}
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -133,7 +129,7 @@ public class PgColumn {
      *
      * @param nullValue {@link #nullValue nullValue}
      */
-    public void setNullValue(boolean nullValue) {
+    public void setNullValue(final boolean nullValue) {
         this.nullValue = nullValue;
     }
 
@@ -151,7 +147,7 @@ public class PgColumn {
      *
      * @param type {@link #type type}
      */
-    public void setType(String type) {
+    public void setType(final String type) {
         this.type = type;
     }
 
@@ -169,76 +165,75 @@ public class PgColumn {
      *
      * @param definition definition of the column
      */
-    public void parseDefinition(String definition) {
-        if (definition.startsWith("timestamp without time zone")) {
+    public void parseDefinition(final String definition) {
+        String def = definition;
+
+        if (def.startsWith("timestamp without time zone")) {
             type = "timestamp without time zone";
 
-            if (definition.contentEquals("timestamp without time zone")) {
-                definition = "";
+            if (def.contentEquals("timestamp without time zone")) {
+                def = "";
             } else {
-                definition =
-                    definition.substring(
-                            "timestamp without time zone".length()).trim();
+                def = def.substring("timestamp without time zone".length())
+                         .trim();
             }
-        } else if (definition.startsWith("character varying(")) {
-            if (definition.matches("^character varying\\([0-9]*\\)$")) {
-                type = definition;
-                definition = "";
+        } else if (def.startsWith("character varying(")) {
+            if (def.matches("^character varying\\([0-9]*\\)$")) {
+                type = def;
+                def = "";
             } else {
                 type =
-                    definition.substring(
+                    def.substring(
                             0,
-                            definition.indexOf(
-                                    " ",
-                                    "character varying(".length())).trim();
-                definition = definition.substring(type.length()).trim();
+                            def.indexOf(' ', "character varying(".length()))
+                       .trim();
+                def = def.substring(type.length()).trim();
             }
         } else {
-            if (definition.indexOf(" ") == -1) {
-                type = definition;
-                definition = "";
+            if (def.indexOf(' ') == -1) {
+                type = def;
+                def = "";
             } else {
-                type = definition.substring(0, definition.indexOf(" ")).trim();
-                definition = definition.substring(definition.indexOf(" ")).trim();
+                type = def.substring(0, def.indexOf(' ')).trim();
+                def = def.substring(def.indexOf(' ')).trim();
             }
         }
 
-        if (definition.startsWith("DEFAULT ")) {
-            definition = definition.substring("DEFAULT ".length()).trim();
+        if (def.startsWith("DEFAULT ")) {
+            def = def.substring("DEFAULT ".length()).trim();
 
-            if (definition.indexOf(" ") == -1) {
-                defaultValue = definition;
-                definition = "";
-            } else if (definition.matches(".*::character varying.*")) {
+            if (def.indexOf(' ') == -1) {
+                defaultValue = def;
+                def = "";
+            } else if (def.matches(".*::character varying.*")) {
                 defaultValue =
-                    definition.substring(
+                    def.substring(
                             0,
-                            definition.indexOf("::character varying")
+                            def.indexOf("::character varying")
                             + "::character varying".length()).trim();
-                definition = definition.substring(defaultValue.length()).trim();
+                def = def.substring(defaultValue.length()).trim();
             } else {
-                defaultValue = definition.substring(0, definition.indexOf(" "))
-                                         .trim();
-                definition = definition.substring(defaultValue.length()).trim();
+                defaultValue = def.substring(0, def.indexOf(' ')).trim();
+                def = def.substring(defaultValue.length()).trim();
             }
         }
 
-        if (definition.contentEquals("NULL")) {
+        if (def.contentEquals("NULL")) {
             nullValue = true;
-            definition = "";
-        } else if (definition.startsWith("NULL ")) {
+            def = "";
+        } else if (def.startsWith("NULL ")) {
             nullValue = true;
-            definition = definition.substring("NULL ".length()).trim();
-        } else if (definition.contentEquals("NOT NULL")) {
+            def = def.substring("NULL ".length()).trim();
+        } else if (def.contentEquals("NOT NULL")) {
             nullValue = false;
-            definition = "";
-        } else if (definition.startsWith("NOT NULL ")) {
+            def = "";
+        } else if (def.startsWith("NOT NULL ")) {
             nullValue = false;
-            definition = definition.substring("NOT NULL ".length()).trim();
+            def = def.substring("NOT NULL ".length()).trim();
         }
 
-        if (definition.length() > 0) {
-            constraint = definition;
+        if (def.length() > 0) {
+            constraint = def;
         }
     }
 }

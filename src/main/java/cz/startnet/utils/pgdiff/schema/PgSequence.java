@@ -1,7 +1,7 @@
 /*
  * $CVSHeader$
  */
-package cz.startnet.utils.pgdiff;
+package cz.startnet.utils.pgdiff.schema;
 
 /**
  * Stores sequence information.
@@ -21,17 +21,11 @@ public class PgSequence {
     private String name = null;
 
     /**
-     * Creates a new instance of PgSequence.
-     */
-    public PgSequence() {
-    }
-
-    /**
      * Creates a new PgSequence object.
      *
      * @param name name of the sequence
      */
-    public PgSequence(String name) {
+    public PgSequence(final String name) {
         this.name = name;
     }
 
@@ -40,7 +34,7 @@ public class PgSequence {
      *
      * @param definition {@link #definition definition}
      */
-    public void setDefinition(String definition) {
+    public void setDefinition(final String definition) {
         this.definition = definition;
     }
 
@@ -58,7 +52,7 @@ public class PgSequence {
      *
      * @param name {@link #name name}
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 

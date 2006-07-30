@@ -1,7 +1,7 @@
 /*
  * $CVSHeader$
  */
-package cz.startnet.utils.pgdiff;
+package cz.startnet.utils.pgdiff.schema;
 
 /**
  * Stores table constraint information.
@@ -21,12 +21,6 @@ public class PgConstraint {
     private String name = null;
 
     /**
-     * Creates a new instance of PgConstraint.
-     */
-    public PgConstraint() {
-    }
-
-    /**
      * Creates a new PgConstraint object.
      *
      * @param name name of the constraint
@@ -40,7 +34,7 @@ public class PgConstraint {
      *
      * @param definition {@link #definition definition}
      */
-    public void setDefinition(String definition) {
+    public void setDefinition(final String definition) {
         this.definition = definition;
     }
 
@@ -58,7 +52,7 @@ public class PgConstraint {
      *
      * @param name {@link #name name}
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -69,5 +63,15 @@ public class PgConstraint {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Returns true if this is a PRIMARY KEY constraint, otherwise
+     * false.
+     *
+     * @return true if this is a PRIMARY KEY constraint, otherwise false
+     */
+    public boolean isPrimaryKeyConstraint() {
+        return definition.contains("PRIMARY KEY");
     }
 }

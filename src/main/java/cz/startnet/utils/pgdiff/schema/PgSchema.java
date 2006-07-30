@@ -1,7 +1,7 @@
 /*
  * $CVSHeader$
  */
-package cz.startnet.utils.pgdiff;
+package cz.startnet.utils.pgdiff.schema;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,19 +17,13 @@ public class PgSchema {
     /**
      * Map of sequence names and sequence definitions.
      */
-    private Map<String, PgSequence> sequences =
+    private final Map<String, PgSequence> sequences = //NOPMD
         new HashMap<String, PgSequence>();
 
     /**
      * Map of table names and table definitions.
      */
-    private Map<String, PgTable> tables = new HashMap<String, PgTable>();
-
-    /**
-     * Creates a new instance of PgSchema.
-     */
-    public PgSchema() {
-    }
+    private final Map<String, PgTable> tables = new HashMap<String, PgTable>(); //NOPMD
 
     /**
      * Returns sequence with given name. If the sequence exists in the
@@ -40,7 +34,7 @@ public class PgSchema {
      *
      * @return existing or new sequence
      */
-    public PgSequence getSequence(String name) {
+    public PgSequence getSequence(final String name) {
         PgSequence sequence = null;
 
         if (sequences.containsKey(name)) {
@@ -71,7 +65,7 @@ public class PgSchema {
      *
      * @return existing or new table
      */
-    public PgTable getTable(String name) {
+    public PgTable getTable(final String name) {
         PgTable table = null;
 
         if (tables.containsKey(name)) {

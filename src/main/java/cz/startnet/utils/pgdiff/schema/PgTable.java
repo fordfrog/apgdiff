@@ -1,8 +1,9 @@
 /*
  * $CVSHeader$
  */
-package cz.startnet.utils.pgdiff;
+package cz.startnet.utils.pgdiff.schema;
 
+import cz.startnet.utils.pgdiff.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,29 +18,24 @@ public class PgTable {
     /**
      * Map of column names and columns.
      */
-    private Map<String, PgColumn> columns = new HashMap<String, PgColumn>();
+    private final Map<String, PgColumn> columns = //NOPMD
+        new HashMap<String, PgColumn>();
 
     /**
      * Map of constraint names and constraints.
      */
-    private Map<String, PgConstraint> constraints =
+    private final Map<String, PgConstraint> constraints = // NOPMD
         new HashMap<String, PgConstraint>();
 
     /**
      * Map of index names and indexes.
      */
-    private Map<String, PgIndex> indexes = new HashMap<String, PgIndex>();
+    private final Map<String, PgIndex> indexes = new HashMap<String, PgIndex>(); //NOPMD
 
     /**
      * Name of the table.
      */
     private String name = null;
-
-    /**
-     * Creates a new instance of PgTable.
-     */
-    public PgTable() {
-    }
 
     /**
      * Creates a new PgTable object.
@@ -59,7 +55,7 @@ public class PgTable {
      *
      * @return existing or new column
      */
-    public PgColumn getColumn(String name) {
+    public PgColumn getColumn(final String name) {
         PgColumn column = null;
 
         if (columns.containsKey(name)) {
@@ -90,7 +86,7 @@ public class PgTable {
      *
      * @return existing or new constraint
      */
-    public PgConstraint getConstraint(String name) {
+    public PgConstraint getConstraint(final String name) {
         PgConstraint constraint = null;
 
         if (constraints.containsKey(name)) {
@@ -121,7 +117,7 @@ public class PgTable {
      *
      * @return existing or new index
      */
-    public PgIndex getIndex(String name) {
+    public PgIndex getIndex(final String name) {
         PgIndex index = null;
 
         if (indexes.containsKey(name)) {
@@ -148,7 +144,7 @@ public class PgTable {
      *
      * @param name {@link #name name}
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -167,16 +163,20 @@ public class PgTable {
      * @return SQL for creation of the table
      */
     public String getTableSQL() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("CREATE TABLE " + name + " (\n");
+        final StringBuilder sbSQL = new StringBuilder();
+        sbSQL.append("CREATE TABLE ");
+        sbSQL.append(name);
+        sbSQL.append(" (\n");
 
         for (PgColumn column : columns.values()) {
-            sb.append("\t" + column.getFullDefinition() + ",\n");
+            sbSQL.append("\t");
+            sbSQL.append(column.getFullDefinition());
+            sbSQL.append(",\n");
         }
 
-        sb.setLength(sb.length() - 2);
-        sb.append("\n);");
+        sbSQL.setLength(sbSQL.length() - 2);
+        sbSQL.append("\n);");
 
-        return sb.toString();
+        return sbSQL.toString();
     }
 }
