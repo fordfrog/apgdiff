@@ -3,7 +3,7 @@
   <groupId>cz.startnet.utils.apgdiff</groupId>
   <artifactId>apgdiff</artifactId>
   <name>Another PostgreSQL Diff Tool</name>
-  <version>1.0.0_beta8</version>
+  <version>1.0.0_beta9</version>
   <description>Simple PostgreSQL diff tool that is useful for schema upgrades. The tool compares two schema dump files and creates output file that is (after some hand-made modifications) suitable for upgrade of old schema.</description>
   <url>http://apgdiff.sourceforge.net</url>
   <issueManagement>
@@ -51,6 +51,18 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-report-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <classpathPrefix>lib</classpathPrefix>
+              <mainClass>cz.startnet.utils.pgdiff.Main</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
       </plugin>
     </plugins>
   </build>
