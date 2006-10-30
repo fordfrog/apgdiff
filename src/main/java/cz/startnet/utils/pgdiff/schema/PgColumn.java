@@ -11,6 +11,11 @@ package cz.startnet.utils.pgdiff.schema;
  */
 public class PgColumn {
     /**
+     * Specific statistics value.
+     */
+    private Integer statistics = null;
+
+    /**
      * Column constraint.
      */
     private String constraint = null;
@@ -40,7 +45,7 @@ public class PgColumn {
      *
      * @param name name of the column
      */
-    public PgColumn(String name) {
+    public PgColumn(final String name) {
         this.name = name;
     }
 
@@ -140,6 +145,24 @@ public class PgColumn {
      */
     public boolean getNullValue() {
         return nullValue;
+    }
+
+    /**
+     * Setter for {@link #statistics statistics}.
+     *
+     * @param statistics {@link #statistics statistics}
+     */
+    public void setStatistics(final Integer statistics) {
+        this.statistics = statistics;
+    }
+
+    /**
+     * Getter for {@link #statistics statistics}.
+     *
+     * @return {@link #statistics statistics}
+     */
+    public Integer getStatistics() {
+        return statistics;
     }
 
     /**

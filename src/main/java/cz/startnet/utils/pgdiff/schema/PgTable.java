@@ -3,8 +3,10 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
-import cz.startnet.utils.pgdiff.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 
@@ -15,6 +17,12 @@ import java.util.Map;
  * @version $CVSHeader$
  */
 public class PgTable {
+    /**
+     * Ordered collection of columns name.
+     */
+    private final Collection<PgColumn> orderedColumns =
+        new ArrayList<PgColumn>();
+
     /**
      * Map of column names and columns.
      */
@@ -33,6 +41,11 @@ public class PgTable {
     private final Map<String, PgIndex> indexes = new HashMap<String, PgIndex>(); //NOPMD
 
     /**
+     * Name of the index on which the table is clustered
+     */
+    private String clusterIndexName = null;
+
+    /**
      * Name of the table.
      */
     private String name = null;
@@ -44,6 +57,24 @@ public class PgTable {
      */
     public PgTable(String name) {
         this.name = name;
+    }
+
+    /**
+     * Setter for {@link #clusterIndexName clusterIndexName}.
+     *
+     * @param name {@link #clusterIndexName clusterIndexName}
+     */
+    public void setClusterIndexName(final String name) {
+        clusterIndexName = name;
+    }
+
+    /**
+     * Getter for {@link #clusterIndexName clusterIndexName}.
+     *
+     * @return {@link #clusterIndexName clusterIndexName}
+     */
+    public String getClusterIndexName() {
+        return clusterIndexName;
     }
 
     /**
@@ -63,6 +94,7 @@ public class PgTable {
         } else {
             column = new PgColumn(name);
             columns.put(name, column);
+            orderedColumns.add(column);
         }
 
         return column;
@@ -158,24 +190,64 @@ public class PgTable {
     }
 
     /**
+     * Returns a collection of all columns ordered as specified in the
+     * DDL.
+     *
+     * @return collection of all the columns
+     */
+    public Collection<PgColumn> getOrderedColumns() {
+        return orderedColumns;
+    }
+
+    /**
      * Creates table creation SQL.
      *
      * @return SQL for creation of the table
      */
     public String getTableSQL() {
+        final Map<String, Integer> colsWithStats =
+            new HashMap<String, Integer>();
+
         final StringBuilder sbSQL = new StringBuilder();
         sbSQL.append("CREATE TABLE ");
         sbSQL.append(name);
         sbSQL.append(" (\n");
 
-        for (PgColumn column : columns.values()) {
+        for (PgColumn column : orderedColumns) {
             sbSQL.append("\t");
             sbSQL.append(column.getFullDefinition());
+
+            if (column.getStatistics() != null) {
+                colsWithStats.put(column.getName(), column.getStatistics());
+            }
+
             sbSQL.append(",\n");
         }
 
         sbSQL.setLength(sbSQL.length() - 2);
         sbSQL.append("\n);");
+
+        final Iterator<String> iter = colsWithStats.keySet().iterator();
+
+        while (iter.hasNext()) {
+            final String colName = iter.next();
+            final Integer value = colsWithStats.get(colName);
+            sbSQL.append("\nALTER TABLE ONLY ");
+            sbSQL.append(name);
+            sbSQL.append(" ALTER column ");
+            sbSQL.append(colName);
+            sbSQL.append(" SET STATISTICS ");
+            sbSQL.append(value);
+            sbSQL.append(";");
+        }
+
+        if (this.clusterIndexName != null) {
+            sbSQL.append("\nALTER TABLE ");
+            sbSQL.append(name);
+            sbSQL.append(" CLUSTER ON ");
+            sbSQL.append(clusterIndexName);
+            sbSQL.append(" ;");
+        }
 
         return sbSQL.toString();
     }

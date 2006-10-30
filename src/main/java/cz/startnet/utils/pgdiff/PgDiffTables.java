@@ -6,8 +6,11 @@ package cz.startnet.utils.pgdiff;
 import cz.startnet.utils.pgdiff.schema.PgColumn;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -42,6 +45,63 @@ public class PgDiffTables {
             }
 
             updateTableFields(schema1.getTable(table.getName()), table);
+            addAlterStats(schema1.getTable(table.getName()), table);
+        }
+    }
+
+    /**
+     * Generate the needed alter table xxx set statistics when needed
+     * ....
+     *
+     * @param table1 original table
+     * @param table2 new table
+     */
+    private static void addAlterStats(
+        final PgTable table1,
+        final PgTable table2) {
+        final Map<String, Integer> list = new HashMap<String, Integer>();
+        final Map<String, PgColumn> table1Cols = table1.getColumns();
+
+        for (PgColumn column : table2.getColumns().values()) {
+            final PgColumn col = table1Cols.get(column.getName());
+
+            if (col != null) {
+                final Integer oldStat = col.getStatistics();
+                final Integer newStat = column.getStatistics();
+                Integer statValue = null;
+
+                if (oldStat == null) {
+                    if (newStat != null) {
+                        statValue = newStat;
+                    }
+                } else {
+                    if (newStat == null) {
+                        statValue = Integer.valueOf(-1);
+                    } else {
+                        if (newStat.compareTo(oldStat) != 0) {
+                            statValue = newStat;
+                        }
+                    }
+                }
+
+                if (statValue != null) {
+                    list.put(column.getName(), statValue);
+                }
+            }
+        }
+
+        final StringBuilder sbSQL = new StringBuilder();
+
+        for (String colName : list.keySet()) {
+            sbSQL.setLength(0);
+            sbSQL.append("\nALTER TABLE ONLY ");
+            sbSQL.append(table2.getName());
+            sbSQL.append(" ALTER COLUMN");
+            sbSQL.append(colName);
+            sbSQL.append(" SET STATISTICS ");
+            sbSQL.append(list.get(colName).intValue());
+            sbSQL.append(" ;");
+            System.out.println(sbSQL.toString());
         }
     }
 
@@ -57,7 +117,7 @@ public class PgDiffTables {
         final List<String> commands,
         final PgTable table1,
         final PgTable table2) {
-        for (PgColumn column : table2.getColumns().values()) {
+        for (PgColumn column : table2.getOrderedColumns()) {
             if (!table1.getColumns().containsKey(column.getName())) {
                 commands.add("\tADD COLUMN " + column.getFullDefinition());
             }

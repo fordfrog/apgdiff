@@ -15,6 +15,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 /**
  * Loads PostgreSQL dump into classes.
@@ -151,16 +154,46 @@ public class PgDumpLoader {
             return;
         }
 
+        Pattern pattern =
+            Pattern.compile("ALTER TABLE (?:ONLY )?([^ ]+)(?: )?(.+)?");
+        Matcher matcher = pattern.matcher(line);
+
         final String tableName;
 
-        if (line.startsWith("ALTER TABLE ONLY ")) {
-            tableName = line.substring("ALTER TABLE ONLY ".length()).trim();
+        if (matcher.matches()) {
+            tableName = matcher.group(1);
         } else {
-            tableName = line.substring("ALTER TABLE ".length()).trim();
+            tableName = "";
+
+            return;
         }
 
         final PgTable table = schema.getTable(tableName);
         String origLine = null;
+        final String traillingDef = matcher.group(2);
+
+        if (traillingDef != null) {
+            pattern =
+                Pattern.compile(
+                        "(CLUSTER ON|ALTER COLUMN) ([^ ;]+)(?: SET STATISTICS )?(\\d+)?;?");
+            matcher = pattern.matcher(traillingDef);
+
+            if (matcher.matches()) {
+                if (matcher.group(1).compareTo("ALTER COLUMN") == 0) {
+                    //Stats
+                    final String columnName = matcher.group(2);
+                    final Integer value = Integer.valueOf(matcher.group(3));
+                    final PgColumn col = table.getColumn(columnName);
+                    col.setStatistics(value);
+                } else {
+                    //Cluster
+                    final String indexName = matcher.group(2);
+                    table.setClusterIndexName(indexName);
+                }
+            }
+
+            return;
+        }
 
         try {
             String newLine = reader.readLine();

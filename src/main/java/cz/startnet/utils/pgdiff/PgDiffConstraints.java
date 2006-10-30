@@ -21,7 +21,7 @@ import java.util.Set;
  */
 public class PgDiffConstraints {
     /**
-     * Creates a new instance of PgDiffConstraints
+     * Creates a new instance of PgDiffConstraints.
      */
     private PgDiffConstraints() {
         super();
@@ -43,6 +43,7 @@ public class PgDiffConstraints {
 
         for (PgTable table2 : schema2.getTables().values()) {
             final String tableName2 = table2.getName();
+            final PgTable table1 = tables1.get(tableName2);
 
             // Drop constraints that do not exist in new schema or are modified
             for (PgConstraint constraint : getDropConstraints(
@@ -63,6 +64,10 @@ public class PgDiffConstraints {
                 System.out.println(
                         "\tADD CONSTRAINT " + constraint.getName() + " "
                         + constraint.getDefinition() + ";");
+            }
+
+            if ((table1 != null) && !primaryKey) {
+                dropOrCreateCluster(tables1.get(tableName2), table2);
             }
         }
     }
@@ -146,5 +151,44 @@ public class PgDiffConstraints {
         }
 
         return list;
+    }
+
+    /**
+     * Generate appropriate ALTER orders
+     *
+     * @param table1 original table
+     * @param table2 new table
+     */
+    private static void dropOrCreateCluster(
+        final PgTable table1,
+        final PgTable table2) {
+        final String oldCluster = table1.getClusterIndexName();
+        final String newCluster = table2.getClusterIndexName();
+        final StringBuilder sbSQL = new StringBuilder();
+
+        if ((oldCluster == null) && (newCluster != null)) {
+            sbSQL.append("\nALTER TABLE ");
+            sbSQL.append(table2.getName());
+            sbSQL.append(" CLUSTER ON ");
+            sbSQL.append(newCluster);
+            sbSQL.append(" ;");
+        } else if ((oldCluster != null) && (newCluster == null)) {
+            sbSQL.append("\nALTER TABLE ");
+            sbSQL.append(table2.getName());
+            sbSQL.append(" SET WITHOUT CLUSTER;");
+        } else if (
+            (oldCluster != null)
+                && (newCluster != null)
+                && (newCluster.compareTo(oldCluster) != 0)) {
+            sbSQL.append("\nALTER TABLE ");
+            sbSQL.append(table2.getName());
+            sbSQL.append(" CLUSTER ON ");
+            sbSQL.append(newCluster);
+            sbSQL.append(" ;");
+        }
+
+        if (sbSQL.length() > 0) {
+            System.out.println(sbSQL.toString());
+        }
     }
 }
