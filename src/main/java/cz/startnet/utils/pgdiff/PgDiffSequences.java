@@ -18,7 +18,7 @@ import java.util.Set;
  */
 public class PgDiffSequences {
     /**
-     * Creates a new instance of PgDiffSequences
+     * Creates a new instance of PgDiffSequences.
      */
     private PgDiffSequences() {
         super();

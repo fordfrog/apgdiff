@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class PgDiffTables {
     /**
-     * Creates a new instance of PgDiffTables
+     * Creates a new instance of PgDiffTables.
      */
     private PgDiffTables() {
         super();

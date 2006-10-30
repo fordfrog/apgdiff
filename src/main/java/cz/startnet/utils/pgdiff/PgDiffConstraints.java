@@ -154,7 +154,7 @@ public class PgDiffConstraints {
     }
 
     /**
-     * Generate appropriate ALTER orders
+     * Generates and outputs CLUSTER specific DDL if appropriate.
      *
      * @param table1 original table
      * @param table2 new table

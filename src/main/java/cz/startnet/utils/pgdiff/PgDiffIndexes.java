@@ -21,7 +21,7 @@ import java.util.Set;
  */
 public class PgDiffIndexes {
     /**
-     * Creates a new instance of PgDiffIndexes
+     * Creates a new instance of PgDiffIndexes.
      */
     private PgDiffIndexes() {
         super();
