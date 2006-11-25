@@ -377,7 +377,7 @@ public class PgDumpLoader {
                 origLine = newLine;
                 newLine = newLine.trim();
 
-                if (newLine.contentEquals(");")) {
+                if (");".equals(newLine)) {
                     break;
                 } else if (newLine.endsWith(",")) {
                     newLine = newLine.substring(0, newLine.length() - 1).trim();

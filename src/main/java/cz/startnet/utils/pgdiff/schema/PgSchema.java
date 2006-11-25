@@ -86,4 +86,16 @@ public class PgSchema {
     public Map<String, PgTable> getTables() {
         return tables;
     }
+
+    /**
+     * Returns true if schema contains table definition, otherwise
+     * false.
+     *
+     * @param name name of the table
+     *
+     * @return true if schema contains table definition, otherwise false
+     */
+    public boolean containsTable(final String name) {
+        return tables.containsKey(name);
+    }
 }

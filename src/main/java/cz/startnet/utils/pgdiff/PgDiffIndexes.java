@@ -7,6 +7,8 @@ import cz.startnet.utils.pgdiff.schema.PgIndex;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
 
+import java.io.PrintWriter;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,10 +32,12 @@ public class PgDiffIndexes {
     /**
      * Outputs commands for differences in indexes.
      *
+     * @param writer writer the output should be written to
      * @param schema1 original schema
      * @param schema2 new schema
      */
     public static void diffIndexes(
+        final PrintWriter writer,
         final PgSchema schema1,
         final PgSchema schema2) {
         final Map<String, PgTable> tables1 = schema1.getTables();
@@ -45,13 +49,15 @@ public class PgDiffIndexes {
             for (PgIndex index : getDropIndexes(
                         tables1.get(tableName2),
                         table2)) {
-                System.out.println("\nDROP INDEX " + index.getName() + ";");
+                writer.println();
+                writer.println("DROP INDEX " + index.getName() + ";");
             }
 
             // Add new constraints
             for (PgIndex index : getNewIndexes(tables1.get(tableName2), table2)) {
-                System.out.println(
-                        "\nCREATE INDEX " + index.getName() + " ON "
+                writer.println();
+                writer.println(
+                        "CREATE INDEX " + index.getName() + " ON "
                         + table2.getName() + " " + index.getDefinition() + ";");
             }
         }
@@ -79,7 +85,7 @@ public class PgDiffIndexes {
             for (final PgIndex index : table1.getIndexes().values()) {
                 if (
                     !names2.contains(index.getName())
-                        || !table2.getIndex(index.getName()).getDefinition().contentEquals(
+                        || !table2.getIndex(index.getName()).getDefinition().equals(
                                 index.getDefinition())) {
                     list.add(index);
                 }
@@ -114,7 +120,7 @@ public class PgDiffIndexes {
                     if (
                         !names1.contains(index.getName())
                             || !table1.getIndex(index.getName()).getDefinition()
-                                          .contentEquals(index.getDefinition())) {
+                                          .equals(index.getDefinition())) {
                         list.add(index);
                     }
                 }

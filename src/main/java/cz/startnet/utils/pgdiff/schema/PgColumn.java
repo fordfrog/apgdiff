@@ -194,7 +194,7 @@ public class PgColumn {
         if (def.startsWith("timestamp without time zone")) {
             type = "timestamp without time zone";
 
-            if (def.contentEquals("timestamp without time zone")) {
+            if ("timestamp without time zone".equals(def)) {
                 def = "";
             } else {
                 def = def.substring("timestamp without time zone".length())
@@ -241,13 +241,13 @@ public class PgColumn {
             }
         }
 
-        if (def.contentEquals("NULL")) {
+        if ("NULL".equals(def)) {
             nullValue = true;
             def = "";
         } else if (def.startsWith("NULL ")) {
             nullValue = true;
             def = def.substring("NULL ".length()).trim();
-        } else if (def.contentEquals("NOT NULL")) {
+        } else if ("NOT NULL".equals(def)) {
             nullValue = false;
             def = "";
         } else if (def.startsWith("NOT NULL ")) {

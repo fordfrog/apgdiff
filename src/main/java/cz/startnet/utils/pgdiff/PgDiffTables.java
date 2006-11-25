@@ -7,6 +7,8 @@ import cz.startnet.utils.pgdiff.schema.PgColumn;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
 
+import java.io.PrintWriter;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,33 +32,36 @@ public class PgDiffTables {
     /**
      * Creates diff of tables.
      *
+     * @param writer writer the output should be written to
      * @param schema1 original schema
      * @param schema2 new schema
      */
     public static void diffTables(
+        final PrintWriter writer,
         final PgSchema schema1,
         final PgSchema schema2) {
-        dropTables(schema1, schema2);
-        createTables(schema1, schema2);
+        dropTables(writer, schema1, schema2);
+        createTables(writer, schema1, schema2);
 
         for (PgTable table : schema2.getTables().values()) {
-            if (!schema1.getTables().containsKey(table.getName())) {
+            if (!schema1.containsTable(table.getName())) {
                 continue;
             }
 
-            updateTableFields(schema1.getTable(table.getName()), table);
-            addAlterStats(schema1.getTable(table.getName()), table);
+            updateTableFields(writer, schema1.getTable(table.getName()), table);
+            addAlterStats(writer, schema1.getTable(table.getName()), table);
         }
     }
 
     /**
-     * Generate the needed alter table xxx set statistics when needed
-     * ....
+     * Generate the needed alter table xxx set statistics when needed.
      *
+     * @param writer writer the output should be written to
      * @param table1 original table
      * @param table2 new table
      */
     private static void addAlterStats(
+        final PrintWriter writer,
         final PgTable table1,
         final PgTable table2) {
         final Map<String, Integer> list = new HashMap<String, Integer>();
@@ -90,18 +95,15 @@ public class PgDiffTables {
             }
         }
 
-        final StringBuilder sbSQL = new StringBuilder();
-
         for (String colName : list.keySet()) {
-            sbSQL.setLength(0);
-            sbSQL.append("\nALTER TABLE ONLY ");
-            sbSQL.append(table2.getName());
-            sbSQL.append(" ALTER COLUMN");
-            sbSQL.append(colName);
-            sbSQL.append(" SET STATISTICS ");
-            sbSQL.append(list.get(colName).intValue());
-            sbSQL.append(" ;");
-            System.out.println(sbSQL.toString());
+            writer.println();
+            writer.print("ALTER TABLE ONLY ");
+            writer.print(table2.getName());
+            writer.print(" ALTER COLUMN");
+            writer.print(colName);
+            writer.print(" SET STATISTICS ");
+            writer.print(list.get(colName).intValue());
+            writer.print(" ;");
         }
     }
 
@@ -118,7 +120,7 @@ public class PgDiffTables {
         final PgTable table1,
         final PgTable table2) {
         for (PgColumn column : table2.getOrderedColumns()) {
-            if (!table1.getColumns().containsKey(column.getName())) {
+            if (!table1.containsColumn(column.getName())) {
                 commands.add("\tADD COLUMN " + column.getFullDefinition());
             }
         }
@@ -136,7 +138,7 @@ public class PgDiffTables {
         final PgTable table1,
         final PgTable table2) {
         for (PgColumn column : table1.getColumns().values()) {
-            if (!table2.getColumns().containsKey(column.getName())) {
+            if (!table2.containsColumn(column.getName())) {
                 commands.add("\tDROP COLUMN " + column.getName());
             }
         }
@@ -146,22 +148,24 @@ public class PgDiffTables {
      * Adds commands for modification of columns to the list of
      * commands.
      *
+     * @param writer writer the output should be written to
      * @param commands list of commands
      * @param table1 original table
      * @param table2 new table
      */
     private static void addModifyTableColumns(
+        final PrintWriter writer,
         final List<String> commands,
         final PgTable table1,
         final PgTable table2) {
         for (PgColumn column : table2.getColumns().values()) {
-            if (!table1.getColumns().containsKey(column.getName())) {
+            if (!table1.containsColumn(column.getName())) {
                 continue;
             }
 
             final PgColumn column1 = table1.getColumn(column.getName());
 
-            if (!column1.getType().contentEquals(column.getType())) {
+            if (!column1.getType().equals(column.getType())) {
                 commands.add(
                         "\tALTER COLUMN " + column.getName() + " TYPE "
                         + column.getType());
@@ -173,7 +177,7 @@ public class PgDiffTables {
             final String default2 =
                 (column.getDefaultValue() == null) ? "" : column.getDefaultValue();
 
-            if (!default1.contentEquals(default2)) {
+            if (!default1.equals(default2)) {
                 if (default2.length() == 0) {
                     commands.add(
                             "\tALTER COLUMN " + column.getName()
@@ -202,12 +206,13 @@ public class PgDiffTables {
             final String constraint1 =
                 (column1.getConstraint() == null) ? "" : column1.getConstraint();
 
-            if (!constraint.contentEquals(constraint1)) {
-                System.out.println(
-                        "\nMODIFIED CONSTRAINT ON COLUMN " + column.getName()
+            if (!constraint.equals(constraint1)) {
+                writer.println();
+                writer.println(
+                        "MODIFIED CONSTRAINT ON COLUMN " + column.getName()
                         + " IN TABLE " + table2.getName());
-                System.out.println("ORIGINAL: " + constraint1);
-                System.out.println("NEW: " + constraint);
+                writer.println("ORIGINAL: " + constraint1);
+                writer.println("NEW: " + constraint);
             }
         }
     }
@@ -215,15 +220,18 @@ public class PgDiffTables {
     /**
      * Outputs commands for creation of new tables.
      *
+     * @param writer writer the output should be written to
      * @param schema1 original schema
      * @param schema2 new schema
      */
     private static void createTables(
+        final PrintWriter writer,
         final PgSchema schema1,
         final PgSchema schema2) {
         for (PgTable table : schema2.getTables().values()) {
-            if (!schema1.getTables().containsKey(table.getName())) {
-                System.out.println("\n" + table.getTableSQL());
+            if (!schema1.containsTable(table.getName())) {
+                writer.println();
+                writer.println(table.getTableSQL());
             }
         }
     }
@@ -231,15 +239,18 @@ public class PgDiffTables {
     /**
      * Outputs commands for dropping tables.
      *
+     * @param writer writer the output should be written to
      * @param schema1 original schema
      * @param schema2 new schema
      */
     private static void dropTables(
+        final PrintWriter writer,
         final PgSchema schema1,
         final PgSchema schema2) {
         for (PgTable table : schema1.getTables().values()) {
-            if (!schema2.getTables().containsKey(table.getName())) {
-                System.out.println("\nDROP TABLE " + table.getName() + ";");
+            if (!schema2.containsTable(table.getName())) {
+                writer.println();
+                writer.println("DROP TABLE " + table.getName() + ";");
             }
         }
     }
@@ -248,23 +259,26 @@ public class PgDiffTables {
      * Outputs commands for addition, removal and modifications of
      * table fields.
      *
+     * @param writer writer the output should be written to
      * @param table1 original table
      * @param table2 new table
      */
     private static void updateTableFields(
+        final PrintWriter writer,
         final PgTable table1,
         final PgTable table2) {
         final List<String> commands = new ArrayList<String>();
         addDropTableColumns(commands, table1, table2);
         addCreateTableColumns(commands, table1, table2);
-        addModifyTableColumns(commands, table1, table2);
+        addModifyTableColumns(writer, commands, table1, table2);
 
         if (commands.size() > 0) {
-            System.out.println("\nALTER TABLE " + table2.getName());
+            writer.println();
+            writer.println("ALTER TABLE " + table2.getName());
 
             for (int i = 0; i < commands.size(); i++) {
-                System.out.print(commands.get(i));
-                System.out.println(((i + 1) < commands.size()) ? "," : ";");
+                writer.print(commands.get(i));
+                writer.println(((i + 1) < commands.size()) ? "," : ";");
             }
         }
     }

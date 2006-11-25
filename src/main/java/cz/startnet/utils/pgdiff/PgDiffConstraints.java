@@ -7,6 +7,8 @@ import cz.startnet.utils.pgdiff.schema.PgConstraint;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
 
+import java.io.PrintWriter;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,12 +32,14 @@ public class PgDiffConstraints {
     /**
      * Outputs commands for differences in constraints.
      *
+     * @param writer writer the output should be written to
      * @param schema1 original schema
      * @param schema2 new schema
      * @param primaryKey determines whether primery keys should be processed or
      *        any other constraints should be processed
      */
     public static void diffConstraints(
+        final PrintWriter writer,
         final PgSchema schema1,
         final PgSchema schema2,
         final boolean primaryKey) {
@@ -50,8 +54,9 @@ public class PgDiffConstraints {
                         tables1.get(tableName2),
                         table2,
                         primaryKey)) {
-                System.out.println("\nALTER TABLE " + tableName2);
-                System.out.println(
+                writer.println();
+                writer.println("ALTER TABLE " + tableName2);
+                writer.println(
                         "\tDROP CONSTRAINT " + constraint.getName() + ";");
             }
 
@@ -60,14 +65,15 @@ public class PgDiffConstraints {
                         tables1.get(tableName2),
                         table2,
                         primaryKey)) {
-                System.out.println("\nALTER TABLE " + tableName2);
-                System.out.println(
+                writer.println();
+                writer.println("ALTER TABLE " + tableName2);
+                writer.println(
                         "\tADD CONSTRAINT " + constraint.getName() + " "
                         + constraint.getDefinition() + ";");
             }
 
             if ((table1 != null) && !primaryKey) {
-                dropOrCreateCluster(tables1.get(tableName2), table2);
+                dropOrCreateCluster(writer, tables1.get(tableName2), table2);
             }
         }
     }
@@ -99,7 +105,7 @@ public class PgDiffConstraints {
                     (constraint.isPrimaryKeyConstraint() == primaryKey)
                         && (!names2.contains(constraint.getName())
                         || !table2.getConstraint(constraint.getName())
-                                      .getDefinition().contentEquals(
+                                      .getDefinition().equals(
                                 constraint.getDefinition()))) {
                     list.add(constraint);
                 }
@@ -142,7 +148,7 @@ public class PgDiffConstraints {
                         (constraint.isPrimaryKeyConstraint() == primaryKey)
                             && (!names1.contains(constraint.getName())
                             || !table1.getConstraint(constraint.getName())
-                                          .getDefinition().contentEquals(
+                                          .getDefinition().equals(
                                     constraint.getDefinition()))) {
                         list.add(constraint);
                     }
@@ -156,39 +162,39 @@ public class PgDiffConstraints {
     /**
      * Generates and outputs CLUSTER specific DDL if appropriate.
      *
+     * @param writer writer the output should be written to
      * @param table1 original table
      * @param table2 new table
      */
     private static void dropOrCreateCluster(
+        final PrintWriter writer,
         final PgTable table1,
         final PgTable table2) {
         final String oldCluster = table1.getClusterIndexName();
         final String newCluster = table2.getClusterIndexName();
-        final StringBuilder sbSQL = new StringBuilder();
 
         if ((oldCluster == null) && (newCluster != null)) {
-            sbSQL.append("\nALTER TABLE ");
-            sbSQL.append(table2.getName());
-            sbSQL.append(" CLUSTER ON ");
-            sbSQL.append(newCluster);
-            sbSQL.append(" ;");
+            writer.println();
+            writer.print("ALTER TABLE ");
+            writer.print(table2.getName());
+            writer.print(" CLUSTER ON ");
+            writer.print(newCluster);
+            writer.print(" ;");
         } else if ((oldCluster != null) && (newCluster == null)) {
-            sbSQL.append("\nALTER TABLE ");
-            sbSQL.append(table2.getName());
-            sbSQL.append(" SET WITHOUT CLUSTER;");
+            writer.println();
+            writer.print("ALTER TABLE ");
+            writer.print(table2.getName());
+            writer.print(" SET WITHOUT CLUSTER;");
         } else if (
             (oldCluster != null)
                 && (newCluster != null)
                 && (newCluster.compareTo(oldCluster) != 0)) {
-            sbSQL.append("\nALTER TABLE ");
-            sbSQL.append(table2.getName());
-            sbSQL.append(" CLUSTER ON ");
-            sbSQL.append(newCluster);
-            sbSQL.append(" ;");
-        }
-
-        if (sbSQL.length() > 0) {
-            System.out.println(sbSQL.toString());
+            writer.println();
+            writer.print("ALTER TABLE ");
+            writer.print(table2.getName());
+            writer.print(" CLUSTER ON ");
+            writer.print(newCluster);
+            writer.print(" ;");
         }
     }
 }

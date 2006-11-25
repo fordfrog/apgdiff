@@ -5,6 +5,9 @@ package cz.startnet.utils.pgdiff;
 
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgSequence;
+
+import java.io.PrintWriter;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -27,30 +30,35 @@ public class PgDiffSequences {
     /**
      * Outputs commands for differences in sequences.
      *
+     * @param writer writer the output should be written to
      * @param schema1 original schema
      * @param schema2 new schema
      */
     public static void diffSequences(
+        final PrintWriter writer,
         final PgSchema schema1,
         final PgSchema schema2) {
         // Drop sequences that do not exist in new schema
         for (PgSequence sequence : getDropSequences(schema1, schema2)) {
-            System.out.println("\nDROP SEQUENCE " + sequence.getName() + ";");
+            writer.println();
+            writer.println("DROP SEQUENCE " + sequence.getName() + ";");
         }
 
         // Add new sequences
         for (PgSequence sequence : getNewSequences(schema1, schema2)) {
-            System.out.println("\nCREATE SEQUENCE " + sequence.getName());
-            System.out.println(sequence.getDefinition() + ";");
+            writer.println();
+            writer.println("CREATE SEQUENCE " + sequence.getName());
+            writer.println(sequence.getDefinition() + ";");
         }
 
         // Inform about modified sequences
         for (PgSequence sequence : getModifiedSequences(schema1, schema2)) {
-            System.out.println("\nMODIFIED SEQUENCE " + sequence.getName());
-            System.out.println(
+            writer.println();
+            writer.println("MODIFIED SEQUENCE " + sequence.getName());
+            writer.println(
                     "ORIGINAL: "
                     + schema1.getSequence(sequence.getName()).getDefinition());
-            System.out.println("NEW: " + sequence.getDefinition());
+            writer.println("NEW: " + sequence.getDefinition());
         }
     }
 
@@ -94,7 +102,7 @@ public class PgDiffSequences {
         for (final PgSequence sequence : schema2.getSequences().values()) {
             if (
                 names1.contains(sequence.getName())
-                    && !schema1.getSequence(sequence.getName()).getDefinition().contentEquals(
+                    && !schema1.getSequence(sequence.getName()).getDefinition().equals(
                             sequence.getDefinition())) {
                 list.add(sequence);
             }

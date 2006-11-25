@@ -20,7 +20,7 @@ public class PgTable {
     /**
      * Ordered collection of columns name.
      */
-    private final Collection<PgColumn> orderedColumns =
+    private final Collection<PgColumn> orderedColumns = //NOPMD
         new ArrayList<PgColumn>();
 
     /**
@@ -250,5 +250,17 @@ public class PgTable {
         }
 
         return sbSQL.toString();
+    }
+
+    /**
+     * Returns true if table contains given column name, otherwise
+     * false.
+     *
+     * @param name name of the column
+     *
+     * @return true if table contains given column name, otherwise false
+     */
+    public boolean containsColumn(final String name) {
+        return columns.containsKey(name);
     }
 }
