@@ -1,4 +1,4 @@
-/*
+/**
  * Contains PostgreSQL schema objects.<br/>
  * $CVSHeader$
  */
