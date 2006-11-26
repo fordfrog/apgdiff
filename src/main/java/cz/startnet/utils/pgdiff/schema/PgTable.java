@@ -6,7 +6,6 @@ package cz.startnet.utils.pgdiff.schema;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 
@@ -227,17 +226,13 @@ public class PgTable {
         sbSQL.setLength(sbSQL.length() - 2);
         sbSQL.append("\n);");
 
-        final Iterator<String> iter = colsWithStats.keySet().iterator();
-
-        while (iter.hasNext()) {
-            final String colName = iter.next();
-            final Integer value = colsWithStats.get(colName);
+        for (Map.Entry<String, Integer> entry : colsWithStats.entrySet()) {
             sbSQL.append("\nALTER TABLE ONLY ");
             sbSQL.append(name);
             sbSQL.append(" ALTER column ");
-            sbSQL.append(colName);
+            sbSQL.append(entry.getKey());
             sbSQL.append(" SET STATISTICS ");
-            sbSQL.append(value);
+            sbSQL.append(entry.getValue());
             sbSQL.append(";");
         }
 

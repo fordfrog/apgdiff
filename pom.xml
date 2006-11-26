@@ -24,6 +24,14 @@
       <timezone>+1</timezone>
     </developer>
   </developers>
+  <contributors>
+      <contributor>
+          <name>Matthieu Patou</name>
+          <roles>
+              <role>CLUSTER and STATISTICS support + ordering of columns according to source DDL</role>
+          </roles>
+      </contributor>
+  </contributors>
   <licenses>
     <license>
       <name>Another PostgreSQL Diff Tool License</name>
@@ -133,7 +141,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.0</version>
+      <version>4.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

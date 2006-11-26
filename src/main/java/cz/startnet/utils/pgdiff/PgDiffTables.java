@@ -64,7 +64,7 @@ public class PgDiffTables {
         final PrintWriter writer,
         final PgTable table1,
         final PgTable table2) {
-        final Map<String, Integer> list = new HashMap<String, Integer>();
+        final Map<String, Integer> stats = new HashMap<String, Integer>();
         final Map<String, PgColumn> table1Cols = table1.getColumns();
 
         for (PgColumn column : table2.getColumns().values()) {
@@ -90,19 +90,19 @@ public class PgDiffTables {
                 }
 
                 if (statValue != null) {
-                    list.put(column.getName(), statValue);
+                    stats.put(column.getName(), statValue);
                 }
             }
         }
 
-        for (String colName : list.keySet()) {
+        for (Map.Entry<String, Integer> entry : stats.entrySet()) {
             writer.println();
             writer.print("ALTER TABLE ONLY ");
             writer.print(table2.getName());
             writer.print(" ALTER COLUMN");
-            writer.print(colName);
+            writer.print(entry.getKey());
             writer.print(" SET STATISTICS ");
-            writer.print(list.get(colName).intValue());
+            writer.print(entry.getValue());
             writer.print(" ;");
         }
     }
