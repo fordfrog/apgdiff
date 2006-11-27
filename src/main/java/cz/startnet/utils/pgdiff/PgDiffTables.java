@@ -86,16 +86,15 @@ public class PgDiffTables {
         dropTables(writer, oldSchema, newSchema);
         createTables(writer, oldSchema, newSchema);
 
-        for (PgTable table : newSchema.getTables().values()) {
-            if (!oldSchema.containsTable(table.getName())) {
+        for (PgTable newTable : newSchema.getTables().values()) {
+            if (!oldSchema.containsTable(newTable.getName())) {
                 continue;
             }
 
-            updateTableFields(
-                    writer,
-                    oldSchema.getTable(table.getName()),
-                    table);
-            addAlterStats(writer, oldSchema.getTable(table.getName()), table);
+            final PgTable oldTable = oldSchema.getTable(newTable.getName());
+            updateTableFields(writer, oldTable, newTable);
+            checkInherits(writer, oldTable, newTable);
+            addAlterStats(writer, oldTable, newTable);
         }
     }
 
@@ -243,22 +242,47 @@ public class PgDiffTables {
                             + " SET NOT NULL");
                 }
             }
+        }
+    }
 
-            final String constraint =
-                (newColumn.getConstraint() == null) ? ""
-                                                    : newColumn.getConstraint();
-            final String oldConstraint =
-                (oldColumn.getConstraint() == null) ? ""
-                                                    : oldColumn.getConstraint();
+    /**
+     * Checks whether there is a discrepancy in INHERITS for original
+     * and new table.
+     *
+     * @param writer writer the output should be written to
+     * @param oldTable original table
+     * @param newTable new table
+     */
+    private static void checkInherits(
+        final PrintWriter writer,
+        final PgTable oldTable,
+        final PgTable newTable) {
+        final String oldInherits = oldTable.getInherits();
+        final String newInherits = newTable.getInherits();
 
-            if (!constraint.equals(oldConstraint)) {
-                writer.println();
-                writer.println(
-                        "MODIFIED CONSTRAINT ON COLUMN " + newColumn.getName()
-                        + " IN TABLE " + newTable.getName());
-                writer.println("ORIGINAL: " + oldConstraint);
-                writer.println("NEW: " + constraint);
-            }
+        if ((oldInherits == null) && (newInherits != null)) {
+            writer.println();
+            writer.println(
+                    "Modified INHERITS on TABLE " + newTable.getName()
+                    + ": original table doesn't use INHERITS but new table "
+                    + "uses INHERITS " + newTable.getInherits());
+        } else if ((oldInherits != null) && (newInherits == null)) {
+            writer.println();
+            writer.println(
+                    "Modified INHERITS on TABLE " + newTable.getName()
+                    + ": original table uses INHERITS "
+                    + oldTable.getInherits()
+                    + " but new table doesn't use INHERITS");
+        } else if (
+            (oldInherits != null)
+                && (newInherits != null)
+                && !oldInherits.equals(newInherits)) {
+            writer.println();
+            writer.println(
+                    "Modified INHERITS on TABLE " + newTable.getName()
+                    + ": original table uses INHERITS "
+                    + oldTable.getInherits() + " but new table uses INHERITS "
+                    + newTable.getInherits());
         }
     }
 

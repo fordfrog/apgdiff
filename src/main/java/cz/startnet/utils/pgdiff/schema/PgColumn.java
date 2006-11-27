@@ -16,11 +16,6 @@ public class PgColumn {
     private Integer statistics = null;
 
     /**
-     * Column constraint.
-     */
-    private String constraint = null;
-
-    /**
      * Default value of the column.
      */
     private String defaultValue = null;
@@ -50,24 +45,6 @@ public class PgColumn {
     }
 
     /**
-     * Setter for {@link #constraint constraint}.
-     *
-     * @param constraint {@link #constraint constraint}
-     */
-    public void setConstraint(final String constraint) {
-        this.constraint = constraint;
-    }
-
-    /**
-     * Getter for {@link #constraint constraint}.
-     *
-     * @return {@link #constraint constraint}
-     */
-    public String getConstraint() {
-        return constraint;
-    }
-
-    /**
      * Setter for {@link #defaultValue defaultValue}.
      *
      * @param defaultValue {@link #defaultValue defaultValue}
@@ -80,8 +57,6 @@ public class PgColumn {
      * Getter for {@link #defaultValue defaultValue}.
      *
      * @return {@link #defaultValue defaultValue}
-     *
-     * @todo Rewrite and improve.
      */
     public String getDefaultValue() {
         return defaultValue;
@@ -102,10 +77,6 @@ public class PgColumn {
 
         if (!nullValue) {
             sbDefinition.append(" NOT NULL");
-        }
-
-        if ((getConstraint() != null) && (getConstraint().length() > 0)) {
-            sbDefinition.append(" " + getConstraint());
         }
 
         return sbDefinition.toString();
@@ -189,82 +160,30 @@ public class PgColumn {
      * @param definition definition of the column
      */
     public void parseDefinition(final String definition) {
-        String def = definition;
+        final int posDefault = definition.indexOf(" DEFAULT ");
+        final int posNotNull = definition.indexOf(" NOT NULL");
 
-        if (def.startsWith("timestamp without time zone")) {
-            type = "timestamp without time zone";
-
-            if ("timestamp without time zone".equals(def)) {
-                def = "";
-            } else {
-                def = def.substring("timestamp without time zone".length())
-                         .trim();
-            }
-        } else if (def.startsWith("character varying(")) {
-            if (def.matches("^character varying\\([0-9]*\\)$")) {
-                type = def;
-                def = "";
-            } else {
-                type =
-                    def.substring(
-                            0,
-                            def.indexOf(' ', "character varying(".length()))
-                       .trim();
-                def = def.substring(type.length()).trim();
-            }
-        } else if (def.startsWith("double precision")) {
-            type = "double precision";
-
-            if ("double precision".equals(def)) {
-                def = "";
-            } else {
-                def = def.substring("double precision".length()).trim();
-            }
+        if (posDefault > -1) {
+            setType(definition.substring(0, posDefault).trim());
+        } else if (posNotNull > -1) {
+            setType(definition.substring(0, posNotNull).trim());
         } else {
-            if (def.indexOf(' ') == -1) {
-                type = def;
-                def = "";
+            setType(definition.trim());
+        }
+
+        if (posDefault > -1) {
+            if (posNotNull > -1) {
+                setDefaultValue(
+                        definition.substring(
+                                posDefault + " DEFAULT ".length(),
+                                posNotNull).trim());
             } else {
-                type = def.substring(0, def.indexOf(' ')).trim();
-                def = def.substring(def.indexOf(' ')).trim();
+                setDefaultValue(
+                        definition.substring(posDefault + " DEFAULT ".length())
+                                  .trim());
             }
         }
 
-        if (def.startsWith("DEFAULT ")) {
-            def = def.substring("DEFAULT ".length()).trim();
-
-            if (def.indexOf(' ') == -1) {
-                defaultValue = def;
-                def = "";
-            } else if (def.matches(".*::character varying.*")) {
-                defaultValue =
-                    def.substring(
-                            0,
-                            def.indexOf("::character varying")
-                            + "::character varying".length()).trim();
-                def = def.substring(defaultValue.length()).trim();
-            } else {
-                defaultValue = def.substring(0, def.indexOf(' ')).trim();
-                def = def.substring(defaultValue.length()).trim();
-            }
-        }
-
-        if ("NULL".equals(def)) {
-            nullValue = true;
-            def = "";
-        } else if (def.startsWith("NULL ")) {
-            nullValue = true;
-            def = def.substring("NULL ".length()).trim();
-        } else if ("NOT NULL".equals(def)) {
-            nullValue = false;
-            def = "";
-        } else if (def.startsWith("NOT NULL ")) {
-            nullValue = false;
-            def = def.substring("NOT NULL ".length()).trim();
-        }
-
-        if (def.length() > 0) {
-            constraint = def;
-        }
+        setNullValue(posNotNull == -1);
     }
 }

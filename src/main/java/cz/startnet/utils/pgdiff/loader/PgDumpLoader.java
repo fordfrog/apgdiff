@@ -163,89 +163,88 @@ public class PgDumpLoader {
         final PgSchema schema,
         final BufferedReader reader,
         final String line) {
-        if (line.matches("^ALTER TABLE .* OWNER TO .*;$")) {
-            return;
-        }
+        if (!line.matches("^ALTER TABLE .* OWNER TO .*;$")) {
+            Pattern pattern =
+                Pattern.compile("ALTER TABLE (?:ONLY )?([^ ]+)(?: )?(.+)?");
+            Matcher matcher = pattern.matcher(line);
 
-        Pattern pattern =
-            Pattern.compile("ALTER TABLE (?:ONLY )?([^ ]+)(?: )?(.+)?");
-        Matcher matcher = pattern.matcher(line);
-
-        final String tableName;
-
-        if (matcher.matches()) {
-            tableName = matcher.group(1);
-        } else {
-            tableName = "";
-
-            return;
-        }
-
-        final PgTable table = schema.getTable(tableName);
-        String origLine = null;
-        final String traillingDef = matcher.group(2);
-
-        if (traillingDef != null) {
-            pattern =
-                Pattern.compile(
-                        "(CLUSTER ON|ALTER COLUMN) ([^ ;]+)(?: SET STATISTICS )?(\\d+)?;?");
-            matcher = pattern.matcher(traillingDef);
+            final String tableName;
 
             if (matcher.matches()) {
-                if (matcher.group(1).compareTo("ALTER COLUMN") == 0) {
-                    //Stats
-                    final String columnName = matcher.group(2);
-                    final Integer value = Integer.valueOf(matcher.group(3));
-                    final PgColumn col = table.getColumn(columnName);
-                    col.setStatistics(value);
-                } else {
-                    //Cluster
-                    final String indexName = matcher.group(2);
-                    table.setClusterIndexName(indexName);
-                }
+                tableName = matcher.group(1);
+            } else {
+                throw new RuntimeException("Cannot parse command: " + line);
             }
 
-            return;
-        }
+            final PgTable table = schema.getTable(tableName);
+            String origLine = null;
+            final String traillingDef = matcher.group(2);
 
-        try {
-            String newLine = reader.readLine();
+            if (traillingDef == null) {
+                try {
+                    String newLine = reader.readLine();
 
-            while (newLine != null) {
-                boolean last = false;
-                origLine = newLine;
-                newLine = newLine.trim();
+                    while (newLine != null) {
+                        boolean last = false;
+                        origLine = newLine;
+                        newLine = newLine.trim();
 
-                if (newLine.endsWith(";")) {
-                    last = true;
-                    newLine = newLine.substring(0, newLine.length() - 1);
+                        if (newLine.endsWith(";")) {
+                            last = true;
+                            newLine = newLine.substring(
+                                        0,
+                                        newLine.length() - 1);
+                        }
+
+                        if (newLine.startsWith("ADD CONSTRAINT ")) {
+                            newLine =
+                                newLine.substring("ADD CONSTRAINT ".length())
+                                       .trim();
+
+                            final String constraintName =
+                                newLine.substring(0, newLine.indexOf(' ')).trim();
+                            final PgConstraint constraint =
+                                table.getConstraint(constraintName);
+                            constraint.setDefinition(
+                                    newLine.substring(newLine.indexOf(' '))
+                                           .trim());
+                        }
+
+                        if (last) {
+                            break;
+                        }
+
+                        newLine = reader.readLine();
+                    }
+                } catch (IOException ex) {
+                    throw new RuntimeException(IO_EXCEPTION, ex);
+                } catch (Exception ex) {
+                    throw new RuntimeException(
+                            "Cannot parse ALTER TABLE '" + tableName
+                            + "', line '" + origLine + "'",
+                            ex);
                 }
+            } else {
+                pattern =
+                    Pattern.compile(
+                            "(CLUSTER ON|ALTER COLUMN) ([^ ;]+)"
+                            + "(?: SET STATISTICS )?(\\d+)?;?");
+                matcher = pattern.matcher(traillingDef);
 
-                if (newLine.startsWith("ADD CONSTRAINT ")) {
-                    newLine = newLine.substring("ADD CONSTRAINT ".length())
-                                     .trim();
-
-                    final String constraintName =
-                        newLine.substring(0, newLine.indexOf(' ')).trim();
-                    final PgConstraint constraint =
-                        table.getConstraint(constraintName);
-                    constraint.setDefinition(
-                            newLine.substring(newLine.indexOf(' ')).trim());
+                if (matcher.matches()) {
+                    if ("ALTER COLUMN".equals(matcher.group(1))) {
+                        //Stats
+                        final String columnName = matcher.group(2);
+                        final Integer value = Integer.valueOf(matcher.group(3));
+                        final PgColumn col = table.getColumn(columnName);
+                        col.setStatistics(value);
+                    } else {
+                        //Cluster
+                        final String indexName = matcher.group(2);
+                        table.setClusterIndexName(indexName);
+                    }
                 }
-
-                if (last) {
-                    break;
-                }
-
-                newLine = reader.readLine();
             }
-        } catch (IOException ex) {
-            throw new RuntimeException(IO_EXCEPTION, ex);
-        } catch (Exception ex) {
-            throw new RuntimeException(
-                    "Cannot parse ALTER TABLE '" + tableName + "', line '"
-                    + origLine + "'",
-                    ex);
         }
     }
 
@@ -381,6 +380,7 @@ public class PgDumpLoader {
 
         final PgTable table = schema.getTable(tableName);
         String origLine = null;
+        boolean postColumns = false;
 
         try {
             String newLine = reader.readLine();
@@ -390,26 +390,54 @@ public class PgDumpLoader {
                 origLine = newLine;
                 newLine = newLine.trim();
 
-                if (");".equals(newLine)) {
-                    break;
-                } else if (newLine.endsWith(",")) {
-                    newLine = newLine.substring(0, newLine.length() - 1).trim();
-                } else if (newLine.endsWith(");")) {
-                    newLine = newLine.substring(0, newLine.length() - 2).trim();
-                    last = true;
+                if (postColumns) {
+                    if (newLine.endsWith(";")) {
+                        newLine = newLine.substring(0, newLine.length() - 1);
+                        last = true;
+                    }
+
+                    if (newLine.startsWith("INHERITS ")) {
+                        table.setInherits(
+                                newLine.substring("INHERITS ".length()).trim());
+                    }
+                } else {
+                    if (")".equals(newLine)) {
+                        postColumns = true;
+
+                        continue;
+                    } else if (");".equals(newLine)) {
+                        break;
+                    } else if (newLine.endsWith(",")) {
+                        newLine = newLine.substring(0, newLine.length() - 1)
+                                         .trim();
+                    } else if (newLine.endsWith(");")) {
+                        newLine = newLine.substring(0, newLine.length() - 2)
+                                         .trim();
+                        last = true;
+                    }
+
+                    if (newLine.length() == 0) {
+                        newLine = reader.readLine();
+
+                        continue;
+                    }
+
+                    if (newLine.startsWith("CONSTRAINT ")) {
+                        newLine = newLine.substring("CONSTRAINT ".length())
+                                         .trim();
+
+                        final String constraintName =
+                            newLine.substring(0, newLine.indexOf(' '));
+                        table.getConstraint(constraintName).setDefinition(
+                                newLine.substring(newLine.indexOf(' ')).trim());
+                    } else {
+                        final String columnName =
+                            newLine.substring(0, newLine.indexOf(' '));
+                        final PgColumn column = table.getColumn(columnName);
+                        column.parseDefinition(
+                                newLine.substring(newLine.indexOf(' ')).trim());
+                    }
                 }
-
-                if (newLine.length() == 0) {
-                    newLine = reader.readLine();
-
-                    continue;
-                }
-
-                final String columnName =
-                    newLine.substring(0, newLine.indexOf(' '));
-                final PgColumn column = table.getColumn(columnName);
-                column.parseDefinition(
-                        newLine.substring(newLine.indexOf(' ')).trim());
 
                 if (last) {
                     break;

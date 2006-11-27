@@ -51,20 +51,6 @@ public class PgDiffTest {
      * Provides parameters for running the tests.
      *
      * @return parameters for the tests
-     *
-     * @todo Test scenario where CONSTRAINT on COLUMN is modified.
-     * @todo Test scenario where new TABLE is added.
-     * @todo Test scenario where TABLE is dropped.
-     * @todo Test scenario where TABLE with CONSTRAINT that depends on the
-     *       table is dropped.
-     * @todo Test scenario where TABLE with INDEX that depends on the table is
-     *       dropped.
-     * @todo Test scenarios for INHERITED table(s).
-     * @todo Test that all possible data types are read in correctly.
-     * @todo Test scenario where COLUMN with CONSTRAINT that depends on the
-     *       COLUMN is dropped from TABLE.
-     * @todo Test scenario where COLUMN with INDEX that depends on the COLUMN
-     *       is dropped from TABLE.
      */
     @Parameters
     public static Collection parameters() {
@@ -115,7 +101,24 @@ public class PgDiffTest {
                     // Tests scenario where COLUMN is added to TABLE definition.
                     {"add_column" },
                     // Tests scenario where COLUMN is dropped from TABLE.
-                    {"drop_column" }
+                    {"drop_column" },
+                    // Tests scenario where new TABLE is added.
+                    {"add_table" },
+                    // Tests scenario where TABLE is dropped.
+                    {"drop_table" },
+                    // Tests scenario where TABLE CONSTRAINT is added.
+                    {"add_constraint" },
+                    // Tests scenario where TABLE CONSTRAINT is modified.
+                    {"modify_constraint" },
+                    // Tests scenario where TABLE CONSTRAINT is dropped.
+                    {"drop_constraint" },
+                    // Tests reading of TABLE with INHERITS.
+                    {"read_inherits" },
+                    // Tests scenario where TABLE with INHERITS is added.
+                    {"add_inherits" },
+                    // Tests scenario where original and new TABLE contain
+                //different INHERITS.
+                    {"modify_inherits" }
                 });
     }
 

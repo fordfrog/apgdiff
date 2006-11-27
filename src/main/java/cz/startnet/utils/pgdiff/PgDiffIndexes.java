@@ -74,7 +74,7 @@ public class PgDiffIndexes {
      *
      * @return list of indexes that should be dropped
      *
-     * @todo Indexes that are dependent on a removed field should not be added
+     * @todo Indexes that are depending on a removed field should not be added
      *       to drop because they are already removed.
      */
     private static List<PgIndex> getDropIndexes(

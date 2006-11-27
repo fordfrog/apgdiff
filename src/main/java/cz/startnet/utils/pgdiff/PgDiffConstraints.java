@@ -83,7 +83,7 @@ public class PgDiffConstraints {
      *
      * @return list of constraints that should be dropped
      *
-     * @todo Constraints that are dependent on a removed field should not be
+     * @todo Constraints that are depending on a removed field should not be
      *       added to drop because they are already removed.
      */
     private static List<PgConstraint> getDropConstraints(

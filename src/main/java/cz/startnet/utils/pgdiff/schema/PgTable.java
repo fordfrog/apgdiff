@@ -45,6 +45,11 @@ public class PgTable {
     private String clusterIndexName = null;
 
     /**
+     * Definition of names of inherited tables.
+     */
+    private String inherits = null;
+
+    /**
      * Name of the table.
      */
     private String name = null;
@@ -171,6 +176,24 @@ public class PgTable {
     }
 
     /**
+     * Setter for {@link #inherits inherits}.
+     *
+     * @param inherits {@link #inherits inherits}
+     */
+    public void setInherits(final String inherits) {
+        this.inherits = inherits;
+    }
+
+    /**
+     * Getter for {@link #inherits inherits}.
+     *
+     * @return {@link #inherits inherits}
+     */
+    public String getInherits() {
+        return inherits;
+    }
+
+    /**
      * Setter for {@link #name name}.
      *
      * @param name {@link #name name}
@@ -224,12 +247,19 @@ public class PgTable {
         }
 
         sbSQL.setLength(sbSQL.length() - 2);
-        sbSQL.append("\n);");
+        sbSQL.append("\n)");
+
+        if ((inherits != null) && (inherits.length() > 0)) {
+            sbSQL.append("\nINHERITS ");
+            sbSQL.append(inherits);
+        }
+
+        sbSQL.append(';');
 
         for (Map.Entry<String, Integer> entry : colsWithStats.entrySet()) {
             sbSQL.append("\nALTER TABLE ONLY ");
             sbSQL.append(name);
-            sbSQL.append(" ALTER column ");
+            sbSQL.append(" ALTER COLUMN ");
             sbSQL.append(entry.getKey());
             sbSQL.append(" SET STATISTICS ");
             sbSQL.append(entry.getValue());
