@@ -1,5 +1,5 @@
 /*
- * $CVSHeader$
+ * $Id$
  */
 package cz.startnet.utils.pgdiff;
 
@@ -11,7 +11,7 @@ import java.io.PrintWriter;
  * in the schemas.
  *
  * @author fordfrog
- * @version $CVSHeader$
+ * @version $Id$
  */
 public class Main {
     /**

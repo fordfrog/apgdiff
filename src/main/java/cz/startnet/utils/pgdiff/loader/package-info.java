@@ -1,6 +1,6 @@
 /**
  * Contains PostgreSQL dump loader.<br/>
- * $CVSHeader$
+ * $Id$
  */
 package cz.startnet.utils.pgdiff.loader;
 

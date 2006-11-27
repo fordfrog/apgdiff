@@ -1,5 +1,5 @@
 /*
- * $CVSHeader$
+ * $Id$
  */
 package cz.startnet.utils.pgdiff;
 
@@ -26,7 +26,7 @@ import java.util.Collection;
  * Tests for PgDiff class.
  *
  * @author fordfrog
- * @version $CVSHeader$
+ * @version $Id$
  */
 @RunWith(value = Parameterized.class)
 public class PgDiffTest {

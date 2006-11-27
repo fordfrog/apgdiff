@@ -1,5 +1,5 @@
 /*
- * $CVSHeader$
+ * $Id$
  */
 package cz.startnet.utils.pgdiff;
 
@@ -19,7 +19,7 @@ import java.util.Set;
  * Diffs indexes.
  *
  * @author fordfrog
- * @version $CVSHeader$
+ * @version $Id$
  */
 public class PgDiffIndexes {
     /**

@@ -1,5 +1,5 @@
 /*
- * $CVSHeader$
+ * $Id$
  */
 package cz.startnet.utils.pgdiff.loader;
 
@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
  * Loads PostgreSQL dump into classes.
  *
  * @author fordfrog
- * @version $CVSHeader$
+ * @version $Id$
  *
  * @todo Needs review.
  */

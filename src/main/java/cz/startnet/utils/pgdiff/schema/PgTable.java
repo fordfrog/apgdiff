@@ -1,5 +1,5 @@
 /*
- * $CVSHeader$
+ * $Id$
  */
 package cz.startnet.utils.pgdiff.schema;
 
@@ -13,7 +13,7 @@ import java.util.Map;
  * Stores table information.
  *
  * @author fordfrog
- * @version $CVSHeader$
+ * @version $Id$
  */
 public class PgTable {
     /**

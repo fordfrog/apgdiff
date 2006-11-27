@@ -1,5 +1,5 @@
 /*
- * $CVSHeader$
+ * $Id$
  */
 package cz.startnet.utils.pgdiff;
 
@@ -17,7 +17,7 @@ import java.util.Set;
  * Diffs sequences.
  *
  * @author fordfrog
- * @version $CVSHeader$
+ * @version $Id$
  */
 public class PgDiffSequences {
     /**

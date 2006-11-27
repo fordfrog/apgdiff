@@ -1,5 +1,5 @@
 /*
- * $CVSHeader$
+ * $Id$
  */
 package cz.startnet.utils.pgdiff;
 
@@ -14,7 +14,7 @@ import java.io.PrintWriter;
  * Creates diff of two schemas.
  *
  * @author fordfrog
- * @version $CVSHeader$
+ * @version $Id$
  */
 public class PgDiff {
     /**

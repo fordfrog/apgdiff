@@ -1,6 +1,6 @@
 /**
  * Contains tool that creates diff file from two PostgreSQL dump files.<br/>
- * $CVSHeader$
+ * $Id$
  */
 package cz.startnet.utils.pgdiff;
 

@@ -1,5 +1,5 @@
 /*
- * $CVSHeader$
+ * $Id$
  */
 package cz.startnet.utils.pgdiff.schema;
 
@@ -7,7 +7,7 @@ package cz.startnet.utils.pgdiff.schema;
  * Stores table index information.
  *
  * @author fordfrog
- * @version $CVSHeader$
+ * @version $Id$
  */
 public class PgIndex {
     /**

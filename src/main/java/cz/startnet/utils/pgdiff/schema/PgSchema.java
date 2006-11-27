@@ -1,5 +1,5 @@
 /*
- * $CVSHeader$
+ * $Id$
  */
 package cz.startnet.utils.pgdiff.schema;
 
@@ -11,7 +11,7 @@ import java.util.Map;
  * Stores schema information.
  *
  * @author fordfrog
- * @version $CVSHeader$
+ * @version $Id$
  */
 public class PgSchema {
     /**

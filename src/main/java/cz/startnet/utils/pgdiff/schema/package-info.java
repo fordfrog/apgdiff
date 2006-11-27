@@ -1,6 +1,6 @@
 /**
  * Contains PostgreSQL schema objects.<br/>
- * $CVSHeader$
+ * $Id$
  */
 package cz.startnet.utils.pgdiff.schema;
 

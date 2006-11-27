@@ -1,5 +1,5 @@
 /*
- * $CVSHeader$
+ * $Id$
  */
 package cz.startnet.utils.pgdiff.schema;
 
@@ -7,7 +7,7 @@ package cz.startnet.utils.pgdiff.schema;
  * Stores column information.
  *
  * @author fordfrog
- * @version $CVSHeader$
+ * @version $Id$
  */
 public class PgColumn {
     /**
