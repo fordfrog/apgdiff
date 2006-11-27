@@ -6,6 +6,7 @@ package cz.startnet.utils.pgdiff;
 import cz.startnet.utils.pgdiff.loader.PgDumpLoader;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 
+import java.io.InputStream;
 import java.io.PrintWriter;
 
 
@@ -27,34 +28,54 @@ public class PgDiff {
      * Creates diff on the two schemas.
      *
      * @param writer writer the output should be written to
-     * @param file1 name of file containing dump of the original schema
-     * @param file2 name of file containing dump of the new schema
+     * @param oldFile name of file containing dump of the original schema
+     * @param newFile name of file containing dump of the new schema
      */
     public static void createDiff(
         final PrintWriter writer,
-        final String file1,
-        final String file2) {
+        final String oldFile,
+        final String newFile) {
         diffSchemas(
                 writer,
-                PgDumpLoader.loadSchema(file1),
-                PgDumpLoader.loadSchema(file2));
+                PgDumpLoader.loadSchema(oldFile),
+                PgDumpLoader.loadSchema(newFile));
+    }
+
+    /**
+     * Creates diff on the two schemas.
+     *
+     * @param writer writer the output should be written to
+     * @param oldInputStream input stream of file containing dump of the
+     *        original schema
+     * @param newInputStream input stream of file containing dump of the new
+     *        schema
+     */
+    public static void createDiff(
+        final PrintWriter writer,
+        final InputStream oldInputStream,
+        final InputStream newInputStream) {
+        diffSchemas(
+                writer,
+                PgDumpLoader.loadSchema(oldInputStream),
+                PgDumpLoader.loadSchema(newInputStream));
     }
 
     /**
      * Creates diff from comparison of two schemas.
      *
      * @param writer writer the output should be written to
-     * @param schema1 original schema
-     * @param schema2 new schema
+     * @param oldSchema original schema
+     * @param newSchema new schema
      */
     private static void diffSchemas(
         final PrintWriter writer,
-        final PgSchema schema1,
-        final PgSchema schema2) {
-        PgDiffTables.diffTables(writer, schema1, schema2);
-        PgDiffSequences.diffSequences(writer, schema1, schema2);
-        PgDiffConstraints.diffConstraints(writer, schema1, schema2, true);
-        PgDiffConstraints.diffConstraints(writer, schema1, schema2, false);
-        PgDiffIndexes.diffIndexes(writer, schema1, schema2);
+        final PgSchema oldSchema,
+        final PgSchema newSchema) {
+        PgDiffTables.diffTables(writer, oldSchema, newSchema);
+        PgDiffSequences.diffSequences(writer, oldSchema, newSchema);
+        PgDiffConstraints.diffConstraints(writer, oldSchema, newSchema, true);
+        PgDiffConstraints.diffConstraints(writer, oldSchema, newSchema, false);
+        PgDiffIndexes.diffIndexes(writer, oldSchema, newSchema);
+        PgDiffTables.diffClusters(writer, oldSchema, newSchema);
     }
 }

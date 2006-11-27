@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 
@@ -43,29 +44,24 @@ public class PgDumpLoader {
     /**
      * Loads schema from dump file.
      *
-     * @param file name of file containing the dump
+     * @param inputStream input stream that should be read
      *
-     * @return schema from dump file
+     * @return schema from dump fle
      *
-     * @throws UnsupportedOperationException Thrown if encoding is not
-     *         supported.
-     * @throws RuntimeException Thrown if file not found or problem occured
-     *         while reading the file.
+     * @throws UnsupportedOperationException Thrown if unsupported encoding has
+     *         been encountered.
+     * @throws RuntimeException Thrown if problem occured while reading input
+     *         stream.
      */
-    public static PgSchema loadSchema(final String file) {
+    public static PgSchema loadSchema(final InputStream inputStream) {
         final PgSchema schema = new PgSchema();
         BufferedReader reader = null;
 
         try {
             reader =
-                new BufferedReader(
-                        new InputStreamReader(
-                                new FileInputStream(file),
-                                "UTF-8"));
+                new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
         } catch (UnsupportedEncodingException ex) {
             throw new UnsupportedOperationException("Unsupported encoding", ex);
-        } catch (FileNotFoundException ex) {
-            throw new RuntimeException("File '" + file + "' not found", ex);
         }
 
         try {
@@ -108,6 +104,23 @@ public class PgDumpLoader {
         }
 
         return schema;
+    }
+
+    /**
+     * Loads schema from dump file.
+     *
+     * @param file name of file containing the dump
+     *
+     * @return schema from dump file
+     *
+     * @throws RuntimeException Thrown if file not found.
+     */
+    public static PgSchema loadSchema(final String file) {
+        try {
+            return loadSchema(new FileInputStream(file));
+        } catch (FileNotFoundException ex) {
+            throw new RuntimeException("File '" + file + "' not found", ex);
+        }
     }
 
     /**

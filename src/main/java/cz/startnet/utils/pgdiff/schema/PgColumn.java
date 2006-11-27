@@ -212,6 +212,14 @@ public class PgColumn {
                        .trim();
                 def = def.substring(type.length()).trim();
             }
+        } else if (def.startsWith("double precision")) {
+            type = "double precision";
+
+            if ("double precision".equals(def)) {
+                def = "";
+            } else {
+                def = def.substring("double precision".length()).trim();
+            }
         } else {
             if (def.indexOf(' ') == -1) {
                 type = def;

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <actions>
   <action>
     <actionName>run</actionName>
@@ -12,6 +13,36 @@
       <netbeans.jar.run.params>/home/fordfrog/src/database/intranet/20060728_original.sql /home/fordfrog/src/database/intranet/20060728_clean.sql</netbeans.jar.run.params>
     </properties>
   </action>
+  <actions>
+        <action>
+            <actionName>run</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>package</goal>
+                <goal>org.codehaus.mevenide:netbeans-run-plugin:LATEST:run-jar</goal>
+            </goals>
+            <properties>
+                <netbeans.jar.run.params>/home/fordfrog/src/database/intranet/20060728_original.sql /home/fordfrog/src/database/intranet/20060728_clean.sql</netbeans.jar.run.params>
+            </properties>
+        </action>
+        <action>
+            <actionName>debug</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>package</goal>
+                <goal>org.codehaus.mevenide:netbeans-run-plugin:LATEST:run-jar</goal>
+            </goals>
+            <properties>
+                <netbeans.jar.run.params>/home/fordfrog/src/database/intranet/20060728_original.sql /home/fordfrog/src/database/intranet/20060728_clean.sql</netbeans.jar.run.params>
+                <jpda.listen>true</jpda.listen>
+                <netbeans.jar.run.debugparams>-Xdebug -Djava.compiler=none -Xnoagent -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address}</netbeans.jar.run.debugparams>
+            </properties>
+        </action>
+    </actions>
   <action>
     <actionName>debug</actionName>
     <packagings>

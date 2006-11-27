@@ -1,0 +1,3 @@
+
+ALTER TABLE testtable
+	ALTER COLUMN field4 DROP DEFAULT;

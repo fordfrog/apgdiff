@@ -33,47 +33,43 @@ public class PgDiffConstraints {
      * Outputs commands for differences in constraints.
      *
      * @param writer writer the output should be written to
-     * @param schema1 original schema
-     * @param schema2 new schema
+     * @param oldSchema original schema
+     * @param newSchema new schema
      * @param primaryKey determines whether primery keys should be processed or
      *        any other constraints should be processed
      */
     public static void diffConstraints(
         final PrintWriter writer,
-        final PgSchema schema1,
-        final PgSchema schema2,
+        final PgSchema oldSchema,
+        final PgSchema newSchema,
         final boolean primaryKey) {
-        final Map<String, PgTable> tables1 = schema1.getTables();
+        final Map<String, PgTable> oldTables = oldSchema.getTables();
 
-        for (PgTable table2 : schema2.getTables().values()) {
-            final String tableName2 = table2.getName();
-            final PgTable table1 = tables1.get(tableName2);
+        for (PgTable newTable : newSchema.getTables().values()) {
+            final String newTableName = newTable.getName();
+            final PgTable oldTable = oldTables.get(newTableName);
 
             // Drop constraints that do not exist in new schema or are modified
             for (PgConstraint constraint : getDropConstraints(
-                        tables1.get(tableName2),
-                        table2,
+                        oldTables.get(newTableName),
+                        newTable,
                         primaryKey)) {
                 writer.println();
-                writer.println("ALTER TABLE " + tableName2);
+                writer.println("ALTER TABLE " + newTableName);
                 writer.println(
                         "\tDROP CONSTRAINT " + constraint.getName() + ";");
             }
 
             // Add new constraints
             for (PgConstraint constraint : getNewConstraints(
-                        tables1.get(tableName2),
-                        table2,
+                        oldTables.get(newTableName),
+                        newTable,
                         primaryKey)) {
                 writer.println();
-                writer.println("ALTER TABLE " + tableName2);
+                writer.println("ALTER TABLE " + newTableName);
                 writer.println(
                         "\tADD CONSTRAINT " + constraint.getName() + " "
                         + constraint.getDefinition() + ";");
-            }
-
-            if ((table1 != null) && !primaryKey) {
-                dropOrCreateCluster(writer, tables1.get(tableName2), table2);
             }
         }
     }
@@ -81,8 +77,8 @@ public class PgDiffConstraints {
     /**
      * Returns list of constraints that should be dropped.
      *
-     * @param table1 original table or null
-     * @param table2 new table or null
+     * @param oldTable original table or null
+     * @param newTable new table or null
      * @param primaryKey determines whether primery keys should be processed or
      *        any other constraints should be processed
      *
@@ -92,20 +88,21 @@ public class PgDiffConstraints {
      *       added to drop because they are already removed.
      */
     private static List<PgConstraint> getDropConstraints(
-        final PgTable table1,
-        final PgTable table2,
+        final PgTable oldTable,
+        final PgTable newTable,
         final boolean primaryKey) {
         final List<PgConstraint> list = new ArrayList<PgConstraint>();
 
-        if ((table2 != null) && (table1 != null)) {
-            final Set<String> names2 = table2.getConstraints().keySet();
+        if ((newTable != null) && (oldTable != null)) {
+            final Set<String> newNames = newTable.getConstraints().keySet();
 
-            for (final PgConstraint constraint : table1.getConstraints().values()) {
+            for (final PgConstraint constraint : oldTable.getConstraints()
+                                                         .values()) {
                 if (
                     (constraint.isPrimaryKeyConstraint() == primaryKey)
-                        && (!names2.contains(constraint.getName())
-                        || !table2.getConstraint(constraint.getName())
-                                      .getDefinition().equals(
+                        && (!newNames.contains(constraint.getName())
+                        || !newTable.getConstraint(constraint.getName())
+                                        .getDefinition().equals(
                                 constraint.getDefinition()))) {
                     list.add(constraint);
                 }
@@ -118,37 +115,37 @@ public class PgDiffConstraints {
     /**
      * Returns list of constraints that should be added.
      *
-     * @param table1 original table
-     * @param table2 new table
+     * @param oldTable original table
+     * @param newTable new table
      * @param primaryKey determines whether primery keys should be processed or
      *        any other constraints should be processed
      *
      * @return list of constraints that should be added
      */
     private static List<PgConstraint> getNewConstraints(
-        final PgTable table1,
-        final PgTable table2,
+        final PgTable oldTable,
+        final PgTable newTable,
         final boolean primaryKey) {
         final List<PgConstraint> list = new ArrayList<PgConstraint>();
 
-        if (table2 != null) {
-            if (table1 == null) {
-                for (final PgConstraint constraint : table2.getConstraints()
-                                                           .values()) {
+        if (newTable != null) {
+            if (oldTable == null) {
+                for (final PgConstraint constraint : newTable.getConstraints()
+                                                             .values()) {
                     if (constraint.isPrimaryKeyConstraint() == primaryKey) {
                         list.add(constraint);
                     }
                 }
             } else {
-                final Set<String> names1 = table1.getConstraints().keySet();
+                final Set<String> oldNames = oldTable.getConstraints().keySet();
 
-                for (final PgConstraint constraint : table2.getConstraints()
-                                                           .values()) {
+                for (final PgConstraint constraint : newTable.getConstraints()
+                                                             .values()) {
                     if (
                         (constraint.isPrimaryKeyConstraint() == primaryKey)
-                            && (!names1.contains(constraint.getName())
-                            || !table1.getConstraint(constraint.getName())
-                                          .getDefinition().equals(
+                            && (!oldNames.contains(constraint.getName())
+                            || !oldTable.getConstraint(constraint.getName())
+                                            .getDefinition().equals(
                                     constraint.getDefinition()))) {
                         list.add(constraint);
                     }
@@ -157,44 +154,5 @@ public class PgDiffConstraints {
         }
 
         return list;
-    }
-
-    /**
-     * Generates and outputs CLUSTER specific DDL if appropriate.
-     *
-     * @param writer writer the output should be written to
-     * @param table1 original table
-     * @param table2 new table
-     */
-    private static void dropOrCreateCluster(
-        final PrintWriter writer,
-        final PgTable table1,
-        final PgTable table2) {
-        final String oldCluster = table1.getClusterIndexName();
-        final String newCluster = table2.getClusterIndexName();
-
-        if ((oldCluster == null) && (newCluster != null)) {
-            writer.println();
-            writer.print("ALTER TABLE ");
-            writer.print(table2.getName());
-            writer.print(" CLUSTER ON ");
-            writer.print(newCluster);
-            writer.print(" ;");
-        } else if ((oldCluster != null) && (newCluster == null)) {
-            writer.println();
-            writer.print("ALTER TABLE ");
-            writer.print(table2.getName());
-            writer.print(" SET WITHOUT CLUSTER;");
-        } else if (
-            (oldCluster != null)
-                && (newCluster != null)
-                && (newCluster.compareTo(oldCluster) != 0)) {
-            writer.println();
-            writer.print("ALTER TABLE ");
-            writer.print(table2.getName());
-            writer.print(" CLUSTER ON ");
-            writer.print(newCluster);
-            writer.print(" ;");
-        }
     }
 }

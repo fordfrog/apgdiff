@@ -33,32 +33,35 @@ public class PgDiffIndexes {
      * Outputs commands for differences in indexes.
      *
      * @param writer writer the output should be written to
-     * @param schema1 original schema
-     * @param schema2 new schema
+     * @param oldSchema original schema
+     * @param newSchema new schema
      */
     public static void diffIndexes(
         final PrintWriter writer,
-        final PgSchema schema1,
-        final PgSchema schema2) {
-        final Map<String, PgTable> tables1 = schema1.getTables();
+        final PgSchema oldSchema,
+        final PgSchema newSchema) {
+        final Map<String, PgTable> oldTables = oldSchema.getTables();
 
-        for (PgTable table2 : schema2.getTables().values()) {
-            final String tableName2 = table2.getName();
+        for (PgTable newTable : newSchema.getTables().values()) {
+            final String newTableName = newTable.getName();
 
             // Drop indexes that do not exist in new schema or are modified
             for (PgIndex index : getDropIndexes(
-                        tables1.get(tableName2),
-                        table2)) {
+                        oldTables.get(newTableName),
+                        newTable)) {
                 writer.println();
                 writer.println("DROP INDEX " + index.getName() + ";");
             }
 
             // Add new constraints
-            for (PgIndex index : getNewIndexes(tables1.get(tableName2), table2)) {
+            for (PgIndex index : getNewIndexes(
+                        oldTables.get(newTableName),
+                        newTable)) {
                 writer.println();
                 writer.println(
                         "CREATE INDEX " + index.getName() + " ON "
-                        + table2.getName() + " " + index.getDefinition() + ";");
+                        + newTable.getName() + " " + index.getDefinition()
+                        + ";");
             }
         }
     }
@@ -66,8 +69,8 @@ public class PgDiffIndexes {
     /**
      * Returns list of indexes that should be dropped.
      *
-     * @param table1 original table
-     * @param table2 new table
+     * @param oldTable original table
+     * @param newTable new table
      *
      * @return list of indexes that should be dropped
      *
@@ -75,17 +78,17 @@ public class PgDiffIndexes {
      *       to drop because they are already removed.
      */
     private static List<PgIndex> getDropIndexes(
-        final PgTable table1,
-        final PgTable table2) {
+        final PgTable oldTable,
+        final PgTable newTable) {
         final List<PgIndex> list = new ArrayList<PgIndex>();
 
-        if ((table2 != null) && (table1 != null)) {
-            final Set<String> names2 = table2.getIndexes().keySet();
+        if ((newTable != null) && (oldTable != null)) {
+            final Set<String> newNames = newTable.getIndexes().keySet();
 
-            for (final PgIndex index : table1.getIndexes().values()) {
+            for (final PgIndex index : oldTable.getIndexes().values()) {
                 if (
-                    !names2.contains(index.getName())
-                        || !table2.getIndex(index.getName()).getDefinition().equals(
+                    !newNames.contains(index.getName())
+                        || !newTable.getIndex(index.getName()).getDefinition().equals(
                                 index.getDefinition())) {
                     list.add(index);
                 }
@@ -98,29 +101,30 @@ public class PgDiffIndexes {
     /**
      * Returns list of indexes that should be added.
      *
-     * @param table1 original table
-     * @param table2 new table
+     * @param oldTable original table
+     * @param newTable new table
      *
      * @return list of indexes that should be added
      */
     private static List<PgIndex> getNewIndexes(
-        final PgTable table1,
-        final PgTable table2) {
+        final PgTable oldTable,
+        final PgTable newTable) {
         final List<PgIndex> list = new ArrayList<PgIndex>();
 
-        if (table2 != null) {
-            if (table1 == null) {
-                for (final PgIndex index : table2.getIndexes().values()) {
+        if (newTable != null) {
+            if (oldTable == null) {
+                for (final PgIndex index : newTable.getIndexes().values()) {
                     list.add(index);
                 }
             } else {
-                final Set<String> names1 = table1.getIndexes().keySet();
+                final Set<String> oldNames = oldTable.getIndexes().keySet();
 
-                for (final PgIndex index : table2.getIndexes().values()) {
+                for (final PgIndex index : newTable.getIndexes().values()) {
                     if (
-                        !names1.contains(index.getName())
-                            || !table1.getIndex(index.getName()).getDefinition()
-                                          .equals(index.getDefinition())) {
+                        !oldNames.contains(index.getName())
+                            || !oldTable.getIndex(index.getName())
+                                            .getDefinition().equals(
+                                    index.getDefinition())) {
                         list.add(index);
                     }
                 }

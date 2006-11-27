@@ -258,4 +258,16 @@ public class PgTable {
     public boolean containsColumn(final String name) {
         return columns.containsKey(name);
     }
+
+    /**
+     * Returns true if table contains given index name, otherwise
+     * false.
+     *
+     * @param name name of the index
+     *
+     * @return true if table contains given index name, otherwise false
+     */
+    public boolean containsIndex(final String name) {
+        return indexes.containsKey(name);
+    }
 }

@@ -31,33 +31,33 @@ public class PgDiffSequences {
      * Outputs commands for differences in sequences.
      *
      * @param writer writer the output should be written to
-     * @param schema1 original schema
-     * @param schema2 new schema
+     * @param oldSchema original schema
+     * @param newSchema new schema
      */
     public static void diffSequences(
         final PrintWriter writer,
-        final PgSchema schema1,
-        final PgSchema schema2) {
+        final PgSchema oldSchema,
+        final PgSchema newSchema) {
         // Drop sequences that do not exist in new schema
-        for (PgSequence sequence : getDropSequences(schema1, schema2)) {
+        for (PgSequence sequence : getDropSequences(oldSchema, newSchema)) {
             writer.println();
             writer.println("DROP SEQUENCE " + sequence.getName() + ";");
         }
 
         // Add new sequences
-        for (PgSequence sequence : getNewSequences(schema1, schema2)) {
+        for (PgSequence sequence : getNewSequences(oldSchema, newSchema)) {
             writer.println();
             writer.println("CREATE SEQUENCE " + sequence.getName());
             writer.println(sequence.getDefinition() + ";");
         }
 
         // Inform about modified sequences
-        for (PgSequence sequence : getModifiedSequences(schema1, schema2)) {
+        for (PgSequence sequence : getModifiedSequences(oldSchema, newSchema)) {
             writer.println();
             writer.println("MODIFIED SEQUENCE " + sequence.getName());
             writer.println(
                     "ORIGINAL: "
-                    + schema1.getSequence(sequence.getName()).getDefinition());
+                    + oldSchema.getSequence(sequence.getName()).getDefinition());
             writer.println("NEW: " + sequence.getDefinition());
         }
     }
@@ -65,19 +65,19 @@ public class PgDiffSequences {
     /**
      * Returns list of sequences that should be dropped.
      *
-     * @param schema1 original schema
-     * @param schema2 new schema
+     * @param oldSchema original schema
+     * @param newSchema new schema
      *
      * @return list of sequences that should be dropped
      */
     private static List<PgSequence> getDropSequences(
-        final PgSchema schema1,
-        final PgSchema schema2) {
+        final PgSchema oldSchema,
+        final PgSchema newSchema) {
         final List<PgSequence> list = new ArrayList<PgSequence>();
-        final Set<String> names2 = schema2.getSequences().keySet();
+        final Set<String> newNames = newSchema.getSequences().keySet();
 
-        for (final PgSequence sequence : schema1.getSequences().values()) {
-            if (!names2.contains(sequence.getName())) {
+        for (final PgSequence sequence : oldSchema.getSequences().values()) {
+            if (!newNames.contains(sequence.getName())) {
                 list.add(sequence);
             }
         }
@@ -88,22 +88,22 @@ public class PgDiffSequences {
     /**
      * Returns list of modified sequences.
      *
-     * @param schema1 original schema
-     * @param schema2 new schema
+     * @param oldSchema original schema
+     * @param newSchema new schema
      *
      * @return list of modified sequences
      */
     private static List<PgSequence> getModifiedSequences(
-        final PgSchema schema1,
-        final PgSchema schema2) {
+        final PgSchema oldSchema,
+        final PgSchema newSchema) {
         final List<PgSequence> list = new ArrayList<PgSequence>();
-        final Set<String> names1 = schema1.getSequences().keySet();
+        final Set<String> oldNames = oldSchema.getSequences().keySet();
 
-        for (final PgSequence sequence : schema2.getSequences().values()) {
+        for (final PgSequence sequence : newSchema.getSequences().values()) {
             if (
-                names1.contains(sequence.getName())
-                    && !schema1.getSequence(sequence.getName()).getDefinition().equals(
-                            sequence.getDefinition())) {
+                oldNames.contains(sequence.getName())
+                    && !oldSchema.getSequence(sequence.getName()).getDefinition()
+                                     .equals(sequence.getDefinition())) {
                 list.add(sequence);
             }
         }
@@ -114,19 +114,19 @@ public class PgDiffSequences {
     /**
      * Returns list of sequences that should be added.
      *
-     * @param schema1 original table
-     * @param schema2 new table
+     * @param oldSchema original table
+     * @param newSchema new table
      *
      * @return list of sequences that should be added
      */
     private static List<PgSequence> getNewSequences(
-        final PgSchema schema1,
-        final PgSchema schema2) {
+        final PgSchema oldSchema,
+        final PgSchema newSchema) {
         final List<PgSequence> list = new ArrayList<PgSequence>();
-        final Set<String> names1 = schema1.getSequences().keySet();
+        final Set<String> oldNames = oldSchema.getSequences().keySet();
 
-        for (final PgSequence sequence : schema2.getSequences().values()) {
-            if (!names1.contains(sequence.getName())) {
+        for (final PgSequence sequence : newSchema.getSequences().values()) {
+            if (!oldNames.contains(sequence.getName())) {
                 list.add(sequence);
             }
         }
