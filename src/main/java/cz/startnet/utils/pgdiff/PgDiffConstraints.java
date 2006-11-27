@@ -47,7 +47,6 @@ public class PgDiffConstraints {
 
         for (PgTable newTable : newSchema.getTables().values()) {
             final String newTableName = newTable.getName();
-            final PgTable oldTable = oldTables.get(newTableName);
 
             // Drop constraints that do not exist in new schema or are modified
             for (PgConstraint constraint : getDropConstraints(

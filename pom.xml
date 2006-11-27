@@ -41,9 +41,8 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:cvs:pserver:anonymous@apgdiff.cvs.sourceforge.net:/cvsroot/apgdiff:apgdiff</connection>
-        <developerConnection>scm:cvs:ext:username@apgdiff.cvs.sourceforge.net:/cvsroot/apgdiff/:apgdiff</developerConnection>
-        <url>http://apgdiff.cvs.sourceforge.net/apgdiff</url>
+        <connection>scm:svn:https://svn.sourceforge.net/svnroot/apgdiff</connection>
+        <url>http://svn.sourceforge.net/apgdiff/</url>
     </scm>
     <organization>
         <name>StartNet s.r.o.</name>
