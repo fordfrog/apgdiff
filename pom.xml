@@ -168,6 +168,14 @@
                 <checksumPolicy>warn</checksumPolicy>
             </snapshots>
         </pluginRepository>
+        <pluginRepository>
+            <id>stat-scm-sourceforge</id>
+            <url>http://stat-scm.sourceforge.net/maven2</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>stat-scm-sourceforge-snapshot</id>
+            <url>http://stat-scm.sourceforge.net/maven2-snapshots</url>
+        </pluginRepository>
     </pluginRepositories>
     <dependencies>
         <dependency>
@@ -199,6 +207,11 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>net.sf</groupId>
+                <artifactId>stat-scm</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </plugin>
+            <plugin>
                 <artifactId>maven-pmd-plugin</artifactId>
                 <configuration>
                     <sourceEncoding>utf-8</sourceEncoding>
@@ -209,29 +222,6 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>taglist-maven-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>changelog-maven-plugin</artifactId>
-                <reportSets>
-                    <reportSet>
-                        <id>all-reports</id>
-                        <configuration>
-                            <type>range</type>
-                            <range>30</range>
-                        </configuration>
-                        <reports>
-                            <report>changelog</report>
-                            <report>file-activity</report>
-                            <report>dev-activity</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            <!--
-            <plugin>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-            </plugin>
-            -->
             <plugin>
                 <artifactId>maven-jxr-plugin</artifactId>
                 <configuration>
