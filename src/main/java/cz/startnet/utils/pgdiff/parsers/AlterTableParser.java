@@ -70,7 +70,7 @@ public class AlterTableParser {
             final String tableName;
 
             if (matcher.matches()) {
-                tableName = matcher.group(1);
+                tableName = matcher.group(1).trim();
             } else {
                 throw new ParserException(
                         ParserException.CANNOT_PARSE_COMMAND + line);
@@ -82,7 +82,7 @@ public class AlterTableParser {
             if (traillingDef == null) {
                 parseRows(table, reader);
             } else {
-                parseTraillingDef(table, traillingDef);
+                parseTraillingDef(table, traillingDef.trim());
             }
         }
     }
@@ -155,15 +155,15 @@ public class AlterTableParser {
         final Matcher matcher = PATTERN_TRAILING_DEF.matcher(traillingDef);
 
         if (matcher.matches()) {
-            if ("ALTER COLUMN".equals(matcher.group(1))) {
+            if ("ALTER COLUMN".equals(matcher.group(1).trim())) {
                 //Stats
-                final String columnName = matcher.group(2);
-                final Integer value = Integer.valueOf(matcher.group(3));
+                final String columnName = matcher.group(2).trim();
+                final Integer value = Integer.valueOf(matcher.group(3).trim());
                 final PgColumn col = table.getColumn(columnName);
                 col.setStatistics(value);
             } else {
                 //Cluster
-                final String indexName = matcher.group(2);
+                final String indexName = matcher.group(2).trim();
                 table.setClusterIndexName(indexName);
             }
         }

@@ -2,7 +2,7 @@
   <property file="${user.home}/.m2/maven.properties"/>
   <property name="maven.build.output" value="target/classes"/>
   <property name="maven.build.directory" value="target"/>
-  <property name="maven.build.final.name" value="apgdiff-1.0.0_beta11"/>
+  <property name="maven.build.final.name" value="apgdiff-1.0.0_beta12"/>
   <property name="maven.test.reports" value="${maven.build.directory}/test-reports"/>
   <property name="maven.test.output" value="target/test-classes"/>
   <property name="maven.repo.local" value="${user.home}/.m2/repository"/>
@@ -45,7 +45,7 @@
   </target>
   <target name="test" depends="junit-present, compile-tests" if="junit.present" description="Run the test cases">
     <mkdir dir="${maven.test.reports}"/>
-    <junit printSummary="yes" haltonerror="true" haltonfailure="true" fork="true" dir=".">
+    <junit printSummary="yes" haltonerror="true" haltonfailure="true" fork="false" dir=".">
       <sysproperty key="basedir" value="."/>
       <!--
       <formatter type="xml"/>

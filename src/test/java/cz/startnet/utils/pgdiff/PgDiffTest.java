@@ -38,13 +38,22 @@ public class PgDiffTest {
     private final String fileNameTemplate;
 
     /**
+     * Value for the same named command line argument.
+     */
+    private final boolean ignoreStartWith;
+
+    /**
      * Creates a new PgDiffTest object.
      *
      * @param fileNameTemplate {@link #originalFileName originalFileName}
+     * @param ignoreStartWith {@link #ignoreStartWith ignoreStartWith}
      */
-    public PgDiffTest(final String fileNameTemplate) {
+    public PgDiffTest(
+        final String fileNameTemplate,
+        final boolean ignoreStartWith) {
         super();
         this.fileNameTemplate = fileNameTemplate;
+        this.ignoreStartWith = ignoreStartWith;
     }
 
     /**
@@ -57,68 +66,85 @@ public class PgDiffTest {
         return Arrays.asList(
                 new Object[][] {
                     // Tests scenario where COLUMN type is modified.
-                    {"modify_column_type" },
+                    {"modify_column_type", false },
                     // Tests scenario where CLUSTER is added to TABLE.
-                    {"add_cluster" },
+                    {"add_cluster", false },
                     // Tests scenario where CLUSTER is dropped from TABLE.
-                    {"drop_cluster" },
+                    {"drop_cluster", false },
                     // Tests scenario where CLUSTER is changed on TABLE.
-                    {"modify_cluster" },
+                    {"modify_cluster", false },
                     // Tests scenario where INDEX is added.
-                    {"add_index" },
+                    {"add_index", false },
                     // Tests scenario where INDEX is dropped.
-                    {"drop_index" },
+                    {"drop_index", false },
                     // Tests scenario where INDEX that TABLE CLUSTER is based
                 // on is dropped.
-                    {"drop_index_with_cluster" },
+                    {"drop_index_with_cluster", false },
                     // Tests scenario where INDEX definition is modified.
-                    {"modify_index" },
-                    // Tests scenario where SEQUENCE is added.
-                    {"add_sequence" },
-                    // Tests scenario where SEQUENCE is modified.
-                    {"modify_sequence" },
-                    // Tests scenario where SEQUENCE is dropped.
-                    {"drop_sequence" },
+                    {"modify_index", false },
                     // Tests scenario where STATISTICS information is added
                 // to COLUMN.
-                    {"add_statistics" },
+                    {"add_statistics", false },
                     // Tests scenario where STATISTICS information is modified.
-                    {"modify_statistics" },
+                    {"modify_statistics", false },
                     // Tests scenario where STATISTICS information is dropped.
-                    {"drop_statistics" },
+                    {"drop_statistics", false },
                     // Tests scenario where DEFAULT value is set on COLUMN.
-                    {"add_default_value" },
+                    {"add_default_value", false },
                     // Tests scenario where DEFAULT value is modified.
-                    {"modify_default_value" },
+                    {"modify_default_value", false },
                     // Tests scenario where DEFAULT value is dropped from COLUMN.
-                    {"drop_default_value" },
+                    {"drop_default_value", false },
                     // Tests scenario where NOT NULL constraint is set
                 // on COLUMN.
-                    {"add_not_null" },
+                    {"add_not_null", false },
                     // Tests scenario where NOT NULL constraint is dropped
                 // from COLUMN.
-                    {"drop_not_null" },
+                    {"drop_not_null", false },
                     // Tests scenario where COLUMN is added to TABLE definition.
-                    {"add_column" },
+                    {"add_column", false },
                     // Tests scenario where COLUMN is dropped from TABLE.
-                    {"drop_column" },
+                    {"drop_column", false },
                     // Tests scenario where new TABLE is added.
-                    {"add_table" },
+                    {"add_table", false },
                     // Tests scenario where TABLE is dropped.
-                    {"drop_table" },
+                    {"drop_table", false },
                     // Tests scenario where TABLE CONSTRAINT is added.
-                    {"add_constraint" },
+                    {"add_constraint", false },
                     // Tests scenario where TABLE CONSTRAINT is modified.
-                    {"modify_constraint" },
+                    {"modify_constraint", false },
                     // Tests scenario where TABLE CONSTRAINT is dropped.
-                    {"drop_constraint" },
+                    {"drop_constraint", false },
                     // Tests reading of TABLE with INHERITS.
-                    {"read_inherits" },
+                    {"read_inherits", false },
                     // Tests scenario where TABLE with INHERITS is added.
-                    {"add_inherits" },
+                    {"add_inherits", false },
                     // Tests scenario where original and new TABLE contain
                 //different INHERITS.
-                    {"modify_inherits" }
+                    {"modify_inherits", false },
+                    // Tests scenario where SEQUENCE is added.
+                    {"add_sequence", false },
+                    // Tests scenario where SEQUENCE is dropped.
+                    {"drop_sequence", false },
+                    // Tests scenario where INCREMENT BY is modified on SEQUENCE.
+                    {"modify_sequence_increment", false },
+                    // Tests scenario where START WITH is modified on SEQUENCE
+                // (both with --ignore-start-with turned off and on).
+                    {"modify_sequence_start_ignore_off", false },
+                    { "modify_sequence_start_ignore_on", true },
+                    // Tests scenario where MINVALUE is modified on SEQUENCE
+                // (both setting and unsetting the value).
+                    {"modify_sequence_minvalue_set", false },
+                    { "modify_sequence_minvalue_unset", false },
+                    // Tests scenario where MAXVALUE is modified on SEQUENCE
+                // (both setting and unsetting the value).
+                    {"modify_sequence_maxvalue_set", false },
+                    { "modify_sequence_maxvalue_unset", false },
+                    // Tests scenario where CACHE is modified on SEQUENCE.
+                    {"modify_sequence_cache", false },
+                    // Tests scenario where CYCLE is modified on SEQUENCE.
+                    {"modify_sequence_cycle_on", false },
+                    { "modify_sequence_cycle_off", false }
                 });
     }
 
@@ -134,8 +160,11 @@ public class PgDiffTest {
     public void runDiff() throws FileNotFoundException, IOException {
         final ByteArrayOutputStream diffInput = new ByteArrayOutputStream();
         final PrintWriter writer = new PrintWriter(diffInput, true);
+        final PgDiffArguments arguments = new PgDiffArguments();
+        arguments.setIgnoreStartWith(ignoreStartWith);
         PgDiff.createDiff(
                 writer,
+                arguments,
                 PgDiffTest.class.getResourceAsStream(
                         fileNameTemplate + "_original.sql"),
                 PgDiffTest.class.getResourceAsStream(

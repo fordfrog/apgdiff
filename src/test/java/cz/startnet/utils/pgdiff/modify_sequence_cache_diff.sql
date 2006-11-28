@@ -1,0 +1,3 @@
+
+ALTER SEQUENCE testseq
+	CACHE 10;

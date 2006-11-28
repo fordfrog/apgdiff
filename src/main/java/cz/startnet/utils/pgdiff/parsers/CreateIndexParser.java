@@ -42,9 +42,9 @@ public class CreateIndexParser {
         final Matcher matcher = PATTERN.matcher(line.trim());
 
         if (matcher.matches()) {
-            final String indexName = matcher.group(1);
-            final String tableName = matcher.group(2);
-            final String def = matcher.group(3);
+            final String indexName = matcher.group(1).trim();
+            final String tableName = matcher.group(2).trim();
+            final String def = matcher.group(3).trim();
 
             if ((indexName == null) || (tableName == null) || (def == null)) {
                 throw new ParserException(

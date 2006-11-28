@@ -1,0 +1,3 @@
+
+ALTER SEQUENCE testseq
+	INCREMENT BY 10;

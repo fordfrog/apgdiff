@@ -70,7 +70,7 @@ public class CreateTableParser {
         final String tableName;
 
         if (matcher.matches()) {
-            tableName = matcher.group(1);
+            tableName = matcher.group(1).trim();
         } else {
             throw new ParserException(
                     ParserException.CANNOT_PARSE_COMMAND + line);
@@ -111,8 +111,8 @@ public class CreateTableParser {
                     PATTERN_CONSTRAINT.matcher(adjLine.trim());
 
                 if (matcher.matches()) {
-                    table.getConstraint(matcher.group(1))
-                         .setDefinition(matcher.group(2));
+                    table.getConstraint(matcher.group(1).trim()).setDefinition(
+                            matcher.group(2).trim());
                 } else {
                     throw new ParserException(
                             ParserException.CANNOT_PARSE_COMMAND + line);
@@ -121,8 +121,9 @@ public class CreateTableParser {
                 final Matcher matcher = PATTERN_COLUMN.matcher(adjLine);
 
                 if (matcher.matches()) {
-                    final PgColumn column = table.getColumn(matcher.group(1));
-                    column.parseDefinition(matcher.group(2));
+                    final PgColumn column =
+                        table.getColumn(matcher.group(1).trim());
+                    column.parseDefinition(matcher.group(2).trim());
                 } else {
                     throw new ParserException(
                             ParserException.CANNOT_PARSE_COMMAND + line);
@@ -158,7 +159,7 @@ public class CreateTableParser {
         final Matcher matcher = PATTERN_INHERITS.matcher(line);
 
         if (matcher.matches()) {
-            table.setInherits(matcher.group(1));
+            table.setInherits(matcher.group(1).trim());
         } else {
             throw new ParserException(
                     ParserException.CANNOT_PARSE_COMMAND + line);

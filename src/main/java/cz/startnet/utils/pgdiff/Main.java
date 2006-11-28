@@ -28,11 +28,10 @@ public class Main {
      */
     public static void main(final String[] args) {
         final PrintWriter writer = new PrintWriter(System.out, true);
+        final PgDiffArguments arguments = new PgDiffArguments();
 
-        if (args.length == 2) {
-            PgDiff.createDiff(writer, args[0], args[1]);
-        } else {
-            writer.println("Usage: apgdiff <old_dump> <new_dump>");
+        if (arguments.parse(writer, args)) {
+            PgDiff.createDiff(writer, arguments);
         }
     }
 }

@@ -1,0 +1,3 @@
+
+ALTER SEQUENCE testseq
+	CYCLE;
