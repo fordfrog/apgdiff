@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>cz.startnet.utils.apgdiff</groupId>
+    <groupId>cz.startnet.utils.pgdiff</groupId>
     <artifactId>apgdiff</artifactId>
     <name>Another PostgreSQL Diff Tool</name>
     <version>1.0.0_beta12</version>
@@ -35,13 +35,15 @@
     </contributors>
     <licenses>
         <license>
-            <name>Another PostgreSQL Diff Tool License</name>
-            <url>http://apgdiff.sourceforge.net/license.html</url>
+            <name>MIT</name>
+            <url>license.txt</url>
             <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
         </license>
     </licenses>
     <scm>
         <connection>scm:svn:https://svn.sourceforge.net/svnroot/apgdiff</connection>
+        <developerConnection>scm:svn:https://svn.sourceforge.net/svnroot/apgdiff</developerConnection>
         <url>http://svn.sourceforge.net/apgdiff/</url>
     </scm>
     <organization>

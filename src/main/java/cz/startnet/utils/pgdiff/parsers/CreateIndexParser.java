@@ -42,16 +42,17 @@ public class CreateIndexParser {
         final Matcher matcher = PATTERN.matcher(line.trim());
 
         if (matcher.matches()) {
-            final String indexName = matcher.group(1).trim();
-            final String tableName = matcher.group(2).trim();
-            final String def = matcher.group(3).trim();
+            final String indexName = matcher.group(1);
+            final String tableName = matcher.group(2);
+            final String def = matcher.group(3);
 
             if ((indexName == null) || (tableName == null) || (def == null)) {
                 throw new ParserException(
                         ParserException.CANNOT_PARSE_COMMAND + line);
             }
 
-            schema.getTable(tableName).getIndex(indexName).setDefinition(def);
+            schema.getTable(tableName.trim()).getIndex(indexName.trim()).setDefinition(
+                    def.trim());
         } else {
             throw new ParserException(
                     ParserException.CANNOT_PARSE_COMMAND + line);

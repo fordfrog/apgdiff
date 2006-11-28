@@ -37,6 +37,10 @@
                 the output to a file:
             </p>
             <code>java -jar apgdiff.jar original_schema_dump.sql new_schema_dump.sql > diff.sql</code>
+            <p>
+                For more information run apgdiff without parameters:
+            </p>
+            <code>java -jar apgdiff.jar</code>
         </section>
         <section name="List of Features">
             <ul>
@@ -45,13 +49,8 @@
                     sequences, constraints and indexes
                 </li>
                 <li>
-                    apgdiff creates SQL commands for creations and drops
-                    of database objects and for modifications of columns
-                </li>
-                <li>
-                    modifications of other database objects are outputted
-                    informatively and are left to the developer to decide
-                    how to handle them
+                    apgdiff creates SQL commands for creations, drops and
+                    modifications of database objects
                 </li>
                 <li>
                     CREATE TABLE, ALTER TABLE (except ALTER TABLE ... OWNER TO
@@ -65,9 +64,9 @@
                 </li>
             </ul>
             <p>
-                Note: I use apgdiff on dumps generated from PostgreSQL 8.1.3 so
+                Note: I use apgdiff on dumps generated from PostgreSQL 8.1.x so
                 it might not work on dumps from other versions if there are some
-                differences in the format that the code cannot handle at this
+                differences in the format that apgdiff cannot handle at this
                 moment. Feel free to submit a patch for such a problem or send
                 me your dump and I'll have a look at it. Please also note that
                 if you want to have a new feature in apgdiff and you do not plan
