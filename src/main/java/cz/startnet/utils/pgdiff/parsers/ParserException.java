@@ -14,7 +14,7 @@ public class ParserException extends RuntimeException {
      * Predefined message string that can be used as default exception
      * message with provided parsed line.
      */
-    public static String CANNOT_PARSE_COMMAND = "Cannot parse command: ";
+    public static final String CANNOT_PARSE_COMMAND = "Cannot parse command: ";
 
     /**
      * Creates a new instance of <code>ParserException</code> without

@@ -227,9 +227,11 @@
                     </reportSet>
                 </reportSets>
             </plugin>
+            <!--
             <plugin>
                 <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
+            -->
             <plugin>
                 <artifactId>maven-jxr-plugin</artifactId>
                 <configuration>
@@ -240,7 +242,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
-                <version>1.0-SNAPSHOT</version>
                 <configuration>
                     <threshold>Ignore</threshold>
                     <effort>Max</effort>

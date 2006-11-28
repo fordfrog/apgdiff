@@ -187,13 +187,11 @@ public class PgDiffTables {
      * Adds commands for modification of columns to the list of
      * commands.
      *
-     * @param writer writer the output should be written to
      * @param commands list of commands
      * @param oldTable original table
      * @param newTable new table
      */
     private static void addModifyTableColumns(
-        final PrintWriter writer,
         final List<String> commands,
         final PgTable oldTable,
         final PgTable newTable) {
@@ -339,7 +337,7 @@ public class PgDiffTables {
         final List<String> commands = new ArrayList<String>();
         addDropTableColumns(commands, oldTable, newTable);
         addCreateTableColumns(commands, oldTable, newTable);
-        addModifyTableColumns(writer, commands, oldTable, newTable);
+        addModifyTableColumns(commands, oldTable, newTable);
 
         if (commands.size() > 0) {
             writer.println();
