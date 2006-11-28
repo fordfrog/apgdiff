@@ -13,11 +13,15 @@
                 Another PostgreSQL Diff Tool is simple PostgreSQL diff tool that
                 is useful for schema upgrades. The tool compares two schema dump
                 files and creates output file that is (after some hand-made
-                modifications) suitable for upgrade of old schema. I've created this
-                tool because I need to perform PostgreSQL database schema upgrades
-                for our application. I didn't found anything suitable so I created
-                this simple tool. I decided to place it on SourceForge.Net because
-                it might be useful for other developers too.
+                modifications) suitable for upgrade of old schema.
+            </p>
+            <p>
+                I created this tool because I need to perform PostgreSQL
+                database schema upgrades for our application. I didn't found
+                anything suitable so I created this simple tool. I decided to
+                place it here on SourceForge.Net because it might be useful for
+                other developers too. If you find the tool useful too please
+                let me know and I may create a Used By section here at the site.
             </p>
         </section>
         <section name="How the Program Works">
@@ -28,11 +32,9 @@
             </p>
             <code>java -jar apgdiff.jar original_schema_dump.sql new_schema_dump.sql</code>
             <p>
-                After you press Enter, you will see SQL commands and modification
-                information on the screen (or Java exception if format of your dump
-                file is not supported - in such a case you can create patch to
-                handle the dump format or send me your dump files and I'll have a
-                look at it). You can also redirect the output to a file:
+                After you submit the command, you will see list of SQL commands
+                and modification information on the screen. You can also redirect
+                the output to a file:
             </p>
             <code>java -jar apgdiff.jar original_schema_dump.sql new_schema_dump.sql > diff.sql</code>
         </section>
@@ -54,6 +56,8 @@
                 <li>
                     CREATE TABLE, ALTER TABLE (except ALTER TABLE ... OWNER TO
                     ...), CREATE SEQUENCE and CREATE INDEX commands are supported
+                    but some specific features of the commands may not be
+                    implemented yet (see Note below)
                 </li>
                 <li>
                     Comments, empty lines, SET, COMMENT, SELECT, INSERT INTO,
@@ -65,29 +69,47 @@
                 it might not work on dumps from other versions if there are some
                 differences in the format that the code cannot handle at this
                 moment. Feel free to submit a patch for such a problem or send
-                me your dump and I'll have a look at it.
+                me your dump and I'll have a look at it. Please also note that
+                if you want to have a new feature in apgdiff and you do not plan
+                to provide a patch for the feature then you need to add your
+                <a href="http://sourceforge.net/tracker/?group_id=163508&amp;atid=828026">
+                    feature request
+                </a> so I can find out that the feature is in need. I do not
+                plan to add new features just in case somebody may need it, I
+                need to see a request for the feature at the first time so
+                I can see the effort has some meaning.
             </p>
         </section>
         <section name="Requirements">
             <p>
                 apgdiff is a Java program so you need Java installed. apgdiff
-                requires Java 1.5. I use "Sun JDK 1.5.0.06".
+                requires Java 1.5. I use "Sun JDK 1.5.0.09" and
+                "Sun JDK 1.6.0.0_rc104".
             </p>
         </section>
         <section name="Bugs">
             <p>
-                There are still a lot of them because I implement support
-                for some column types and SQL features as I need it. If you want
-                to speed the things up, you can participate and create a patch
-                or send me your dump that causes Java exception and I may
-                resolve it.
+                There are three kinds of bugs in apgdiff:
             </p>
-        </section>
-        <section name="Download">
+            <ul>
+                <li>
+                    bugs for currently supported features (they should be rare
+                    because they should be caught by automated tests)
+                </li>
+                <li>
+                    bugs caused by not implemented features (see
+                    <a href="#List of Features">List of Features</a>)
+                </li>
+                <li>
+                    bugs caused by different format of PostgreSQL dump file
+                    that other than 8.1.x versions may create (see Note at the
+                    end of <a href="#List of Features">List of Features</a>)
+                </li>
+            </ul>
             <p>
-                You can download the program from
-                <a href="http://sourceforge.net/project/showfiles.php?group_id=163508">
-                    SourceForge.Net download page
+                No matter of what bug you came across, please file it to
+                <a href="http://sourceforge.net/tracker/?group_id=163508&amp;atid=828023">
+                    Bugs Tracker
                 </a>.
             </p>
         </section>
@@ -95,14 +117,16 @@
             <p>
                 As I use this tool quite often I will probably release new
                 versions from time to time. If you are interested in this tool
-                and have a patch for it, send it to me and I'll add it to a new
-                release.
+                and have a patch for it, put it to
+                <a href="http://sourceforge.net/tracker/?group_id=163508&amp;atid=828025">
+                    Patch Tracker
+                </a> and I'll add it to a new release.
             </p>
         </section>
         <section name="Contact">
             <p>
                 You can contact me at <a href="mailto:miroslav.sulc@startnet.cz">
-                    mailto:miroslav.sulc@startnet.cz
+                    miroslav.sulc@startnet.cz
                 </a>.
             </p>
         </section>
