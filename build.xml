@@ -1,13 +1,11 @@
 <project name="apgdiff" default="jar" basedir=".">
-  <property file="${user.home}/.m2/maven.properties"/>
   <property name="maven.build.output" value="target/classes"/>
   <property name="maven.build.directory" value="target"/>
   <property name="maven.build.final.name" value="apgdiff-1.0.0_beta12"/>
   <property name="maven.test.reports" value="${maven.build.directory}/test-reports"/>
   <property name="maven.test.output" value="target/test-classes"/>
-  <property name="maven.repo.local" value="${user.home}/.m2/repository"/>
   <path id="build.classpath">
-    <fileset dir="${maven.repo.local}"/>
+    <fileset dir="lib"/>
   </path>
   <target name="clean" description="Clean the output directory">
     <delete dir="${maven.build.directory}"/>
@@ -78,6 +76,13 @@
     </condition>
   </target>
   <target name="get-deps" depends="test-offline" description="Download all dependencies" unless="maven.mode.offline">
-    <mkdir dir="${maven.repo.local}"/>
+    <mkdir dir="lib"/>
+  </target>
+  <target name="javadoc">
+    <delete dir="doc" />
+    <mkdir dir="doc" />
+      <javadoc packagenames="cz.*" sourcepath="src/main/java" destdir="doc" classpathref="build.classpath" author="true"
+      version="true" private="false" use="true" splitindex="true" windowtitle="Another PostgreSQL Diff Tool"
+      doctitle="Another PostgreSQL Diff Tool"/>
   </target>
 </project>
