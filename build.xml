@@ -1,88 +1,105 @@
 <project name="apgdiff" default="jar" basedir=".">
-  <property name="maven.build.output" value="target/classes"/>
-  <property name="maven.build.directory" value="target"/>
-  <property name="maven.build.final.name" value="apgdiff-1.0.0_beta12"/>
-  <property name="maven.test.reports" value="${maven.build.directory}/test-reports"/>
-  <property name="maven.test.output" value="target/test-classes"/>
-  <path id="build.classpath">
-    <fileset dir="lib"/>
-  </path>
-  <target name="clean" description="Clean the output directory">
-    <delete dir="${maven.build.directory}"/>
-  </target>
-  <target name="compile" depends="get-deps" description="Compile the code">
-    <mkdir dir="${maven.build.output}"/>
-    <javac destdir="${maven.build.output}" excludes="**/package.html" debug="true" deprecation="true" optimize="false">
-      <src>
-        <pathelement location="src/main/java"/>
-      </src>
-      <classpath refid="build.classpath"/>
-    </javac>
-  </target>
-  <target name="jar" depends="compile" description="Clean the JAR">
-    <jar jarfile="${maven.build.directory}/${maven.build.final.name}.jar" basedir="${maven.build.output}" excludes="**/package.html">
-      <manifest>
-         <attribute name="Main-Class" value="cz.startnet.utils.pgdiff.Main" />
-      </manifest>
-    </jar>
-  </target>
-  <target name="compile-tests" depends="junit-present, compile" description="Compile the test code" if="junit.present">
-    <mkdir dir="${maven.test.output}"/>
-    <javac destdir="${maven.test.output}" excludes="**/package.html" debug="true" deprecation="true" optimize="false">
-      <src>
-        <pathelement location="src/test/java"/>
-      </src>
-      <classpath>
-        <path refid="build.classpath"/>
-        <pathelement location="${maven.build.output}"/>
-      </classpath>
-    </javac>
-    <copy todir="${maven.test.output}">
-      <fileset dir="src/test/java" excludes="**/*.java"/>
-    </copy>
-  </target>
-  <target name="test" depends="junit-present, compile-tests" if="junit.present" description="Run the test cases">
-    <mkdir dir="${maven.test.reports}"/>
-    <junit printSummary="yes" haltonerror="true" haltonfailure="true" fork="false" dir=".">
-      <sysproperty key="basedir" value="."/>
-      <!--
-      <formatter type="xml"/>
-      -->
-      <formatter type="plain" usefile="false"/>
-      <classpath>
-        <path refid="build.classpath"/>
-        <pathelement location="${maven.build.output}"/>
-        <pathelement location="${maven.test.output}"/>
-      </classpath>
-      <batchtest todir="${maven.test.reports}">
-        <fileset dir="src/test/java">
-          <include name="**/*Test.java"/>
-          <exclude name="**/*Abstract*Test.java"/>
+    <property name="name" value="Another PostgreSQL Diff Tool"/>
+    <property name="version" value="1.0.0_beta12"/>
+    <property name="build" value="build"/>
+    <property name="dist" value="dist"/>
+    <property name="build.output" value="${build}/classes"/>
+    <property name="dist.javadoc" value="${dist}/javadoc"/>
+    <property name="build.final.name" value="${ant.project.name}-${version}"/>
+    <property name="lib" value="lib"/>
+    <property name="test.reports" value="${build}/test-reports"/>
+    <property name="test.output" value="${build}/test-classes"/>
+    <property name="src" value="src/main/java"/>
+    <property name="test.src" value="src/test/java"/>
+    <property name="source" value="1.5"/>
+    <property name="target" value="1.5"/>
+    <property name="main.class" value="cz.startnet.utils.pgdiff.Main"/>
+    
+    <path id="build.classpath">
+        <fileset dir="${lib}">
+            <include name="**/*.jar"/>
         </fileset>
-      </batchtest>
-    </junit>
-  </target>
-  <target name="test-junit-present">
-    <available classname="org.junit.Test" property="junit.present"/>
-  </target>
-  <target name="junit-present" depends="test-junit-present" unless="junit.present">
-    <echo>================================= WARNING ================================</echo>
-    <echo> Junit isn&apos;t present in your $ANT_HOME/lib directory. Tests not executed. </echo>
-    <echo>==========================================================================</echo>
-  </target>
-  <target name="test-offline">
-    <condition property="maven.mode.offline">
-      <equals arg1="${build.sysclasspath}" arg2="only"/>
-    </condition>
-  </target>
-  <target name="get-deps" depends="test-offline" description="Download all dependencies" unless="maven.mode.offline">
-    <mkdir dir="lib"/>
-  </target>
-  <target name="javadoc">
-    <delete dir="doc" />
-    <mkdir dir="doc" />
-      <javadoc packagenames="cz.*" sourcepath="src/main/java" destdir="doc" classpathref="build.classpath" author="true"
-      version="true" private="false" use="true" splitindex="true" windowtitle="Another PostgreSQL Diff Tool"
-      doctitle="Another PostgreSQL Diff Tool"/>
-  </target>
+    </path>
+    
+    <target name="init" description="Initializes build environment">
+        <tstamp/>
+    </target>
+    
+    <target name="clean" description="Clean the output directory">
+        <delete dir="${build}"/>
+        <delete dir="${dist}"/>
+        <delete dir="${lib}"/>
+    </target>
+    
+    <target name="compile" depends="init,get-deps"
+            description="Compile the code">
+        <mkdir dir="${build.output}"/>
+        <javac destdir="${build.output}" srcdir="${src}" source="${source}"
+               target="${target}" debug="true" deprecation="true"
+               optimize="false"/>
+    </target>
+    
+    <target name="jar" depends="compile" description="Clean the JAR">
+        <mkdir dir="${dist}"/>
+        <jar jarfile="${dist}/${build.final.name}.jar" 
+             basedir="${build.output}">
+            <manifest>
+                <attribute name="Main-Class" value="${main.class}"/>
+            </manifest>
+        </jar>
+    </target>
+    
+    <target name="compile-tests" depends="compile"
+            description="Compile the test code">
+        <mkdir dir="${test.output}"/>
+        <javac destdir="${test.output}" srcdir="${test.src}" source="${source}"
+               target="${target}" debug="true" deprecation="true"
+               optimize="false">
+            <classpath>
+                <path refid="build.classpath"/>
+                <pathelement location="${build.output}"/>
+            </classpath>
+        </javac>
+        <copy todir="${test.output}">
+            <fileset dir="${test.src}" excludes="**/*.java"/>
+        </copy>
+    </target>
+    
+    <target name="test" depends="compile-tests"
+            description="Run the test cases">
+        <mkdir dir="${test.reports}"/>
+        <junit printSummary="yes" haltonerror="true" haltonfailure="true"
+               fork="true" dir=".">
+            <sysproperty key="basedir" value="."/>
+            <formatter type="plain" usefile="false"/>
+            <classpath>
+                <path refid="build.classpath"/>
+                <pathelement location="${build.output}"/>
+                <pathelement location="${test.output}"/>
+            </classpath>
+            <batchtest todir="${test.reports}">
+                <fileset dir="${test.src}">
+                    <include name="**/*Test.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+    
+    <target name="get-deps" description="Download all dependencies"
+            unless="noget">
+        <mkdir dir="${lib}"/>
+        <get src="http://www.ibiblio.org/maven/junit/jars/junit-4.1.jar"
+             dest="${lib}/junit.jar"/>
+    </target>
+    
+    <target name="javadoc">
+        <delete dir="doc"/>
+        <mkdir dir="doc"/>
+        <javadoc packagenames="cz.*" sourcepath="${src}" 
+                 destdir="${dist.javadoc}" classpathref="build.classpath"
+                 author="true" version="true" private="false" use="true"
+                 splitindex="true" windowtitle="${name} ${version}"
+                 doctitle="${name} ${version}"/>
+    </target>
+    
 </project>
