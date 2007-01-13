@@ -93,6 +93,7 @@ public class PgDiffTables {
 
             final PgTable oldTable = oldSchema.getTable(newTable.getName());
             updateTableFields(writer, oldTable, newTable);
+            checkWithOIDS(writer, oldTable, newTable);
             checkInherits(writer, oldTable, newTable);
             addAlterStats(writer, oldTable, newTable);
         }
@@ -281,6 +282,32 @@ public class PgDiffTables {
                     + ": original table uses INHERITS "
                     + oldTable.getInherits() + " but new table uses INHERITS "
                     + newTable.getInherits());
+        }
+    }
+
+    /**
+     * Checks whether OIDS are dropped from the new table. There is no
+     * way to add OIDS to existing table so we do not create SQL command for
+     * addition of OIDS but we issue warning.
+     *
+     * @param writer writer the output should be written to
+     * @param oldTable original table
+     * @param newTable new table
+     */
+    private static void checkWithOIDS(
+        final PrintWriter writer,
+        final PgTable oldTable,
+        final PgTable newTable) {
+        if (oldTable.isWithOIDS() && !newTable.isWithOIDS()) {
+            writer.println();
+            writer.println("ALTER TABLE " + newTable.getName());
+            writer.println("\tSET WITHOUT OIDS;");
+        } else if (!oldTable.isWithOIDS() && newTable.isWithOIDS()) {
+            writer.println();
+            writer.println(
+                    "WARNING: Table '" + newTable.getName()
+                    + "' adds WITH OIDS but there is no equivalent command "
+                    + "for adding of OIDS in PostgreSQL");
         }
     }
 

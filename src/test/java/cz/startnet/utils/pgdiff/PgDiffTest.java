@@ -73,6 +73,8 @@ public class PgDiffTest {
                     {"drop_cluster", false },
                     // Tests scenario where CLUSTER is changed on TABLE.
                     {"modify_cluster", false },
+                    // Tests scenario where WITH OIDS is dropped from TABLE.
+                    {"drop_with_oids", false },
                     // Tests scenario where INDEX is added.
                     {"add_index", false },
                     // Tests scenario where INDEX is dropped.

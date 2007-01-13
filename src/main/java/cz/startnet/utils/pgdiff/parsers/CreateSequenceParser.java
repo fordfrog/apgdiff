@@ -3,12 +3,8 @@
  */
 package cz.startnet.utils.pgdiff.parsers;
 
-import cz.startnet.utils.pgdiff.loader.FileException;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgSequence;
-
-import java.io.BufferedReader;
-import java.io.IOException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,30 +27,31 @@ public class CreateSequenceParser {
      * Pattern for getting value of START WITH parameter.
      */
     private static final Pattern PATTERN_START_WITH =
-        Pattern.compile("START (?:WITH )?(.+)");
+        Pattern.compile("START (?:WITH )?([-]?[\\d]+)");
 
     /**
      * Pattern for getting value of INCREMENT BY parameter.
      */
     private static final Pattern PATTERN_INCREMENT_BY =
-        Pattern.compile("INCREMENT (?:BY )?(.+)");
+        Pattern.compile("INCREMENT (?:BY )?([-]?[\\d]+)");
 
     /**
      * Pattern for getting value of MAXVALUE parameter.
      */
     private static final Pattern PATTERN_MAXVALUE =
-        Pattern.compile("MAXVALUE (.+)");
+        Pattern.compile("MAXVALUE ([-]?[\\d]+)");
 
     /**
      * Pattern for getting value of MINVALUE parameter.
      */
     private static final Pattern PATTERN_MINVALUE =
-        Pattern.compile("MINVALUE (.+)");
+        Pattern.compile("MINVALUE ([-]?[\\d]+)");
 
     /**
      * Pattern for getting value of CACHE parameter.
      */
-    private static final Pattern PATTERN_CACHE = Pattern.compile("CACHE (.+)");
+    private static final Pattern PATTERN_CACHE =
+        Pattern.compile("CACHE ([\\d]+)");
 
     /**
      * Creates a new instance of CreateSequenceParser.
@@ -67,90 +64,208 @@ public class CreateSequenceParser {
      * Parses CREATE SEQUENCE command.
      *
      * @param schema schema to be filled
-     * @param reader reader of the dump file
-     * @param line first line read
+     * @param command CREATE SEQUENCE command
      *
      * @throws ParserException Thrown if problem occured while parsing the
      *         command.
-     * @throws FileException Thrown if problem occured while reading dump file.
      */
-    public static void parse(
-        final PgSchema schema,
-        final BufferedReader reader,
-        final String line) {
-        Matcher matcher = PATTERN_SEQUENCE_NAME.matcher(line);
+    public static void parse(final PgSchema schema, final String command) {
+        String line = command;
+        final Matcher matcher = PATTERN_SEQUENCE_NAME.matcher(line);
         final String sequenceName;
 
-        if (matcher.matches()) {
+        if (matcher.find()) {
             sequenceName = matcher.group(1).trim();
+            line =
+                ParserUtils.removeSubString(
+                        line,
+                        matcher.start(),
+                        matcher.end());
         } else {
             throw new ParserException(
                     ParserException.CANNOT_PARSE_COMMAND + line);
         }
 
         final PgSequence sequence = schema.getSequence(sequenceName);
-        String origLine = null;
+        line = ParserUtils.removeLastSemicolon(line);
+        line = processMaxValue(sequence, line);
+        line = processMinValue(sequence, line);
+        line = processCycle(sequence, line);
+        line = processCache(sequence, line);
+        line = processIncrement(sequence, line);
+        line = processStartWith(sequence, line);
+        line = line.trim();
 
-        try {
-            String newLine = reader.readLine();
-
-            while (newLine != null) {
-                boolean last = false;
-                origLine = newLine;
-                newLine = newLine.trim();
-
-                if (newLine.endsWith(";")) {
-                    last = true;
-                    newLine = newLine.substring(0, newLine.length() - 1).trim();
-                }
-
-                if ("NO MAXVALUE".equals(newLine)) {
-                    sequence.setMaxValue(null);
-                } else if ("NO MINVALUE".equals(newLine)) {
-                    sequence.setMinValue(null);
-                } else if ("CYCLE".equals(newLine)) {
-                    sequence.setCycle(true);
-                } else if ("NO CYCLE".equals(newLine)) {
-                    sequence.setCycle(false);
-                } else if (PATTERN_CACHE.matcher(newLine).matches()) {
-                    matcher = PATTERN_CACHE.matcher(newLine);
-                    matcher.matches();
-                    sequence.setCache(matcher.group(1).trim());
-                } else if (PATTERN_INCREMENT_BY.matcher(newLine).matches()) {
-                    matcher = PATTERN_INCREMENT_BY.matcher(newLine);
-                    matcher.matches();
-                    sequence.setIncrement(matcher.group(1).trim());
-                } else if (PATTERN_MAXVALUE.matcher(newLine).matches()) {
-                    matcher = PATTERN_MAXVALUE.matcher(newLine);
-                    matcher.matches();
-                    sequence.setMaxValue(matcher.group(1).trim());
-                } else if (PATTERN_MINVALUE.matcher(newLine).matches()) {
-                    matcher = PATTERN_MINVALUE.matcher(newLine);
-                    matcher.matches();
-                    sequence.setMinValue(matcher.group(1).trim());
-                } else if (PATTERN_START_WITH.matcher(newLine).matches()) {
-                    matcher = PATTERN_START_WITH.matcher(newLine);
-                    matcher.matches();
-                    sequence.setStartWith(matcher.group(1).trim());
-                } else {
-                    throw new ParserException(
-                            "Cannot parse CREATE SEQUENCE '" + sequenceName
-                            + "', line '" + origLine + "'");
-                }
-
-                if (last) {
-                    break;
-                }
-
-                newLine = reader.readLine();
-            }
-        } catch (IOException ex) {
-            throw new FileException(FileException.CANNOT_READ_FILE, ex);
-        } catch (IllegalStateException ex) {
+        if (line.length() > 0) {
             throw new ParserException(
-                    "Cannot parse CREATE SEQUENCE '" + sequenceName
-                    + "', line '" + origLine + "'",
-                    ex);
+                    "Cannot parse commmand '" + command + "', string '" + line
+                    + "'");
         }
+    }
+
+    /**
+     * Processes CACHE instruction.
+     *
+     * @param sequence sequence
+     * @param command command
+     *
+     * @return command without CACHE instruction
+     */
+    private static String processCache(
+        final PgSequence sequence,
+        final String command) {
+        String line = command;
+        final Matcher matcher = PATTERN_CACHE.matcher(line);
+
+        if (matcher.find()) {
+            sequence.setCache(matcher.group(1).trim());
+            line =
+                ParserUtils.removeSubString(
+                        line,
+                        matcher.start(),
+                        matcher.end());
+        }
+
+        return line;
+    }
+
+    /**
+     * Processes CYCLE and NO CYCLE instructions.
+     *
+     * @param sequence sequence
+     * @param command command
+     *
+     * @return command without CYCLE instructions
+     */
+    private static String processCycle(
+        final PgSequence sequence,
+        final String command) {
+        String line = command;
+
+        if (line.contains("NO CYCLE")) {
+            sequence.setCycle(false);
+            line = ParserUtils.removeSubString(line, "NO CYCLE");
+        } else if (line.contains("CYCLE")) {
+            sequence.setCycle(true);
+            line = ParserUtils.removeSubString(line, "CYCLE");
+        }
+
+        return line;
+    }
+
+    /**
+     * Processes INCREMENT BY instruction.
+     *
+     * @param sequence sequence
+     * @param command command
+     *
+     * @return command without INCREMENT BY instruction
+     */
+    private static String processIncrement(
+        final PgSequence sequence,
+        final String command) {
+        String line = command;
+        final Matcher matcher = PATTERN_INCREMENT_BY.matcher(line);
+
+        if (matcher.find()) {
+            sequence.setIncrement(matcher.group(1).trim());
+            line =
+                ParserUtils.removeSubString(
+                        line,
+                        matcher.start(),
+                        matcher.end());
+        }
+
+        return line;
+    }
+
+    /**
+     * Processes MAX VALUE and NO MAXVALUE instructions.
+     *
+     * @param sequence sequence
+     * @param command command
+     *
+     * @return command without MAX VALUE instructions
+     */
+    private static String processMaxValue(
+        final PgSequence sequence,
+        final String command) {
+        String line = command;
+
+        if (line.contains("NO MAXVALUE")) {
+            sequence.setMaxValue(null);
+            line = ParserUtils.removeSubString(line, "NO MAXVALUE");
+        } else {
+            final Matcher matcher = PATTERN_MAXVALUE.matcher(line);
+
+            if (matcher.find()) {
+                sequence.setMaxValue(matcher.group(1).trim());
+                line =
+                    ParserUtils.removeSubString(
+                            line,
+                            matcher.start(),
+                            matcher.end());
+            }
+        }
+
+        return line;
+    }
+
+    /**
+     * Processes MIN VALUE and NO MINVALUE instructions.
+     *
+     * @param sequence sequence
+     * @param command command
+     *
+     * @return command without MIN VALUE instructions
+     */
+    private static String processMinValue(
+        final PgSequence sequence,
+        final String command) {
+        String line = command;
+
+        if (line.contains("NO MINVALUE")) {
+            sequence.setMinValue(null);
+            line = ParserUtils.removeSubString(line, "NO MINVALUE");
+        } else {
+            final Matcher matcher = PATTERN_MINVALUE.matcher(line);
+
+            if (matcher.find()) {
+                sequence.setMinValue(matcher.group(1).trim());
+                line =
+                    ParserUtils.removeSubString(
+                            line,
+                            matcher.start(),
+                            matcher.end());
+            }
+        }
+
+        return line;
+    }
+
+    /**
+     * Processes START WITH instruction.
+     *
+     * @param sequence sequence
+     * @param command command
+     *
+     * @return command without START WITH instruction
+     */
+    private static String processStartWith(
+        final PgSequence sequence,
+        final String command) {
+        String line = command;
+        final Matcher matcher = PATTERN_START_WITH.matcher(line);
+
+        if (matcher.find()) {
+            sequence.setStartWith(matcher.group(1).trim());
+            line =
+                ParserUtils.removeSubString(
+                        line,
+                        matcher.start(),
+                        matcher.end());
+        }
+
+        return line;
     }
 }

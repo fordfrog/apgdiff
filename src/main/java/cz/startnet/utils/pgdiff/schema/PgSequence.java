@@ -163,9 +163,9 @@ public class PgSequence {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns SQL command for creation of SEQUENCE.
      *
-     * @return DOCUMENT ME!
+     * @return SQL command for creation of SEQUENCE
      */
     public String getSequenceSQL() {
         final StringBuilder sbSQL = new StringBuilder();

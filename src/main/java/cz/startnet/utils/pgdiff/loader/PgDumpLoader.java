@@ -68,26 +68,30 @@ public class PgDumpLoader { //NOPMD
                     line = reader.readLine();
 
                     continue;
-                } else if (line.startsWith("SET ")) {
-                    processSet(reader, line);
-                } else if (line.startsWith("COMMENT ")) {
-                    processComment(reader, line);
+                } else if (
+                    line.startsWith("SET ")
+                        || line.startsWith("COMMENT ")
+                        || line.startsWith("SELECT ")
+                        || line.startsWith("INSERT INTO ")
+                        || line.startsWith("REVOKE ")
+                        || line.startsWith("GRANT ")) {
+                    getWholeCommand(reader, line);
                 } else if (line.startsWith("CREATE TABLE ")) {
-                    CreateTableParser.parse(schema, reader, line);
+                    CreateTableParser.parse(
+                            schema,
+                            getWholeCommand(reader, line));
                 } else if (line.startsWith("ALTER TABLE ")) {
-                    AlterTableParser.parse(schema, reader, line);
+                    AlterTableParser.parse(
+                            schema,
+                            getWholeCommand(reader, line));
                 } else if (line.startsWith("CREATE SEQUENCE ")) {
-                    CreateSequenceParser.parse(schema, reader, line);
-                } else if (line.startsWith("SELECT ")) {
-                    processSelect(reader, line);
-                } else if (line.startsWith("INSERT INTO ")) {
-                    processInsertInto(reader, line);
+                    CreateSequenceParser.parse(
+                            schema,
+                            getWholeCommand(reader, line));
                 } else if (line.startsWith("CREATE INDEX ")) {
-                    CreateIndexParser.parse(schema, line);
-                } else if (line.startsWith("REVOKE ")) {
-                    processRevoke(reader, line);
-                } else if (line.startsWith("GRANT ")) {
-                    processGrant(reader, line);
+                    CreateIndexParser.parse(
+                            schema,
+                            getWholeCommand(reader, line));
                 }
 
                 line = reader.readLine();
@@ -117,111 +121,35 @@ public class PgDumpLoader { //NOPMD
     }
 
     /**
-     * Reads current reader till end of command is reached.
+     * Reads whole command from the reader into single-line string.
      *
      * @param reader reader to be read
+     * @param line first line read
      *
-     * @throws FileException Thrown if problem occured while reading the file.
+     * @return whole command from the reader into single-line string
+     *
+     * @throws FileException Thrown if problem occured while reading string
+     *         from <code>reader</code>.
      */
-    private static void moveToEndOfCommand(final BufferedReader reader) {
-        String line = null;
+    private static String getWholeCommand(
+        final BufferedReader reader,
+        final String line) {
+        String newLine = line.trim();
+        final StringBuilder sbCommand = new StringBuilder(newLine);
 
-        try {
-            line = reader.readLine();
-
-            while (line != null) {
-                if (line.trim().endsWith(";")) {
-                    break;
-                }
-
-                line = reader.readLine();
+        while (!newLine.trim().endsWith(";")) {
+            try {
+                newLine = reader.readLine().trim();
+            } catch (IOException ex) {
+                throw new FileException(FileException.CANNOT_READ_FILE, ex);
             }
-        } catch (IOException ex) {
-            throw new FileException(FileException.CANNOT_READ_FILE, ex);
-        }
-    }
 
-    /**
-     * Processes COMMENT command.
-     *
-     * @param reader reader of the dump file
-     * @param line first line read
-     */
-    private static void processComment(
-        final BufferedReader reader,
-        final String line) {
-        if (!line.endsWith(";")) {
-            moveToEndOfCommand(reader);
+            if (newLine.length() > 0) {
+                sbCommand.append(' ');
+                sbCommand.append(newLine);
+            }
         }
-    }
 
-    /**
-     * Processes GRANT command.
-     *
-     * @param reader reader of the dump file
-     * @param line first line read
-     */
-    private static void processGrant(
-        final BufferedReader reader,
-        final String line) {
-        if (!line.endsWith(";")) {
-            moveToEndOfCommand(reader);
-        }
-    }
-
-    /**
-     * Processes INSERT INTO command.
-     *
-     * @param reader reader of the dump file
-     * @param line first line read
-     */
-    private static void processInsertInto(
-        final BufferedReader reader,
-        final String line) {
-        if (!line.endsWith(";")) {
-            moveToEndOfCommand(reader);
-        }
-    }
-
-    /**
-     * Processes REVOKE command.
-     *
-     * @param reader reader of the dump file
-     * @param line first line read
-     */
-    private static void processRevoke(
-        final BufferedReader reader,
-        final String line) {
-        if (!line.endsWith(";")) {
-            moveToEndOfCommand(reader);
-        }
-    }
-
-    /**
-     * Processes SELECT command.
-     *
-     * @param reader reader of the dump file
-     * @param line first line read
-     */
-    private static void processSelect(
-        final BufferedReader reader,
-        final String line) {
-        if (!line.endsWith(";")) {
-            moveToEndOfCommand(reader);
-        }
-    }
-
-    /**
-     * Processes SET command.
-     *
-     * @param reader reader of the dump file
-     * @param line first line read
-     */
-    private static void processSet(
-        final BufferedReader reader,
-        final String line) {
-        if (!line.endsWith(";")) {
-            moveToEndOfCommand(reader);
-        }
+        return sbCommand.toString();
     }
 }

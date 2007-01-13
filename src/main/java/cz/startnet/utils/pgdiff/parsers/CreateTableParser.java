@@ -3,13 +3,9 @@
  */
 package cz.startnet.utils.pgdiff.parsers;
 
-import cz.startnet.utils.pgdiff.loader.FileException;
 import cz.startnet.utils.pgdiff.schema.PgColumn;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
-
-import java.io.BufferedReader;
-import java.io.IOException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,27 +53,29 @@ public class CreateTableParser {
      * Parses CREATE TABLE command.
      *
      * @param schema schema to be filled
-     * @param reader reader of the dump file
-     * @param line first line read
+     * @param command CREATE TABLE command
      *
      * @throws ParserException Thrown if problem occured while parsing DDL.
      */
-    public static void parse(
-        final PgSchema schema,
-        final BufferedReader reader,
-        final String line) {
+    public static void parse(final PgSchema schema, final String command) {
+        String line = command;
         final Matcher matcher = PATTERN_TABLE_NAME.matcher(line);
         final String tableName;
 
-        if (matcher.matches()) {
+        if (matcher.find()) {
             tableName = matcher.group(1).trim();
+            line =
+                ParserUtils.removeSubString(
+                        line,
+                        matcher.start(),
+                        matcher.end());
         } else {
             throw new ParserException(
                     ParserException.CANNOT_PARSE_COMMAND + line);
         }
 
         final PgTable table = schema.getTable(tableName);
-        parseRows(table, reader);
+        parseRows(table, ParserUtils.removeLastSemicolon(line));
     }
 
     /**
@@ -87,28 +85,12 @@ public class CreateTableParser {
      * @param table table being parsed
      * @param line line being processed
      *
-     * @return true if the command was the last command for CREATE TABLE,
-     *         otherwise false
-     *
      * @throws ParserException Thrown if problem occured while parsing DDL.
      */
-    private static boolean parseColumnDefs(
-        final PgTable table,
-        final String line) {
-        boolean last = false;
-        String adjLine = line;
-
-        if (adjLine.endsWith(",")) {
-            adjLine = adjLine.substring(0, adjLine.length() - 1).trim();
-        } else if (adjLine.endsWith(");")) {
-            adjLine = adjLine.substring(0, adjLine.length() - 2).trim();
-            last = true;
-        }
-
-        if (adjLine.length() > 0) {
-            if (adjLine.startsWith("CONSTRAINT ")) {
-                final Matcher matcher =
-                    PATTERN_CONSTRAINT.matcher(adjLine.trim());
+    private static void parseColumnDefs(final PgTable table, final String line) {
+        if (line.length() > 0) {
+            if (line.startsWith("CONSTRAINT ")) {
+                final Matcher matcher = PATTERN_CONSTRAINT.matcher(line.trim());
 
                 if (matcher.matches()) {
                     table.getConstraint(matcher.group(1).trim()).setDefinition(
@@ -118,7 +100,7 @@ public class CreateTableParser {
                             ParserException.CANNOT_PARSE_COMMAND + line);
                 }
             } else {
-                final Matcher matcher = PATTERN_COLUMN.matcher(adjLine);
+                final Matcher matcher = PATTERN_COLUMN.matcher(line);
 
                 if (matcher.matches()) {
                     final PgColumn column =
@@ -130,8 +112,6 @@ public class CreateTableParser {
                 }
             }
         }
-
-        return last;
     }
 
     /**
@@ -139,83 +119,81 @@ public class CreateTableParser {
      * closed with ')'.
      *
      * @param table table being parsed
-     * @param line line being processed
+     * @param commands commands being processed
      *
      * @return true if the command was the last command for CREATE TABLE,
      *         otherwise false
-     *
-     * @throws ParserException Thrown if problem occured while parsing INHERITS
-     *         command.
      */
-    private static boolean parsePostColumns(
+    private static String parsePostColumns(
         final PgTable table,
-        final String line) {
-        boolean last = false;
-
-        if (line.endsWith(";")) {
-            last = true;
-        }
-
+        final String commands) {
+        String line = commands;
         final Matcher matcher = PATTERN_INHERITS.matcher(line);
 
-        if (matcher.matches()) {
+        if (matcher.find()) {
             table.setInherits(matcher.group(1).trim());
-        } else {
-            throw new ParserException(
-                    ParserException.CANNOT_PARSE_COMMAND + line);
+            line =
+                ParserUtils.removeSubString(
+                        line,
+                        matcher.start(),
+                        matcher.end());
         }
 
-        return last;
+        if (line.contains("WITH OIDS")) {
+            table.setWithOIDS(true);
+            line = ParserUtils.removeSubString(line, "WITH OIDS");
+        } else if (line.contains("WITHOUT OIDS")) {
+            table.setWithOIDS(false);
+            line = ParserUtils.removeSubString(line, "WITHOUT OIDS");
+        }
+
+        return line;
     }
 
     /**
      * Parses all rows in CREATE TABLE command.
      *
      * @param table table being parsed
-     * @param reader dump file reader
+     * @param command command without 'CREATE SEQUENCE ... (' string
      *
-     * @throws FileException Thrown if problem occured while reading dump file.
      * @throws ParserException Thrown if problem occured with parsing of DDL.
      */
-    private static void parseRows(
-        final PgTable table,
-        final BufferedReader reader) {
-        String origLine = null;
+    private static void parseRows(final PgTable table, final String command) {
+        String line = command;
         boolean postColumns = false;
 
         try {
-            String newLine = reader.readLine();
-
-            while (newLine != null) {
-                boolean last = false;
-                origLine = newLine;
-                newLine = newLine.trim();
+            while (line.length() > 0) {
+                final int commandEnd = ParserUtils.getCommandEnd(line, 0);
+                final String subCommand = line.substring(0, commandEnd).trim();
 
                 if (postColumns) {
-                    last = parsePostColumns(table, newLine);
-                } else {
-                    if (")".equals(newLine)) {
-                        postColumns = true;
-                    } else if (");".equals(newLine)) {
-                        break;
-                    } else {
-                        last = parseColumnDefs(table, newLine);
-                    }
-                }
+                    line = parsePostColumns(table, subCommand);
 
-                if (last) {
                     break;
+                } else if (line.charAt(commandEnd) == ')') {
+                    postColumns = true;
                 }
 
-                newLine = reader.readLine();
+                parseColumnDefs(table, subCommand);
+                line =
+                    (commandEnd >= line.length()) ? ""
+                                                  : line.substring(
+                            commandEnd + 1);
             }
-        } catch (IOException ex) {
-            throw new FileException(FileException.CANNOT_READ_FILE, ex);
         } catch (RuntimeException ex) {
             throw new ParserException(
-                    "Cannot parse CREATE TABLE '" + table.getName()
-                    + "', line '" + origLine + "'",
+                    ParserException.CANNOT_PARSE_COMMAND + "CREATE TABLE "
+                    + table.getName() + " ( " + command,
                     ex);
+        }
+
+        line = line.trim();
+
+        if (line.length() > 0) {
+            throw new ParserException(
+                    "Cannot parse CREATE TABLE '" + table.getName()
+                    + "' - do not know how to parse '" + line + "'");
         }
     }
 }

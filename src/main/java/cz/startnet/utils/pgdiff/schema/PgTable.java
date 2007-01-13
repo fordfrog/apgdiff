@@ -55,6 +55,11 @@ public class PgTable {
     private String name = null;
 
     /**
+     * Whether WITH OIDS is used.
+     */
+    private boolean withOIDS = false;
+
+    /**
      * Creates a new PgTable object.
      *
      * @param name name of the table
@@ -275,6 +280,24 @@ public class PgTable {
         }
 
         return sbSQL.toString();
+    }
+
+    /**
+     * Setter for {@link #withOIDS withOIDS}.
+     *
+     * @param withOIDS {@link #withOIDS withOIDS}
+     */
+    public void setWithOIDS(final boolean withOIDS) {
+        this.withOIDS = withOIDS;
+    }
+
+    /**
+     * Getter for {@link #withOIDS withOIDS}
+     *
+     * @return {@link #withOIDS withOIDS}
+     */
+    public boolean isWithOIDS() {
+        return withOIDS;
     }
 
     /**

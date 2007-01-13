@@ -3,14 +3,10 @@
  */
 package cz.startnet.utils.pgdiff.parsers;
 
-import cz.startnet.utils.pgdiff.loader.FileException;
 import cz.startnet.utils.pgdiff.schema.PgColumn;
 import cz.startnet.utils.pgdiff.schema.PgConstraint;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
-
-import java.io.BufferedReader;
-import java.io.IOException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -55,22 +51,23 @@ public class AlterTableParser {
      * Parses ALTER TABLE command.
      *
      * @param schema schema to be filled
-     * @param reader reader of the dump file
-     * @param line first line read
+     * @param command ALTER TABLE command
      *
      * @throws ParserException Thrown if problem occured while parsing DDL.
      */
-    public static void parse(
-        final PgSchema schema,
-        final BufferedReader reader,
-        final String line) {
-        if (!PATTERN_OWNER.matcher(line).matches()) {
+    public static void parse(final PgSchema schema, final String command) {
+        if (!PATTERN_OWNER.matcher(command).matches()) {
+            String line = command;
             final Matcher matcher = PATTERN_START.matcher(line);
-
             final String tableName;
 
-            if (matcher.matches()) {
+            if (matcher.find()) {
                 tableName = matcher.group(1).trim();
+                line =
+                    ParserUtils.removeSubString(
+                            line,
+                            matcher.start(),
+                            matcher.end());
             } else {
                 throw new ParserException(
                         ParserException.CANNOT_PARSE_COMMAND + line);
@@ -80,7 +77,7 @@ public class AlterTableParser {
             final String traillingDef = matcher.group(2);
 
             if (traillingDef == null) {
-                parseRows(table, reader);
+                parseRows(table, line);
             } else {
                 parseTraillingDef(table, traillingDef.trim());
             }
@@ -91,54 +88,39 @@ public class AlterTableParser {
      * Parses all rows in ALTER TABLE command.
      *
      * @param table table being parsed
-     * @param reader reader for reading the dump
+     * @param commands commands
      *
-     * @throws FileException Thrown if problem occured while reading the dump
-     *         file.
      * @throws ParserException Thrown if problem occured while parsing DDL.
      */
-    private static void parseRows(
-        final PgTable table,
-        final BufferedReader reader) {
-        String origLine = null;
+    private static void parseRows(final PgTable table, final String commands) {
+        String line = commands;
+        String subCommand = null;
 
         try {
-            String newLine = reader.readLine();
+            while (line.length() > 0) {
+                final int commandEnd = ParserUtils.getCommandEnd(line, 0);
+                subCommand = line.substring(0, commandEnd).trim();
 
-            while (newLine != null) {
-                boolean last = false;
-                origLine = newLine;
-                newLine = newLine.trim();
-
-                if (newLine.endsWith(";")) {
-                    last = true;
-                    newLine = newLine.substring(0, newLine.length() - 1);
-                }
-
-                if (newLine.startsWith("ADD CONSTRAINT ")) {
-                    newLine = newLine.substring("ADD CONSTRAINT ".length())
-                                     .trim();
+                if (subCommand.startsWith("ADD CONSTRAINT ")) {
+                    subCommand = subCommand.substring(
+                                "ADD CONSTRAINT ".length()).trim();
 
                     final String constraintName =
-                        newLine.substring(0, newLine.indexOf(' ')).trim();
+                        subCommand.substring(0, subCommand.indexOf(' ')).trim();
                     final PgConstraint constraint =
                         table.getConstraint(constraintName);
                     constraint.setDefinition(
-                            newLine.substring(newLine.indexOf(' ')).trim());
+                            subCommand.substring(subCommand.indexOf(' ')).trim());
+                    line =
+                        (commandEnd >= line.length()) ? ""
+                                                      : line.substring(
+                                commandEnd + 1);
                 }
-
-                if (last) {
-                    break;
-                }
-
-                newLine = reader.readLine();
             }
-        } catch (IOException ex) {
-            throw new FileException(FileException.CANNOT_READ_FILE, ex);
         } catch (RuntimeException ex) {
             throw new ParserException(
                     "Cannot parse ALTER TABLE '" + table.getName()
-                    + "', line '" + origLine + "'",
+                    + "', line '" + subCommand + "'",
                     ex);
         }
     }

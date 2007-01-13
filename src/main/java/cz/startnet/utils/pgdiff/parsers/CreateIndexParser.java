@@ -33,13 +33,13 @@ public class CreateIndexParser {
      * Parses CREATE INDEX command.
      *
      * @param schema schema to be filled
-     * @param line first line read
+     * @param command CREATE INDEX command
      *
      * @throws ParserException Thrown if problem occured while parsing the
      *         command.
      */
-    public static void parse(final PgSchema schema, final String line) {
-        final Matcher matcher = PATTERN.matcher(line.trim());
+    public static void parse(final PgSchema schema, final String command) {
+        final Matcher matcher = PATTERN.matcher(command.trim());
 
         if (matcher.matches()) {
             final String indexName = matcher.group(1);
@@ -48,14 +48,14 @@ public class CreateIndexParser {
 
             if ((indexName == null) || (tableName == null) || (def == null)) {
                 throw new ParserException(
-                        ParserException.CANNOT_PARSE_COMMAND + line);
+                        ParserException.CANNOT_PARSE_COMMAND + command);
             }
 
             schema.getTable(tableName.trim()).getIndex(indexName.trim()).setDefinition(
                     def.trim());
         } else {
             throw new ParserException(
-                    ParserException.CANNOT_PARSE_COMMAND + line);
+                    ParserException.CANNOT_PARSE_COMMAND + command);
         }
     }
 }
