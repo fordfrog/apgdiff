@@ -64,31 +64,25 @@
                 </li>
             </ul>
             <p>
-                Note: I use apgdiff on dumps generated from PostgreSQL 8.1.x so
-                it might not work on dumps from other versions if there are some
-                differences in the format that apgdiff cannot handle at this
-                moment. Feel free to submit a patch for such a problem or send
-                me your dump and I'll have a look at it. Please also note that
-                if you want to have a new feature in apgdiff and you do not plan
-                to provide a patch for the feature then you need to add your
-                <a href="http://sourceforge.net/tracker/?group_id=163508&amp;atid=828026">
-                    feature request
-                </a> so I can find out that the feature is in need. I do not
-                plan to add new features just in case somebody may need it, I
-                need to see a request for the feature at the first time so
-                I can see the effort has some meaning.
+                Note: apgdiff is no more depending on formatting of SQL commands
+                so it can be used on dumps from different version of PostgreSQL,
+                on SQL commands from pgAdmin, hand-written SQL commands etc.
+                I do the testing on dumps from PostgreSQL 8.1.x. Please note
+                that there are some differences in what parameters are default
+                in what versions of PostgreSQL (for example creation of OIDS)
+                so have this in mind while creating your diffs as apgadmin
+                defaults to default of PostgreSQL 8.x.
             </p>
         </section>
         <section name="Requirements">
             <p>
                 apgdiff is a Java program so you need Java installed. apgdiff
-                requires Java 1.5. I use "Sun JDK 1.5.0.09" and
-                "Sun JDK 1.6.0.0_rc104".
+                requires at least Java 1.5. I use "Sun JDK 1.6.0".
             </p>
         </section>
         <section name="Bugs">
             <p>
-                There are three kinds of bugs in apgdiff:
+                There are two kinds of bugs in apgdiff:
             </p>
             <ul>
                 <li>
@@ -96,20 +90,14 @@
                     because they should be caught by automated tests)
                 </li>
                 <li>
-                    bugs caused by not implemented features (see
-                    <a href="#List of Features">List of Features</a>)
-                </li>
-                <li>
-                    bugs caused by different format of PostgreSQL dump file
-                    that other than 8.1.x versions may create (see Note at the
-                    end of <a href="#List of Features">List of Features</a>)
+                    bugs caused by not implemented features
                 </li>
             </ul>
             <p>
                 No matter of what bug you came across, please file it to
-                <a href="http://sourceforge.net/tracker/?group_id=163508&amp;atid=828023">
-                    Bugs Tracker
-                </a>.
+                <a href="http://sourceforge.net/tracker/?group_id=163508&amp;atid=828023">Bugs Tracker</a>.
+                If you have a patch for such a bug then please file it to
+                <a href="http://sourceforge.net/tracker/?group_id=163508&amp;atid=828025">Patches</a>.
             </p>
         </section>
         <section name="Future">
@@ -117,16 +105,15 @@
                 As I use this tool quite often I will probably release new
                 versions from time to time. If you are interested in this tool
                 and have a patch for it, put it to
-                <a href="http://sourceforge.net/tracker/?group_id=163508&amp;atid=828025">
-                    Patch Tracker
-                </a> and I'll add it to a new release.
+                <a href="http://sourceforge.net/tracker/?group_id=163508&amp;atid=828025">Patch Tracker</a>
+                and I'll add it to a new release. Also, if you would like to see
+                a new feature in apgdiff then you can submit
+                <a href="http://sourceforge.net/tracker/?group_id=163508&amp;atid=828026">Feature Request</a>.
             </p>
         </section>
         <section name="Contact">
             <p>
-                You can contact me at <a href="mailto:miroslav.sulc@startnet.cz">
-                    miroslav.sulc@startnet.cz
-                </a>.
+                You can contact me at <a href="mailto:miroslav.sulc@startnet.cz">miroslav.sulc@startnet.cz</a>.
             </p>
         </section>
     </body>
