@@ -113,7 +113,9 @@
         description="Creates binary distribution file">
         <zip destfile="${dist}/${build.final.name}-bin.zip">
             <zipfileset prefix="${build.final.name}" dir="."
-                includes="${dist}/${build.final.name}.jar, **/license.txt"/>
+                includes="**/license.txt"/>
+            <zipfileset dir="." includes="${dist}/${build.final.name}.jar"
+                fullpath="${build.final.name}/${build.final.name}.jar"/>
         </zip>
     </target>
     
