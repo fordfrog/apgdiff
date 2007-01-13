@@ -1,6 +1,6 @@
 <project name="apgdiff" default="jar" basedir=".">
     <property name="name" value="Another PostgreSQL Diff Tool"/>
-    <property name="version" value="1.0.0_beta12"/>
+    <property name="version" value="1.0.0_beta13"/>
     <property name="build" value="build"/>
     <property name="dist" value="dist"/>
     <property name="build.output" value="${build}/classes"/>
@@ -88,11 +88,11 @@
     <target name="get-deps" description="Download all dependencies"
             unless="noget">
         <mkdir dir="${lib}"/>
-        <get src="http://www.ibiblio.org/maven/junit/jars/junit-4.1.jar"
+        <get src="http://www.ibiblio.org/maven/junit/jars/junit-4.2.jar"
              dest="${lib}/junit.jar"/>
     </target>
     
-    <target name="javadoc">
+    <target name="javadoc" description="Generates javadoc">
         <delete dir="doc"/>
         <mkdir dir="doc"/>
         <javadoc packagenames="cz.*" sourcepath="${src}" 
@@ -100,6 +100,21 @@
                  author="true" version="true" private="false" use="true"
                  splitindex="true" windowtitle="${name} ${version}"
                  doctitle="${name} ${version}"/>
+    </target>
+    
+    <target name="distsrc" description="Creates source distribution file">
+        <zip destfile="${dist}/${build.final.name}-src.zip">
+            <zipfileset prefix="${build.final.name}" dir="."
+                excludes="${dist}/**, target/**, stats/**, lib/**, nbproject/**"/>
+        </zip>
+    </target>
+    
+    <target name="distbin" depends="jar"
+        description="Creates binary distribution file">
+        <zip destfile="${dist}/${build.final.name}-bin.zip">
+            <zipfileset prefix="${build.final.name}" dir="."
+                includes="${dist}/${build.final.name}.jar, **/license.txt"/>
+        </zip>
     </target>
     
 </project>
