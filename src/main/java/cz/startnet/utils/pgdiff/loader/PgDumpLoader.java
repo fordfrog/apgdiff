@@ -61,9 +61,9 @@ public class PgDumpLoader { //NOPMD
             String line = reader.readLine();
 
             while (line != null) {
+                line = stripComment(line).trim();
                 line = line.trim();
 
-                // '--' comments are ignored
                 if (line.length() == 0) {
                     line = reader.readLine();
 
@@ -139,7 +139,7 @@ public class PgDumpLoader { //NOPMD
 
         while (!newLine.trim().endsWith(";")) {
             try {
-                newLine = reader.readLine().trim();
+                newLine = stripComment(reader.readLine()).trim();
             } catch (IOException ex) {
                 throw new FileException(FileException.CANNOT_READ_FILE, ex);
             }
@@ -151,5 +151,44 @@ public class PgDumpLoader { //NOPMD
         }
 
         return sbCommand.toString();
+    }
+
+    /**
+     * Strips comment from command line.
+     *
+     * @param command command
+     *
+     * @return if comment was found then command without the comment, otherwise
+     *         the original command
+     */
+    private static String stripComment(final String command) {
+        String result = command;
+        int pos = result.indexOf("--");
+
+        while (pos >= 0) {
+            if (pos == 0) {
+                result = "";
+
+                break;
+            } else {
+                int count = 0;
+
+                for (int chr = 0; chr < pos; chr++) {
+                    if (chr == '\'') {
+                        count++;
+                    }
+                }
+
+                if ((count % 2) == 0) {
+                    result = result.substring(0, pos).trim();
+
+                    break;
+                }
+            }
+
+            pos = result.indexOf("--", pos + 1);
+        }
+
+        return result;
     }
 }
