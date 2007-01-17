@@ -20,7 +20,7 @@ public class CreateIndexParser {
      * Pattern for parsing CREATE INDEX definition.
      */
     private static final Pattern PATTERN =
-        Pattern.compile("CREATE INDEX ([^ ]+) ON ([^ ]+) ([^;]+)[;]?");
+        Pattern.compile("CREATE INDEX ([^ ]+) ON ([^ ]+)[ ]*([^;]+)[;]?");
 
     /**
      * Creates a new instance of CreateIndexParser.

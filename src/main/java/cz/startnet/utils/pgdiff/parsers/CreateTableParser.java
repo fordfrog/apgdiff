@@ -22,7 +22,7 @@ public class CreateTableParser {
      * Pattern for getting table name from CREATE TABLE.
      */
     private static final Pattern PATTERN_TABLE_NAME =
-        Pattern.compile("CREATE TABLE ([^ ]+) \\(");
+        Pattern.compile("CREATE TABLE ([^ ]+)[ ]*\\(");
 
     /**
      * Pattern for getting CONSTRAINT parameters.
