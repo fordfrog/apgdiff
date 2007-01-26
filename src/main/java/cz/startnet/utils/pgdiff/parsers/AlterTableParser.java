@@ -41,6 +41,18 @@ public class AlterTableParser {
                 + "(?: SET STATISTICS )?(\\d+)?;?");
 
     /**
+     * Pattern for matching ADD CONSTRAINT row.
+     */
+    private static final Pattern PATTERN_ADD_CONSTRAINT =
+        Pattern.compile("^ADD[ ]+CONSTRAINT[ ]+([^ ]+)[ ]+(.*)$");
+
+    /**
+     * Pattern for matching ADD FOREIGN KEY row.
+     */
+    private static final Pattern PATTERN_ADD_FOREIGN_KEY =
+        Pattern.compile("^ADD[ ]+(FOREIGN[ ]+KEY[ ]+\\(([^ ]+)\\)[ ]+.*)$");
+
+    /**
      * Creates a new instance of AlterTableParser.
      */
     private AlterTableParser() {
@@ -63,23 +75,18 @@ public class AlterTableParser {
 
             if (matcher.find()) {
                 tableName = matcher.group(1).trim();
-                line =
-                    ParserUtils.removeSubString(
-                            line,
-                            matcher.start(),
-                            matcher.end());
             } else {
                 throw new ParserException(
                         ParserException.CANNOT_PARSE_COMMAND + line);
             }
 
             final PgTable table = schema.getTable(tableName);
-            final String traillingDef = matcher.group(2);
+            line = ParserUtils.removeLastSemicolon(matcher.group(2));
 
-            if (traillingDef == null) {
-                parseRows(table, line);
+            if (PATTERN_TRAILING_DEF.matcher(line).matches()) {
+                parseTraillingDef(table, line.trim());
             } else {
-                parseTraillingDef(table, traillingDef.trim());
+                parseRows(table, line);
             }
         }
     }
@@ -100,21 +107,38 @@ public class AlterTableParser {
             while (line.length() > 0) {
                 final int commandEnd = ParserUtils.getCommandEnd(line, 0);
                 subCommand = line.substring(0, commandEnd).trim();
+                line =
+                    (commandEnd >= line.length()) ? ""
+                                                  : line.substring(
+                            commandEnd + 1);
 
-                if (subCommand.startsWith("ADD CONSTRAINT ")) {
-                    subCommand = subCommand.substring(
-                                "ADD CONSTRAINT ".length()).trim();
+                Matcher matcher = PATTERN_ADD_CONSTRAINT.matcher(subCommand);
 
-                    final String constraintName =
-                        subCommand.substring(0, subCommand.indexOf(' ')).trim();
+                if (matcher.matches()) {
+                    final String constraintName = matcher.group(1).trim();
                     final PgConstraint constraint =
                         table.getConstraint(constraintName);
-                    constraint.setDefinition(
-                            subCommand.substring(subCommand.indexOf(' ')).trim());
-                    line =
-                        (commandEnd >= line.length()) ? ""
-                                                      : line.substring(
-                                commandEnd + 1);
+                    constraint.setDefinition(matcher.group(2).trim());
+                    subCommand = "";
+                }
+
+                if (subCommand.length() > 0) {
+                    matcher = PATTERN_ADD_FOREIGN_KEY.matcher(subCommand);
+
+                    if (matcher.matches()) {
+                        final String columnName = matcher.group(2).trim();
+                        final String constraintName =
+                            table.getName() + "_" + columnName + "_fkey";
+                        final PgConstraint constraint =
+                            table.getConstraint(constraintName);
+                        constraint.setDefinition(matcher.group(1).trim());
+                        subCommand = "";
+                    }
+                }
+
+                if (subCommand.length() > 0) {
+                    throw new ParserException(
+                            "Don't know how to parse: " + subCommand);
                 }
             }
         } catch (RuntimeException ex) {

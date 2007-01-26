@@ -117,6 +117,8 @@ public class PgDiffTest {
                     {"modify_constraint", false },
                     // Tests scenario where TABLE CONSTRAINT is dropped.
                     {"drop_constraint", false },
+                    // Tests scenario where UNIQUE TABLE CONSTRAINT is added.
+                    {"add_unique_constraint", true },
                     // Tests reading of TABLE with INHERITS.
                     {"read_inherits", false },
                     // Tests scenario where TABLE with INHERITS is added.
