@@ -42,7 +42,7 @@ public class PgDiffIndexes {
         final PgSchema newSchema) {
         final Map<String, PgTable> oldTables = oldSchema.getTables();
 
-        for (PgTable newTable : newSchema.getTables().values()) {
+        for (PgTable newTable : newSchema.getOrderedTables()) {
             final String newTableName = newTable.getName();
 
             // Drop indexes that do not exist in new schema or are modified
@@ -85,7 +85,7 @@ public class PgDiffIndexes {
         if ((newTable != null) && (oldTable != null)) {
             final Set<String> newNames = newTable.getIndexes().keySet();
 
-            for (final PgIndex index : oldTable.getIndexes().values()) {
+            for (final PgIndex index : oldTable.getOrderedIndexes()) {
                 if (
                     !newNames.contains(index.getName())
                         || !newTable.getIndex(index.getName()).getDefinition().equals(
@@ -113,13 +113,13 @@ public class PgDiffIndexes {
 
         if (newTable != null) {
             if (oldTable == null) {
-                for (final PgIndex index : newTable.getIndexes().values()) {
+                for (final PgIndex index : newTable.getOrderedIndexes()) {
                     list.add(index);
                 }
             } else {
                 final Set<String> oldNames = oldTable.getIndexes().keySet();
 
-                for (final PgIndex index : newTable.getIndexes().values()) {
+                for (final PgIndex index : newTable.getOrderedIndexes()) {
                     if (
                         !oldNames.contains(index.getName())
                             || !oldTable.getIndex(index.getName())

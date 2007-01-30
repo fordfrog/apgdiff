@@ -21,37 +21,43 @@ public class CreateSequenceParser {
      * Pattern for getting sequence name.
      */
     private static final Pattern PATTERN_SEQUENCE_NAME =
-        Pattern.compile("CREATE SEQUENCE ([^ ]+)");
+        Pattern.compile(
+                "CREATE SEQUENCE \"?([^ \"]+)\"?",
+                Pattern.CASE_INSENSITIVE);
 
     /**
      * Pattern for getting value of START WITH parameter.
      */
     private static final Pattern PATTERN_START_WITH =
-        Pattern.compile("START (?:WITH )?([-]?[\\d]+)");
+        Pattern.compile(
+                "START (?:WITH )?([-]?[\\d]+)",
+                Pattern.CASE_INSENSITIVE);
 
     /**
      * Pattern for getting value of INCREMENT BY parameter.
      */
     private static final Pattern PATTERN_INCREMENT_BY =
-        Pattern.compile("INCREMENT (?:BY )?([-]?[\\d]+)");
+        Pattern.compile(
+                "INCREMENT (?:BY )?([-]?[\\d]+)",
+                Pattern.CASE_INSENSITIVE);
 
     /**
      * Pattern for getting value of MAXVALUE parameter.
      */
     private static final Pattern PATTERN_MAXVALUE =
-        Pattern.compile("MAXVALUE ([-]?[\\d]+)");
+        Pattern.compile("MAXVALUE ([-]?[\\d]+)", Pattern.CASE_INSENSITIVE);
 
     /**
      * Pattern for getting value of MINVALUE parameter.
      */
     private static final Pattern PATTERN_MINVALUE =
-        Pattern.compile("MINVALUE ([-]?[\\d]+)");
+        Pattern.compile("MINVALUE ([-]?[\\d]+)", Pattern.CASE_INSENSITIVE);
 
     /**
      * Pattern for getting value of CACHE parameter.
      */
     private static final Pattern PATTERN_CACHE =
-        Pattern.compile("CACHE ([\\d]+)");
+        Pattern.compile("CACHE ([\\d]+)", Pattern.CASE_INSENSITIVE);
 
     /**
      * Creates a new instance of CreateSequenceParser.

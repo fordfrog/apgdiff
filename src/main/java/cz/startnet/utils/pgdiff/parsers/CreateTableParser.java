@@ -22,25 +22,30 @@ public class CreateTableParser {
      * Pattern for getting table name from CREATE TABLE.
      */
     private static final Pattern PATTERN_TABLE_NAME =
-        Pattern.compile("CREATE TABLE ([^ ]+)[ ]*\\(");
+        Pattern.compile(
+                "CREATE TABLE \"?([^ \"]+)\"?[ ]*\\(",
+                Pattern.CASE_INSENSITIVE);
 
     /**
      * Pattern for getting CONSTRAINT parameters.
      */
     private static final Pattern PATTERN_CONSTRAINT =
-        Pattern.compile("CONSTRAINT ([^ ]+) (.*)");
+        Pattern.compile(
+                "CONSTRAINT \"?([^ \"]+)\"? (.*)",
+                Pattern.CASE_INSENSITIVE);
 
     /**
      * Pattern for parsing column definition.
      */
     private static final Pattern PATTERN_COLUMN =
-        Pattern.compile("([^ ]+) (.*)");
+        //Pattern.compile("([^ ]+) (.*)", Pattern.CASE_INSENSITIVE);
+        Pattern.compile("\"?([^ \"]+)\"? (.*)", Pattern.CASE_INSENSITIVE);
 
     /**
      * Pattern for parsing INHERITS.
      */
     private static final Pattern PATTERN_INHERITS =
-        Pattern.compile("INHERITS ([^;]+)[;]?");
+        Pattern.compile("INHERITS ([^;]+)[;]?", Pattern.CASE_INSENSITIVE);
 
     /**
      * Creates a new instance of CreateTableParser.

@@ -3,7 +3,9 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -15,6 +17,17 @@ import java.util.Map;
  */
 public class PgSchema {
     /**
+     * List of ordered sequences.
+     */
+    private final List<PgSequence> orderedSequences =
+        new ArrayList<PgSequence>();
+
+    /**
+     * list of ordered tables.
+     */
+    private final List<PgTable> orderedTables = new ArrayList<PgTable>();
+
+    /**
      * Map of sequence names and sequence definitions.
      */
     private final Map<String, PgSequence> sequences = //NOPMD
@@ -24,6 +37,26 @@ public class PgSchema {
      * Map of table names and table definitions.
      */
     private final Map<String, PgTable> tables = new HashMap<String, PgTable>(); //NOPMD
+
+    /**
+     * Returns a collection of all sequences ordered as specified in
+     * the DDL.
+     *
+     * @return collection of all the sequences
+     */
+    public List<PgSequence> getOrderedSequences() {
+        return orderedSequences;
+    }
+
+    /**
+     * Returns a collection of all tables ordered as specified in the
+     * DDL.
+     *
+     * @return collection of all the tables
+     */
+    public List<PgTable> getOrderedTables() {
+        return orderedTables;
+    }
 
     /**
      * Returns sequence with given name. If the sequence exists in the
@@ -42,6 +75,7 @@ public class PgSchema {
         } else {
             sequence = new PgSequence(name);
             sequences.put(name, sequence);
+            getOrderedSequences().add(sequence);
         }
 
         return sequence;
@@ -73,6 +107,7 @@ public class PgSchema {
         } else {
             table = new PgTable(name);
             tables.put(name, table);
+            getOrderedTables().add(table);
         }
 
         return table;

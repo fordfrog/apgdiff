@@ -45,7 +45,7 @@ public class PgDiffConstraints {
         final boolean primaryKey) {
         final Map<String, PgTable> oldTables = oldSchema.getTables();
 
-        for (PgTable newTable : newSchema.getTables().values()) {
+        for (PgTable newTable : newSchema.getOrderedTables()) {
             final String newTableName = newTable.getName();
 
             // Drop constraints that do not exist in new schema or are modified
@@ -95,8 +95,7 @@ public class PgDiffConstraints {
         if ((newTable != null) && (oldTable != null)) {
             final Set<String> newNames = newTable.getConstraints().keySet();
 
-            for (final PgConstraint constraint : oldTable.getConstraints()
-                                                         .values()) {
+            for (final PgConstraint constraint : oldTable.getOrderedConstraints()) {
                 if (
                     (constraint.isPrimaryKeyConstraint() == primaryKey)
                         && (!newNames.contains(constraint.getName())
@@ -129,8 +128,8 @@ public class PgDiffConstraints {
 
         if (newTable != null) {
             if (oldTable == null) {
-                for (final PgConstraint constraint : newTable.getConstraints()
-                                                             .values()) {
+                for (final PgConstraint constraint : newTable
+                    .getOrderedConstraints()) {
                     if (constraint.isPrimaryKeyConstraint() == primaryKey) {
                         list.add(constraint);
                     }
@@ -138,8 +137,8 @@ public class PgDiffConstraints {
             } else {
                 final Set<String> oldNames = oldTable.getConstraints().keySet();
 
-                for (final PgConstraint constraint : newTable.getConstraints()
-                                                             .values()) {
+                for (final PgConstraint constraint : newTable
+                    .getOrderedConstraints()) {
                     if (
                         (constraint.isPrimaryKeyConstraint() == primaryKey)
                             && (!oldNames.contains(constraint.getName())

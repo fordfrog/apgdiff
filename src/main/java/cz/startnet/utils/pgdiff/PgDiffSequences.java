@@ -70,7 +70,7 @@ public class PgDiffSequences {
         final List<PgSequence> list = new ArrayList<PgSequence>();
         final Set<String> newNames = newSchema.getSequences().keySet();
 
-        for (final PgSequence sequence : oldSchema.getSequences().values()) {
+        for (final PgSequence sequence : oldSchema.getOrderedSequences()) {
             if (!newNames.contains(sequence.getName())) {
                 list.add(sequence);
             }
@@ -93,7 +93,7 @@ public class PgDiffSequences {
         final List<PgSequence> list = new ArrayList<PgSequence>();
         final Set<String> oldNames = oldSchema.getSequences().keySet();
 
-        for (final PgSequence sequence : newSchema.getSequences().values()) {
+        for (final PgSequence sequence : newSchema.getOrderedSequences()) {
             if (!oldNames.contains(sequence.getName())) {
                 list.add(sequence);
             }
@@ -118,7 +118,7 @@ public class PgDiffSequences {
         final Set<String> oldNames = oldSchema.getSequences().keySet();
         final StringBuilder sbSQL = new StringBuilder();
 
-        for (final PgSequence newSequence : newSchema.getSequences().values()) {
+        for (final PgSequence newSequence : newSchema.getOrderedSequences()) {
             if (oldNames.contains(newSequence.getName())) {
                 final PgSequence oldSequence =
                     oldSchema.getSequence(newSequence.getName());

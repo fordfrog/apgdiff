@@ -4,8 +4,8 @@
 package cz.startnet.utils.pgdiff.schema;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -17,10 +17,21 @@ import java.util.Map;
  */
 public class PgTable {
     /**
-     * Ordered collection of columns name.
+     * Ordered collection of columns.
      */
-    private final Collection<PgColumn> orderedColumns = //NOPMD
+    private final List<PgColumn> orderedColumns =  //NOPMD
         new ArrayList<PgColumn>();
+
+    /**
+     * Ordered collection of constraints.
+     */
+    private final List<PgConstraint> orderedConstraints =
+        new ArrayList<PgConstraint>();
+
+    /**
+     * Ordered collection of indexes.
+     */
+    private final List<PgIndex> orderedIndexes = new ArrayList<PgIndex>();
 
     /**
      * Map of column names and columns.
@@ -135,6 +146,7 @@ public class PgTable {
         } else {
             constraint = new PgConstraint(name);
             constraints.put(name, constraint);
+            orderedConstraints.add(constraint);
         }
 
         return constraint;
@@ -166,6 +178,7 @@ public class PgTable {
         } else {
             index = new PgIndex(name);
             indexes.put(name, index);
+            orderedIndexes.add(index);
         }
 
         return index;
@@ -222,8 +235,28 @@ public class PgTable {
      *
      * @return collection of all the columns
      */
-    public Collection<PgColumn> getOrderedColumns() {
+    public List<PgColumn> getOrderedColumns() {
         return orderedColumns;
+    }
+
+    /**
+     * Returns a collection of all constraints ordered as specified in
+     * the DDL.
+     *
+     * @return collection of all the constraints
+     */
+    public List<PgConstraint> getOrderedConstraints() {
+        return orderedConstraints;
+    }
+
+    /**
+     * Returns a collection of all indexes ordered as specified in the
+     * DDL.
+     *
+     * @return collection of all the indexes
+     */
+    public List<PgIndex> getOrderedIndexes() {
+        return orderedIndexes;
     }
 
     /**

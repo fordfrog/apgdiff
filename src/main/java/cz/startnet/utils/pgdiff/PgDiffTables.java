@@ -40,7 +40,7 @@ public class PgDiffTables {
         final PrintWriter writer,
         final PgSchema oldSchema,
         final PgSchema newSchema) {
-        for (PgTable newTable : newSchema.getTables().values()) {
+        for (PgTable newTable : newSchema.getOrderedTables()) {
             final PgTable oldTable = oldSchema.getTable(newTable.getName());
 
             if (oldTable == null) {
@@ -86,7 +86,7 @@ public class PgDiffTables {
         dropTables(writer, oldSchema, newSchema);
         createTables(writer, oldSchema, newSchema);
 
-        for (PgTable newTable : newSchema.getTables().values()) {
+        for (PgTable newTable : newSchema.getOrderedTables()) {
             if (!oldSchema.containsTable(newTable.getName())) {
                 continue;
             }
@@ -113,7 +113,7 @@ public class PgDiffTables {
         final Map<String, Integer> stats = new HashMap<String, Integer>();
         final Map<String, PgColumn> oldTableCols = oldTable.getColumns();
 
-        for (PgColumn newColumn : newTable.getColumns().values()) {
+        for (PgColumn newColumn : newTable.getOrderedColumns()) {
             final PgColumn oldColumn = oldTableCols.get(newColumn.getName());
 
             if (oldColumn != null) {
@@ -177,7 +177,7 @@ public class PgDiffTables {
         final List<String> commands,
         final PgTable oldTable,
         final PgTable newTable) {
-        for (PgColumn column : oldTable.getColumns().values()) {
+        for (PgColumn column : oldTable.getOrderedColumns()) {
             if (!newTable.containsColumn(column.getName())) {
                 commands.add("\tDROP COLUMN " + column.getName());
             }
@@ -196,7 +196,7 @@ public class PgDiffTables {
         final List<String> commands,
         final PgTable oldTable,
         final PgTable newTable) {
-        for (PgColumn newColumn : newTable.getColumns().values()) {
+        for (PgColumn newColumn : newTable.getOrderedColumns()) {
             if (!oldTable.containsColumn(newColumn.getName())) {
                 continue;
             }
@@ -322,7 +322,7 @@ public class PgDiffTables {
         final PrintWriter writer,
         final PgSchema oldSchema,
         final PgSchema newSchema) {
-        for (PgTable table : newSchema.getTables().values()) {
+        for (PgTable table : newSchema.getOrderedTables()) {
             if (!oldSchema.containsTable(table.getName())) {
                 writer.println();
                 writer.println(table.getTableSQL());
@@ -341,7 +341,7 @@ public class PgDiffTables {
         final PrintWriter writer,
         final PgSchema oldSchema,
         final PgSchema newSchema) {
-        for (PgTable table : oldSchema.getTables().values()) {
+        for (PgTable table : oldSchema.getOrderedTables()) {
             if (!newSchema.containsTable(table.getName())) {
                 writer.println();
                 writer.println("DROP TABLE " + table.getName() + ";");

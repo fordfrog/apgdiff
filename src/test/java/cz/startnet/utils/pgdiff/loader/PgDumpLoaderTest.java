@@ -46,7 +46,8 @@ public class PgDumpLoaderTest {
         return Arrays.asList(
                 new Object[][] {
                     { 1 },
-                    { 2 }
+                    { 2 },
+                    { 3 }
                 });
     }
 

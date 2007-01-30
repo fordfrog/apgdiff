@@ -23,13 +23,17 @@ public class AlterTableParser {
      * Pattern for matching ALTER TABLE ... OWNER TO ...;.
      */
     private static final Pattern PATTERN_OWNER =
-        Pattern.compile("^ALTER TABLE .* OWNER TO .*;$");
+        Pattern.compile(
+                "^ALTER TABLE .* OWNER TO .*;$",
+                Pattern.CASE_INSENSITIVE);
 
     /**
      * Pattern for matching table name and optional definition.
      */
     private static final Pattern PATTERN_START =
-        Pattern.compile("ALTER TABLE (?:ONLY )?([^ ]+)(?: )?(.+)?");
+        Pattern.compile(
+                "ALTER TABLE (?:ONLY )?\"?([^ \"]+)\"?(?: )?(.+)?",
+                Pattern.CASE_INSENSITIVE);
 
     /**
      * Pattern for matching of trailing definition of ALTER TABLE
@@ -37,20 +41,25 @@ public class AlterTableParser {
      */
     private static final Pattern PATTERN_TRAILING_DEF =
         Pattern.compile(
-                "(CLUSTER ON|ALTER COLUMN) ([^ ;]+)"
-                + "(?: SET STATISTICS )?(\\d+)?;?");
+                "(CLUSTER ON|ALTER COLUMN) \"?([^ ;\"]+)\"?"
+                + "(?: SET STATISTICS )?(\\d+)?;?",
+                Pattern.CASE_INSENSITIVE);
 
     /**
      * Pattern for matching ADD CONSTRAINT row.
      */
     private static final Pattern PATTERN_ADD_CONSTRAINT =
-        Pattern.compile("^ADD[ ]+CONSTRAINT[ ]+([^ ]+)[ ]+(.*)$");
+        Pattern.compile(
+                "^ADD[ ]+CONSTRAINT[ ]+\"?([^ \"]+)\"?[ ]+(.*)$",
+                Pattern.CASE_INSENSITIVE);
 
     /**
      * Pattern for matching ADD FOREIGN KEY row.
      */
     private static final Pattern PATTERN_ADD_FOREIGN_KEY =
-        Pattern.compile("^ADD[ ]+(FOREIGN[ ]+KEY[ ]+\\(([^ ]+)\\)[ ]+.*)$");
+        Pattern.compile(
+                "^ADD[ ]+(FOREIGN[ ]+KEY[ ]+\\(([^ ]+)\\)[ ]+.*)$",
+                Pattern.CASE_INSENSITIVE);
 
     /**
      * Creates a new instance of AlterTableParser.
