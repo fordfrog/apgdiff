@@ -75,8 +75,8 @@ public class PgDiff {
         final PgDiffArguments arguments,
         final PgSchema oldSchema,
         final PgSchema newSchema) {
-        PgDiffTables.diffTables(writer, oldSchema, newSchema);
         PgDiffSequences.diffSequences(writer, arguments, oldSchema, newSchema);
+        PgDiffTables.diffTables(writer, oldSchema, newSchema);
         PgDiffConstraints.diffConstraints(writer, oldSchema, newSchema, true);
         PgDiffConstraints.diffConstraints(writer, oldSchema, newSchema, false);
         PgDiffIndexes.diffIndexes(writer, oldSchema, newSchema);
