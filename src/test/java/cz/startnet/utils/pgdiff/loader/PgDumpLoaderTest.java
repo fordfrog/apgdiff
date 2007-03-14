@@ -47,7 +47,8 @@ public class PgDumpLoaderTest {
                 new Object[][] {
                     { 1 },
                     { 2 },
-                    { 3 }
+                    { 3 },
+                    { 4 }
                 });
     }
 

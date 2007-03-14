@@ -62,6 +62,14 @@ public class AlterTableParser {
                 Pattern.CASE_INSENSITIVE);
 
     /**
+     * Pattern for matching ALTER COLUMN ... SET DEFAULT ...
+     */
+    private static final Pattern PATTERN_SET_DEFAULT =
+        Pattern.compile(
+                "^ALTER[ ]+COLUMN[ ]+\"?([^ \"]+)\"?[ ]+SET[ ]+DEFAULT[ ]+(.*)$",
+                Pattern.CASE_INSENSITIVE);
+
+    /**
      * Creates a new instance of AlterTableParser.
      */
     private AlterTableParser() {
@@ -112,8 +120,8 @@ public class AlterTableParser {
         String line = commands;
         String subCommand = null;
 
-        try {
-            while (line.length() > 0) {
+        while (line.length() > 0) {
+            try {
                 final int commandEnd = ParserUtils.getCommandEnd(line, 0);
                 subCommand = line.substring(0, commandEnd).trim();
                 line =
@@ -146,15 +154,35 @@ public class AlterTableParser {
                 }
 
                 if (subCommand.length() > 0) {
-                    throw new ParserException(
-                            "Don't know how to parse: " + subCommand);
+                    matcher = PATTERN_SET_DEFAULT.matcher(subCommand);
+
+                    if (matcher.matches()) {
+                        final String columnName = matcher.group(1).trim();
+                        final String defaultValue = matcher.group(2).trim();
+
+                        if (table.containsColumn(columnName)) {
+                            final PgColumn column = table.getColumn(columnName);
+                            column.setDefaultValue(defaultValue);
+                        } else {
+                            throw new ParserException(
+                                    "Cannot find column '" + columnName
+                                    + " 'in table '" + table.getName() + "'");
+                        }
+
+                        subCommand = "";
+                    }
                 }
+            } catch (RuntimeException ex) {
+                throw new ParserException(
+                        "Cannot parse ALTER TABLE '" + table.getName()
+                        + "', line '" + subCommand + "'",
+                        ex);
             }
-        } catch (RuntimeException ex) {
-            throw new ParserException(
-                    "Cannot parse ALTER TABLE '" + table.getName()
-                    + "', line '" + subCommand + "'",
-                    ex);
+
+            if (subCommand.length() > 0) {
+                throw new ParserException(
+                        "Don't know how to parse: " + subCommand);
+            }
         }
     }
 
