@@ -38,6 +38,12 @@
                 <role>Case insensitivity of parsers + correct handling of quoted names</role>
             </roles>
         </contributor>
+        <contributor>
+            <name>Hans Idink</name>
+            <roles>
+                <role>Initial help with support of FUNCTIONs</role>
+            </roles>
+        </contributor>
     </contributors>
     <licenses>
         <license>
