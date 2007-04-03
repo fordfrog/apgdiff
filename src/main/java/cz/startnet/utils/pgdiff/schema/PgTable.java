@@ -4,9 +4,7 @@
 package cz.startnet.utils.pgdiff.schema;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -17,38 +15,25 @@ import java.util.Map;
  */
 public class PgTable {
     /**
-     * Ordered collection of columns.
+     * List of columns defined on the table.
      */
-    private final List<PgColumn> orderedColumns =  //NOPMD
-        new ArrayList<PgColumn>();
+    private final List<PgColumn> columns = new ArrayList<PgColumn>();
 
     /**
-     * Ordered collection of constraints.
+     * List of constraints defined on the table.
      */
-    private final List<PgConstraint> orderedConstraints =
+    private final List<PgConstraint> constraints =
         new ArrayList<PgConstraint>();
 
     /**
-     * Ordered collection of indexes.
+     * List of indexes defined on the table.
      */
-    private final List<PgIndex> orderedIndexes = new ArrayList<PgIndex>();
+    private final List<PgIndex> indexes = new ArrayList<PgIndex>();
 
     /**
-     * Map of column names and columns.
+     * List of triggers defined on the table.
      */
-    private final Map<String, PgColumn> columns = //NOPMD
-        new HashMap<String, PgColumn>();
-
-    /**
-     * Map of constraint names and constraints.
-     */
-    private final Map<String, PgConstraint> constraints = // NOPMD
-        new HashMap<String, PgConstraint>();
-
-    /**
-     * Map of index names and indexes.
-     */
-    private final Map<String, PgIndex> indexes = new HashMap<String, PgIndex>(); //NOPMD
+    private final List<PgTrigger> triggers = new ArrayList<PgTrigger>();
 
     /**
      * Name of the index on which the table is clustered
@@ -75,7 +60,7 @@ public class PgTable {
      *
      * @param name name of the table
      */
-    public PgTable(String name) {
+    public PgTable(final String name) {
         this.name = name;
     }
 
@@ -98,98 +83,150 @@ public class PgTable {
     }
 
     /**
-     * Returns column with given name. If the column exists in the
-     * {@link #columns columns} then the existing column is returned otherwise
-     * new column is created.
+     * Finds column according to specified column <code>name</code>.
      *
-     * @param name name of the column
+     * @param name name of the column to be searched
      *
-     * @return existing or new column
+     * @return found column or null if no such column has been found
      */
     public PgColumn getColumn(final String name) {
         PgColumn column = null;
 
-        if (columns.containsKey(name)) {
-            column = columns.get(name);
-        } else {
-            column = new PgColumn(name);
-            columns.put(name, column);
-            orderedColumns.add(column);
+        for (PgColumn curColumn : columns) {
+            if (curColumn.getName().equals(name)) {
+                column = curColumn;
+
+                break;
+            }
         }
 
         return column;
     }
 
     /**
-     * Returns map of all columns.
+     * Getter for {@link #columns columns}.
      *
-     * @return map of all columns
+     * @return {@link #columns columns}
      */
-    public Map<String, PgColumn> getColumns() {
+    public List<PgColumn> getColumns() {
         return columns;
     }
 
     /**
-     * Returns constraint with given name. If the constraint exists in
-     * the {@link #constraints constraints} then the existing constraint is
-     * returned otherwise new constraint is created.
+     * Finds constraint according to specified constraint
+     * <code>name</code>.
      *
-     * @param name name of the constraint
+     * @param name name of the constraint to be searched
      *
-     * @return existing or new constraint
+     * @return found constraint or null if no such constraint has been found
      */
     public PgConstraint getConstraint(final String name) {
         PgConstraint constraint = null;
 
-        if (constraints.containsKey(name)) {
-            constraint = constraints.get(name);
-        } else {
-            constraint = new PgConstraint(name);
-            constraints.put(name, constraint);
-            orderedConstraints.add(constraint);
+        for (PgConstraint curConstraint : constraints) {
+            if (curConstraint.getName().equals(name)) {
+                constraint = curConstraint;
+
+                break;
+            }
         }
 
         return constraint;
     }
 
     /**
-     * Returns map of all constraints.
+     * Getter for {@link #constraints constraints}.
      *
-     * @return map of all constraints
+     * @return {@link #constraints constraints}
      */
-    public Map<String, PgConstraint> getConstraints() {
+    public List<PgConstraint> getConstraints() {
         return constraints;
     }
 
     /**
-     * Returns index with given name. If the index exists in the {@link
-     * #indexes indexes} then the existing index is returned otherwise new
-     * index is created.
+     * Creates and returns SQL for creation of the table.
      *
-     * @param name name of the index
+     * @return created SQL command
+     */
+    public String getCreationSQL() {
+        final StringBuilder sbSQL = new StringBuilder();
+        sbSQL.append("CREATE TABLE ");
+        sbSQL.append(name);
+        sbSQL.append(" (\n");
+
+        for (PgColumn column : columns) {
+            sbSQL.append("\t");
+            sbSQL.append(column.getFullDefinition());
+            sbSQL.append(",\n");
+        }
+
+        sbSQL.setLength(sbSQL.length() - 2);
+        sbSQL.append("\n)");
+
+        if ((inherits != null) && (inherits.length() > 0)) {
+            sbSQL.append("\nINHERITS ");
+            sbSQL.append(inherits);
+        }
+
+        sbSQL.append(';');
+
+        for (PgColumn column : getColumnsWithStatistics()) {
+            sbSQL.append("\nALTER TABLE ONLY ");
+            sbSQL.append(name);
+            sbSQL.append(" ALTER COLUMN ");
+            sbSQL.append(column.getName());
+            sbSQL.append(" SET STATISTICS ");
+            sbSQL.append(column.getStatistics());
+            sbSQL.append(';');
+        }
+
+        if (this.clusterIndexName != null) {
+            sbSQL.append("\nALTER TABLE ");
+            sbSQL.append(name);
+            sbSQL.append(" CLUSTER ON ");
+            sbSQL.append(clusterIndexName);
+            sbSQL.append(';');
+        }
+
+        return sbSQL.toString();
+    }
+
+    /**
+     * Creates and returns SQL command for dropping the table.
      *
-     * @return existing or new index
+     * @return created SQL command
+     */
+    public String getDropSQL() {
+        return "DROP TABLE " + getName() + ";";
+    }
+
+    /**
+     * Finds index according to specified index <code>name</code>.
+     *
+     * @param name name of the index to be searched
+     *
+     * @return found index or null if no such index has been found
      */
     public PgIndex getIndex(final String name) {
         PgIndex index = null;
 
-        if (indexes.containsKey(name)) {
-            index = indexes.get(name);
-        } else {
-            index = new PgIndex(name);
-            indexes.put(name, index);
-            orderedIndexes.add(index);
+        for (PgIndex curIndex : indexes) {
+            if (curIndex.getName().equals(name)) {
+                index = curIndex;
+
+                break;
+            }
         }
 
         return index;
     }
 
     /**
-     * Returns map of all indexes.
+     * Getter for {@link #indexes indexes}.
      *
-     * @return map of all indexes
+     * @return {@link #indexes indexes}
      */
-    public Map<String, PgIndex> getIndexes() {
+    public List<PgIndex> getIndexes() {
         return indexes;
     }
 
@@ -230,89 +267,12 @@ public class PgTable {
     }
 
     /**
-     * Returns a collection of all columns ordered as specified in the
-     * DDL.
+     * Getter for {@link #triggers triggers}.
      *
-     * @return collection of all the columns
+     * @return {@link #triggers triggers}
      */
-    public List<PgColumn> getOrderedColumns() {
-        return orderedColumns;
-    }
-
-    /**
-     * Returns a collection of all constraints ordered as specified in
-     * the DDL.
-     *
-     * @return collection of all the constraints
-     */
-    public List<PgConstraint> getOrderedConstraints() {
-        return orderedConstraints;
-    }
-
-    /**
-     * Returns a collection of all indexes ordered as specified in the
-     * DDL.
-     *
-     * @return collection of all the indexes
-     */
-    public List<PgIndex> getOrderedIndexes() {
-        return orderedIndexes;
-    }
-
-    /**
-     * Creates table creation SQL.
-     *
-     * @return SQL for creation of the table
-     */
-    public String getTableSQL() {
-        final Map<String, Integer> colsWithStats =
-            new HashMap<String, Integer>();
-
-        final StringBuilder sbSQL = new StringBuilder();
-        sbSQL.append("CREATE TABLE ");
-        sbSQL.append(name);
-        sbSQL.append(" (\n");
-
-        for (PgColumn column : orderedColumns) {
-            sbSQL.append("\t");
-            sbSQL.append(column.getFullDefinition());
-
-            if (column.getStatistics() != null) {
-                colsWithStats.put(column.getName(), column.getStatistics());
-            }
-
-            sbSQL.append(",\n");
-        }
-
-        sbSQL.setLength(sbSQL.length() - 2);
-        sbSQL.append("\n)");
-
-        if ((inherits != null) && (inherits.length() > 0)) {
-            sbSQL.append("\nINHERITS ");
-            sbSQL.append(inherits);
-        }
-
-        sbSQL.append(';');
-
-        for (Map.Entry<String, Integer> entry : colsWithStats.entrySet()) {
-            sbSQL.append("\nALTER TABLE ONLY ");
-            sbSQL.append(name);
-            sbSQL.append(" ALTER COLUMN ");
-            sbSQL.append(entry.getKey());
-            sbSQL.append(" SET STATISTICS ");
-            sbSQL.append(entry.getValue());
-            sbSQL.append(";");
-        }
-
-        if (this.clusterIndexName != null) {
-            sbSQL.append("\nALTER TABLE ");
-            sbSQL.append(name);
-            sbSQL.append(" CLUSTER ON ");
-            sbSQL.append(clusterIndexName);
-            sbSQL.append(" ;");
-        }
-
-        return sbSQL.toString();
+    public List<PgTrigger> getTriggers() {
+        return triggers;
     }
 
     /**
@@ -334,26 +294,124 @@ public class PgTable {
     }
 
     /**
-     * Returns true if table contains given column name, otherwise
-     * false.
+     * Adds <code>column</code> to the list of columns.
      *
-     * @param name name of the column
-     *
-     * @return true if table contains given column name, otherwise false
+     * @param column column
      */
-    public boolean containsColumn(final String name) {
-        return columns.containsKey(name);
+    public void addColumn(final PgColumn column) {
+        columns.add(column);
     }
 
     /**
-     * Returns true if table contains given index name, otherwise
-     * false.
+     * Adds <code>constraint</code> to the list of constraints.
+     *
+     * @param constraint constraint
+     */
+    public void addConstraint(final PgConstraint constraint) {
+        constraints.add(constraint);
+    }
+
+    /**
+     * Adds <code>index</code> to the list of indexes.
+     *
+     * @param index index
+     */
+    public void addIndex(final PgIndex index) {
+        indexes.add(index);
+    }
+
+    /**
+     * Adds <code>trigger</code> to the list of triggers.
+     *
+     * @param trigger trigger
+     */
+    public void addTrigger(final PgTrigger trigger) {
+        triggers.add(trigger);
+    }
+
+    /**
+     * Returns true if table contains given column <code>name</code>,
+     * otherwise false.
+     *
+     * @param name name of the column
+     *
+     * @return true if table contains given column <code>name</code>, otherwise
+     *         false
+     */
+    public boolean containsColumn(final String name) {
+        boolean found = false;
+
+        for (PgColumn column : columns) {
+            if (column.getName().equals(name)) {
+                found = true;
+
+                break;
+            }
+        }
+
+        return found;
+    }
+
+    /**
+     * Returns true if table contains given constraint
+     * <code>name</code>, otherwise false.
+     *
+     * @param name name of the constraint
+     *
+     * @return true if table contains given constraint <code>name</code>,
+     *         otherwise false
+     */
+    public boolean containsConstraint(final String name) {
+        boolean found = false;
+
+        for (PgConstraint constraint : constraints) {
+            if (constraint.getName().equals(name)) {
+                found = true;
+
+                break;
+            }
+        }
+
+        return found;
+    }
+
+    /**
+     * Returns true if table contains given index <code>name</code>,
+     * otherwise false.
      *
      * @param name name of the index
      *
-     * @return true if table contains given index name, otherwise false
+     * @return true if table contains given index <code>name</code>, otherwise
+     *         false
      */
     public boolean containsIndex(final String name) {
-        return indexes.containsKey(name);
+        boolean found = false;
+
+        for (PgIndex index : indexes) {
+            if (index.getName().equals(name)) {
+                found = true;
+
+                break;
+            }
+        }
+
+        return found;
+    }
+
+    /**
+     * Returns list of columns that have statistics defined.
+     *
+     * @return list of columns that have statistics defined
+     */
+    private List<PgColumn> getColumnsWithStatistics() {
+        final List<PgColumn> list = new ArrayList<PgColumn>();
+
+        for (PgColumn column : columns) {
+            if (column.getStatistics() != null) {
+                list.add(column);
+            }
+        }
+
+        return list;
     }
 }

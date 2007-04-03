@@ -148,7 +148,40 @@ public class PgDiffTest {
                     {"modify_sequence_cache", false },
                     // Tests scenario where CYCLE is modified on SEQUENCE.
                     {"modify_sequence_cycle_on", false },
-                    { "modify_sequence_cycle_off", false }
+                    { "modify_sequence_cycle_off", false },
+                    // Tests scenario where new FUNCTION without args is added.
+                    {"add_function_noargs", false },
+                    // Tests scenario where FUNCTION without args is dropped.
+                    {"drop_function_noargs", false },
+                    // Tests scenario where FUNCTION without args is modified.
+                    {"modify_function_noargs", false },
+                    // Tests scenario where new FUNCTION with args is added.
+                    {"add_function_args", false },
+                    // Tests scenario where FUNCTION with args is dropped.
+                    {"drop_function_args", false },
+                    // Tests scenario where FUNCTION with args is modified.
+                    {"modify_function_args", false },
+                    // Tests scenario where new FUNCTION with args is added.
+                    {"add_function_args2", false },
+                    // Tests scenario where FUNCTION with args is dropped.
+                    {"drop_function_args2", false },
+                    // Tests scenario where FUNCTION with args is modified.
+                    {"modify_function_args2", false },
+                    // Tests scenario where FUNCTION with same name but
+                // different args is added.
+                    {"add_function_similar", false },
+                    // Tests scenario where FUNCTION with same name but
+                // different args is dropped.
+                    {"drop_function_similar", false },
+                    // Tests scenario where FUNCTION with same name but
+                // different args is modified.
+                    {"modify_function_similar", false },
+                    // Tests scenario where TRIGGER is added.
+                    {"add_trigger", false },
+                    // Tests scenario where TRIGGER is dropped.
+                    {"drop_trigger", false },
+                    // Tests scenario where TRIGGER is modified.
+                    {"modify_trigger", false }
                 });
     }
 

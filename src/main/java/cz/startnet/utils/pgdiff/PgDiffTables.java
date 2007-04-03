@@ -40,7 +40,7 @@ public class PgDiffTables {
         final PrintWriter writer,
         final PgSchema oldSchema,
         final PgSchema newSchema) {
-        for (PgTable newTable : newSchema.getOrderedTables()) {
+        for (PgTable newTable : newSchema.getTables()) {
             final PgTable oldTable = oldSchema.getTable(newTable.getName());
 
             if (oldTable == null) {
@@ -86,7 +86,7 @@ public class PgDiffTables {
         dropTables(writer, oldSchema, newSchema);
         createTables(writer, oldSchema, newSchema);
 
-        for (PgTable newTable : newSchema.getOrderedTables()) {
+        for (PgTable newTable : newSchema.getTables()) {
             if (!oldSchema.containsTable(newTable.getName())) {
                 continue;
             }
@@ -95,7 +95,7 @@ public class PgDiffTables {
             updateTableFields(writer, oldTable, newTable);
             checkWithOIDS(writer, oldTable, newTable);
             checkInherits(writer, oldTable, newTable);
-            addAlterStats(writer, oldTable, newTable);
+            addAlterStatistics(writer, oldTable, newTable);
         }
     }
 
@@ -106,15 +106,14 @@ public class PgDiffTables {
      * @param oldTable original table
      * @param newTable new table
      */
-    private static void addAlterStats(
+    private static void addAlterStatistics(
         final PrintWriter writer,
         final PgTable oldTable,
         final PgTable newTable) {
         final Map<String, Integer> stats = new HashMap<String, Integer>();
-        final Map<String, PgColumn> oldTableCols = oldTable.getColumns();
 
-        for (PgColumn newColumn : newTable.getOrderedColumns()) {
-            final PgColumn oldColumn = oldTableCols.get(newColumn.getName());
+        for (PgColumn newColumn : newTable.getColumns()) {
+            final PgColumn oldColumn = oldTable.getColumn(newColumn.getName());
 
             if (oldColumn != null) {
                 final Integer oldStat = oldColumn.getStatistics();
@@ -159,7 +158,7 @@ public class PgDiffTables {
         final List<String> commands,
         final PgTable oldTable,
         final PgTable newTable) {
-        for (PgColumn column : newTable.getOrderedColumns()) {
+        for (PgColumn column : newTable.getColumns()) {
             if (!oldTable.containsColumn(column.getName())) {
                 commands.add("\tADD COLUMN " + column.getFullDefinition());
             }
@@ -177,7 +176,7 @@ public class PgDiffTables {
         final List<String> commands,
         final PgTable oldTable,
         final PgTable newTable) {
-        for (PgColumn column : oldTable.getOrderedColumns()) {
+        for (PgColumn column : oldTable.getColumns()) {
             if (!newTable.containsColumn(column.getName())) {
                 commands.add("\tDROP COLUMN " + column.getName());
             }
@@ -196,7 +195,7 @@ public class PgDiffTables {
         final List<String> commands,
         final PgTable oldTable,
         final PgTable newTable) {
-        for (PgColumn newColumn : newTable.getOrderedColumns()) {
+        for (PgColumn newColumn : newTable.getColumns()) {
             if (!oldTable.containsColumn(newColumn.getName())) {
                 continue;
             }
@@ -322,10 +321,10 @@ public class PgDiffTables {
         final PrintWriter writer,
         final PgSchema oldSchema,
         final PgSchema newSchema) {
-        for (PgTable table : newSchema.getOrderedTables()) {
+        for (PgTable table : newSchema.getTables()) {
             if (!oldSchema.containsTable(table.getName())) {
                 writer.println();
-                writer.println(table.getTableSQL());
+                writer.println(table.getCreationSQL());
             }
         }
     }
@@ -341,10 +340,10 @@ public class PgDiffTables {
         final PrintWriter writer,
         final PgSchema oldSchema,
         final PgSchema newSchema) {
-        for (PgTable table : oldSchema.getOrderedTables()) {
+        for (PgTable table : oldSchema.getTables()) {
             if (!newSchema.containsTable(table.getName())) {
                 writer.println();
-                writer.println("DROP TABLE " + table.getName() + ";");
+                writer.println(table.getDropSQL());
             }
         }
     }

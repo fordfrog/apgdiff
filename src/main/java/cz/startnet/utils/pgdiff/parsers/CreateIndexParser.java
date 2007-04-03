@@ -3,7 +3,9 @@
  */
 package cz.startnet.utils.pgdiff.parsers;
 
+import cz.startnet.utils.pgdiff.schema.PgIndex;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
+import cz.startnet.utils.pgdiff.schema.PgTable;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,7 +23,8 @@ public class CreateIndexParser {
      */
     private static final Pattern PATTERN =
         Pattern.compile(
-                "CREATE INDEX \"?([^ \"]+)\"? ON ([^ ]+)[ ]*([^;]+)[;]?",
+                "CREATE[\\s]+INDEX[\\s]+\"?([^\\s\"]+)\"?[\\s]+"
+                + "ON[\\s]+\"?([^\\s\"(]+)\"?[\\s]*([^;]+)[;]?",
                 Pattern.CASE_INSENSITIVE);
 
     /**
@@ -53,8 +56,11 @@ public class CreateIndexParser {
                         ParserException.CANNOT_PARSE_COMMAND + command);
             }
 
-            schema.getTable(tableName.trim()).getIndex(indexName.trim()).setDefinition(
-                    def.trim());
+            final PgTable table = schema.getTable(tableName.trim());
+            final PgIndex index = new PgIndex(indexName);
+            table.addIndex(index);
+            index.setDefinition(def.trim());
+            index.setTableName(table.getName());
         } else {
             throw new ParserException(
                     ParserException.CANNOT_PARSE_COMMAND + command);

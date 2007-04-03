@@ -3,6 +3,10 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+
 /**
  * Stores column information.
  *
@@ -10,6 +14,26 @@ package cz.startnet.utils.pgdiff.schema;
  * @version $Id$
  */
 public class PgColumn {
+    /**
+     * Pattern for parsing NULL arguments.
+     */
+    private static final Pattern PATTERN_NULL =
+        Pattern.compile("^(.+)[\\s]+NULL$", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * Pattern for parsing NOT NULL arguments.
+     */
+    private static final Pattern PATTERN_NOT_NULL =
+        Pattern.compile("^(.+)[\\s]+NOT[\\s]+NULL$", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * Pattern for parsing DEFAULT value.
+     */
+    private static final Pattern PATTERN_DEFAULT =
+        Pattern.compile(
+                "^(.+)[\\s]+DEFAULT[\\s]+(.+)$",
+                Pattern.CASE_INSENSITIVE);
+
     /**
      * Specific statistics value.
      */
@@ -160,30 +184,29 @@ public class PgColumn {
      * @param definition definition of the column
      */
     public void parseDefinition(final String definition) {
-        final int posDefault = definition.indexOf(" DEFAULT ");
-        final int posNotNull = definition.indexOf(" NOT NULL");
+        String string = definition;
 
-        if (posDefault > -1) {
-            setType(definition.substring(0, posDefault).trim());
-        } else if (posNotNull > -1) {
-            setType(definition.substring(0, posNotNull).trim());
+        Matcher matcher = PATTERN_NOT_NULL.matcher(string);
+
+        if (matcher.matches()) {
+            string = matcher.group(1).trim();
+            setNullValue(false);
         } else {
-            setType(definition.trim());
-        }
+            matcher = PATTERN_NULL.matcher(string);
 
-        if (posDefault > -1) {
-            if (posNotNull > -1) {
-                setDefaultValue(
-                        definition.substring(
-                                posDefault + " DEFAULT ".length(),
-                                posNotNull).trim());
-            } else {
-                setDefaultValue(
-                        definition.substring(posDefault + " DEFAULT ".length())
-                                  .trim());
+            if (matcher.matches()) {
+                string = matcher.group(1).trim();
+                setNullValue(true);
             }
         }
 
-        setNullValue(posNotNull == -1);
+        matcher = PATTERN_DEFAULT.matcher(string);
+
+        if (matcher.matches()) {
+            string = matcher.group(1).trim();
+            setDefaultValue(matcher.group(2).trim());
+        }
+
+        setType(string);
     }
 }

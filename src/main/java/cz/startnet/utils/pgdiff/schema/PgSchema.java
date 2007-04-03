@@ -4,9 +4,7 @@
 package cz.startnet.utils.pgdiff.schema;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -17,120 +15,205 @@ import java.util.Map;
  */
 public class PgSchema {
     /**
-     * List of ordered sequences.
+     * List of functions defined in the schema.
      */
-    private final List<PgSequence> orderedSequences =
-        new ArrayList<PgSequence>();
+    private final List<PgFunction> functions = new ArrayList<PgFunction>();
 
     /**
-     * list of ordered tables.
+     * List of sequences defined in the schema.
      */
-    private final List<PgTable> orderedTables = new ArrayList<PgTable>();
+    private final List<PgSequence> sequences = new ArrayList<PgSequence>();
 
     /**
-     * Map of sequence names and sequence definitions.
+     * List of tables defined in the schema.
      */
-    private final Map<String, PgSequence> sequences = //NOPMD
-        new HashMap<String, PgSequence>();
+    private final List<PgTable> tables = new ArrayList<PgTable>();
 
     /**
-     * Map of table names and table definitions.
-     */
-    private final Map<String, PgTable> tables = new HashMap<String, PgTable>(); //NOPMD
-
-    /**
-     * Returns a collection of all sequences ordered as specified in
-     * the DDL.
+     * Finds function according to specified function
+     * <code>declaration</code>.
      *
-     * @return collection of all the sequences
+     * @param declaration declaration of the function to be searched
+     *
+     * @return found function or null if no such function has been found
      */
-    public List<PgSequence> getOrderedSequences() {
-        return orderedSequences;
+    public PgFunction getFunction(final String declaration) {
+        PgFunction function = null;
+
+        for (PgFunction curFunction : functions) {
+            if (curFunction.getDeclaration().equals(declaration)) {
+                function = curFunction;
+
+                break;
+            }
+        }
+
+        return function;
     }
 
     /**
-     * Returns a collection of all tables ordered as specified in the
-     * DDL.
+     * Getter for {@link #functions functions}.
      *
-     * @return collection of all the tables
+     * @return {@link #functions functions}
      */
-    public List<PgTable> getOrderedTables() {
-        return orderedTables;
+    public List<PgFunction> getFunctions() {
+        return functions;
     }
 
     /**
-     * Returns sequence with given name. If the sequence exists in the
-     * {@link #sequences sequences} then the existing sequence is returned
-     * otherwise new sequence is created.
+     * Finds sequence according to specified sequence
+     * <code>name</code>.
      *
-     * @param name name of the sequence
+     * @param name name of the sequence to be searched
      *
-     * @return existing or new sequence
+     * @return found sequence or null if no such sequence has been found
      */
     public PgSequence getSequence(final String name) {
         PgSequence sequence = null;
 
-        if (sequences.containsKey(name)) {
-            sequence = sequences.get(name);
-        } else {
-            sequence = new PgSequence(name);
-            sequences.put(name, sequence);
-            getOrderedSequences().add(sequence);
+        for (PgSequence curSequence : sequences) {
+            if (curSequence.getName().equals(name)) {
+                sequence = curSequence;
+
+                break;
+            }
         }
 
         return sequence;
     }
 
     /**
-     * Returns map of all sequences.
+     * Getter for {@link #sequences sequences}.
      *
-     * @return map of all sequences
+     * @return {@link #sequences sequences}
      */
-    public Map<String, PgSequence> getSequences() {
+    public List<PgSequence> getSequences() {
         return sequences;
     }
 
     /**
-     * Returns table with given name. If the table exists in the {@link
-     * #tables tables} then the existing table is returned otherwise new table
-     * is created.
+     * Finds table according to specified table <code>name</code>.
      *
-     * @param name name of the table
+     * @param name name of the table to be searched
      *
-     * @return existing or new table
+     * @return found table or null if no such table has been found
      */
     public PgTable getTable(final String name) {
         PgTable table = null;
 
-        if (tables.containsKey(name)) {
-            table = tables.get(name);
-        } else {
-            table = new PgTable(name);
-            tables.put(name, table);
-            getOrderedTables().add(table);
+        for (PgTable curTable : tables) {
+            if (curTable.getName().equals(name)) {
+                table = curTable;
+
+                break;
+            }
         }
 
         return table;
     }
 
     /**
-     * Returns map of all tables.
+     * Getter for {@link #tables tables}.
      *
-     * @return map of all tables
+     * @return {@link #tables tables}
      */
-    public Map<String, PgTable> getTables() {
+    public List<PgTable> getTables() {
         return tables;
     }
 
     /**
-     * Returns true if schema contains table definition, otherwise
-     * false.
+     * Adds <code>function</code> to the list of functions.
+     *
+     * @param function function
+     */
+    public void addFunction(final PgFunction function) {
+        functions.add(function);
+    }
+
+    /**
+     * Adds <code>sequence</code> to the list of sequences.
+     *
+     * @param sequence sequence
+     */
+    public void addSequence(final PgSequence sequence) {
+        sequences.add(sequence);
+    }
+
+    /**
+     * Adds <code>table</code> to the list of tables.
+     *
+     * @param table table
+     */
+    public void addTable(final PgTable table) {
+        tables.add(table);
+    }
+
+    /**
+     * Returns true if schema contains function with given
+     * <code>declaration</code>, otherwise false.
+     *
+     * @param declaration declaration of the function
+     *
+     * @return true if schema contains function with given
+     *         <code>declaration</code>, otherwise false
+     */
+    public boolean containsFunction(final String declaration) {
+        boolean found = false;
+
+        for (PgFunction function : functions) {
+            if (function.getDeclaration().equals(declaration)) {
+                found = true;
+
+                break;
+            }
+        }
+
+        return found;
+    }
+
+    /**
+     * Returns true if schema contains sequence with given
+     * <code>name</code>, otherwise false.
+     *
+     * @param name name of the sequence
+     *
+     * @return true if schema contains sequence with given <code>name</code>,
+     *         otherwise false
+     */
+    public boolean containsSequence(final String name) {
+        boolean found = false;
+
+        for (PgSequence sequence : sequences) {
+            if (sequence.getName().equals(name)) {
+                found = true;
+
+                break;
+            }
+        }
+
+        return found;
+    }
+
+    /**
+     * Returns true if schema contains table with given
+     * <code>name</code>, otherwise false.
      *
      * @param name name of the table
      *
-     * @return true if schema contains table definition, otherwise false
+     * @return true if schema contains table with given <code>name</code>,
+     *         otherwise false.
      */
     public boolean containsTable(final String name) {
-        return tables.containsKey(name);
+        boolean found = false;
+
+        for (PgTable table : tables) {
+            if (table.getName().equals(name)) {
+                found = true;
+
+                break;
+            }
+        }
+
+        return found;
     }
 }

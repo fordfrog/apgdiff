@@ -11,8 +11,6 @@ import java.io.PrintWriter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -43,32 +41,25 @@ public class PgDiffConstraints {
         final PgSchema oldSchema,
         final PgSchema newSchema,
         final boolean primaryKey) {
-        final Map<String, PgTable> oldTables = oldSchema.getTables();
+        for (PgTable newTable : newSchema.getTables()) {
+            final PgTable oldTable = oldSchema.getTable(newTable.getName());
 
-        for (PgTable newTable : newSchema.getOrderedTables()) {
-            final String newTableName = newTable.getName();
-
-            // Drop constraints that do not exist in new schema or are modified
+            // Drop constraints that no more exist or are modified
             for (PgConstraint constraint : getDropConstraints(
-                        oldTables.get(newTableName),
+                        oldTable,
                         newTable,
                         primaryKey)) {
                 writer.println();
-                writer.println("ALTER TABLE " + newTableName);
-                writer.println(
-                        "\tDROP CONSTRAINT " + constraint.getName() + ";");
+                writer.println(constraint.getDropSQL());
             }
 
             // Add new constraints
             for (PgConstraint constraint : getNewConstraints(
-                        oldTables.get(newTableName),
+                        oldTable,
                         newTable,
                         primaryKey)) {
                 writer.println();
-                writer.println("ALTER TABLE " + newTableName);
-                writer.println(
-                        "\tADD CONSTRAINT " + constraint.getName() + " "
-                        + constraint.getDefinition() + ";");
+                writer.println(constraint.getCreationSQL());
             }
         }
     }
@@ -93,15 +84,12 @@ public class PgDiffConstraints {
         final List<PgConstraint> list = new ArrayList<PgConstraint>();
 
         if ((newTable != null) && (oldTable != null)) {
-            final Set<String> newNames = newTable.getConstraints().keySet();
-
-            for (final PgConstraint constraint : oldTable.getOrderedConstraints()) {
+            for (final PgConstraint constraint : oldTable.getConstraints()) {
                 if (
                     (constraint.isPrimaryKeyConstraint() == primaryKey)
-                        && (!newNames.contains(constraint.getName())
-                        || !newTable.getConstraint(constraint.getName())
-                                        .getDefinition().equals(
-                                constraint.getDefinition()))) {
+                        && (!newTable.containsConstraint(constraint.getName())
+                        || !newTable.getConstraint(constraint.getName()).equals(
+                                constraint))) {
                     list.add(constraint);
                 }
             }
@@ -128,23 +116,19 @@ public class PgDiffConstraints {
 
         if (newTable != null) {
             if (oldTable == null) {
-                for (final PgConstraint constraint : newTable
-                    .getOrderedConstraints()) {
+                for (final PgConstraint constraint : newTable.getConstraints()) {
                     if (constraint.isPrimaryKeyConstraint() == primaryKey) {
                         list.add(constraint);
                     }
                 }
             } else {
-                final Set<String> oldNames = oldTable.getConstraints().keySet();
-
-                for (final PgConstraint constraint : newTable
-                    .getOrderedConstraints()) {
+                for (final PgConstraint constraint : newTable.getConstraints()) {
                     if (
                         (constraint.isPrimaryKeyConstraint() == primaryKey)
-                            && (!oldNames.contains(constraint.getName())
-                            || !oldTable.getConstraint(constraint.getName())
-                                            .getDefinition().equals(
-                                    constraint.getDefinition()))) {
+                            && (!oldTable.containsConstraint(
+                                    constraint.getName())
+                            || !oldTable.getConstraint(constraint.getName()).equals(
+                                    constraint))) {
                         list.add(constraint);
                     }
                 }

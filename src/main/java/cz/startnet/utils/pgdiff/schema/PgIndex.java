@@ -21,12 +21,35 @@ public class PgIndex {
     private String name = null;
 
     /**
+     * Table name the index is defined on.
+     */
+    private String tableName = null;
+
+    /**
      * Creates a new PgIndex object.
      *
      * @param name name of the index
      */
     public PgIndex(final String name) {
         this.name = name;
+    }
+
+    /**
+     * Creates and returns SQL for creation of the index.
+     *
+     * @return created SQL
+     */
+    public String getCreationSQL() {
+        final StringBuilder sbSQL = new StringBuilder();
+        sbSQL.append("CREATE INDEX ");
+        sbSQL.append(getName());
+        sbSQL.append(" ON ");
+        sbSQL.append(getTableName());
+        sbSQL.append(' ');
+        sbSQL.append(getDefinition());
+        sbSQL.append(';');
+
+        return sbSQL.toString();
     }
 
     /**
@@ -48,6 +71,15 @@ public class PgIndex {
     }
 
     /**
+     * Creates and returns SQL command for dropping the index.
+     *
+     * @return created SQL command
+     */
+    public String getDropSQL() {
+        return "DROP INDEX " + getName() + ";";
+    }
+
+    /**
      * Setter for {@link #name name}.
      *
      * @param name {@link #name name}
@@ -63,5 +95,57 @@ public class PgIndex {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Setter for {@link #tableName tableName}.
+     *
+     * @param tableName {@link #tableName tableName}
+     */
+    public void setTableName(final String tableName) {
+        this.tableName = tableName;
+    }
+
+    /**
+     * Getter for {@link #tableName tableName}.
+     *
+     * @return {@link #tableName tableName}
+     */
+    public String getTableName() {
+        return tableName;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param object {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object object) {
+        boolean equals = false;
+
+        if (this == object) {
+            equals = true;
+        } else if (object instanceof PgIndex) {
+            final PgIndex index = (PgIndex) object;
+            equals =
+                definition.equals(index.definition) && name.equals(index.name)
+                && tableName.equals(index.tableName);
+        }
+
+        return equals;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return (getClass().getName() + "|" + definition + "|" + name + "|"
+        + tableName).hashCode();
     }
 }

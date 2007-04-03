@@ -3,6 +3,9 @@
  */
 package cz.startnet.utils.pgdiff.parsers;
 
+import java.util.regex.Pattern;
+
+
 /**
  * Parser utilities.
  *
@@ -46,7 +49,7 @@ public class ParserUtils {
                     bracesCount--;
                 }
             } else if (chr == '\'') {
-                singleQuoteOn = !singleQuoteOn;
+                singleQuoteOn ^= singleQuoteOn;
             } else if ((chr == ',') && !singleQuoteOn && (bracesCount == 0)) {
                 break;
             }
@@ -103,7 +106,8 @@ public class ParserUtils {
     }
 
     /**
-     * Removes <code>subString</code> from <code>string</code>.
+     * Removes <code>subString</code> from <code>string</code>. The
+     * removal is performed case insensitive.
      *
      * @param string string
      * @param subString substring
@@ -113,6 +117,7 @@ public class ParserUtils {
     public static String removeSubString(
         final String string,
         final String subString) {
-        return string.replace(subString, "");
+        return Pattern.compile(subString, Pattern.CASE_INSENSITIVE)
+                      .matcher(string).replaceAll("");
     }
 }

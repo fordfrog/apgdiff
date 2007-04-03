@@ -51,7 +51,7 @@ public class PgSequence {
      * @param name name of the sequence
      */
     public PgSequence(final String name) {
-        this.setName(name);
+        this.name = name;
     }
 
     /**
@@ -73,6 +73,58 @@ public class PgSequence {
     }
 
     /**
+     * Creates and returns SQL command for creation of the sequence.
+     *
+     * @return created SQL command
+     */
+    public String getCreationSQL() {
+        final StringBuilder sbSQL = new StringBuilder();
+        sbSQL.append("CREATE SEQUENCE ");
+        sbSQL.append(name);
+
+        if (startWith != null) {
+            sbSQL.append("\n\tSTART WITH ");
+            sbSQL.append(startWith);
+        }
+
+        if (increment != null) {
+            sbSQL.append("\n\tINCREMENT BY ");
+            sbSQL.append(increment);
+        }
+
+        sbSQL.append("\n\t");
+
+        if (maxValue == null) {
+            sbSQL.append("NO MAXVALUE");
+        } else {
+            sbSQL.append("MAXVALUE ");
+            sbSQL.append(maxValue);
+        }
+
+        sbSQL.append("\n\t");
+
+        if (maxValue == null) {
+            sbSQL.append("NO MINVALUE");
+        } else {
+            sbSQL.append("MINVALUE ");
+            sbSQL.append(maxValue);
+        }
+
+        if (cache != null) {
+            sbSQL.append("\n\tCACHE ");
+            sbSQL.append(cache);
+        }
+
+        if (cycle) {
+            sbSQL.append("\n\tCYCLE");
+        }
+
+        sbSQL.append(';');
+
+        return sbSQL.toString();
+    }
+
+    /**
      * Setter for {@link #cycle cycle}.
      *
      * @param cycle {@link #cycle cycle}
@@ -88,6 +140,15 @@ public class PgSequence {
      */
     public boolean isCycle() {
         return cycle;
+    }
+
+    /**
+     * Creates and returns SQL command for dropping the sequence.
+     *
+     * @return created SQL
+     */
+    public String getDropSQL() {
+        return "DROP SEQUENCE " + getName() + ";";
     }
 
     /**
@@ -160,58 +221,6 @@ public class PgSequence {
      */
     public String getName() {
         return name;
-    }
-
-    /**
-     * Returns SQL command for creation of SEQUENCE.
-     *
-     * @return SQL command for creation of SEQUENCE
-     */
-    public String getSequenceSQL() {
-        final StringBuilder sbSQL = new StringBuilder();
-        sbSQL.append("CREATE SEQUENCE ");
-        sbSQL.append(name);
-
-        if (startWith != null) {
-            sbSQL.append("\n\tSTART WITH ");
-            sbSQL.append(startWith);
-        }
-
-        if (increment != null) {
-            sbSQL.append("\n\tINCREMENT BY ");
-            sbSQL.append(increment);
-        }
-
-        sbSQL.append("\n\t");
-
-        if (maxValue == null) {
-            sbSQL.append("NO MAXVALUE");
-        } else {
-            sbSQL.append("MAXVALUE ");
-            sbSQL.append(maxValue);
-        }
-
-        sbSQL.append("\n\t");
-
-        if (maxValue == null) {
-            sbSQL.append("NO MINVALUE");
-        } else {
-            sbSQL.append("MINVALUE ");
-            sbSQL.append(maxValue);
-        }
-
-        if (cache != null) {
-            sbSQL.append("\n\tCACHE ");
-            sbSQL.append(cache);
-        }
-
-        if (cycle) {
-            sbSQL.append("\n\tCYCLE");
-        }
-
-        sbSQL.append(';');
-
-        return sbSQL.toString();
     }
 
     /**

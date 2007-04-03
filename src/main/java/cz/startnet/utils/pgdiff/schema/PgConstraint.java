@@ -3,6 +3,9 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
+import java.util.regex.Pattern;
+
+
 /**
  * Stores table constraint information.
  *
@@ -10,6 +13,13 @@ package cz.startnet.utils.pgdiff.schema;
  * @version $Id$
  */
 public class PgConstraint {
+    /**
+     * Pattern for checking whether the constraint is PRIMARY KEY
+     * constraint.
+     */
+    private static final Pattern PATTERN_PRIMARY_KEY =
+        Pattern.compile(".*PRIMARY[\\s]+KEY.*", Pattern.CASE_INSENSITIVE);
+
     /**
      * Definition of the constraint.
      */
@@ -21,12 +31,35 @@ public class PgConstraint {
     private String name = null;
 
     /**
+     * Name of the table the constraint is defined on.
+     */
+    private String tableName = null;
+
+    /**
      * Creates a new PgConstraint object.
      *
      * @param name name of the constraint
      */
     public PgConstraint(String name) {
         this.name = name;
+    }
+
+    /**
+     * Creates and returns SQL for creation of the constraint.
+     *
+     * @return created SQL
+     */
+    public String getCreationSQL() {
+        final StringBuilder sbSQL = new StringBuilder();
+        sbSQL.append("ALTER TABLE ");
+        sbSQL.append(getTableName());
+        sbSQL.append("\n\tADD CONSTRAINT ");
+        sbSQL.append(getName());
+        sbSQL.append(' ');
+        sbSQL.append(getDefinition());
+        sbSQL.append(';');
+
+        return sbSQL.toString();
     }
 
     /**
@@ -45,6 +78,22 @@ public class PgConstraint {
      */
     public String getDefinition() {
         return definition;
+    }
+
+    /**
+     * Creates and returns SQL for dropping the constraint.
+     *
+     * @return created SQL
+     */
+    public String getDropSQL() {
+        final StringBuilder sbSQL = new StringBuilder();
+        sbSQL.append("ALTER TABLE ");
+        sbSQL.append(getTableName());
+        sbSQL.append("\n\tDROP CONSTRAINT ");
+        sbSQL.append(getName());
+        sbSQL.append(';');
+
+        return sbSQL.toString();
     }
 
     /**
@@ -72,6 +121,59 @@ public class PgConstraint {
      * @return true if this is a PRIMARY KEY constraint, otherwise false
      */
     public boolean isPrimaryKeyConstraint() {
-        return definition.contains("PRIMARY KEY");
+        return PATTERN_PRIMARY_KEY.matcher(definition).matches();
+    }
+
+    /**
+     * Setter for {@link #tableName tableName}.
+     *
+     * @param tableName {@link #tableName tableName}
+     */
+    public void setTableName(final String tableName) {
+        this.tableName = tableName;
+    }
+
+    /**
+     * Getter for {@link #tableName tableName}.
+     *
+     * @return {@link #tableName tableName}
+     */
+    public String getTableName() {
+        return tableName;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param object {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object object) {
+        boolean equals = false;
+
+        if (this == object) {
+            equals = true;
+        } else if (object instanceof PgConstraint) {
+            final PgConstraint constraint = (PgConstraint) object;
+            equals =
+                definition.equals(constraint.definition)
+                && name.equals(constraint.name)
+                && tableName.equals(constraint.tableName);
+        }
+
+        return equals;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return (getClass().getName() + "|" + definition + "|" + name + "|"
+        + tableName).hashCode();
     }
 }

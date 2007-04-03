@@ -45,8 +45,8 @@
         <section name="List of Features">
             <ul>
                 <li>
-                    apgdiff looks for differences in definitions of tables,
-                    sequences, constraints and indexes
+                    apgdiff looks for differences in definitions of TABLEs,
+                    SEQUENCEs, CONSTRAINTs, INDEXes, FUNCTIONs and TRIGGERs
                 </li>
                 <li>
                     apgdiff creates SQL commands for creations, drops and
@@ -54,9 +54,10 @@
                 </li>
                 <li>
                     CREATE TABLE, ALTER TABLE (except ALTER TABLE ... OWNER TO
-                    ...), CREATE SEQUENCE and CREATE INDEX commands are supported
-                    but some specific features of the commands may not be
-                    implemented yet (see Note below)
+                    ...), CREATE SEQUENCE, CREATE INDEX, CREATE (OR REPLACE )FUNCTION
+                    and CREATE TRIGGER commands are supported but some specific
+                    features of the commands may not be implemented yet
+                    (see Note below)
                 </li>
                 <li>
                     Comments, empty lines, SET, COMMENT, SELECT, INSERT INTO,
@@ -70,8 +71,8 @@
                 I do the testing on dumps from PostgreSQL 8.1.x. Please note
                 that there are some differences in what parameters are default
                 in what versions of PostgreSQL (for example creation of OIDS)
-                so have this in mind while creating your diffs as apgadmin
-                defaults to default of PostgreSQL 8.x.
+                so have this in mind while creating your diffs as apgdiff
+                defaults to the defaults of PostgreSQL 8.x.
             </p>
         </section>
         <section name="Requirements">

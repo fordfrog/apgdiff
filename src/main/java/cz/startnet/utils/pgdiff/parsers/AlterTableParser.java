@@ -24,7 +24,7 @@ public class AlterTableParser {
      */
     private static final Pattern PATTERN_OWNER =
         Pattern.compile(
-                "^ALTER TABLE .* OWNER TO .*;$",
+                "^ALTER[\\s]+TABLE[\\s]+.*[\\s]+OWNER[\\s]+TO[\\s]+.*;$",
                 Pattern.CASE_INSENSITIVE);
 
     /**
@@ -32,7 +32,8 @@ public class AlterTableParser {
      */
     private static final Pattern PATTERN_START =
         Pattern.compile(
-                "ALTER TABLE (?:ONLY )?\"?([^ \"]+)\"?(?: )?(.+)?",
+                "ALTER[\\s]+TABLE[\\s]+(?:ONLY[\\s]+)?\"?([^\\s\"]+)\"?"
+                + "(?:[\\s]+)?(.+)?",
                 Pattern.CASE_INSENSITIVE);
 
     /**
@@ -41,8 +42,8 @@ public class AlterTableParser {
      */
     private static final Pattern PATTERN_TRAILING_DEF =
         Pattern.compile(
-                "(CLUSTER ON|ALTER COLUMN) \"?([^ ;\"]+)\"?"
-                + "(?: SET STATISTICS )?(\\d+)?;?",
+                "(CLUSTER[\\s]+ON|ALTER[\\s]+COLUMN)[\\s]+\"?([^\\s;\"]+)\"?"
+                + "(?:[\\s]+SET[\\s]+STATISTICS[\\s]+)?(\\d+)?;?",
                 Pattern.CASE_INSENSITIVE);
 
     /**
@@ -50,7 +51,7 @@ public class AlterTableParser {
      */
     private static final Pattern PATTERN_ADD_CONSTRAINT =
         Pattern.compile(
-                "^ADD[ ]+CONSTRAINT[ ]+\"?([^ \"]+)\"?[ ]+(.*)$",
+                "^ADD[\\s]+CONSTRAINT[\\s]+\"?([^\\s\"]+)\"?[\\s]+(.*)$",
                 Pattern.CASE_INSENSITIVE);
 
     /**
@@ -58,7 +59,7 @@ public class AlterTableParser {
      */
     private static final Pattern PATTERN_ADD_FOREIGN_KEY =
         Pattern.compile(
-                "^ADD[ ]+(FOREIGN[ ]+KEY[ ]+\\(([^ ]+)\\)[ ]+.*)$",
+                "^ADD[\\s]+(FOREIGN[\\s]+KEY[\\s]+\\(([^\\s]+)\\)[\\s]+.*)$",
                 Pattern.CASE_INSENSITIVE);
 
     /**
@@ -66,8 +67,15 @@ public class AlterTableParser {
      */
     private static final Pattern PATTERN_SET_DEFAULT =
         Pattern.compile(
-                "^ALTER[ ]+COLUMN[ ]+\"?([^ \"]+)\"?[ ]+SET[ ]+DEFAULT[ ]+(.*)$",
+                "^ALTER[\\s]+COLUMN[\\s]+\"?([^\\s\"]+)\"?[\\s]+SET[\\s]+"
+                + "DEFAULT[\\s]+(.*)$",
                 Pattern.CASE_INSENSITIVE);
+
+    /**
+     * Pattern for checking whether string is ALTER COLUMN.
+     */
+    private static final Pattern PATTERN_ALTER_COLUMN =
+        Pattern.compile("ALTER[\\s]+COLUMN", Pattern.CASE_INSENSITIVE);
 
     /**
      * Creates a new instance of AlterTableParser.
@@ -134,8 +142,10 @@ public class AlterTableParser {
                 if (matcher.matches()) {
                     final String constraintName = matcher.group(1).trim();
                     final PgConstraint constraint =
-                        table.getConstraint(constraintName);
+                        new PgConstraint(constraintName);
+                    table.addConstraint(constraint);
                     constraint.setDefinition(matcher.group(2).trim());
+                    constraint.setTableName(table.getName());
                     subCommand = "";
                 }
 
@@ -147,8 +157,10 @@ public class AlterTableParser {
                         final String constraintName =
                             table.getName() + "_" + columnName + "_fkey";
                         final PgConstraint constraint =
-                            table.getConstraint(constraintName);
+                            new PgConstraint(constraintName);
+                        table.addConstraint(constraint);
                         constraint.setDefinition(matcher.group(1).trim());
+                        constraint.setTableName(table.getName());
                         subCommand = "";
                     }
                 }
@@ -198,7 +210,7 @@ public class AlterTableParser {
         final Matcher matcher = PATTERN_TRAILING_DEF.matcher(traillingDef);
 
         if (matcher.matches()) {
-            if ("ALTER COLUMN".equals(matcher.group(1).trim())) {
+            if (PATTERN_ALTER_COLUMN.matcher(matcher.group(1).trim()).matches()) {
                 //Stats
                 final String columnName = matcher.group(2).trim();
                 final Integer value = Integer.valueOf(matcher.group(3).trim());

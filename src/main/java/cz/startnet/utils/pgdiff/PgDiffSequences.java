@@ -8,10 +8,6 @@ import cz.startnet.utils.pgdiff.schema.PgSequence;
 
 import java.io.PrintWriter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 
 /**
  * Diffs sequences.
@@ -41,65 +37,23 @@ public class PgDiffSequences {
         final PgSchema oldSchema,
         final PgSchema newSchema) {
         // Drop sequences that do not exist in new schema
-        for (PgSequence sequence : getDropSequences(oldSchema, newSchema)) {
-            writer.println();
-            writer.println("DROP SEQUENCE " + sequence.getName() + ";");
+        for (PgSequence sequence : oldSchema.getSequences()) {
+            if (!newSchema.containsSequence(sequence.getName())) {
+                writer.println();
+                writer.println(sequence.getDropSQL());
+            }
         }
 
         // Add new sequences
-        for (PgSequence sequence : getNewSequences(oldSchema, newSchema)) {
-            writer.println();
-            writer.println(sequence.getSequenceSQL());
+        for (PgSequence sequence : newSchema.getSequences()) {
+            if (!oldSchema.containsSequence(sequence.getName())) {
+                writer.println();
+                writer.println(sequence.getCreationSQL());
+            }
         }
 
         // Alter modified sequences
         addModifiedSequences(writer, arguments, oldSchema, newSchema);
-    }
-
-    /**
-     * Returns list of sequences that should be dropped.
-     *
-     * @param oldSchema original schema
-     * @param newSchema new schema
-     *
-     * @return list of sequences that should be dropped
-     */
-    private static List<PgSequence> getDropSequences(
-        final PgSchema oldSchema,
-        final PgSchema newSchema) {
-        final List<PgSequence> list = new ArrayList<PgSequence>();
-        final Set<String> newNames = newSchema.getSequences().keySet();
-
-        for (final PgSequence sequence : oldSchema.getOrderedSequences()) {
-            if (!newNames.contains(sequence.getName())) {
-                list.add(sequence);
-            }
-        }
-
-        return list;
-    }
-
-    /**
-     * Returns list of sequences that should be added.
-     *
-     * @param oldSchema original table
-     * @param newSchema new table
-     *
-     * @return list of sequences that should be added
-     */
-    private static List<PgSequence> getNewSequences(
-        final PgSchema oldSchema,
-        final PgSchema newSchema) {
-        final List<PgSequence> list = new ArrayList<PgSequence>();
-        final Set<String> oldNames = oldSchema.getSequences().keySet();
-
-        for (final PgSequence sequence : newSchema.getOrderedSequences()) {
-            if (!oldNames.contains(sequence.getName())) {
-                list.add(sequence);
-            }
-        }
-
-        return list;
     }
 
     /**
@@ -115,11 +69,10 @@ public class PgDiffSequences {
         final PgDiffArguments arguments,
         final PgSchema oldSchema,
         final PgSchema newSchema) {
-        final Set<String> oldNames = oldSchema.getSequences().keySet();
         final StringBuilder sbSQL = new StringBuilder();
 
-        for (final PgSequence newSequence : newSchema.getOrderedSequences()) {
-            if (oldNames.contains(newSequence.getName())) {
+        for (final PgSequence newSequence : newSchema.getSequences()) {
+            if (oldSchema.containsSequence(newSequence.getName())) {
                 final PgSequence oldSequence =
                     oldSchema.getSequence(newSequence.getName());
                 sbSQL.setLength(0);

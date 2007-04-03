@@ -4,6 +4,7 @@
 package cz.startnet.utils.pgdiff.parsers;
 
 import cz.startnet.utils.pgdiff.schema.PgColumn;
+import cz.startnet.utils.pgdiff.schema.PgConstraint;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
 
@@ -23,7 +24,7 @@ public class CreateTableParser {
      */
     private static final Pattern PATTERN_TABLE_NAME =
         Pattern.compile(
-                "CREATE TABLE \"?([^ \"]+)\"?[ ]*\\(",
+                "CREATE[\\s]+TABLE[\\s]+\"?([^\\s\"]+)\"?[\\s]*\\(",
                 Pattern.CASE_INSENSITIVE);
 
     /**
@@ -31,21 +32,35 @@ public class CreateTableParser {
      */
     private static final Pattern PATTERN_CONSTRAINT =
         Pattern.compile(
-                "CONSTRAINT \"?([^ \"]+)\"? (.*)",
+                "CONSTRAINT[\\s]+\"?([^\\s\"]+)\"?[\\s]+(.*)",
                 Pattern.CASE_INSENSITIVE);
 
     /**
      * Pattern for parsing column definition.
      */
     private static final Pattern PATTERN_COLUMN =
-        //Pattern.compile("([^ ]+) (.*)", Pattern.CASE_INSENSITIVE);
-        Pattern.compile("\"?([^ \"]+)\"? (.*)", Pattern.CASE_INSENSITIVE);
+        Pattern.compile(
+                "\"?([^\\s\"]+)\"?[\\s]+(.*)",
+                Pattern.CASE_INSENSITIVE);
 
     /**
      * Pattern for parsing INHERITS.
      */
     private static final Pattern PATTERN_INHERITS =
-        Pattern.compile("INHERITS ([^;]+)[;]?", Pattern.CASE_INSENSITIVE);
+        Pattern.compile("INHERITS[\\s]+([^;]+)[;]?", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * Pattern for checking whether string contains WITH OIDS string.
+     */
+    private static final Pattern PATTERN_WITH_OIDS =
+        Pattern.compile(".*WITH[\\s]+OIDS.*", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * Pattern for checking whether string contains WITHOUT OIDS
+     * string.
+     */
+    private static final Pattern PATTERN_WITHOUT_OIDS =
+        Pattern.compile(".*WITHOUT[\\s]+OIDS.*", Pattern.CASE_INSENSITIVE);
 
     /**
      * Creates a new instance of CreateTableParser.
@@ -79,7 +94,8 @@ public class CreateTableParser {
                     ParserException.CANNOT_PARSE_COMMAND + line);
         }
 
-        final PgTable table = schema.getTable(tableName);
+        final PgTable table = new PgTable(tableName);
+        schema.addTable(table);
         parseRows(table, ParserUtils.removeLastSemicolon(line));
     }
 
@@ -94,27 +110,33 @@ public class CreateTableParser {
      */
     private static void parseColumnDefs(final PgTable table, final String line) {
         if (line.length() > 0) {
-            if (line.startsWith("CONSTRAINT ")) {
-                final Matcher matcher = PATTERN_CONSTRAINT.matcher(line.trim());
+            boolean matched = false;
+            Matcher matcher = PATTERN_CONSTRAINT.matcher(line.trim());
 
-                if (matcher.matches()) {
-                    table.getConstraint(matcher.group(1).trim()).setDefinition(
-                            matcher.group(2).trim());
-                } else {
-                    throw new ParserException(
-                            ParserException.CANNOT_PARSE_COMMAND + line);
-                }
-            } else {
-                final Matcher matcher = PATTERN_COLUMN.matcher(line);
+            if (matcher.matches()) {
+                final PgConstraint constraint =
+                    new PgConstraint(matcher.group(1).trim());
+                table.addConstraint(constraint);
+                constraint.setDefinition(matcher.group(2).trim());
+                constraint.setTableName(table.getName());
+                matched = true;
+            }
+
+            if (!matched) {
+                matcher = PATTERN_COLUMN.matcher(line);
 
                 if (matcher.matches()) {
                     final PgColumn column =
-                        table.getColumn(matcher.group(1).trim());
+                        new PgColumn(matcher.group(1).trim());
+                    table.addColumn(column);
                     column.parseDefinition(matcher.group(2).trim());
-                } else {
-                    throw new ParserException(
-                            ParserException.CANNOT_PARSE_COMMAND + line);
+                    matched = true;
                 }
+            }
+
+            if (!matched) {
+                throw new ParserException(
+                        ParserException.CANNOT_PARSE_COMMAND + line);
             }
         }
     }
@@ -144,10 +166,10 @@ public class CreateTableParser {
                         matcher.end());
         }
 
-        if (line.contains("WITH OIDS")) {
+        if (PATTERN_WITH_OIDS.matcher(line).matches()) {
             table.setWithOIDS(true);
             line = ParserUtils.removeSubString(line, "WITH OIDS");
-        } else if (line.contains("WITHOUT OIDS")) {
+        } else if (PATTERN_WITHOUT_OIDS.matcher(line).matches()) {
             table.setWithOIDS(false);
             line = ParserUtils.removeSubString(line, "WITHOUT OIDS");
         }

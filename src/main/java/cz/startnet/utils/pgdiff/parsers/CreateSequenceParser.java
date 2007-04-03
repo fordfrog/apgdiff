@@ -22,7 +22,7 @@ public class CreateSequenceParser {
      */
     private static final Pattern PATTERN_SEQUENCE_NAME =
         Pattern.compile(
-                "CREATE SEQUENCE \"?([^ \"]+)\"?",
+                "CREATE[\\s]+SEQUENCE[\\s]+\"?([^\\s\"]+)\"?",
                 Pattern.CASE_INSENSITIVE);
 
     /**
@@ -30,7 +30,7 @@ public class CreateSequenceParser {
      */
     private static final Pattern PATTERN_START_WITH =
         Pattern.compile(
-                "START (?:WITH )?([-]?[\\d]+)",
+                "START[\\s]+(?:WITH[\\s]+)?([-]?[\\d]+)",
                 Pattern.CASE_INSENSITIVE);
 
     /**
@@ -38,26 +38,50 @@ public class CreateSequenceParser {
      */
     private static final Pattern PATTERN_INCREMENT_BY =
         Pattern.compile(
-                "INCREMENT (?:BY )?([-]?[\\d]+)",
+                "INCREMENT[\\s]+(?:BY[\\s]+)?([-]?[\\d]+)",
                 Pattern.CASE_INSENSITIVE);
 
     /**
      * Pattern for getting value of MAXVALUE parameter.
      */
     private static final Pattern PATTERN_MAXVALUE =
-        Pattern.compile("MAXVALUE ([-]?[\\d]+)", Pattern.CASE_INSENSITIVE);
+        Pattern.compile("MAXVALUE[\\s]+([-]?[\\d]+)", Pattern.CASE_INSENSITIVE);
 
     /**
      * Pattern for getting value of MINVALUE parameter.
      */
     private static final Pattern PATTERN_MINVALUE =
-        Pattern.compile("MINVALUE ([-]?[\\d]+)", Pattern.CASE_INSENSITIVE);
+        Pattern.compile("MINVALUE[\\s]+([-]?[\\d]+)", Pattern.CASE_INSENSITIVE);
 
     /**
      * Pattern for getting value of CACHE parameter.
      */
     private static final Pattern PATTERN_CACHE =
-        Pattern.compile("CACHE ([\\d]+)", Pattern.CASE_INSENSITIVE);
+        Pattern.compile("CACHE[\\s]+([\\d]+)", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * Pattern for checking whether string contains NO CYCLE string.
+     */
+    private static final Pattern PATTERN_NO_CYCLE =
+        Pattern.compile(".*NO[\\s]+CYCLE.*", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * Pattern for checking whether string contains CYCLE string.
+     */
+    private static final Pattern PATTERN_CYCLE =
+        Pattern.compile(".*CYCLE.*", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * Pattern for checking whether string contains NO MAXVALUE string.
+     */
+    private static final Pattern PATTERN_NO_MAXVALUE =
+        Pattern.compile(".*NO[\\s]+MAXVALUE.*", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * Pattern for checking whether string contains NO MINVALUE string.
+     */
+    private static final Pattern PATTERN_NO_MINVALUE =
+        Pattern.compile(".*NO[\\s]+MINVALUE.*", Pattern.CASE_INSENSITIVE);
 
     /**
      * Creates a new instance of CreateSequenceParser.
@@ -92,7 +116,8 @@ public class CreateSequenceParser {
                     ParserException.CANNOT_PARSE_COMMAND + line);
         }
 
-        final PgSequence sequence = schema.getSequence(sequenceName);
+        final PgSequence sequence = new PgSequence(sequenceName);
+        schema.addSequence(sequence);
         line = ParserUtils.removeLastSemicolon(line);
         line = processMaxValue(sequence, line);
         line = processMinValue(sequence, line);
@@ -148,10 +173,10 @@ public class CreateSequenceParser {
         final String command) {
         String line = command;
 
-        if (line.contains("NO CYCLE")) {
+        if (PATTERN_NO_CYCLE.matcher(line).matches()) {
             sequence.setCycle(false);
             line = ParserUtils.removeSubString(line, "NO CYCLE");
-        } else if (line.contains("CYCLE")) {
+        } else if (PATTERN_CYCLE.matcher(line).matches()) {
             sequence.setCycle(true);
             line = ParserUtils.removeSubString(line, "CYCLE");
         }
@@ -198,7 +223,7 @@ public class CreateSequenceParser {
         final String command) {
         String line = command;
 
-        if (line.contains("NO MAXVALUE")) {
+        if (PATTERN_NO_MAXVALUE.matcher(line).matches()) {
             sequence.setMaxValue(null);
             line = ParserUtils.removeSubString(line, "NO MAXVALUE");
         } else {
@@ -230,7 +255,7 @@ public class CreateSequenceParser {
         final String command) {
         String line = command;
 
-        if (line.contains("NO MINVALUE")) {
+        if (PATTERN_NO_MINVALUE.matcher(line).matches()) {
             sequence.setMinValue(null);
             line = ParserUtils.removeSubString(line, "NO MINVALUE");
         } else {

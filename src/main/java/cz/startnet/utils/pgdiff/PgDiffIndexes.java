@@ -11,8 +11,6 @@ import java.io.PrintWriter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -40,28 +38,23 @@ public class PgDiffIndexes {
         final PrintWriter writer,
         final PgSchema oldSchema,
         final PgSchema newSchema) {
-        final Map<String, PgTable> oldTables = oldSchema.getTables();
-
-        for (PgTable newTable : newSchema.getOrderedTables()) {
+        for (PgTable newTable : newSchema.getTables()) {
             final String newTableName = newTable.getName();
 
             // Drop indexes that do not exist in new schema or are modified
             for (PgIndex index : getDropIndexes(
-                        oldTables.get(newTableName),
+                        oldSchema.getTable(newTableName),
                         newTable)) {
                 writer.println();
-                writer.println("DROP INDEX " + index.getName() + ";");
+                writer.println(index.getDropSQL());
             }
 
-            // Add new constraints
+            // Add new indexes
             for (PgIndex index : getNewIndexes(
-                        oldTables.get(newTableName),
+                        oldSchema.getTable(newTableName),
                         newTable)) {
                 writer.println();
-                writer.println(
-                        "CREATE INDEX " + index.getName() + " ON "
-                        + newTable.getName() + " " + index.getDefinition()
-                        + ";");
+                writer.println(index.getCreationSQL());
             }
         }
     }
@@ -83,13 +76,10 @@ public class PgDiffIndexes {
         final List<PgIndex> list = new ArrayList<PgIndex>();
 
         if ((newTable != null) && (oldTable != null)) {
-            final Set<String> newNames = newTable.getIndexes().keySet();
-
-            for (final PgIndex index : oldTable.getOrderedIndexes()) {
+            for (final PgIndex index : oldTable.getIndexes()) {
                 if (
-                    !newNames.contains(index.getName())
-                        || !newTable.getIndex(index.getName()).getDefinition().equals(
-                                index.getDefinition())) {
+                    !newTable.containsIndex(index.getName())
+                        || !newTable.getIndex(index.getName()).equals(index)) {
                     list.add(index);
                 }
             }
@@ -113,18 +103,15 @@ public class PgDiffIndexes {
 
         if (newTable != null) {
             if (oldTable == null) {
-                for (final PgIndex index : newTable.getOrderedIndexes()) {
+                for (final PgIndex index : newTable.getIndexes()) {
                     list.add(index);
                 }
             } else {
-                final Set<String> oldNames = oldTable.getIndexes().keySet();
-
-                for (final PgIndex index : newTable.getOrderedIndexes()) {
+                for (final PgIndex index : newTable.getIndexes()) {
                     if (
-                        !oldNames.contains(index.getName())
-                            || !oldTable.getIndex(index.getName())
-                                            .getDefinition().equals(
-                                    index.getDefinition())) {
+                        !oldTable.containsIndex(index.getName())
+                            || !oldTable.getIndex(index.getName()).equals(
+                                    index)) {
                         list.add(index);
                     }
                 }
