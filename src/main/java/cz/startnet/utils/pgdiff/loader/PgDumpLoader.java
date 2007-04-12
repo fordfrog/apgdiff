@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
@@ -114,12 +115,12 @@ public class PgDumpLoader { //NOPMD
                 Pattern.CASE_INSENSITIVE);
 
     /**
-     * Pattern for testing whether the line is the last row of CREATE
-     * FUNCTION command.
+     * Pattern for getting the string that is used to end the function
+     * or the function definition itself.
      */
     private static final Pattern PATTERN_END_OF_FUNCTION =
         Pattern.compile(
-                "^.*[\\s]+LANGUAGE[\\s]+[^\\s]+[\\s]*;$",
+                "^(?:.*[\\s]+)?AS[\\s]+(['$][^\\s]*).*$",
                 Pattern.CASE_INSENSITIVE);
 
     /**
@@ -267,25 +268,79 @@ public class PgDumpLoader { //NOPMD
      * @return whole CREATE FUNCTION DDL from the reader into multi-line string
      *
      * @throws FileException Thrown if problem occured while reading string
-     *         from <code>reader</code>.
+     *         from<code>reader</code>.
+     * @throws RuntimeException DOCUMENT ME!
      */
     private static String getWholeFunction(
         final BufferedReader reader,
         final String line) {
-        final StringBuilder sbCommand = new StringBuilder(line);
-        sbCommand.append('\n');
-
+        final String firstLine = line;
+        final StringBuilder sbCommand = new StringBuilder();
         String newLine = line;
+        Pattern endOfFunctionPattern = null;
+        boolean searchForSemicolon = false;
 
-        while (!PATTERN_END_OF_FUNCTION.matcher(newLine).matches()) {
+        while (newLine != null) {
+            if (!searchForSemicolon && (endOfFunctionPattern == null)) {
+                final Matcher matcher =
+                    PATTERN_END_OF_FUNCTION.matcher(newLine);
+
+                if (matcher.matches()) {
+                    String endOfFunction = matcher.group(1);
+
+                    if (endOfFunction.charAt(0) == '\'') {
+                        endOfFunction = "'";
+                    } else {
+                        endOfFunction =
+                            endOfFunction.substring(
+                                    0,
+                                    endOfFunction.indexOf('$', 1) + 1);
+                    }
+
+                    if ("'".equals(endOfFunction)) {
+                        endOfFunctionPattern =
+                            Pattern.compile(
+                                    "(?:.*[^\\\\]'.*|^.*[\\s]*'[\\s]*.*$)");
+                    } else {
+                        endOfFunctionPattern =
+                            Pattern.compile(
+                                    ".*\\Q" + endOfFunction + "\\E.*$",
+                                    Pattern.CASE_INSENSITIVE);
+                    }
+
+                    final String stripped =
+                        newLine.replaceAll(
+                                "[\\s]+AS[\\s]+\\Q" + endOfFunction + "\\E",
+                                " ");
+                    searchForSemicolon = endOfFunctionPattern.matcher(stripped)
+                                                             .matches();
+                }
+            }
+
+            sbCommand.append(newLine);
+            sbCommand.append('\n');
+
+            if (searchForSemicolon && newLine.trim().endsWith(";")) {
+                break;
+            }
+
             try {
                 newLine = reader.readLine();
             } catch (IOException ex) {
                 throw new FileException(FileException.CANNOT_READ_FILE, ex);
             }
 
-            sbCommand.append(newLine);
-            sbCommand.append('\n');
+            if (newLine == null) {
+                throw new RuntimeException(
+                        "Cannot find end of function: " + firstLine);
+            }
+
+            if (
+                !searchForSemicolon
+                    && (endOfFunctionPattern != null)
+                    && endOfFunctionPattern.matcher(newLine).matches()) {
+                searchForSemicolon = true;
+            }
         }
 
         return sbCommand.toString();
