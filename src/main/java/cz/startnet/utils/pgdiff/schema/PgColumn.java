@@ -3,6 +3,8 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
+import cz.startnet.utils.pgdiff.PgDiffUtils;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -89,14 +91,19 @@ public class PgColumn {
     /**
      * Returns full definition of the column.
      *
+     * @param quoteName whether name should be quoted
+     *
      * @return full definition of the column
      */
-    public String getFullDefinition() {
+    public String getFullDefinition(final boolean quoteName) {
         final StringBuilder sbDefinition = new StringBuilder();
-        sbDefinition.append(name + " " + type);
+        sbDefinition.append(PgDiffUtils.getQuotedName(name, quoteName));
+        sbDefinition.append(' ');
+        sbDefinition.append(type);
 
         if ((defaultValue != null) && (defaultValue.length() > 0)) {
-            sbDefinition.append(" DEFAULT " + defaultValue);
+            sbDefinition.append(" DEFAULT ");
+            sbDefinition.append(defaultValue);
         }
 
         if (!nullValue) {

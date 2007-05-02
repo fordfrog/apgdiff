@@ -31,11 +31,13 @@ public class PgDiffTriggers {
      * Outputs commands for differences in triggers.
      *
      * @param writer writer the output should be written to
+     * @param arguments object containing arguments settings
      * @param oldSchema original schema
      * @param newSchema new schema
      */
     public static void diffTriggers(
         final PrintWriter writer,
+        final PgDiffArguments arguments,
         final PgSchema oldSchema,
         final PgSchema newSchema) {
         for (PgTable newTable : newSchema.getTables()) {
@@ -44,13 +46,14 @@ public class PgDiffTriggers {
             // Drop triggers that no more exist or are modified
             for (PgTrigger trigger : getDropTriggers(oldTable, newTable)) {
                 writer.println();
-                writer.println(trigger.getDropSQL());
+                writer.println(trigger.getDropSQL(arguments.isQuoteNames()));
             }
 
             // Add new triggers
             for (PgTrigger trigger : getNewTriggers(oldTable, newTable)) {
                 writer.println();
-                writer.println(trigger.getCreationSQL());
+                writer.println(
+                        trigger.getCreationSQL(arguments.isQuoteNames()));
             }
         }
     }

@@ -29,6 +29,11 @@ public class PgDiffArguments {
     private boolean ignoreStartWith = false;
 
     /**
+     * Whether to quote names when creating the diff SQL commands.
+     */
+    private boolean quoteNames = false;
+
+    /**
      * Setter for {@link #ignoreStartWith ignoreStartWith}.
      *
      * @param ignoreStartWith {@link #ignoreStartWith ignoreStartWith}
@@ -83,6 +88,24 @@ public class PgDiffArguments {
     }
 
     /**
+     * Setter for {@link #quoteNames}.
+     *
+     * @param quoteNames {@link #quoteNames}
+     */
+    public void setQuoteNames(final boolean quoteNames) {
+        this.quoteNames = quoteNames;
+    }
+
+    /**
+     * Getter for {@link #quoteNames}.
+     *
+     * @return {@link #quoteNames}
+     */
+    public boolean isQuoteNames() {
+        return quoteNames;
+    }
+
+    /**
      * Parses command line arguments or outputs instructions.
      *
      * @param writer writer to be used for info output
@@ -101,6 +124,8 @@ public class PgDiffArguments {
             for (int i = 0; i < (args.length - 2); i++) {
                 if ("--ignore-start-with".equals(args[i])) {
                     setIgnoreStartWith(true);
+                } else if ("--quote-names".equals(args[i])) {
+                    setQuoteNames(true);
                 } else {
                     writer.println("ERROR: Unknown option: " + args[i]);
                     success = false;
@@ -130,5 +155,6 @@ public class PgDiffArguments {
         writer.println("--ignore-start-with: ignores START WITH modifications");
         writer.println("     on SEQUENCEs (default is not to ignore these");
         writer.println("     changes)");
+        writer.println("--quote-names: adds quotes to names");
     }
 }

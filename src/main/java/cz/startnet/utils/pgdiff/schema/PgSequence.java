@@ -3,6 +3,9 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
+import cz.startnet.utils.pgdiff.PgDiffUtils;
+
+
 /**
  * Stores sequence information.
  *
@@ -75,12 +78,14 @@ public class PgSequence {
     /**
      * Creates and returns SQL command for creation of the sequence.
      *
+     * @param quoteNames whether names should be quoted
+     *
      * @return created SQL command
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(final boolean quoteNames) {
         final StringBuilder sbSQL = new StringBuilder();
         sbSQL.append("CREATE SEQUENCE ");
-        sbSQL.append(name);
+        sbSQL.append(PgDiffUtils.getQuotedName(name, quoteNames));
 
         if (startWith != null) {
             sbSQL.append("\n\tSTART WITH ");
@@ -145,10 +150,13 @@ public class PgSequence {
     /**
      * Creates and returns SQL command for dropping the sequence.
      *
+     * @param quoteNames whether names should be quoted
+     *
      * @return created SQL
      */
-    public String getDropSQL() {
-        return "DROP SEQUENCE " + getName() + ";";
+    public String getDropSQL(final boolean quoteNames) {
+        return "DROP SEQUENCE "
+        + PgDiffUtils.getQuotedName(getName(), quoteNames) + ";";
     }
 
     /**

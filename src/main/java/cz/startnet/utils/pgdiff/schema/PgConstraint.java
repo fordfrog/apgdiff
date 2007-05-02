@@ -3,6 +3,8 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
+import cz.startnet.utils.pgdiff.PgDiffUtils;
+
 import java.util.regex.Pattern;
 
 
@@ -47,14 +49,16 @@ public class PgConstraint {
     /**
      * Creates and returns SQL for creation of the constraint.
      *
+     * @param quoteNames whether names should be quoted
+     *
      * @return created SQL
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(final boolean quoteNames) {
         final StringBuilder sbSQL = new StringBuilder();
         sbSQL.append("ALTER TABLE ");
-        sbSQL.append(getTableName());
+        sbSQL.append(PgDiffUtils.getQuotedName(getTableName(), quoteNames));
         sbSQL.append("\n\tADD CONSTRAINT ");
-        sbSQL.append(getName());
+        sbSQL.append(PgDiffUtils.getQuotedName(getName(), quoteNames));
         sbSQL.append(' ');
         sbSQL.append(getDefinition());
         sbSQL.append(';');
@@ -83,14 +87,16 @@ public class PgConstraint {
     /**
      * Creates and returns SQL for dropping the constraint.
      *
+     * @param quoteNames whether names should be quoted
+     *
      * @return created SQL
      */
-    public String getDropSQL() {
+    public String getDropSQL(final boolean quoteNames) {
         final StringBuilder sbSQL = new StringBuilder();
         sbSQL.append("ALTER TABLE ");
-        sbSQL.append(getTableName());
+        sbSQL.append(PgDiffUtils.getQuotedName(getTableName(), quoteNames));
         sbSQL.append("\n\tDROP CONSTRAINT ");
-        sbSQL.append(getName());
+        sbSQL.append(PgDiffUtils.getQuotedName(getName(), quoteNames));
         sbSQL.append(';');
 
         return sbSQL.toString();

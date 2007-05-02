@@ -3,6 +3,9 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
+import cz.startnet.utils.pgdiff.PgDiffUtils;
+
+
 /**
  * Stores trigger information.
  *
@@ -73,12 +76,14 @@ public class PgTrigger {
     /**
      * Creates and returns SQL for creation of trigger.
      *
+     * @param quoteNames whether names should be quoted
+     *
      * @return created SQL
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(final boolean quoteNames) {
         final StringBuilder sbDDL = new StringBuilder();
         sbDDL.append("CREATE TRIGGER ");
-        sbDDL.append(getName());
+        sbDDL.append(PgDiffUtils.getQuotedName(getName(), quoteNames));
         sbDDL.append("\n\t");
         sbDDL.append(isBefore() ? "BEFORE" : "AFTER");
 
@@ -108,7 +113,7 @@ public class PgTrigger {
         }
 
         sbDDL.append(" ON ");
-        sbDDL.append(getTableName());
+        sbDDL.append(PgDiffUtils.getQuotedName(getTableName(), quoteNames));
         sbDDL.append("\n\tFOR EACH ");
         sbDDL.append(isForEachRow() ? "ROW" : "STATEMENT");
         sbDDL.append("\n\tEXECUTE PROCEDURE ");
@@ -121,10 +126,14 @@ public class PgTrigger {
     /**
      * Creates and returns SQL for dropping the trigger.
      *
+     * @param quoteNames whether names should be quoted
+     *
      * @return created SQL
      */
-    public String getDropSQL() {
-        return "DROP TRIGGER " + getName() + " ON " + getTableName() + ";";
+    public String getDropSQL(final boolean quoteNames) {
+        return "DROP TRIGGER "
+        + PgDiffUtils.getQuotedName(getName(), quoteNames) + " ON "
+        + PgDiffUtils.getQuotedName(getTableName(), quoteNames) + ";";
     }
 
     /**

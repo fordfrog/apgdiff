@@ -31,6 +31,7 @@ public class PgDiffConstraints {
      * Outputs commands for differences in constraints.
      *
      * @param writer writer the output should be written to
+     * @param arguments object containing arguments settings
      * @param oldSchema original schema
      * @param newSchema new schema
      * @param primaryKey determines whether primery keys should be processed or
@@ -38,6 +39,7 @@ public class PgDiffConstraints {
      */
     public static void diffConstraints(
         final PrintWriter writer,
+        final PgDiffArguments arguments,
         final PgSchema oldSchema,
         final PgSchema newSchema,
         final boolean primaryKey) {
@@ -50,7 +52,7 @@ public class PgDiffConstraints {
                         newTable,
                         primaryKey)) {
                 writer.println();
-                writer.println(constraint.getDropSQL());
+                writer.println(constraint.getDropSQL(arguments.isQuoteNames()));
             }
 
             // Add new constraints
@@ -59,7 +61,8 @@ public class PgDiffConstraints {
                         newTable,
                         primaryKey)) {
                 writer.println();
-                writer.println(constraint.getCreationSQL());
+                writer.println(
+                        constraint.getCreationSQL(arguments.isQuoteNames()));
             }
         }
     }

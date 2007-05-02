@@ -3,6 +3,8 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
+import cz.startnet.utils.pgdiff.PgDiffUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,17 +148,19 @@ public class PgTable {
     /**
      * Creates and returns SQL for creation of the table.
      *
+     * @param quoteNames whether names should be quoted
+     *
      * @return created SQL command
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(final boolean quoteNames) {
         final StringBuilder sbSQL = new StringBuilder();
         sbSQL.append("CREATE TABLE ");
-        sbSQL.append(name);
+        sbSQL.append(PgDiffUtils.getQuotedName(name, quoteNames));
         sbSQL.append(" (\n");
 
         for (PgColumn column : columns) {
             sbSQL.append("\t");
-            sbSQL.append(column.getFullDefinition());
+            sbSQL.append(column.getFullDefinition(quoteNames));
             sbSQL.append(",\n");
         }
 
@@ -172,9 +176,10 @@ public class PgTable {
 
         for (PgColumn column : getColumnsWithStatistics()) {
             sbSQL.append("\nALTER TABLE ONLY ");
-            sbSQL.append(name);
+            sbSQL.append(PgDiffUtils.getQuotedName(name, quoteNames));
             sbSQL.append(" ALTER COLUMN ");
-            sbSQL.append(column.getName());
+            sbSQL.append(
+                    PgDiffUtils.getQuotedName(column.getName(), quoteNames));
             sbSQL.append(" SET STATISTICS ");
             sbSQL.append(column.getStatistics());
             sbSQL.append(';');
@@ -182,9 +187,10 @@ public class PgTable {
 
         if (this.clusterIndexName != null) {
             sbSQL.append("\nALTER TABLE ");
-            sbSQL.append(name);
+            sbSQL.append(PgDiffUtils.getQuotedName(name, quoteNames));
             sbSQL.append(" CLUSTER ON ");
-            sbSQL.append(clusterIndexName);
+            sbSQL.append(
+                    PgDiffUtils.getQuotedName(clusterIndexName, quoteNames));
             sbSQL.append(';');
         }
 
@@ -194,10 +200,13 @@ public class PgTable {
     /**
      * Creates and returns SQL command for dropping the table.
      *
+     * @param quoteNames whether names should be quoted
+     *
      * @return created SQL command
      */
-    public String getDropSQL() {
-        return "DROP TABLE " + getName() + ";";
+    public String getDropSQL(final boolean quoteNames) {
+        return "DROP TABLE " + PgDiffUtils.getQuotedName(getName(), quoteNames)
+        + ";";
     }
 
     /**

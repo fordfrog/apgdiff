@@ -3,6 +3,9 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
+import cz.startnet.utils.pgdiff.PgDiffUtils;
+
+
 /**
  * Stores table index information.
  *
@@ -37,14 +40,16 @@ public class PgIndex {
     /**
      * Creates and returns SQL for creation of the index.
      *
+     * @param quoteNames whether names should be quoted
+     *
      * @return created SQL
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(final boolean quoteNames) {
         final StringBuilder sbSQL = new StringBuilder();
         sbSQL.append("CREATE INDEX ");
-        sbSQL.append(getName());
+        sbSQL.append(PgDiffUtils.getQuotedName(getName(), quoteNames));
         sbSQL.append(" ON ");
-        sbSQL.append(getTableName());
+        sbSQL.append(PgDiffUtils.getQuotedName(getTableName(), quoteNames));
         sbSQL.append(' ');
         sbSQL.append(getDefinition());
         sbSQL.append(';');
@@ -73,10 +78,13 @@ public class PgIndex {
     /**
      * Creates and returns SQL command for dropping the index.
      *
+     * @param quoteNames whether names should be quoted
+     *
      * @return created SQL command
      */
-    public String getDropSQL() {
-        return "DROP INDEX " + getName() + ";";
+    public String getDropSQL(final boolean quoteNames) {
+        return "DROP INDEX " + PgDiffUtils.getQuotedName(getName(), quoteNames)
+        + ";";
     }
 
     /**

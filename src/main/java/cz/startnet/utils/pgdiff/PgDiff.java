@@ -77,11 +77,21 @@ public class PgDiff {
         final PgSchema newSchema) {
         PgDiffFunctions.diffFunctions(writer, oldSchema, newSchema);
         PgDiffSequences.diffSequences(writer, arguments, oldSchema, newSchema);
-        PgDiffTables.diffTables(writer, oldSchema, newSchema);
-        PgDiffConstraints.diffConstraints(writer, oldSchema, newSchema, true);
-        PgDiffConstraints.diffConstraints(writer, oldSchema, newSchema, false);
-        PgDiffIndexes.diffIndexes(writer, oldSchema, newSchema);
-        PgDiffTables.diffClusters(writer, oldSchema, newSchema);
-        PgDiffTriggers.diffTriggers(writer, oldSchema, newSchema);
+        PgDiffTables.diffTables(writer, arguments, oldSchema, newSchema);
+        PgDiffConstraints.diffConstraints(
+                writer,
+                arguments,
+                oldSchema,
+                newSchema,
+                true);
+        PgDiffConstraints.diffConstraints(
+                writer,
+                arguments,
+                oldSchema,
+                newSchema,
+                false);
+        PgDiffIndexes.diffIndexes(writer, arguments, oldSchema, newSchema);
+        PgDiffTables.diffClusters(writer, arguments, oldSchema, newSchema);
+        PgDiffTriggers.diffTriggers(writer, arguments, oldSchema, newSchema);
     }
 }

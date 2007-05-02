@@ -40,7 +40,7 @@ public class PgDiffSequences {
         for (PgSequence sequence : oldSchema.getSequences()) {
             if (!newSchema.containsSequence(sequence.getName())) {
                 writer.println();
-                writer.println(sequence.getDropSQL());
+                writer.println(sequence.getDropSQL(arguments.isQuoteNames()));
             }
         }
 
@@ -48,7 +48,8 @@ public class PgDiffSequences {
         for (PgSequence sequence : newSchema.getSequences()) {
             if (!oldSchema.containsSequence(sequence.getName())) {
                 writer.println();
-                writer.println(sequence.getCreationSQL());
+                writer.println(
+                        sequence.getCreationSQL(arguments.isQuoteNames()));
             }
         }
 
@@ -140,7 +141,11 @@ public class PgDiffSequences {
 
                 if (sbSQL.length() > 0) {
                     writer.println();
-                    writer.print("ALTER SEQUENCE " + newSequence.getName());
+                    writer.print(
+                            "ALTER SEQUENCE "
+                            + PgDiffUtils.getQuotedName(
+                                    newSequence.getName(),
+                                    arguments.isQuoteNames()));
                     writer.print(sbSQL.toString());
                     writer.println(';');
                 }
