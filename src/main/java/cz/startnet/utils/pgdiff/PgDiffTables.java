@@ -4,6 +4,7 @@
 package cz.startnet.utils.pgdiff;
 
 import cz.startnet.utils.pgdiff.schema.PgColumn;
+import cz.startnet.utils.pgdiff.schema.PgColumnUtils;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
 
@@ -105,7 +106,7 @@ public class PgDiffTables {
             }
 
             final PgTable oldTable = oldSchema.getTable(newTable.getName());
-            updateTableFields(writer, arguments, oldTable, newTable);
+            updateTableColumns(writer, arguments, oldTable, newTable);
             checkWithOIDS(writer, arguments, oldTable, newTable);
             checkInherits(writer, arguments, oldTable, newTable);
             addAlterStatistics(writer, arguments, oldTable, newTable);
@@ -175,17 +176,26 @@ public class PgDiffTables {
      * @param arguments object containing arguments settings
      * @param oldTable original table
      * @param newTable new table
+     * @param dropDefaultsColumns list for storing columns for which default
+     *        value should be dropped
      */
     private static void addCreateTableColumns(
         final List<String> commands,
         final PgDiffArguments arguments,
         final PgTable oldTable,
-        final PgTable newTable) {
+        final PgTable newTable,
+        final List<PgColumn> dropDefaultsColumns) {
         for (PgColumn column : newTable.getColumns()) {
             if (!oldTable.containsColumn(column.getName())) {
                 commands.add(
                         "\tADD COLUMN "
-                        + column.getFullDefinition(arguments.isQuoteNames()));
+                        + column.getFullDefinition(
+                                arguments.isQuoteNames(),
+                                arguments.isAddDefaults()));
+
+                if (arguments.isAddDefaults() && !column.getNullValue()) {
+                    dropDefaultsColumns.add(column);
+                }
             }
         }
     }
@@ -222,12 +232,15 @@ public class PgDiffTables {
      * @param arguments object containing arguments settings
      * @param oldTable original table
      * @param newTable new table
+     * @param dropDefaultsColumns list for storing columns for which default
+     *        value should be dropped
      */
     private static void addModifyTableColumns(
         final List<String> commands,
         final PgDiffArguments arguments,
         final PgTable oldTable,
-        final PgTable newTable) {
+        final PgTable newTable,
+        final List<PgColumn> dropDefaultsColumns) {
         for (PgColumn newColumn : newTable.getColumns()) {
             if (!oldTable.containsColumn(newColumn.getName())) {
                 continue;
@@ -271,6 +284,18 @@ public class PgDiffTables {
                             "\tALTER COLUMN " + newColumnName
                             + " DROP NOT NULL");
                 } else {
+                    if (arguments.isAddDefaults()) {
+                        final String defaultValue =
+                            PgColumnUtils.getDefaultValue(newColumn.getType());
+
+                        if (defaultValue != null) {
+                            commands.add(
+                                    "\tALTER COLUMN " + newColumnName
+                                    + " SET DEFAULT " + defaultValue);
+                            dropDefaultsColumns.add(newColumn);
+                        }
+                    }
+
                     commands.add(
                             "\tALTER COLUMN " + newColumnName + " SET NOT NULL");
                 }
@@ -409,34 +434,61 @@ public class PgDiffTables {
 
     /**
      * Outputs commands for addition, removal and modifications of
-     * table fields.
+     * table columns.
      *
      * @param writer writer the output should be written to
      * @param arguments object containing arguments settings
      * @param oldTable original table
      * @param newTable new table
      */
-    private static void updateTableFields(
+    private static void updateTableColumns(
         final PrintWriter writer,
         final PgDiffArguments arguments,
         final PgTable oldTable,
         final PgTable newTable) {
         final List<String> commands = new ArrayList<String>();
+        final List<PgColumn> dropDefaultsColumns = new ArrayList<PgColumn>();
         addDropTableColumns(commands, arguments, oldTable, newTable);
-        addCreateTableColumns(commands, arguments, oldTable, newTable);
-        addModifyTableColumns(commands, arguments, oldTable, newTable);
+        addCreateTableColumns(
+                commands,
+                arguments,
+                oldTable,
+                newTable,
+                dropDefaultsColumns);
+        addModifyTableColumns(
+                commands,
+                arguments,
+                oldTable,
+                newTable,
+                dropDefaultsColumns);
 
         if (commands.size() > 0) {
+            final String quotedTableName =
+                PgDiffUtils.getQuotedName(
+                        newTable.getName(),
+                        arguments.isQuoteNames());
             writer.println();
-            writer.println(
-                    "ALTER TABLE "
-                    + PgDiffUtils.getQuotedName(
-                            newTable.getName(),
-                            arguments.isQuoteNames()));
+            writer.println("ALTER TABLE " + quotedTableName);
 
             for (int i = 0; i < commands.size(); i++) {
                 writer.print(commands.get(i));
                 writer.println(((i + 1) < commands.size()) ? "," : ";");
+            }
+
+            if (!dropDefaultsColumns.isEmpty()) {
+                writer.println();
+                writer.println("ALTER TABLE " + quotedTableName);
+
+                for (int i = 0; i < dropDefaultsColumns.size(); i++) {
+                    writer.print("\tALTER COLUMN ");
+                    writer.print(
+                            PgDiffUtils.getQuotedName(
+                                    dropDefaultsColumns.get(i).getName(),
+                                    arguments.isQuoteNames()));
+                    writer.print(" DROP DEFAULT");
+                    writer.println(
+                            ((i + 1) < dropDefaultsColumns.size()) ? "," : ";");
+                }
             }
         }
     }

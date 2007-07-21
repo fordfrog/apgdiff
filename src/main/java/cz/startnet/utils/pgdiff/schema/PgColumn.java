@@ -92,10 +92,14 @@ public class PgColumn {
      * Returns full definition of the column.
      *
      * @param quoteName whether name should be quoted
+     * @param addDefaults whether default value should be added in case NOT
+     *        NULL constraint is specified but no default value is set
      *
      * @return full definition of the column
      */
-    public String getFullDefinition(final boolean quoteName) {
+    public String getFullDefinition(
+        final boolean quoteName,
+        final boolean addDefaults) {
         final StringBuilder sbDefinition = new StringBuilder();
         sbDefinition.append(PgDiffUtils.getQuotedName(name, quoteName));
         sbDefinition.append(' ');
@@ -104,6 +108,13 @@ public class PgColumn {
         if ((defaultValue != null) && (defaultValue.length() > 0)) {
             sbDefinition.append(" DEFAULT ");
             sbDefinition.append(defaultValue);
+        } else if (!nullValue && addDefaults) {
+            final String defaultColValue = PgColumnUtils.getDefaultValue(type);
+
+            if (defaultColValue != null) {
+                sbDefinition.append(" DEFAULT ");
+                sbDefinition.append(defaultColValue);
+            }
         }
 
         if (!nullValue) {

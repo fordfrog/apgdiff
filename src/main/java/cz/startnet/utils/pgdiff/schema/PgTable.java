@@ -160,7 +160,7 @@ public class PgTable {
 
         for (PgColumn column : columns) {
             sbSQL.append("\t");
-            sbSQL.append(column.getFullDefinition(quoteNames));
+            sbSQL.append(column.getFullDefinition(quoteNames, false));
             sbSQL.append(",\n");
         }
 

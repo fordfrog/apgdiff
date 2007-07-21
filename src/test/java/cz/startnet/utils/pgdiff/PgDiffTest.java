@@ -43,16 +43,24 @@ public class PgDiffTest {
     private final boolean ignoreStartWith;
 
     /**
+     * Value for the same named command line argument.
+     */
+    private boolean addDefaults;
+
+    /**
      * Creates a new PgDiffTest object.
      *
      * @param fileNameTemplate {@link #originalFileName originalFileName}
+     * @param addDefaults DOCUMENT ME!
      * @param ignoreStartWith {@link #ignoreStartWith ignoreStartWith}
      */
     public PgDiffTest(
         final String fileNameTemplate,
+        final boolean addDefaults,
         final boolean ignoreStartWith) {
         super();
         this.fileNameTemplate = fileNameTemplate;
+        this.addDefaults = addDefaults;
         this.ignoreStartWith = ignoreStartWith;
     }
 
@@ -66,122 +74,124 @@ public class PgDiffTest {
         return Arrays.asList(
                 new Object[][] {
                     // Tests scenario where COLUMN type is modified.
-                    {"modify_column_type", false },
+                    {"modify_column_type", false, false },
                     // Tests scenario where CLUSTER is added to TABLE.
-                    {"add_cluster", false },
+                    {"add_cluster", false, false },
                     // Tests scenario where CLUSTER is dropped from TABLE.
-                    {"drop_cluster", false },
+                    {"drop_cluster", false, false },
                     // Tests scenario where CLUSTER is changed on TABLE.
-                    {"modify_cluster", false },
+                    {"modify_cluster", false, false },
                     // Tests scenario where WITH OIDS is dropped from TABLE.
-                    {"drop_with_oids", false },
+                    {"drop_with_oids", false, false },
                     // Tests scenario where INDEX is added.
-                    {"add_index", false },
+                    {"add_index", false, false },
                     // Tests scenario where INDEX is dropped.
-                    {"drop_index", false },
+                    {"drop_index", false, false },
                     // Tests scenario where INDEX that TABLE CLUSTER is based
                 // on is dropped.
-                    {"drop_index_with_cluster", false },
+                    {"drop_index_with_cluster", false, false },
                     // Tests scenario where INDEX definition is modified.
-                    {"modify_index", false },
+                    {"modify_index", false, false },
                     // Tests scenario where STATISTICS information is added
                 // to COLUMN.
-                    {"add_statistics", false },
+                    {"add_statistics", false, false },
                     // Tests scenario where STATISTICS information is modified.
-                    {"modify_statistics", false },
+                    {"modify_statistics", false, false },
                     // Tests scenario where STATISTICS information is dropped.
-                    {"drop_statistics", false },
+                    {"drop_statistics", false, false },
                     // Tests scenario where DEFAULT value is set on COLUMN.
-                    {"add_default_value", false },
+                    {"add_default_value", false, false },
                     // Tests scenario where DEFAULT value is modified.
-                    {"modify_default_value", false },
+                    {"modify_default_value", false, false },
                     // Tests scenario where DEFAULT value is dropped from COLUMN.
-                    {"drop_default_value", false },
+                    {"drop_default_value", false, false },
                     // Tests scenario where NOT NULL constraint is set
                 // on COLUMN.
-                    {"add_not_null", false },
+                    {"add_not_null", false, false },
                     // Tests scenario where NOT NULL constraint is dropped
                 // from COLUMN.
-                    {"drop_not_null", false },
+                    {"drop_not_null", false, false },
                     // Tests scenario where COLUMN is added to TABLE definition.
-                    {"add_column", false },
+                    {"add_column", false, false },
                     // Tests scenario where COLUMN is dropped from TABLE.
-                    {"drop_column", false },
+                    {"drop_column", false, false },
                     // Tests scenario where new TABLE is added.
-                    {"add_table", false },
+                    {"add_table", false, false },
                     // Tests scenario where TABLE is dropped.
-                    {"drop_table", false },
+                    {"drop_table", false, false },
                     // Tests scenario where TABLE CONSTRAINT is added.
-                    {"add_constraint", false },
+                    {"add_constraint", false, false },
                     // Tests scenario where TABLE CONSTRAINT is modified.
-                    {"modify_constraint", false },
+                    {"modify_constraint", false, false },
                     // Tests scenario where TABLE CONSTRAINT is dropped.
-                    {"drop_constraint", false },
+                    {"drop_constraint", false, false },
                     // Tests scenario where UNIQUE TABLE CONSTRAINT is added.
-                    {"add_unique_constraint", true },
+                    {"add_unique_constraint", false, true },
                     // Tests reading of TABLE with INHERITS.
-                    {"read_inherits", false },
+                    {"read_inherits", false, false },
                     // Tests scenario where TABLE with INHERITS is added.
-                    {"add_inherits", false },
+                    {"add_inherits", false, false },
                     // Tests scenario where original and new TABLE contain
                 //different INHERITS.
-                    {"modify_inherits", false },
+                    {"modify_inherits", false, false },
                     // Tests scenario where SEQUENCE is added.
-                    {"add_sequence", false },
+                    {"add_sequence", false, false },
                     // Tests scenario where SEQUENCE is dropped.
-                    {"drop_sequence", false },
+                    {"drop_sequence", false, false },
                     // Tests scenario where INCREMENT BY is modified on SEQUENCE.
-                    {"modify_sequence_increment", false },
+                    {"modify_sequence_increment", false, false },
                     // Tests scenario where START WITH is modified on SEQUENCE
                 // (both with --ignore-start-with turned off and on).
-                    {"modify_sequence_start_ignore_off", false },
-                    { "modify_sequence_start_ignore_on", true },
+                    {"modify_sequence_start_ignore_off", false, false },
+                    { "modify_sequence_start_ignore_on", false, true },
                     // Tests scenario where MINVALUE is modified on SEQUENCE
                 // (both setting and unsetting the value).
-                    {"modify_sequence_minvalue_set", false },
-                    { "modify_sequence_minvalue_unset", false },
+                    {"modify_sequence_minvalue_set", false, false },
+                    { "modify_sequence_minvalue_unset", false, false },
                     // Tests scenario where MAXVALUE is modified on SEQUENCE
                 // (both setting and unsetting the value).
-                    {"modify_sequence_maxvalue_set", false },
-                    { "modify_sequence_maxvalue_unset", false },
+                    {"modify_sequence_maxvalue_set", false, false },
+                    { "modify_sequence_maxvalue_unset", false, false },
                     // Tests scenario where CACHE is modified on SEQUENCE.
-                    {"modify_sequence_cache", false },
+                    {"modify_sequence_cache", false, false },
                     // Tests scenario where CYCLE is modified on SEQUENCE.
-                    {"modify_sequence_cycle_on", false },
-                    { "modify_sequence_cycle_off", false },
+                    {"modify_sequence_cycle_on", false, false },
+                    { "modify_sequence_cycle_off", false, false },
                     // Tests scenario where new FUNCTION without args is added.
-                    {"add_function_noargs", false },
+                    {"add_function_noargs", false, false },
                     // Tests scenario where FUNCTION without args is dropped.
-                    {"drop_function_noargs", false },
+                    {"drop_function_noargs", false, false },
                     // Tests scenario where FUNCTION without args is modified.
-                    {"modify_function_noargs", false },
+                    {"modify_function_noargs", false, false },
                     // Tests scenario where new FUNCTION with args is added.
-                    {"add_function_args", false },
+                    {"add_function_args", false, false },
                     // Tests scenario where FUNCTION with args is dropped.
-                    {"drop_function_args", false },
+                    {"drop_function_args", false, false },
                     // Tests scenario where FUNCTION with args is modified.
-                    {"modify_function_args", false },
+                    {"modify_function_args", false, false },
                     // Tests scenario where new FUNCTION with args is added.
-                    {"add_function_args2", false },
+                    {"add_function_args2", false, false },
                     // Tests scenario where FUNCTION with args is dropped.
-                    {"drop_function_args2", false },
+                    {"drop_function_args2", false, false },
                     // Tests scenario where FUNCTION with args is modified.
-                    {"modify_function_args2", false },
+                    {"modify_function_args2", false, false },
                     // Tests scenario where FUNCTION with same name but
                 // different args is added.
-                    {"add_function_similar", false },
+                    {"add_function_similar", false, false },
                     // Tests scenario where FUNCTION with same name but
                 // different args is dropped.
-                    {"drop_function_similar", false },
+                    {"drop_function_similar", false, false },
                     // Tests scenario where FUNCTION with same name but
                 // different args is modified.
-                    {"modify_function_similar", false },
+                    {"modify_function_similar", false, false },
                     // Tests scenario where TRIGGER is added.
-                    {"add_trigger", false },
+                    {"add_trigger", false, false },
                     // Tests scenario where TRIGGER is dropped.
-                    {"drop_trigger", false },
+                    {"drop_trigger", false, false },
                     // Tests scenario where TRIGGER is modified.
-                    {"modify_trigger", false }
+                    {"modify_trigger", false, false },
+                    // Tests scenario where --add-defaults is specified.
+                    {"add_defaults", true, false }
                 });
     }
 
@@ -198,6 +208,7 @@ public class PgDiffTest {
         final ByteArrayOutputStream diffInput = new ByteArrayOutputStream();
         final PrintWriter writer = new PrintWriter(diffInput, true);
         final PgDiffArguments arguments = new PgDiffArguments();
+        arguments.setAddDefaults(addDefaults);
         arguments.setIgnoreStartWith(ignoreStartWith);
         PgDiff.createDiff(
                 writer,
