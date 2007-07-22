@@ -105,7 +105,7 @@
     <target name="distsrc" description="Creates source distribution file">
         <zip destfile="${dist}/${build.final.name}-src.zip">
             <zipfileset prefix="${build.final.name}" dir="."
-                excludes="${dist}/**, target/**, stats/**, lib/**, nbproject/**"/>
+                excludes="${build}/**, ${dist}/**, target/**, stats/**, lib/**, nbproject/**"/>
         </zip>
     </target>
     
