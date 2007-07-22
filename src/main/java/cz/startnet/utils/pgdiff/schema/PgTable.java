@@ -185,15 +185,6 @@ public class PgTable {
             sbSQL.append(';');
         }
 
-        if (this.clusterIndexName != null) {
-            sbSQL.append("\nALTER TABLE ");
-            sbSQL.append(PgDiffUtils.getQuotedName(name, quoteNames));
-            sbSQL.append(" CLUSTER ON ");
-            sbSQL.append(
-                    PgDiffUtils.getQuotedName(clusterIndexName, quoteNames));
-            sbSQL.append(';');
-        }
-
         return sbSQL.toString();
     }
 

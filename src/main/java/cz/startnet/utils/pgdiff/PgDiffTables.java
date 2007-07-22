@@ -45,12 +45,8 @@ public class PgDiffTables {
         final PgSchema newSchema) {
         for (PgTable newTable : newSchema.getTables()) {
             final PgTable oldTable = oldSchema.getTable(newTable.getName());
-
-            if (oldTable == null) {
-                continue;
-            }
-
-            final String oldCluster = oldTable.getClusterIndexName();
+            final String oldCluster =
+                (oldTable == null) ? null : oldTable.getClusterIndexName();
             final String newCluster = newTable.getClusterIndexName();
 
             if (
