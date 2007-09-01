@@ -41,7 +41,13 @@ public class PgDiffTriggers {
         final PgSchema oldSchema,
         final PgSchema newSchema) {
         for (PgTable newTable : newSchema.getTables()) {
-            final PgTable oldTable = oldSchema.getTable(newTable.getName());
+            final PgTable oldTable;
+
+            if (oldSchema == null) {
+                oldTable = null;
+            } else {
+                oldTable = oldSchema.getTable(newTable.getName());
+            }
 
             // Drop triggers that no more exist or are modified
             for (PgTrigger trigger : getDropTriggers(oldTable, newTable)) {

@@ -3,8 +3,8 @@
  */
 package cz.startnet.utils.pgdiff.parsers;
 
+import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgIndex;
-import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
 
 import java.util.regex.Matcher;
@@ -37,13 +37,13 @@ public class CreateIndexParser {
     /**
      * Parses CREATE INDEX command.
      *
-     * @param schema schema to be filled
+     * @param database database
      * @param command CREATE INDEX command
      *
      * @throws ParserException Thrown if problem occured while parsing the
      *         command.
      */
-    public static void parse(final PgSchema schema, final String command) {
+    public static void parse(final PgDatabase database, final String command) {
         final Matcher matcher = PATTERN.matcher(command.trim());
 
         if (matcher.matches()) {
@@ -56,7 +56,10 @@ public class CreateIndexParser {
                         ParserException.CANNOT_PARSE_COMMAND + command);
             }
 
-            final PgTable table = schema.getTable(tableName.trim());
+            final PgTable table =
+                database.getSchema(
+                        ParserUtils.getSchemaName(tableName.trim(), database)).getTable(
+                        tableName.trim());
             final PgIndex index = new PgIndex(indexName);
             table.addIndex(index);
             index.setDefinition(def.trim());

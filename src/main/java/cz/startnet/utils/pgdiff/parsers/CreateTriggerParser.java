@@ -3,7 +3,7 @@
  */
 package cz.startnet.utils.pgdiff.parsers;
 
-import cz.startnet.utils.pgdiff.schema.PgSchema;
+import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgTrigger;
 
 import java.util.regex.Matcher;
@@ -39,13 +39,13 @@ public class CreateTriggerParser {
     /**
      * Parses CREATE TRIGGER command.
      *
-     * @param schema schema to be filled
+     * @param database database
      * @param command CREATE TRIGGER command
      *
      * @throws ParserException Thrown if problem occured while parsing the
      *         command.
      */
-    public static void parse(final PgSchema schema, final String command) {
+    public static void parse(final PgDatabase database, final String command) {
         final Matcher matcher = PATTERN.matcher(command.trim());
 
         if (matcher.matches()) {
@@ -71,7 +71,8 @@ public class CreateTriggerParser {
             trigger.setOnUpdate(isEventPresent(events, "UPDATE"));
             trigger.setTableName(tableName.trim());
 
-            schema.getTable(trigger.getTableName()).addTrigger(trigger);
+            database.getDefaultSchema().getTable(trigger.getTableName()).addTrigger(
+                    trigger);
         } else {
             throw new ParserException(
                     ParserException.CANNOT_PARSE_COMMAND + command);

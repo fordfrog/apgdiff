@@ -5,7 +5,7 @@ package cz.startnet.utils.pgdiff.parsers;
 
 import cz.startnet.utils.pgdiff.schema.PgColumn;
 import cz.startnet.utils.pgdiff.schema.PgConstraint;
-import cz.startnet.utils.pgdiff.schema.PgSchema;
+import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgTable;
 
 import java.util.regex.Matcher;
@@ -87,12 +87,12 @@ public class AlterTableParser {
     /**
      * Parses ALTER TABLE command.
      *
-     * @param schema schema to be filled
+     * @param database database
      * @param command ALTER TABLE command
      *
      * @throws ParserException Thrown if problem occured while parsing DDL.
      */
-    public static void parse(final PgSchema schema, final String command) {
+    public static void parse(final PgDatabase database, final String command) {
         if (!PATTERN_OWNER.matcher(command).matches()) {
             String line = command;
             final Matcher matcher = PATTERN_START.matcher(line);
@@ -105,7 +105,10 @@ public class AlterTableParser {
                         ParserException.CANNOT_PARSE_COMMAND + line);
             }
 
-            final PgTable table = schema.getTable(tableName);
+            final PgTable table =
+                database.getSchema(
+                        ParserUtils.getSchemaName(tableName, database)).getTable(
+                        ParserUtils.getObjectName(tableName));
             line = ParserUtils.removeLastSemicolon(matcher.group(2));
 
             if (PATTERN_TRAILING_DEF.matcher(line).matches()) {

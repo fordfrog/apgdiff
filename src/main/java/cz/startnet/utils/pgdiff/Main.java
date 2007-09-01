@@ -8,7 +8,7 @@ import java.io.PrintWriter;
 
 /**
  * Compares two PostgreSQL dumps and outputs information about differences
- * in the schemas.
+ * in the database schemas.
  *
  * @author fordfrog
  * @version $Id$

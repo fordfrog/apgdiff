@@ -42,21 +42,29 @@ public class PgDiffIndexes {
         final PgSchema newSchema) {
         for (PgTable newTable : newSchema.getTables()) {
             final String newTableName = newTable.getName();
+            final PgTable oldTable;
+
+            if (oldSchema == null) {
+                oldTable = null;
+            } else {
+                oldTable = oldSchema.getTable(newTableName);
+            }
 
             // Drop indexes that do not exist in new schema or are modified
-            for (PgIndex index : getDropIndexes(
-                        oldSchema.getTable(newTableName),
-                        newTable)) {
+            for (PgIndex index : getDropIndexes(oldTable, newTable)) {
                 writer.println();
                 writer.println(index.getDropSQL(arguments.isQuoteNames()));
             }
 
             // Add new indexes
-            for (PgIndex index : getNewIndexes(
-                        oldSchema.getTable(newTableName),
-                        newTable)) {
-                writer.println();
-                writer.println(index.getCreationSQL(arguments.isQuoteNames()));
+            if (oldSchema != null) {
+                for (PgIndex index : getNewIndexes(
+                            oldSchema.getTable(newTableName),
+                            newTable)) {
+                    writer.println();
+                    writer.println(
+                            index.getCreationSQL(arguments.isQuoteNames()));
+                }
             }
         }
     }

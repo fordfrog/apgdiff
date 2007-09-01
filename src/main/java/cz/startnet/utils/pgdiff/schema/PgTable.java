@@ -40,45 +40,45 @@ public class PgTable {
     /**
      * Name of the index on which the table is clustered
      */
-    private String clusterIndexName = null;
+    private String clusterIndexName;
 
     /**
      * Definition of names of inherited tables.
      */
-    private String inherits = null;
+    private String inherits;
 
     /**
      * Name of the table.
      */
-    private String name = null;
+    private String name;
 
     /**
      * Whether WITH OIDS is used.
      */
-    private boolean withOIDS = false;
+    private boolean withOIDS;
 
     /**
      * Creates a new PgTable object.
      *
-     * @param name name of the table
+     * @param name {@link #name}
      */
     public PgTable(final String name) {
         this.name = name;
     }
 
     /**
-     * Setter for {@link #clusterIndexName clusterIndexName}.
+     * Setter for {@link #clusterIndexName}.
      *
-     * @param name {@link #clusterIndexName clusterIndexName}
+     * @param name {@link #clusterIndexName}
      */
     public void setClusterIndexName(final String name) {
         clusterIndexName = name;
     }
 
     /**
-     * Getter for {@link #clusterIndexName clusterIndexName}.
+     * Getter for {@link #clusterIndexName}.
      *
-     * @return {@link #clusterIndexName clusterIndexName}
+     * @return {@link #clusterIndexName}
      */
     public String getClusterIndexName() {
         return clusterIndexName;
@@ -106,9 +106,9 @@ public class PgTable {
     }
 
     /**
-     * Getter for {@link #columns columns}.
+     * Getter for {@link #columns}.
      *
-     * @return {@link #columns columns}
+     * @return {@link #columns}
      */
     public List<PgColumn> getColumns() {
         return columns;
@@ -137,9 +137,9 @@ public class PgTable {
     }
 
     /**
-     * Getter for {@link #constraints constraints}.
+     * Getter for {@link #constraints}.
      *
-     * @return {@link #constraints constraints}
+     * @return {@link #constraints}
      */
     public List<PgConstraint> getConstraints() {
         return constraints;
@@ -222,72 +222,72 @@ public class PgTable {
     }
 
     /**
-     * Getter for {@link #indexes indexes}.
+     * Getter for {@link #indexes}.
      *
-     * @return {@link #indexes indexes}
+     * @return {@link #indexes}
      */
     public List<PgIndex> getIndexes() {
         return indexes;
     }
 
     /**
-     * Setter for {@link #inherits inherits}.
+     * Setter for {@link #inherits}.
      *
-     * @param inherits {@link #inherits inherits}
+     * @param inherits {@link #inherits}
      */
     public void setInherits(final String inherits) {
         this.inherits = inherits;
     }
 
     /**
-     * Getter for {@link #inherits inherits}.
+     * Getter for {@link #inherits}.
      *
-     * @return {@link #inherits inherits}
+     * @return {@link #inherits}
      */
     public String getInherits() {
         return inherits;
     }
 
     /**
-     * Setter for {@link #name name}.
+     * Setter for {@link #name}.
      *
-     * @param name {@link #name name}
+     * @param name {@link #name}
      */
     public void setName(final String name) {
         this.name = name;
     }
 
     /**
-     * Getter for {@link #name name}.
+     * Getter for {@link #name}.
      *
-     * @return {@link #name name}
+     * @return {@link #name}
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Getter for {@link #triggers triggers}.
+     * Getter for {@link #triggers}.
      *
-     * @return {@link #triggers triggers}
+     * @return {@link #triggers}
      */
     public List<PgTrigger> getTriggers() {
         return triggers;
     }
 
     /**
-     * Setter for {@link #withOIDS withOIDS}.
+     * Setter for {@link #withOIDS}.
      *
-     * @param withOIDS {@link #withOIDS withOIDS}
+     * @param withOIDS {@link #withOIDS}
      */
     public void setWithOIDS(final boolean withOIDS) {
         this.withOIDS = withOIDS;
     }
 
     /**
-     * Getter for {@link #withOIDS withOIDS}
+     * Getter for {@link #withOIDS}
      *
-     * @return {@link #withOIDS withOIDS}
+     * @return {@link #withOIDS}
      */
     public boolean isWithOIDS() {
         return withOIDS;

@@ -25,22 +25,22 @@ public class PgConstraint {
     /**
      * Definition of the constraint.
      */
-    private String definition = null;
+    private String definition;
 
     /**
      * Name of the constraint.
      */
-    private String name = null;
+    private String name;
 
     /**
      * Name of the table the constraint is defined on.
      */
-    private String tableName = null;
+    private String tableName;
 
     /**
      * Creates a new PgConstraint object.
      *
-     * @param name name of the constraint
+     * @param name {@link #name}
      */
     public PgConstraint(String name) {
         this.name = name;
@@ -67,18 +67,18 @@ public class PgConstraint {
     }
 
     /**
-     * Setter for {@link #definition definition}.
+     * Setter for {@link #definition}.
      *
-     * @param definition {@link #definition definition}
+     * @param definition {@link #definition}
      */
     public void setDefinition(final String definition) {
         this.definition = definition;
     }
 
     /**
-     * Getter for {@link #definition definition}.
+     * Getter for {@link #definition}.
      *
-     * @return {@link #definition definition}
+     * @return {@link #definition}
      */
     public String getDefinition() {
         return definition;
@@ -103,18 +103,18 @@ public class PgConstraint {
     }
 
     /**
-     * Setter for {@link #name name}.
+     * Setter for {@link #name}.
      *
-     * @param name {@link #name name}
+     * @param name {@link #name}
      */
     public void setName(final String name) {
         this.name = name;
     }
 
     /**
-     * Getter for {@link #name name}.
+     * Getter for {@link #name}.
      *
-     * @return {@link #name name}
+     * @return {@link #name}
      */
     public String getName() {
         return name;
@@ -131,18 +131,18 @@ public class PgConstraint {
     }
 
     /**
-     * Setter for {@link #tableName tableName}.
+     * Setter for {@link #tableName}.
      *
-     * @param tableName {@link #tableName tableName}
+     * @param tableName {@link #tableName}
      */
     public void setTableName(final String tableName) {
         this.tableName = tableName;
     }
 
     /**
-     * Getter for {@link #tableName tableName}.
+     * Getter for {@link #tableName}.
      *
-     * @return {@link #tableName tableName}
+     * @return {@link #tableName}
      */
     public String getTableName() {
         return tableName;

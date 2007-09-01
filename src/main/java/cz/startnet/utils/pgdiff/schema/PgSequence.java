@@ -16,37 +16,37 @@ public class PgSequence {
     /**
      * Value for CACHE or null if no value is specified.
      */
-    private String cache = null;
+    private String cache;
 
     /**
      * Value for INCREMENT BY or null if no value is specified.
      */
-    private String increment = null;
+    private String increment;
 
     /**
      * Value for MAXVALUE or null if no value is specified.
      */
-    private String maxValue = null;
+    private String maxValue;
 
     /**
      * Value for MINVALUE or null if no value is specified.
      */
-    private String minValue = null;
+    private String minValue;
 
     /**
      * Name of the sequence.
      */
-    private String name = null;
+    private String name;
 
     /**
      * Value for START WITH or null if no value is specified.
      */
-    private String startWith = null;
+    private String startWith;
 
     /**
      * True if CYCLE, false if NO CYCLE.
      */
-    private boolean cycle = false;
+    private boolean cycle;
 
     /**
      * Creates a new PgSequence object.
@@ -58,18 +58,18 @@ public class PgSequence {
     }
 
     /**
-     * Setter for {@link #cache cache}.
+     * Setter for {@link #cache}.
      *
-     * @param cache {@link #cache cache}
+     * @param cache {@link #cache}
      */
     public void setCache(final String cache) {
         this.cache = cache;
     }
 
     /**
-     * Getter for {@link #cache cache}.
+     * Getter for {@link #cache}.
      *
-     * @return {@link #cache cache}
+     * @return {@link #cache}
      */
     public String getCache() {
         return cache;
@@ -130,18 +130,18 @@ public class PgSequence {
     }
 
     /**
-     * Setter for {@link #cycle cycle}.
+     * Setter for {@link #cycle}.
      *
-     * @param cycle {@link #cycle cycle}
+     * @param cycle {@link #cycle}
      */
     public void setCycle(final boolean cycle) {
         this.cycle = cycle;
     }
 
     /**
-     * Getter for {@link #cycle cycle}.
+     * Getter for {@link #cycle}.
      *
-     * @return {@link #cycle cycle}
+     * @return {@link #cycle}
      */
     public boolean isCycle() {
         return cycle;
@@ -160,90 +160,90 @@ public class PgSequence {
     }
 
     /**
-     * Setter for {@link #increment increment}.
+     * Setter for {@link #increment}.
      *
-     * @param increment {@link #increment increment}
+     * @param increment {@link #increment}
      */
     public void setIncrement(final String increment) {
         this.increment = increment;
     }
 
     /**
-     * Getter for {@link #increment increment}.
+     * Getter for {@link #increment}.
      *
-     * @return {@link #increment increment}
+     * @return {@link #increment}
      */
     public String getIncrement() {
         return increment;
     }
 
     /**
-     * Setter for {@link #maxValue maxValue}.
+     * Setter for {@link #maxValue}.
      *
-     * @param maxValue {@link #maxValue maxValue}
+     * @param maxValue {@link #maxValue}
      */
     public void setMaxValue(final String maxValue) {
         this.maxValue = maxValue;
     }
 
     /**
-     * Getter for {@link #maxValue maxValue}.
+     * Getter for {@link #maxValue}.
      *
-     * @return {@link #maxValue maxValue}
+     * @return {@link #maxValue}
      */
     public String getMaxValue() {
         return maxValue;
     }
 
     /**
-     * Setter for {@link #minValue minValue}.
+     * Setter for {@link #minValue}.
      *
-     * @param minValue {@link #minValue minValue}
+     * @param minValue {@link #minValue}
      */
     public void setMinValue(final String minValue) {
         this.minValue = minValue;
     }
 
     /**
-     * Getter for {@link #minValue minValue}.
+     * Getter for {@link #minValue}.
      *
-     * @return {@link #minValue minValue}
+     * @return {@link #minValue}
      */
     public String getMinValue() {
         return minValue;
     }
 
     /**
-     * Setter for {@link #name name}.
+     * Setter for {@link #name}.
      *
-     * @param name {@link #name name}
+     * @param name {@link #name}
      */
     public void setName(final String name) {
         this.name = name;
     }
 
     /**
-     * Getter for {@link #name name}.
+     * Getter for {@link #name}.
      *
-     * @return {@link #name name}
+     * @return {@link #name}
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Setter for {@link #startWith startWith}.
+     * Setter for {@link #startWith}.
      *
-     * @param startWith {@link #startWith startWith}
+     * @param startWith {@link #startWith}
      */
     public void setStartWith(final String startWith) {
         this.startWith = startWith;
     }
 
     /**
-     * Getter for {@link #startWith startWith}.
+     * Getter for {@link #startWith}.
      *
-     * @return {@link #startWith startWith}
+     * @return {@link #startWith}
      */
     public String getStartWith() {
         return startWith;

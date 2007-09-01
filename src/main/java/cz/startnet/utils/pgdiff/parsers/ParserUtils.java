@@ -3,6 +3,8 @@
  */
 package cz.startnet.utils.pgdiff.parsers;
 
+import cz.startnet.utils.pgdiff.schema.PgDatabase;
+
 import java.util.regex.Pattern;
 
 
@@ -56,6 +58,49 @@ public class ParserUtils {
         }
 
         return charPos;
+    }
+
+    /**
+     * Returns object name from optionally schema qualified name.
+     *
+     * @param name optionally schema qualified name
+     *
+     * @return name of the object
+     */
+    public static String getObjectName(final String name) {
+        final String result;
+        final int pos = name.indexOf('.');
+
+        if (pos == -1) {
+            result = name;
+        } else {
+            result = name.substring(pos + 1);
+        }
+
+        return result;
+    }
+
+    /**
+     * Returns schema name from optionally schema qualified name.
+     *
+     * @param name optionally schema qualified name
+     * @param database database
+     *
+     * @return name of the schema
+     */
+    public static String getSchemaName(
+        final String name,
+        final PgDatabase database) {
+        final String result;
+        final int pos = name.indexOf('.');
+
+        if (pos == -1) {
+            result = database.getDefaultSchema().getName();
+        } else {
+            result = name.substring(0, pos);
+        }
+
+        return result;
     }
 
     /**

@@ -30,7 +30,7 @@ public class PgDumpLoaderTest {
     /**
      * Creates a new instance of PgDumpLoaderTest.
      *
-     * @param fileIndex {@link #fileIndex fileIndex}
+     * @param fileIndex {@link #fileIndex}
      */
     public PgDumpLoaderTest(final int fileIndex) {
         this.fileIndex = fileIndex;
@@ -58,7 +58,7 @@ public class PgDumpLoaderTest {
      */
     @Test(timeout = 1000)
     public void loadSchema() {
-        PgDumpLoader.loadSchema(
+        PgDumpLoader.loadDatabaseSchema(
                 this.getClass()
                     .getResourceAsStream("schema_" + fileIndex + ".sql"));
     }

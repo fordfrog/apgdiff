@@ -4,6 +4,7 @@
 package cz.startnet.utils.pgdiff;
 
 import cz.startnet.utils.pgdiff.loader.PgDumpLoader;
+import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 
 import java.io.InputStream;
@@ -11,7 +12,7 @@ import java.io.PrintWriter;
 
 
 /**
- * Creates diff of two schemas.
+ * Creates diff of two database schemas.
  *
  * @author fordfrog
  * @version $Id$
@@ -25,7 +26,7 @@ public class PgDiff {
     }
 
     /**
-     * Creates diff on the two schemas.
+     * Creates diff on the two database schemas.
      *
      * @param writer writer the output should be written to
      * @param arguments object containing arguments settings
@@ -33,15 +34,15 @@ public class PgDiff {
     public static void createDiff(
         final PrintWriter writer,
         final PgDiffArguments arguments) {
-        diffSchemas(
+        diffDatabaseSchemas(
                 writer,
                 arguments,
-                PgDumpLoader.loadSchema(arguments.getOldDumpFile()),
-                PgDumpLoader.loadSchema(arguments.getNewDumpFile()));
+                PgDumpLoader.loadDatabaseSchema(arguments.getOldDumpFile()),
+                PgDumpLoader.loadDatabaseSchema(arguments.getNewDumpFile()));
     }
 
     /**
-     * Creates diff on the two schemas.
+     * Creates diff on the two database schemas.
      *
      * @param writer writer the output should be written to
      * @param arguments object containing arguments settings
@@ -55,43 +56,142 @@ public class PgDiff {
         final PgDiffArguments arguments,
         final InputStream oldInputStream,
         final InputStream newInputStream) {
-        diffSchemas(
+        diffDatabaseSchemas(
                 writer,
                 arguments,
-                PgDumpLoader.loadSchema(oldInputStream),
-                PgDumpLoader.loadSchema(newInputStream));
+                PgDumpLoader.loadDatabaseSchema(oldInputStream),
+                PgDumpLoader.loadDatabaseSchema(newInputStream));
     }
 
     /**
-     * Creates diff from comparison of two schemas.
+     * Creates new schemas (not the objects inside the schemas).
      *
      * @param writer writer the output should be written to
      * @param arguments object containing arguments settings
-     * @param oldSchema original schema
-     * @param newSchema new schema
+     * @param oldDatabase original database schema
+     * @param newDatabase new database schema
      */
-    private static void diffSchemas(
+    private static void createNewSchemas(
         final PrintWriter writer,
         final PgDiffArguments arguments,
-        final PgSchema oldSchema,
-        final PgSchema newSchema) {
-        PgDiffFunctions.diffFunctions(writer, oldSchema, newSchema);
-        PgDiffSequences.diffSequences(writer, arguments, oldSchema, newSchema);
-        PgDiffTables.diffTables(writer, arguments, oldSchema, newSchema);
-        PgDiffConstraints.diffConstraints(
-                writer,
-                arguments,
-                oldSchema,
-                newSchema,
-                true);
-        PgDiffConstraints.diffConstraints(
-                writer,
-                arguments,
-                oldSchema,
-                newSchema,
-                false);
-        PgDiffIndexes.diffIndexes(writer, arguments, oldSchema, newSchema);
-        PgDiffTables.diffClusters(writer, arguments, oldSchema, newSchema);
-        PgDiffTriggers.diffTriggers(writer, arguments, oldSchema, newSchema);
+        final PgDatabase oldDatabase,
+        final PgDatabase newDatabase) {
+        for (PgSchema newSchema : newDatabase.getSchemas()) {
+            if (oldDatabase.getSchema(newSchema.getName()) == null) {
+                writer.println();
+                writer.println(
+                        newSchema.getCreationSQL(arguments.isQuoteNames()));
+            }
+        }
+    }
+
+    /**
+     * Creates diff from comparison of two database schemas.
+     *
+     * @param writer writer the output should be written to
+     * @param arguments object containing arguments settings
+     * @param oldDatabase original database schema
+     * @param newDatabase new database schema
+     */
+    private static void diffDatabaseSchemas(
+        final PrintWriter writer,
+        final PgDiffArguments arguments,
+        final PgDatabase oldDatabase,
+        final PgDatabase newDatabase) {
+        if (arguments.isAddTransaction()) {
+            writer.println("START TRANSACTION;");
+        }
+
+        dropOldSchemas(writer, arguments, oldDatabase, newDatabase);
+        createNewSchemas(writer, arguments, oldDatabase, newDatabase);
+        updateSchemas(writer, arguments, oldDatabase, newDatabase);
+
+        if (arguments.isAddTransaction()) {
+            writer.println();
+            writer.println("COMMIT TRANSACTION;");
+        }
+    }
+
+    /**
+     * Drops old schemas that do not exist anymore.
+     *
+     * @param writer writer the output should be written to
+     * @param arguments object containing arguments settings
+     * @param oldDatabase original database schema
+     * @param newDatabase new database schema
+     */
+    private static void dropOldSchemas(
+        final PrintWriter writer,
+        final PgDiffArguments arguments,
+        final PgDatabase oldDatabase,
+        final PgDatabase newDatabase) {
+        for (PgSchema oldSchema : oldDatabase.getSchemas()) {
+            if (newDatabase.getSchema(oldSchema.getName()) == null) {
+                writer.println();
+                writer.println(
+                        "DROP SCHEMA "
+                        + PgDiffUtils.getQuotedName(
+                                oldSchema.getName(),
+                                arguments.isQuoteNames()) + " CASCADE;");
+            }
+        }
+    }
+
+    /**
+     * Updates objects in schemas.
+     *
+     * @param writer writer the output should be written to
+     * @param arguments object containing arguments settings
+     * @param oldDatabase original database schema
+     * @param newDatabase new database schema
+     */
+    private static void updateSchemas(
+        final PrintWriter writer,
+        final PgDiffArguments arguments,
+        final PgDatabase oldDatabase,
+        final PgDatabase newDatabase) {
+        final boolean setSearchPath =
+            (newDatabase.getSchemas().size() > 1)
+            || !newDatabase.getSchemas().get(0).getName().equals("public");
+
+        for (PgSchema newSchema : newDatabase.getSchemas()) {
+            if (setSearchPath) {
+                writer.println();
+                writer.println(
+                        "SET search_path = "
+                        + PgDiffUtils.getQuotedName(
+                                newSchema.getName(),
+                                arguments.isQuoteNames()) + ", pg_catalog;");
+            }
+
+            final PgSchema oldSchema =
+                oldDatabase.getSchema(newSchema.getName());
+            PgDiffFunctions.diffFunctions(writer, oldSchema, newSchema);
+            PgDiffSequences.diffSequences(
+                    writer,
+                    arguments,
+                    oldSchema,
+                    newSchema);
+            PgDiffTables.diffTables(writer, arguments, oldSchema, newSchema);
+            PgDiffConstraints.diffConstraints(
+                    writer,
+                    arguments,
+                    oldSchema,
+                    newSchema,
+                    true);
+            PgDiffConstraints.diffConstraints(
+                    writer,
+                    arguments,
+                    oldSchema,
+                    newSchema,
+                    false);
+            PgDiffIndexes.diffIndexes(writer, arguments, oldSchema, newSchema);
+            PgDiffTables.diffClusters(writer, arguments, oldSchema, newSchema);
+            PgDiffTriggers.diffTriggers(
+                    writer,
+                    arguments,
+                    oldSchema,
+                    newSchema);
+        }
     }
 }

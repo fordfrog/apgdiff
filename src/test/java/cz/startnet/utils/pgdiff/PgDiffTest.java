@@ -40,27 +40,35 @@ public class PgDiffTest {
     /**
      * Value for the same named command line argument.
      */
-    private final boolean ignoreStartWith;
+    private final boolean addDefaults;
 
     /**
      * Value for the same named command line argument.
      */
-    private boolean addDefaults;
+    private final boolean addTransaction;
+
+    /**
+     * Value for the same named command line argument.
+     */
+    private final boolean ignoreStartWith;
 
     /**
      * Creates a new PgDiffTest object.
      *
-     * @param fileNameTemplate {@link #originalFileName originalFileName}
-     * @param addDefaults DOCUMENT ME!
-     * @param ignoreStartWith {@link #ignoreStartWith ignoreStartWith}
+     * @param fileNameTemplate {@link #originalFileName}
+     * @param addDefaults {@link #addDefaults}
+     * @param addTransaction DOCUMENT ME!
+     * @param ignoreStartWith {@link #ignoreStartWith}
      */
     public PgDiffTest(
         final String fileNameTemplate,
         final boolean addDefaults,
+        final boolean addTransaction,
         final boolean ignoreStartWith) {
         super();
         this.fileNameTemplate = fileNameTemplate;
         this.addDefaults = addDefaults;
+        this.addTransaction = addTransaction;
         this.ignoreStartWith = ignoreStartWith;
     }
 
@@ -74,124 +82,128 @@ public class PgDiffTest {
         return Arrays.asList(
                 new Object[][] {
                     // Tests scenario where COLUMN type is modified.
-                    {"modify_column_type", false, false },
+                    {"modify_column_type", false, false, false },
                     // Tests scenario where CLUSTER is added to TABLE.
-                    {"add_cluster", false, false },
+                    {"add_cluster", false, false, false },
                     // Tests scenario where CLUSTER is dropped from TABLE.
-                    {"drop_cluster", false, false },
+                    {"drop_cluster", false, false, false },
                     // Tests scenario where CLUSTER is changed on TABLE.
-                    {"modify_cluster", false, false },
+                    {"modify_cluster", false, false, false },
                     // Tests scenario where WITH OIDS is dropped from TABLE.
-                    {"drop_with_oids", false, false },
+                    {"drop_with_oids", false, false, false },
                     // Tests scenario where INDEX is added.
-                    {"add_index", false, false },
+                    {"add_index", false, false, false },
                     // Tests scenario where INDEX is dropped.
-                    {"drop_index", false, false },
+                    {"drop_index", false, false, false },
                     // Tests scenario where INDEX that TABLE CLUSTER is based
                 // on is dropped.
-                    {"drop_index_with_cluster", false, false },
+                    {"drop_index_with_cluster", false, false, false },
                     // Tests scenario where INDEX definition is modified.
-                    {"modify_index", false, false },
+                    {"modify_index", false, false, false },
                     // Tests scenario where STATISTICS information is added
                 // to COLUMN.
-                    {"add_statistics", false, false },
+                    {"add_statistics", false, false, false },
                     // Tests scenario where STATISTICS information is modified.
-                    {"modify_statistics", false, false },
+                    {"modify_statistics", false, false, false },
                     // Tests scenario where STATISTICS information is dropped.
-                    {"drop_statistics", false, false },
+                    {"drop_statistics", false, false, false },
                     // Tests scenario where DEFAULT value is set on COLUMN.
-                    {"add_default_value", false, false },
+                    {"add_default_value", false, false, false },
                     // Tests scenario where DEFAULT value is modified.
-                    {"modify_default_value", false, false },
+                    {"modify_default_value", false, false, false },
                     // Tests scenario where DEFAULT value is dropped from COLUMN.
-                    {"drop_default_value", false, false },
+                    {"drop_default_value", false, false, false },
                     // Tests scenario where NOT NULL constraint is set
                 // on COLUMN.
-                    {"add_not_null", false, false },
+                    {"add_not_null", false, false, false },
                     // Tests scenario where NOT NULL constraint is dropped
                 // from COLUMN.
-                    {"drop_not_null", false, false },
+                    {"drop_not_null", false, false, false },
                     // Tests scenario where COLUMN is added to TABLE definition.
-                    {"add_column", false, false },
+                    {"add_column", false, false, false },
                     // Tests scenario where COLUMN is dropped from TABLE.
-                    {"drop_column", false, false },
+                    {"drop_column", false, false, false },
                     // Tests scenario where new TABLE is added.
-                    {"add_table", false, false },
+                    {"add_table", false, false, false },
                     // Tests scenario where TABLE is dropped.
-                    {"drop_table", false, false },
+                    {"drop_table", false, false, false },
                     // Tests scenario where TABLE CONSTRAINT is added.
-                    {"add_constraint", false, false },
+                    {"add_constraint", false, false, false },
                     // Tests scenario where TABLE CONSTRAINT is modified.
-                    {"modify_constraint", false, false },
+                    {"modify_constraint", false, false, false },
                     // Tests scenario where TABLE CONSTRAINT is dropped.
-                    {"drop_constraint", false, false },
+                    {"drop_constraint", false, false, false },
                     // Tests scenario where UNIQUE TABLE CONSTRAINT is added.
-                    {"add_unique_constraint", false, true },
+                    {"add_unique_constraint", false, false, true },
                     // Tests reading of TABLE with INHERITS.
-                    {"read_inherits", false, false },
+                    {"read_inherits", false, false, false },
                     // Tests scenario where TABLE with INHERITS is added.
-                    {"add_inherits", false, false },
+                    {"add_inherits", false, false, false },
                     // Tests scenario where original and new TABLE contain
                 //different INHERITS.
-                    {"modify_inherits", false, false },
+                    {"modify_inherits", false, false, false },
                     // Tests scenario where SEQUENCE is added.
-                    {"add_sequence", false, false },
+                    {"add_sequence", false, false, false },
                     // Tests scenario where SEQUENCE is dropped.
-                    {"drop_sequence", false, false },
+                    {"drop_sequence", false, false, false },
                     // Tests scenario where INCREMENT BY is modified on SEQUENCE.
-                    {"modify_sequence_increment", false, false },
+                    {"modify_sequence_increment", false, false, false },
                     // Tests scenario where START WITH is modified on SEQUENCE
                 // (both with --ignore-start-with turned off and on).
-                    {"modify_sequence_start_ignore_off", false, false },
-                    { "modify_sequence_start_ignore_on", false, true },
+                    {"modify_sequence_start_ignore_off", false, false, false },
+                    { "modify_sequence_start_ignore_on", false, false, true },
                     // Tests scenario where MINVALUE is modified on SEQUENCE
                 // (both setting and unsetting the value).
-                    {"modify_sequence_minvalue_set", false, false },
-                    { "modify_sequence_minvalue_unset", false, false },
+                    {"modify_sequence_minvalue_set", false, false, false },
+                    { "modify_sequence_minvalue_unset", false, false, false },
                     // Tests scenario where MAXVALUE is modified on SEQUENCE
                 // (both setting and unsetting the value).
-                    {"modify_sequence_maxvalue_set", false, false },
-                    { "modify_sequence_maxvalue_unset", false, false },
+                    {"modify_sequence_maxvalue_set", false, false, false },
+                    { "modify_sequence_maxvalue_unset", false, false, false },
                     // Tests scenario where CACHE is modified on SEQUENCE.
-                    {"modify_sequence_cache", false, false },
+                    {"modify_sequence_cache", false, false, false },
                     // Tests scenario where CYCLE is modified on SEQUENCE.
-                    {"modify_sequence_cycle_on", false, false },
-                    { "modify_sequence_cycle_off", false, false },
+                    {"modify_sequence_cycle_on", false, false, false },
+                    { "modify_sequence_cycle_off", false, false, false },
                     // Tests scenario where new FUNCTION without args is added.
-                    {"add_function_noargs", false, false },
+                    {"add_function_noargs", false, false, false },
                     // Tests scenario where FUNCTION without args is dropped.
-                    {"drop_function_noargs", false, false },
+                    {"drop_function_noargs", false, false, false },
                     // Tests scenario where FUNCTION without args is modified.
-                    {"modify_function_noargs", false, false },
+                    {"modify_function_noargs", false, false, false },
                     // Tests scenario where new FUNCTION with args is added.
-                    {"add_function_args", false, false },
+                    {"add_function_args", false, false, false },
                     // Tests scenario where FUNCTION with args is dropped.
-                    {"drop_function_args", false, false },
+                    {"drop_function_args", false, false, false },
                     // Tests scenario where FUNCTION with args is modified.
-                    {"modify_function_args", false, false },
+                    {"modify_function_args", false, false, false },
                     // Tests scenario where new FUNCTION with args is added.
-                    {"add_function_args2", false, false },
+                    {"add_function_args2", false, false, false },
                     // Tests scenario where FUNCTION with args is dropped.
-                    {"drop_function_args2", false, false },
+                    {"drop_function_args2", false, false, false },
                     // Tests scenario where FUNCTION with args is modified.
-                    {"modify_function_args2", false, false },
+                    {"modify_function_args2", false, false, false },
                     // Tests scenario where FUNCTION with same name but
                 // different args is added.
-                    {"add_function_similar", false, false },
+                    {"add_function_similar", false, false, false },
                     // Tests scenario where FUNCTION with same name but
                 // different args is dropped.
-                    {"drop_function_similar", false, false },
+                    {"drop_function_similar", false, false, false },
                     // Tests scenario where FUNCTION with same name but
                 // different args is modified.
-                    {"modify_function_similar", false, false },
+                    {"modify_function_similar", false, false, false },
                     // Tests scenario where TRIGGER is added.
-                    {"add_trigger", false, false },
+                    {"add_trigger", false, false, false },
                     // Tests scenario where TRIGGER is dropped.
-                    {"drop_trigger", false, false },
+                    {"drop_trigger", false, false, false },
                     // Tests scenario where TRIGGER is modified.
-                    {"modify_trigger", false, false },
+                    {"modify_trigger", false, false, false },
                     // Tests scenario where --add-defaults is specified.
-                    {"add_defaults", true, false }
+                    {"add_defaults", true, false, false },
+                    // Tests scenario where multiple schemas are in the dumps.
+                    {"multiple_schemas", false, false, false },
+                    // Tests scenario where --add-transaction is specified.
+                    {"multiple_schemas", false, true, false }
                 });
     }
 

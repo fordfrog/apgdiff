@@ -3,7 +3,7 @@
  */
 package cz.startnet.utils.pgdiff.parsers;
 
-import cz.startnet.utils.pgdiff.schema.PgSchema;
+import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgSequence;
 
 import java.util.regex.Matcher;
@@ -93,13 +93,13 @@ public class CreateSequenceParser {
     /**
      * Parses CREATE SEQUENCE command.
      *
-     * @param schema schema to be filled
+     * @param database database
      * @param command CREATE SEQUENCE command
      *
      * @throws ParserException Thrown if problem occured while parsing the
      *         command.
      */
-    public static void parse(final PgSchema schema, final String command) {
+    public static void parse(final PgDatabase database, final String command) {
         String line = command;
         final Matcher matcher = PATTERN_SEQUENCE_NAME.matcher(line);
         final String sequenceName;
@@ -116,8 +116,10 @@ public class CreateSequenceParser {
                     ParserException.CANNOT_PARSE_COMMAND + line);
         }
 
-        final PgSequence sequence = new PgSequence(sequenceName);
-        schema.addSequence(sequence);
+        final PgSequence sequence =
+            new PgSequence(ParserUtils.getObjectName(sequenceName));
+        database.getSchema(ParserUtils.getSchemaName(sequenceName, database)).addSequence(
+                sequence);
         line = ParserUtils.removeLastSemicolon(line);
         line = processMaxValue(sequence, line);
         line = processMinValue(sequence, line);

@@ -44,7 +44,13 @@ public class PgDiffConstraints {
         final PgSchema newSchema,
         final boolean primaryKey) {
         for (PgTable newTable : newSchema.getTables()) {
-            final PgTable oldTable = oldSchema.getTable(newTable.getName());
+            final PgTable oldTable;
+
+            if (oldSchema == null) {
+                oldTable = null;
+            } else {
+                oldTable = oldSchema.getTable(newTable.getName());
+            }
 
             // Drop constraints that no more exist or are modified
             for (PgConstraint constraint : getDropConstraints(

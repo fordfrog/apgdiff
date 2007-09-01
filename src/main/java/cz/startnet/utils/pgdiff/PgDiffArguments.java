@@ -16,28 +16,33 @@ public class PgDiffArguments {
     /**
      * Path to the new dump file.
      */
-    private String newDumpFile = null;
+    private String newDumpFile;
 
     /**
      * Path to the original dump file.
      */
-    private String oldDumpFile = null;
+    private String oldDumpFile;
 
     /**
      * Whether DEFAULT ... should be added in case new column has NOT
      * NULL constraint. The default value is dropped later.
      */
-    private boolean addDefaults = false;
+    private boolean addDefaults;
+
+    /**
+     * Whether to enclose all commands in transaction.
+     */
+    private boolean addTransaction;
 
     /**
      * Whether to ignore START WITH on SEQUENCEs.
      */
-    private boolean ignoreStartWith = false;
+    private boolean ignoreStartWith;
 
     /**
      * Whether to quote names when creating the diff SQL commands.
      */
-    private boolean quoteNames = false;
+    private boolean quoteNames;
 
     /**
      * Setter for {@link #addDefaults}.
@@ -55,6 +60,24 @@ public class PgDiffArguments {
      */
     public boolean isAddDefaults() {
         return addDefaults;
+    }
+
+    /**
+     * Setter for {@link #addTransaction}.
+     *
+     * @param addTransaction {@link #addTransaction}
+     */
+    public void setAddTransaction(final boolean addTransaction) {
+        this.addTransaction = addTransaction;
+    }
+
+    /**
+     * Getter for {@link #addTransaction}.
+     *
+     * @return {@link #addTransaction}
+     */
+    public boolean isAddTransaction() {
+        return addTransaction;
     }
 
     /**
@@ -148,6 +171,8 @@ public class PgDiffArguments {
             for (int i = 0; i < (args.length - 2); i++) {
                 if ("--add-defaults".equals(args[i])) {
                     setAddDefaults(true);
+                } else if ("--add-transaction".equals(args[i])) {
+                    setAddTransaction(true);
                 } else if ("--ignore-start-with".equals(args[i])) {
                     setIgnoreStartWith(true);
                 } else if ("--quote-names".equals(args[i])) {
@@ -181,6 +206,8 @@ public class PgDiffArguments {
         writer.println("--add-defaults: adds DEFAULT ... in case new column");
         writer.println("     NOT NULL constraint but no default value");
         writer.println("     (the default value is dropped later)");
+        writer.println("--add-transaction: adds START TRANSACTION and COMMIT");
+        writer.println("     TRANSACTION to the generated diff file");
         writer.println("--ignore-start-with: ignores START WITH modifications");
         writer.println("     on SEQUENCEs (default is not to ignore these");
         writer.println("     changes)");

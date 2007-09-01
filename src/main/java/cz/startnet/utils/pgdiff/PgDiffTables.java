@@ -44,9 +44,22 @@ public class PgDiffTables {
         final PgSchema oldSchema,
         final PgSchema newSchema) {
         for (PgTable newTable : newSchema.getTables()) {
-            final PgTable oldTable = oldSchema.getTable(newTable.getName());
-            final String oldCluster =
-                (oldTable == null) ? null : oldTable.getClusterIndexName();
+            final PgTable oldTable;
+
+            if (oldSchema == null) {
+                oldTable = null;
+            } else {
+                oldTable = oldSchema.getTable(newTable.getName());
+            }
+
+            final String oldCluster;
+
+            if (oldTable == null) {
+                oldCluster = null;
+            } else {
+                oldCluster = oldTable.getClusterIndexName();
+            }
+
             final String newCluster = newTable.getClusterIndexName();
 
             if (
@@ -97,7 +110,9 @@ public class PgDiffTables {
         createTables(writer, arguments, oldSchema, newSchema);
 
         for (PgTable newTable : newSchema.getTables()) {
-            if (!oldSchema.containsTable(newTable.getName())) {
+            if (
+                (oldSchema == null)
+                    || !oldSchema.containsTable(newTable.getName())) {
                 continue;
             }
 
@@ -400,7 +415,9 @@ public class PgDiffTables {
         final PgSchema oldSchema,
         final PgSchema newSchema) {
         for (PgTable table : newSchema.getTables()) {
-            if (!oldSchema.containsTable(table.getName())) {
+            if (
+                (oldSchema == null)
+                    || !oldSchema.containsTable(table.getName())) {
                 writer.println();
                 writer.println(table.getCreationSQL(arguments.isQuoteNames()));
             }
@@ -420,10 +437,12 @@ public class PgDiffTables {
         final PgDiffArguments arguments,
         final PgSchema oldSchema,
         final PgSchema newSchema) {
-        for (PgTable table : oldSchema.getTables()) {
-            if (!newSchema.containsTable(table.getName())) {
-                writer.println();
-                writer.println(table.getDropSQL(arguments.isQuoteNames()));
+        if (oldSchema != null) {
+            for (PgTable table : oldSchema.getTables()) {
+                if (!newSchema.containsTable(table.getName())) {
+                    writer.println();
+                    writer.println(table.getDropSQL(arguments.isQuoteNames()));
+                }
             }
         }
     }

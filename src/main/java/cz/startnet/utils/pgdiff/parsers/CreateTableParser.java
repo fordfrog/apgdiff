@@ -5,7 +5,7 @@ package cz.startnet.utils.pgdiff.parsers;
 
 import cz.startnet.utils.pgdiff.schema.PgColumn;
 import cz.startnet.utils.pgdiff.schema.PgConstraint;
-import cz.startnet.utils.pgdiff.schema.PgSchema;
+import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgTable;
 
 import java.util.regex.Matcher;
@@ -72,12 +72,12 @@ public class CreateTableParser {
     /**
      * Parses CREATE TABLE command.
      *
-     * @param schema schema to be filled
+     * @param database database
      * @param command CREATE TABLE command
      *
      * @throws ParserException Thrown if problem occured while parsing DDL.
      */
-    public static void parse(final PgSchema schema, final String command) {
+    public static void parse(final PgDatabase database, final String command) {
         String line = command;
         final Matcher matcher = PATTERN_TABLE_NAME.matcher(line);
         final String tableName;
@@ -94,8 +94,9 @@ public class CreateTableParser {
                     ParserException.CANNOT_PARSE_COMMAND + line);
         }
 
-        final PgTable table = new PgTable(tableName);
-        schema.addTable(table);
+        final PgTable table = new PgTable(ParserUtils.getObjectName(tableName));
+        database.getSchema(ParserUtils.getSchemaName(tableName, database)).addTable(
+                table);
         parseRows(table, ParserUtils.removeLastSemicolon(line));
     }
 

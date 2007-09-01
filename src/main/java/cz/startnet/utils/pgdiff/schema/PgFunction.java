@@ -27,17 +27,17 @@ public class PgFunction {
      * Declaration of the function. Contains function name and
      * arguments.
      */
-    private String declaration = null;
+    private String declaration;
 
     /**
      * Whole definition of the function.
      */
-    private String definition = null;
+    private String definition;
 
     /**
      * Name of the function including argument types.
      */
-    private String name = null;
+    private String name;
 
     /**
      * Returns creation SQL of the function.
@@ -58,36 +58,36 @@ public class PgFunction {
     }
 
     /**
-     * Setter for {@link #declaration declaration}.
+     * Setter for {@link #declaration}.
      *
-     * @param declaration {@link #declaration declaration}
+     * @param declaration {@link #declaration}
      */
     public void setDeclaration(final String declaration) {
         this.declaration = declaration;
     }
 
     /**
-     * Getter for {@link #declaration declaration}.
+     * Getter for {@link #declaration}.
      *
-     * @return {@link #declaration declaration}
+     * @return {@link #declaration}
      */
     public String getDeclaration() {
         return declaration;
     }
 
     /**
-     * Setter for {@link #definition definition}.
+     * Setter for {@link #definition}.
      *
-     * @param definition {@link #definition definition}
+     * @param definition {@link #definition}
      */
     public void setDefinition(final String definition) {
         this.definition = definition;
     }
 
     /**
-     * Getter for {@link #definition definition}.
+     * Getter for {@link #definition}.
      *
-     * @return {@link #definition definition}
+     * @return {@link #definition}
      */
     public String getDefinition() {
         return definition;
@@ -103,18 +103,18 @@ public class PgFunction {
     }
 
     /**
-     * Setter for {@link #name name}.
+     * Setter for {@link #name}.
      *
-     * @param name {@link #name name}
+     * @param name {@link #name}
      */
     public void setName(final String name) {
         this.name = name;
     }
 
     /**
-     * Getter for {@link #name name}.
+     * Getter for {@link #name}.
      *
-     * @return {@link #name name}
+     * @return {@link #name}
      */
     public String getName() {
         return name;

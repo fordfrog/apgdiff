@@ -16,24 +16,25 @@ public class PgIndex {
     /**
      * Definition of the index.
      */
-    private String definition = null;
+    private String definition;
 
     /**
      * Name of the index.
      */
-    private String name = null;
+    private String name;
 
     /**
      * Table name the index is defined on.
      */
-    private String tableName = null;
+    private String tableName;
 
     /**
      * Creates a new PgIndex object.
      *
-     * @param name name of the index
+     * @param name {@link #name}
      */
     public PgIndex(final String name) {
+        super();
         this.name = name;
     }
 
@@ -58,18 +59,18 @@ public class PgIndex {
     }
 
     /**
-     * Setter for {@link #definition definition}.
+     * Setter for {@link #definition}.
      *
-     * @param definition {@link #definition definition}
+     * @param definition {@link #definition}
      */
     public void setDefinition(final String definition) {
         this.definition = definition;
     }
 
     /**
-     * Getter for {@link #definition definition}.
+     * Getter for {@link #definition}.
      *
-     * @return {@link #definition definition}
+     * @return {@link #definition}
      */
     public String getDefinition() {
         return definition;
@@ -88,36 +89,36 @@ public class PgIndex {
     }
 
     /**
-     * Setter for {@link #name name}.
+     * Setter for {@link #name}.
      *
-     * @param name {@link #name name}
+     * @param name {@link #name}
      */
     public void setName(final String name) {
         this.name = name;
     }
 
     /**
-     * Getter for {@link #name name}.
+     * Getter for {@link #name}.
      *
-     * @return {@link #name name}
+     * @return {@link #name}
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Setter for {@link #tableName tableName}.
+     * Setter for {@link #tableName}.
      *
-     * @param tableName {@link #tableName tableName}
+     * @param tableName {@link #tableName}
      */
     public void setTableName(final String tableName) {
         this.tableName = tableName;
     }
 
     /**
-     * Getter for {@link #tableName tableName}.
+     * Getter for {@link #tableName}.
      *
-     * @return {@link #tableName tableName}
+     * @return {@link #tableName}
      */
     public String getTableName() {
         return tableName;

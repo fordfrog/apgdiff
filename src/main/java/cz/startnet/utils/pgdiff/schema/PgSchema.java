@@ -3,6 +3,8 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
+import cz.startnet.utils.pgdiff.PgDiffUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +32,67 @@ public class PgSchema {
     private final List<PgTable> tables = new ArrayList<PgTable>();
 
     /**
+     * Name of the schema.
+     */
+    private final String name;
+
+    /**
+     * Schema authorization.
+     */
+    private String authorization;
+
+    /**
+     * Creates a new PgSchema object.
+     *
+     * @param name {@link #name}
+     */
+    public PgSchema(final String name) {
+        super();
+        this.name = name;
+    }
+
+    /**
+     * Setter for {@link #authorization}.
+     *
+     * @param authorization {@link #authorization}
+     */
+    public void setAuthorization(final String authorization) {
+        this.authorization = authorization;
+    }
+
+    /**
+     * Getter for {@link #authorization}.
+     *
+     * @return {@link #authorization}
+     */
+    public String getAuthorization() {
+        return authorization;
+    }
+
+    /**
+     * Creates and returns SQL for creation of the schema.
+     *
+     * @param quoteNames whether names should be quoted
+     *
+     * @return created SQL
+     */
+    public String getCreationSQL(final boolean quoteNames) {
+        final StringBuilder sbSQL = new StringBuilder();
+        sbSQL.append("CREATE SCHEMA ");
+        sbSQL.append(PgDiffUtils.getQuotedName(getName(), quoteNames));
+
+        if (getAuthorization() != null) {
+            sbSQL.append(" AUTHORIOZATION ");
+            sbSQL.append(
+                    PgDiffUtils.getQuotedName(getAuthorization(), quoteNames));
+        }
+
+        sbSQL.append(';');
+
+        return sbSQL.toString();
+    }
+
+    /**
      * Finds function according to specified function
      * <code>declaration</code>.
      *
@@ -52,12 +115,21 @@ public class PgSchema {
     }
 
     /**
-     * Getter for {@link #functions functions}.
+     * Getter for {@link #functions}.
      *
-     * @return {@link #functions functions}
+     * @return {@link #functions}
      */
     public List<PgFunction> getFunctions() {
         return functions;
+    }
+
+    /**
+     * Getter for {@link #name}.
+     *
+     * @return {@link #name}
+     */
+    public String getName() {
+        return name;
     }
 
     /**
@@ -83,9 +155,9 @@ public class PgSchema {
     }
 
     /**
-     * Getter for {@link #sequences sequences}.
+     * Getter for {@link #sequences}.
      *
-     * @return {@link #sequences sequences}
+     * @return {@link #sequences}
      */
     public List<PgSequence> getSequences() {
         return sequences;
@@ -113,9 +185,9 @@ public class PgSchema {
     }
 
     /**
-     * Getter for {@link #tables tables}.
+     * Getter for {@link #tables}.
      *
-     * @return {@link #tables tables}
+     * @return {@link #tables}
      */
     public List<PgTable> getTables() {
         return tables;

@@ -37,16 +37,21 @@ public class PgDiffSequences {
         final PgSchema oldSchema,
         final PgSchema newSchema) {
         // Drop sequences that do not exist in new schema
-        for (PgSequence sequence : oldSchema.getSequences()) {
-            if (!newSchema.containsSequence(sequence.getName())) {
-                writer.println();
-                writer.println(sequence.getDropSQL(arguments.isQuoteNames()));
+        if (oldSchema != null) {
+            for (PgSequence sequence : oldSchema.getSequences()) {
+                if (!newSchema.containsSequence(sequence.getName())) {
+                    writer.println();
+                    writer.println(
+                            sequence.getDropSQL(arguments.isQuoteNames()));
+                }
             }
         }
 
         // Add new sequences
         for (PgSequence sequence : newSchema.getSequences()) {
-            if (!oldSchema.containsSequence(sequence.getName())) {
+            if (
+                (oldSchema == null)
+                    || !oldSchema.containsSequence(sequence.getName())) {
                 writer.println();
                 writer.println(
                         sequence.getCreationSQL(arguments.isQuoteNames()));
@@ -73,7 +78,9 @@ public class PgDiffSequences {
         final StringBuilder sbSQL = new StringBuilder();
 
         for (final PgSequence newSequence : newSchema.getSequences()) {
-            if (oldSchema.containsSequence(newSequence.getName())) {
+            if (
+                (oldSchema != null)
+                    && oldSchema.containsSequence(newSequence.getName())) {
                 final PgSequence oldSequence =
                     oldSchema.getSequence(newSequence.getName());
                 sbSQL.setLength(0);

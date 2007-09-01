@@ -3,8 +3,8 @@
  */
 package cz.startnet.utils.pgdiff.parsers;
 
+import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgFunction;
-import cz.startnet.utils.pgdiff.schema.PgSchema;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,13 +48,13 @@ public class CreateFunctionParser {
     /**
      * Parses CREATE FUNCTION and CREATE OR REPLACE FUNCTION command.
      *
-     * @param schema schema to be filled
+     * @param database database
      * @param command CREATE FUNCTION command
      *
      * @throws ParserException Thrown if problem occured while parsing the
      *         command.
      */
-    public static void parse(final PgSchema schema, final String command) {
+    public static void parse(final PgDatabase database, final String command) {
         final Matcher matcher = PATTERN.matcher(command.trim());
 
         if (matcher.matches()) {
@@ -64,8 +64,10 @@ public class CreateFunctionParser {
             function.setDeclaration(
                     getFunctionDeclaration(functionName, arguments));
             function.setDefinition(command);
-            function.setName(functionName);
-            schema.addFunction(function);
+            function.setName(ParserUtils.getObjectName(functionName));
+            database.getSchema(
+                    ParserUtils.getSchemaName(functionName, database))
+                    .addFunction(function);
         } else {
             throw new ParserException(
                     ParserException.CANNOT_PARSE_COMMAND + command);

@@ -6,10 +6,11 @@ package cz.startnet.utils.pgdiff.loader;
 import cz.startnet.utils.pgdiff.parsers.AlterTableParser;
 import cz.startnet.utils.pgdiff.parsers.CreateFunctionParser;
 import cz.startnet.utils.pgdiff.parsers.CreateIndexParser;
+import cz.startnet.utils.pgdiff.parsers.CreateSchemaParser;
 import cz.startnet.utils.pgdiff.parsers.CreateSequenceParser;
 import cz.startnet.utils.pgdiff.parsers.CreateTableParser;
 import cz.startnet.utils.pgdiff.parsers.CreateTriggerParser;
-import cz.startnet.utils.pgdiff.schema.PgSchema;
+import cz.startnet.utils.pgdiff.schema.PgDatabase;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -30,6 +31,22 @@ import java.util.regex.Pattern;
  * @version $Id$
  */
 public class PgDumpLoader { //NOPMD
+
+    /**
+     * Pattern for testing whether command is CREATE SCHEMA command.
+     */
+    private static final Pattern PATTERN_CREATE_SCHEMA =
+        Pattern.compile(
+                "^CREATE[\\s]+SCHEMA[\\s]+.*$",
+                Pattern.CASE_INSENSITIVE);
+
+    /**
+     * Pattern for parsing default schema (search_path).
+     */
+    private static final Pattern PATTERN_DEFAULT_SCHEMA =
+        Pattern.compile(
+                "^SET[\\s]+search_path[\\s]*=[\\s]*([^,\\s]+)(?:,[\\s]+.*)?;$",
+                Pattern.CASE_INSENSITIVE);
 
     /**
      * Pattern for testing whether command is CREATE TABLE command.
@@ -131,20 +148,20 @@ public class PgDumpLoader { //NOPMD
     }
 
     /**
-     * Loads schema from dump file.
+     * Loads database schema from dump file.
      *
      * @param inputStream input stream that should be read
      *
-     * @return schema from dump fle
+     * @return database schema from dump fle
      *
      * @throws UnsupportedOperationException Thrown if unsupported encoding has
      *         been encountered.
      * @throws FileException Thrown if problem occured while reading input
      *         stream.
      */
-    public static PgSchema loadSchema(final InputStream inputStream) { //NOPMD
+    public static PgDatabase loadDatabaseSchema(final InputStream inputStream) { //NOPMD
 
-        final PgSchema schema = new PgSchema();
+        final PgDatabase database = new PgDatabase();
         BufferedReader reader = null;
 
         try {
@@ -165,29 +182,38 @@ public class PgDumpLoader { //NOPMD
                     line = reader.readLine();
 
                     continue;
+                } else if (PATTERN_CREATE_SCHEMA.matcher(line).matches()) {
+                    CreateSchemaParser.parse(
+                            database,
+                            getWholeCommand(reader, line));
+                } else if (PATTERN_DEFAULT_SCHEMA.matcher(line).matches()) {
+                    final Matcher matcher =
+                        PATTERN_DEFAULT_SCHEMA.matcher(line);
+                    matcher.matches();
+                    database.setDefaultSchema(matcher.group(1));
                 } else if (PATTERN_CREATE_TABLE.matcher(line).matches()) {
                     CreateTableParser.parse(
-                            schema,
+                            database,
                             getWholeCommand(reader, line));
                 } else if (PATTERN_ALTER_TABLE.matcher(line).matches()) {
                     AlterTableParser.parse(
-                            schema,
+                            database,
                             getWholeCommand(reader, line));
                 } else if (PATTERN_CREATE_SEQUENCE.matcher(line).matches()) {
                     CreateSequenceParser.parse(
-                            schema,
+                            database,
                             getWholeCommand(reader, line));
                 } else if (PATTERN_CREATE_INDEX.matcher(line).matches()) {
                     CreateIndexParser.parse(
-                            schema,
+                            database,
                             getWholeCommand(reader, line));
                 } else if (PATTERN_CREATE_TRIGGER.matcher(line).matches()) {
                     CreateTriggerParser.parse(
-                            schema,
+                            database,
                             getWholeCommand(reader, line));
                 } else if (PATTERN_CREATE_FUNCTION.matcher(line).matches()) {
                     CreateFunctionParser.parse(
-                            schema,
+                            database,
                             getWholeFunction(reader, line));
                 } else if (
                     PATTERN_SET.matcher(line).matches()
@@ -205,21 +231,21 @@ public class PgDumpLoader { //NOPMD
             throw new FileException(FileException.CANNOT_READ_FILE, ex);
         }
 
-        return schema;
+        return database;
     }
 
     /**
-     * Loads schema from dump file.
+     * Loads database schema from dump file.
      *
      * @param file name of file containing the dump
      *
-     * @return schema from dump file
+     * @return database schema from dump file
      *
      * @throws FileException Thrown if file not found.
      */
-    public static PgSchema loadSchema(final String file) {
+    public static PgDatabase loadDatabaseSchema(final String file) {
         try {
-            return loadSchema(new FileInputStream(file));
+            return loadDatabaseSchema(new FileInputStream(file));
         } catch (FileNotFoundException ex) {
             throw new FileException("File '" + file + "' not found", ex);
         }
@@ -269,7 +295,7 @@ public class PgDumpLoader { //NOPMD
      *
      * @throws FileException Thrown if problem occured while reading string
      *         from<code>reader</code>.
-     * @throws RuntimeException DOCUMENT ME!
+     * @throws RuntimeException Thrown if cannot find end of function.
      */
     private static String getWholeFunction(
         final BufferedReader reader,

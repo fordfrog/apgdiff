@@ -16,17 +16,17 @@ public class PgTrigger {
     /**
      * Function name and arguments that should be fired on the trigger.
      */
-    private String function = null;
+    private String function;
 
     /**
      * Name of the trigger.
      */
-    private String name = null;
+    private String name;
 
     /**
      * Name of the table the trigger is defined on.
      */
-    private String tableName = null;
+    private String tableName;
 
     /**
      * Whether the trigger should be fired BEFORE or AFTER action.
@@ -38,36 +38,36 @@ public class PgTrigger {
      * Whether the trigger should be fired FOR EACH ROW or FOR EACH
      * STATEMENT. Default is FOR EACH STATEMENT.
      */
-    private boolean forEachRow = false;
+    private boolean forEachRow;
 
     /**
      * Whether the trigger should be fired on DELETE.
      */
-    private boolean onDelete = false;
+    private boolean onDelete;
 
     /**
      * Whether the trigger should be fired on INSERT.
      */
-    private boolean onInsert = false;
+    private boolean onInsert;
 
     /**
      * Whether the trigger should be fired on UPDATE.
      */
-    private boolean onUpdate = false;
+    private boolean onUpdate;
 
     /**
-     * Setter for {@link #before before}.
+     * Setter for {@link #before}.
      *
-     * @param before {@link #before before}
+     * @param before {@link #before}
      */
     public void setBefore(final boolean before) {
         this.before = before;
     }
 
     /**
-     * Getter for {@link #before before}.
+     * Getter for {@link #before}.
      *
-     * @return {@link #before before}
+     * @return {@link #before}
      */
     public boolean isBefore() {
         return before;
@@ -137,126 +137,126 @@ public class PgTrigger {
     }
 
     /**
-     * Setter for {@link #forEachRow forEachRow}.
+     * Setter for {@link #forEachRow}.
      *
-     * @param forEachRow {@link #forEachRow forEachRow}
+     * @param forEachRow {@link #forEachRow}
      */
     public void setForEachRow(final boolean forEachRow) {
         this.forEachRow = forEachRow;
     }
 
     /**
-     * Getter for {@link #forEachRow forEachRow}.
+     * Getter for {@link #forEachRow}.
      *
-     * @return {@link #forEachRow forEachRow}
+     * @return {@link #forEachRow}
      */
     public boolean isForEachRow() {
         return forEachRow;
     }
 
     /**
-     * Setter for {@link #function function}.
+     * Setter for {@link #function}.
      *
-     * @param function {@link #function function}
+     * @param function {@link #function}
      */
     public void setFunction(final String function) {
         this.function = function;
     }
 
     /**
-     * Getter for {@link #function function}.
+     * Getter for {@link #function}.
      *
-     * @return {@link #function function}
+     * @return {@link #function}
      */
     public String getFunction() {
         return function;
     }
 
     /**
-     * Setter for {@link #name name}.
+     * Setter for {@link #name}.
      *
-     * @param name {@link #name name}
+     * @param name {@link #name}
      */
     public void setName(final String name) {
         this.name = name;
     }
 
     /**
-     * Getter for {@link #name name}.
+     * Getter for {@link #name}.
      *
-     * @return {@link #name name}
+     * @return {@link #name}
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Setter for {@link #onDelete onDelete}.
+     * Setter for {@link #onDelete}.
      *
-     * @param onDelete {@link #onDelete onDelete}
+     * @param onDelete {@link #onDelete}
      */
     public void setOnDelete(final boolean onDelete) {
         this.onDelete = onDelete;
     }
 
     /**
-     * Getter for {@link #onDelete onDelete}.
+     * Getter for {@link #onDelete}.
      *
-     * @return {@link #onDelete onDelete}
+     * @return {@link #onDelete}
      */
     public boolean isOnDelete() {
         return onDelete;
     }
 
     /**
-     * Setter for {@link #onInsert onInsert}.
+     * Setter for {@link #onInsert}.
      *
-     * @param onInsert {@link #onInsert onInsert}
+     * @param onInsert {@link #onInsert}
      */
     public void setOnInsert(final boolean onInsert) {
         this.onInsert = onInsert;
     }
 
     /**
-     * Getter for {@link #onInsert onInsert}.
+     * Getter for {@link #onInsert}.
      *
-     * @return {@link #onInsert onInsert}
+     * @return {@link #onInsert}
      */
     public boolean isOnInsert() {
         return onInsert;
     }
 
     /**
-     * Setter for {@link #onUpdate onUpdate}.
+     * Setter for {@link #onUpdate}.
      *
-     * @param onUpdate {@link #onUpdate onUpdate}
+     * @param onUpdate {@link #onUpdate}
      */
     public void setOnUpdate(final boolean onUpdate) {
         this.onUpdate = onUpdate;
     }
 
     /**
-     * Getter for {@link #onUpdate onUpdate}.
+     * Getter for {@link #onUpdate}.
      *
-     * @return {@link #onUpdate onUpdate}
+     * @return {@link #onUpdate}
      */
     public boolean isOnUpdate() {
         return onUpdate;
     }
 
     /**
-     * Setter for {@link #tableName tableName}.
+     * Setter for {@link #tableName}.
      *
-     * @param tableName {@link #tableName tableName}
+     * @param tableName {@link #tableName}
      */
     public void setTableName(final String tableName) {
         this.tableName = tableName;
     }
 
     /**
-     * Getter for {@link #tableName tableName}.
+     * Getter for {@link #tableName}.
      *
-     * @return {@link #tableName tableName}
+     * @return {@link #tableName}
      */
     public String getTableName() {
         return tableName;

@@ -35,17 +35,25 @@ public class PgDiffFunctions {
         final PgSchema oldSchema,
         final PgSchema newSchema) {
         // Drop functions that exist no more
-        for (PgFunction oldFunction : oldSchema.getFunctions()) {
-            if (!newSchema.containsFunction(oldFunction.getDeclaration())) {
-                writer.println();
-                writer.println(oldFunction.getDropSQL());
+        if (oldSchema != null) {
+            for (PgFunction oldFunction : oldSchema.getFunctions()) {
+                if (!newSchema.containsFunction(oldFunction.getDeclaration())) {
+                    writer.println();
+                    writer.println(oldFunction.getDropSQL());
+                }
             }
         }
 
         // Add new functions and replace modified functions
         for (PgFunction newFunction : newSchema.getFunctions()) {
-            final PgFunction oldFunction =
-                oldSchema.getFunction(newFunction.getDeclaration());
+            final PgFunction oldFunction;
+
+            if (oldSchema == null) {
+                oldFunction = null;
+            } else {
+                oldFunction = oldSchema.getFunction(
+                            newFunction.getDeclaration());
+            }
 
             if ((oldFunction == null) || !newFunction.equals(oldFunction)) {
                 writer.println();
