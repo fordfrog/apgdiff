@@ -53,15 +53,16 @@
                     modifications of database objects
                 </li>
                 <li>
-                    CREATE TABLE, ALTER TABLE (except ALTER TABLE ... OWNER TO
-                    ...), CREATE SEQUENCE, CREATE INDEX, CREATE (OR REPLACE )FUNCTION
-                    and CREATE TRIGGER commands are supported but some specific
+                    CREATE SCHEMA, CREATE TABLE, ALTER TABLE (except ALTER TABLE ... OWNER TO
+                    ...), CREATE SEQUENCE, CREATE INDEX, CREATE (OR REPLACE )FUNCTION,
+                    CREATE TRIGGER and SET search_path commands are supported but some specific
                     features of the commands may not be implemented yet
                     (see Note below)
                 </li>
                 <li>
-                    Comments, empty lines, SET, COMMENT, SELECT, INSERT INTO,
-                    REVOKE, GRANT and possibly other commands are ignored
+                    Comments, empty lines, SET (except SET search_path), COMMENT,
+                    SELECT, INSERT INTO, REVOKE, GRANT and possibly other
+                    commands are ignored
                 </li>
             </ul>
             <p>
