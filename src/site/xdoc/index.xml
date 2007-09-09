@@ -46,7 +46,7 @@
             <ul>
                 <li>
                     apgdiff looks for differences in definitions of TABLEs,
-                    SEQUENCEs, CONSTRAINTs, INDEXes, FUNCTIONs and TRIGGERs
+                    SEQUENCEs, CONSTRAINTs, INDEXes, VIEWS, FUNCTIONs and TRIGGERs
                 </li>
                 <li>
                     apgdiff creates SQL commands for creations, drops and
@@ -54,8 +54,9 @@
                 </li>
                 <li>
                     CREATE SCHEMA, CREATE TABLE, ALTER TABLE (except ALTER TABLE ... OWNER TO
-                    ...), CREATE SEQUENCE, CREATE INDEX, CREATE (OR REPLACE )FUNCTION,
-                    CREATE TRIGGER and SET search_path commands are supported but some specific
+                    ...), CREATE SEQUENCE, CREATE INDEX, CREATE (OR REPLACE )VIEW,
+                    CREATE (OR REPLACE )FUNCTION, CREATE TRIGGER and
+                    SET search_path commands are supported but some specific
                     features of the commands may not be implemented yet
                     (see Note below)
                 </li>
