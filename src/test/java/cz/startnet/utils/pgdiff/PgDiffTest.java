@@ -57,7 +57,7 @@ public class PgDiffTest {
      *
      * @param fileNameTemplate {@link #originalFileName}
      * @param addDefaults {@link #addDefaults}
-     * @param addTransaction DOCUMENT ME!
+     * @param addTransaction {@link #addTransaction}
      * @param ignoreStartWith {@link #ignoreStartWith}
      */
     public PgDiffTest(
@@ -198,6 +198,12 @@ public class PgDiffTest {
                     {"drop_trigger", false, false, false },
                     // Tests scenario where TRIGGER is modified.
                     {"modify_trigger", false, false, false },
+                    // Tests scenario where VIEW is added.
+                    {"add_view", false, false, false },
+                    // Tests scenario where VIEW is dropped.
+                    {"drop_view", false, false, false },
+                    // Tests scenario where VIEW is modified.
+                    {"modify_view", false, false, false },
                     // Tests scenario where --add-defaults is specified.
                     {"add_defaults", true, false, false },
                     // Tests scenario where multiple schemas are in the dumps.

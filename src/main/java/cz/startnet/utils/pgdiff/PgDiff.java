@@ -167,6 +167,7 @@ public class PgDiff {
             final PgSchema oldSchema =
                 oldDatabase.getSchema(newSchema.getName());
             PgDiffFunctions.diffFunctions(writer, oldSchema, newSchema);
+            PgDiffViews.dropViews(writer, arguments, oldSchema, newSchema);
             PgDiffSequences.diffSequences(
                     writer,
                     arguments,
@@ -192,6 +193,7 @@ public class PgDiff {
                     arguments,
                     oldSchema,
                     newSchema);
+            PgDiffViews.createViews(writer, arguments, oldSchema, newSchema);
         }
     }
 }

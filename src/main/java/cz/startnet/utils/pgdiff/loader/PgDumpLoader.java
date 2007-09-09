@@ -10,6 +10,7 @@ import cz.startnet.utils.pgdiff.parsers.CreateSchemaParser;
 import cz.startnet.utils.pgdiff.parsers.CreateSequenceParser;
 import cz.startnet.utils.pgdiff.parsers.CreateTableParser;
 import cz.startnet.utils.pgdiff.parsers.CreateTriggerParser;
+import cz.startnet.utils.pgdiff.parsers.CreateViewParser;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
 
 import java.io.BufferedReader;
@@ -54,6 +55,14 @@ public class PgDumpLoader { //NOPMD
     private static final Pattern PATTERN_CREATE_TABLE =
         Pattern.compile(
                 "^CREATE[\\s]+TABLE[\\s]+.*$",
+                Pattern.CASE_INSENSITIVE);
+
+    /**
+     * Pattern for testing whether command is CREATE VIEW command.
+     */
+    private static final Pattern PATTERN_CREATE_VIEW =
+        Pattern.compile(
+                "^CREATE[\\s]+(?:OR[\\s]+REPLACE[\\s]+)?VIEW[\\s]+.*$",
                 Pattern.CASE_INSENSITIVE);
 
     /**
@@ -205,6 +214,10 @@ public class PgDumpLoader { //NOPMD
                             getWholeCommand(reader, line));
                 } else if (PATTERN_CREATE_INDEX.matcher(line).matches()) {
                     CreateIndexParser.parse(
+                            database,
+                            getWholeCommand(reader, line));
+                } else if (PATTERN_CREATE_VIEW.matcher(line).matches()) {
+                    CreateViewParser.parse(
                             database,
                             getWholeCommand(reader, line));
                 } else if (PATTERN_CREATE_TRIGGER.matcher(line).matches()) {

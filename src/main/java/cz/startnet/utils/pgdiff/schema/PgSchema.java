@@ -32,6 +32,11 @@ public class PgSchema {
     private final List<PgTable> tables = new ArrayList<PgTable>();
 
     /**
+     * List of views defined in the schema.
+     */
+    private final List<PgView> views = new ArrayList<PgView>();
+
+    /**
      * Name of the schema.
      */
     private final String name;
@@ -194,6 +199,36 @@ public class PgSchema {
     }
 
     /**
+     * Finds view according to specified view <code>name</code>.
+     *
+     * @param name name of the view to be searched
+     *
+     * @return found view or null if no such view has been found
+     */
+    public PgView getView(final String name) {
+        PgView view = null;
+
+        for (PgView curView : views) {
+            if (curView.getName().equals(name)) {
+                view = curView;
+
+                break;
+            }
+        }
+
+        return view;
+    }
+
+    /**
+     * Getter for {@link #views}.
+     *
+     * @return {@link #views}
+     */
+    public List<PgView> getViews() {
+        return views;
+    }
+
+    /**
      * Adds <code>function</code> to the list of functions.
      *
      * @param function function
@@ -218,6 +253,15 @@ public class PgSchema {
      */
     public void addTable(final PgTable table) {
         tables.add(table);
+    }
+
+    /**
+     * Adds <code>view</code> to the list of views.
+     *
+     * @param view view
+     */
+    public void addView(final PgView view) {
+        views.add(view);
     }
 
     /**
@@ -280,6 +324,29 @@ public class PgSchema {
 
         for (PgTable table : tables) {
             if (table.getName().equals(name)) {
+                found = true;
+
+                break;
+            }
+        }
+
+        return found;
+    }
+
+    /**
+     * Returns true if schema contains view with given
+     * <code>name</code>, otherwise false.
+     *
+     * @param name name of the view
+     *
+     * @return true if schema contains view with given <code>name</code>,
+     *         otherwise false.
+     */
+    public boolean containsView(final String name) {
+        boolean found = false;
+
+        for (PgView view : views) {
+            if (view.getName().equals(name)) {
                 found = true;
 
                 break;
