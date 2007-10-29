@@ -1,6 +1,6 @@
 <project name="apgdiff" default="jar" basedir=".">
     <property name="name" value="Another PostgreSQL Diff Tool"/>
-    <property name="version" value="1.0.0_beta27"/>
+    <property name="version" value="1.0.0_beta28"/>
     <property name="build" value="build"/>
     <property name="dist" value="dist"/>
     <property name="build.output" value="${build}/classes"/>
@@ -14,32 +14,39 @@
     <property name="source" value="1.5"/>
     <property name="target" value="1.5"/>
     <property name="main.class" value="cz.startnet.utils.pgdiff.Main"/>
-    
+
     <path id="build.classpath">
         <fileset dir="${lib}">
             <include name="**/*.jar"/>
         </fileset>
     </path>
-    
+
     <target name="init" description="Initializes build environment">
         <tstamp/>
     </target>
-    
+
     <target name="clean" description="Clean the output directory">
         <delete dir="${build}"/>
         <delete dir="${dist}"/>
         <delete dir="${lib}"/>
     </target>
-    
+
     <target name="compile" depends="init,get-deps"
             description="Compile the code">
         <mkdir dir="${build.output}"/>
         <javac destdir="${build.output}" srcdir="${src}" source="${source}"
                target="${target}" debug="true" deprecation="true"
                optimize="false"/>
+        <copy todir="${build.output}">
+            <fileset dir="${src}" excludes="**/*.java"/>
+        </copy>
+     </target>
+
+    <target name="set-buildnumber">
+        <echo file="${build.output}/cz/startnet/utils/pgdiff/build_info">${version}</echo>
     </target>
-    
-    <target name="jar" depends="compile" description="Clean the JAR">
+
+    <target name="jar" depends="compile,set-buildnumber" description="Clean the JAR">
         <mkdir dir="${dist}"/>
         <jar jarfile="${dist}/${build.final.name}.jar" 
              basedir="${build.output}">
@@ -48,7 +55,7 @@
             </manifest>
         </jar>
     </target>
-    
+
     <target name="compile-tests" depends="compile"
             description="Compile the test code">
         <mkdir dir="${test.output}"/>
@@ -64,7 +71,7 @@
             <fileset dir="${test.src}" excludes="**/*.java"/>
         </copy>
     </target>
-    
+
     <target name="test" depends="compile-tests"
             description="Run the test cases">
         <mkdir dir="${test.reports}"/>
@@ -84,14 +91,14 @@
             </batchtest>
         </junit>
     </target>
-    
+
     <target name="get-deps" description="Download all dependencies"
             unless="noget">
         <mkdir dir="${lib}"/>
         <get src="http://www.ibiblio.org/maven/junit/jars/junit-4.2.jar"
              dest="${lib}/junit.jar"/>
     </target>
-    
+
     <target name="javadoc" description="Generates javadoc">
         <delete dir="doc"/>
         <mkdir dir="doc"/>
@@ -101,14 +108,14 @@
                  splitindex="true" windowtitle="${name} ${version}"
                  doctitle="${name} ${version}"/>
     </target>
-    
+
     <target name="distsrc" description="Creates source distribution file">
         <zip destfile="${dist}/${build.final.name}-src.zip">
             <zipfileset prefix="${build.final.name}" dir="."
                 excludes="${build}/**, ${dist}/**, target/**, stats/**, lib/**, nbproject/**"/>
         </zip>
     </target>
-    
+
     <target name="distbin" depends="jar"
         description="Creates binary distribution file">
         <zip destfile="${dist}/${build.final.name}-bin.zip">
@@ -118,5 +125,5 @@
                 fullpath="${build.final.name}/${build.final.name}.jar"/>
         </zip>
     </target>
-    
+
 </project>

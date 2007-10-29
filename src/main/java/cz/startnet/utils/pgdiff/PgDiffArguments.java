@@ -3,6 +3,9 @@
  */
 package cz.startnet.utils.pgdiff;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 
@@ -43,6 +46,11 @@ public class PgDiffArguments {
      * Whether to quote names when creating the diff SQL commands.
      */
     private boolean quoteNames;
+
+    /**
+     * Whether to display apgdiff version.
+     */
+    private boolean version;
 
     /**
      * Setter for {@link #addDefaults}.
@@ -153,6 +161,24 @@ public class PgDiffArguments {
     }
 
     /**
+     * Setter for {@link #version}.
+     *
+     * @param version {@link #version}
+     */
+    public void setVersion(final boolean version) {
+        this.version = version;
+    }
+
+    /**
+     * Getter for {@link #version}.
+     *
+     * @return {@link #version}
+     */
+    public boolean isVersion() {
+        return version;
+    }
+
+    /**
      * Parses command line arguments or outputs instructions.
      *
      * @param writer writer to be used for info output
@@ -163,30 +189,40 @@ public class PgDiffArguments {
      */
     public boolean parse(final PrintWriter writer, final String[] args) {
         boolean success = true;
+        final int argsLength;
 
-        if (args.length < 2) {
-            printUsage(writer);
-            success = false;
+        if (args.length >= 2) {
+            argsLength = args.length - 2;
         } else {
-            for (int i = 0; i < (args.length - 2); i++) {
-                if ("--add-defaults".equals(args[i])) {
-                    setAddDefaults(true);
-                } else if ("--add-transaction".equals(args[i])) {
-                    setAddTransaction(true);
-                } else if ("--ignore-start-with".equals(args[i])) {
-                    setIgnoreStartWith(true);
-                } else if ("--quote-names".equals(args[i])) {
-                    setQuoteNames(true);
-                } else {
-                    writer.println("ERROR: Unknown option: " + args[i]);
-                    success = false;
+            argsLength = args.length;
+        }
 
-                    break;
-                }
+        for (int i = 0; i < argsLength; i++) {
+            if ("--add-defaults".equals(args[i])) {
+                setAddDefaults(true);
+            } else if ("--add-transaction".equals(args[i])) {
+                setAddTransaction(true);
+            } else if ("--ignore-start-with".equals(args[i])) {
+                setIgnoreStartWith(true);
+            } else if ("--quote-names".equals(args[i])) {
+                setQuoteNames(true);
+            } else if ("--version".equals(args[i])) {
+                setVersion(true);
+            } else {
+                writer.println("ERROR: Unknown option: " + args[i]);
+                success = false;
+
+                break;
             }
         }
 
-        if (success) {
+        if ((args.length == 1) && isVersion()) {
+            printVersion(writer);
+            success = false;
+        } else if (args.length < 2) {
+            printUsage(writer);
+            success = false;
+        } else if (success) {
             setOldDumpFile(args[args.length - 2]);
             setNewDumpFile(args[args.length - 1]);
         }
@@ -198,19 +234,65 @@ public class PgDiffArguments {
      * Prints program usage.
      *
      * @param writer writer to print the usage to
+     *
+     * @throws RuntimeException Thrown if problem occured while reading usage
+     *         info.
      */
     private void printUsage(final PrintWriter writer) {
-        writer.println("Usage: apgdiff [options] <old_dump> <new_dump>");
-        writer.println();
-        writer.println("Options:");
-        writer.println("--add-defaults: adds DEFAULT ... in case new column");
-        writer.println("     NOT NULL constraint but no default value");
-        writer.println("     (the default value is dropped later)");
-        writer.println("--add-transaction: adds START TRANSACTION and COMMIT");
-        writer.println("     TRANSACTION to the generated diff file");
-        writer.println("--ignore-start-with: ignores START WITH modifications");
-        writer.println("     on SEQUENCEs (default is not to ignore these");
-        writer.println("     changes)");
-        writer.println("--quote-names: adds quotes to names");
+        final BufferedReader reader =
+            new BufferedReader(
+                    new InputStreamReader(
+                            getClass().getResourceAsStream("usage.txt")));
+
+        try {
+            String line = reader.readLine();
+
+            while (line != null) {
+                writer.println(line);
+                line = reader.readLine();
+            }
+        } catch (final IOException ex) {
+            throw new RuntimeException(
+                    "Problem occured while reading usage file",
+                    ex);
+        } finally {
+            try {
+                reader.close();
+            } catch (final IOException ex) {
+                throw new RuntimeException(
+                        "Problem occured while closing reader",
+                        ex);
+            }
+        }
+    }
+
+    /**
+     * Prints program version.
+     *
+     * @param writer writer to print the usage to
+     *
+     * @throws RuntimeException Thrown if problem occured while reading program
+     *         version.
+     */
+    private void printVersion(final PrintWriter writer) {
+        final BufferedReader reader =
+            new BufferedReader(
+                    new InputStreamReader(
+                            getClass().getResourceAsStream("build_info")));
+        writer.print("Version: ");
+
+        try {
+            writer.println(reader.readLine());
+        } catch (final IOException ex) {
+            throw new RuntimeException("Cannot read program version", ex);
+        } finally {
+            try {
+                reader.close();
+            } catch (final IOException ex) {
+                throw new RuntimeException(
+                        "Problem occured while closing reader",
+                        ex);
+            }
+        }
     }
 }

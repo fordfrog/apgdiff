@@ -1,0 +1,11 @@
+Usage: apgdiff [options] <old_dump> <new_dump>
+
+Options:
+--version:           displays apgdiff version
+--add-defaults:      adds DEFAULT ... in case new column NOT NULL constraint but
+                     no default value (the default value is dropped later)"
+--add-transaction:   adds START TRANSACTION and COMMIT TRANSACTION
+                     to the generated diff file
+--ignore-start-with: ignores START WITH modifications on SEQUENCEs (default is
+                     not to ignore these changes)
+--quote-names:       adds quotes to names
