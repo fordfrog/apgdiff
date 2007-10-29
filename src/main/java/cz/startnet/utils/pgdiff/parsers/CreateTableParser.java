@@ -6,6 +6,7 @@ package cz.startnet.utils.pgdiff.parsers;
 import cz.startnet.utils.pgdiff.schema.PgColumn;
 import cz.startnet.utils.pgdiff.schema.PgConstraint;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
+import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
 
 import java.util.regex.Matcher;
@@ -76,6 +77,7 @@ public class CreateTableParser {
      * @param command CREATE TABLE command
      *
      * @throws ParserException Thrown if problem occured while parsing DDL.
+     * @throws RuntimeException DOCUMENT ME!
      */
     public static void parse(final PgDatabase database, final String command) {
         String line = command;
@@ -95,8 +97,18 @@ public class CreateTableParser {
         }
 
         final PgTable table = new PgTable(ParserUtils.getObjectName(tableName));
-        database.getSchema(ParserUtils.getSchemaName(tableName, database)).addTable(
-                table);
+        final String schemaName =
+            ParserUtils.getSchemaName(tableName, database);
+        final PgSchema schema = database.getSchema(schemaName);
+
+        if (schema == null) {
+            throw new RuntimeException(
+                    "Cannot get schema '" + schemaName
+                    + "'. Need to issue 'CREATE SCHEMA " + schemaName
+                    + ";' before 'CREATE TABLE " + tableName + "...;'?");
+        }
+
+        schema.addTable(table);
         parseRows(table, ParserUtils.removeLastSemicolon(line));
     }
 
