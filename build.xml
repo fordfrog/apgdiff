@@ -1,6 +1,6 @@
 <project name="apgdiff" default="jar" basedir=".">
     <property name="name" value="Another PostgreSQL Diff Tool"/>
-    <property name="version" value="1.0.0_beta28"/>
+    <property name="version" value="1.1"/>
     <property name="build" value="build"/>
     <property name="dist" value="dist"/>
     <property name="build.output" value="${build}/classes"/>
@@ -44,13 +44,9 @@
         </copy>
      </target>
 
-    <target name="set-buildnumber">
-        <echo file="${build.output}/cz/startnet/utils/pgdiff/build_info">${version}</echo>
-    </target>
-
-    <target name="jar" depends="compile,set-buildnumber" description="Clean the JAR">
+    <target name="jar" depends="compile" description="Clean the JAR">
         <mkdir dir="${dist}"/>
-        <jar jarfile="${dist}/${build.final.name}.jar" 
+        <jar jarfile="${dist}/${build.final.name}.jar"
              basedir="${build.output}">
             <manifest>
                 <attribute name="Main-Class" value="${main.class}"/>
@@ -104,7 +100,7 @@
     <target name="javadoc" description="Generates javadoc">
         <delete dir="doc"/>
         <mkdir dir="doc"/>
-        <javadoc packagenames="cz.*" sourcepath="${src}" 
+        <javadoc packagenames="cz.*" sourcepath="${src}"
                  destdir="${dist.javadoc}" classpathref="build.classpath"
                  author="true" version="true" private="false" use="true"
                  splitindex="true" windowtitle="${name} ${version}"
