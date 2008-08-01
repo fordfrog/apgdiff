@@ -10,7 +10,6 @@ import cz.startnet.utils.pgdiff.schema.PgSchema;
 import java.io.InputStream;
 import java.io.PrintWriter;
 
-
 /**
  * Creates diff of two database schemas.
  *
@@ -18,6 +17,7 @@ import java.io.PrintWriter;
  * @version $Id$
  */
 public class PgDiff {
+
     /**
      * Creates a new instance of PgDiff.
      */
@@ -35,10 +35,10 @@ public class PgDiff {
         final PrintWriter writer,
         final PgDiffArguments arguments) {
         diffDatabaseSchemas(
-                writer,
-                arguments,
-                PgDumpLoader.loadDatabaseSchema(arguments.getOldDumpFile()),
-                PgDumpLoader.loadDatabaseSchema(arguments.getNewDumpFile()));
+            writer,
+            arguments,
+            PgDumpLoader.loadDatabaseSchema(arguments.getOldDumpFile()),
+            PgDumpLoader.loadDatabaseSchema(arguments.getNewDumpFile()));
     }
 
     /**
@@ -57,10 +57,10 @@ public class PgDiff {
         final InputStream oldInputStream,
         final InputStream newInputStream) {
         diffDatabaseSchemas(
-                writer,
-                arguments,
-                PgDumpLoader.loadDatabaseSchema(oldInputStream),
-                PgDumpLoader.loadDatabaseSchema(newInputStream));
+            writer,
+            arguments,
+            PgDumpLoader.loadDatabaseSchema(oldInputStream),
+            PgDumpLoader.loadDatabaseSchema(newInputStream));
     }
 
     /**
@@ -80,7 +80,7 @@ public class PgDiff {
             if (oldDatabase.getSchema(newSchema.getName()) == null) {
                 writer.println();
                 writer.println(
-                        newSchema.getCreationSQL(arguments.isQuoteNames()));
+                    newSchema.getCreationSQL(arguments.isQuoteNames()));
             }
         }
     }
@@ -129,10 +129,9 @@ public class PgDiff {
             if (newDatabase.getSchema(oldSchema.getName()) == null) {
                 writer.println();
                 writer.println(
-                        "DROP SCHEMA "
-                        + PgDiffUtils.getQuotedName(
-                                oldSchema.getName(),
-                                arguments.isQuoteNames()) + " CASCADE;");
+                    "DROP SCHEMA " + PgDiffUtils.getQuotedName(
+                    oldSchema.getName(),
+                    arguments.isQuoteNames()) + " CASCADE;");
             }
         }
     }
@@ -151,48 +150,48 @@ public class PgDiff {
         final PgDatabase oldDatabase,
         final PgDatabase newDatabase) {
         final boolean setSearchPath =
-            (newDatabase.getSchemas().size() > 1)
-            || !newDatabase.getSchemas().get(0).getName().equals("public");
+            (newDatabase.getSchemas().size() > 1) || !newDatabase.getSchemas().
+            get(0).getName().equals("public");
 
         for (PgSchema newSchema : newDatabase.getSchemas()) {
             if (setSearchPath) {
                 writer.println();
                 writer.println(
-                        "SET search_path = "
-                        + PgDiffUtils.getQuotedName(
-                                newSchema.getName(),
-                                arguments.isQuoteNames()) + ", pg_catalog;");
+                    "SET search_path = " + PgDiffUtils.getQuotedName(
+                    newSchema.getName(),
+                    arguments.isQuoteNames()) + ", pg_catalog;");
             }
 
             final PgSchema oldSchema =
                 oldDatabase.getSchema(newSchema.getName());
-            PgDiffFunctions.diffFunctions(writer, oldSchema, newSchema);
+            PgDiffFunctions.diffFunctions(writer, arguments, oldSchema,
+                newSchema);
             PgDiffViews.dropViews(writer, arguments, oldSchema, newSchema);
             PgDiffSequences.diffSequences(
-                    writer,
-                    arguments,
-                    oldSchema,
-                    newSchema);
+                writer,
+                arguments,
+                oldSchema,
+                newSchema);
             PgDiffTables.diffTables(writer, arguments, oldSchema, newSchema);
             PgDiffConstraints.diffConstraints(
-                    writer,
-                    arguments,
-                    oldSchema,
-                    newSchema,
-                    true);
+                writer,
+                arguments,
+                oldSchema,
+                newSchema,
+                true);
             PgDiffConstraints.diffConstraints(
-                    writer,
-                    arguments,
-                    oldSchema,
-                    newSchema,
-                    false);
+                writer,
+                arguments,
+                oldSchema,
+                newSchema,
+                false);
             PgDiffIndexes.diffIndexes(writer, arguments, oldSchema, newSchema);
             PgDiffTables.diffClusters(writer, arguments, oldSchema, newSchema);
             PgDiffTriggers.diffTriggers(
-                    writer,
-                    arguments,
-                    oldSchema,
-                    newSchema);
+                writer,
+                arguments,
+                oldSchema,
+                newSchema);
             PgDiffViews.createViews(writer, arguments, oldSchema, newSchema);
         }
     }

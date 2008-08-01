@@ -44,6 +44,12 @@
                 <role>Initial help with support of FUNCTIONs</role>
             </roles>
         </contributor>
+        <contributor>
+            <name>Anders Semb Hermansen </name>
+            <roles>
+                <role>Ignoring multiple whitespace while comparing content of functions </role>
+            </roles>
+        </contributor>
     </contributors>
     <licenses>
         <license>

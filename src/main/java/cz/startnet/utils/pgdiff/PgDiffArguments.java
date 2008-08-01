@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
-
 /**
  * Contains parsed command line arguments.
  *
@@ -16,37 +15,36 @@ import java.io.PrintWriter;
  * @version $Id$
  */
 public class PgDiffArguments {
+
     /**
      * Path to the new dump file.
      */
     private String newDumpFile;
-
     /**
      * Path to the original dump file.
      */
     private String oldDumpFile;
-
     /**
      * Whether DEFAULT ... should be added in case new column has NOT
      * NULL constraint. The default value is dropped later.
      */
     private boolean addDefaults;
-
     /**
      * Whether to enclose all commands in transaction.
      */
     private boolean addTransaction;
-
+    /**
+     * Whether to ignore whitespace while comparing content of functions.
+     */
+    private boolean ignoreFunctionWhitespace;
     /**
      * Whether to ignore START WITH on SEQUENCEs.
      */
     private boolean ignoreStartWith;
-
     /**
      * Whether to quote names when creating the diff SQL commands.
      */
     private boolean quoteNames;
-
     /**
      * Whether to display apgdiff version.
      */
@@ -86,6 +84,25 @@ public class PgDiffArguments {
      */
     public boolean isAddTransaction() {
         return addTransaction;
+    }
+
+    /**
+     * Setter for {@link #ignoreFunctionWhitespace}.
+     *
+     * @param ignoreStartWith {@link #ignoreFunctionWhitespace}
+     */
+    public void setIgnoreFunctionWhitespace(
+        final boolean ignoreFunctionWhitespace) {
+        this.ignoreFunctionWhitespace = ignoreFunctionWhitespace;
+    }
+
+    /**
+     * Getter for {@link #ignoreFunctionWhitespace}.
+     *
+     * @return {@link #ignoreFunctionWhitespace}
+     */
+    public boolean isIgnoreFunctionWhitespace() {
+        return ignoreFunctionWhitespace;
     }
 
     /**
@@ -202,6 +219,8 @@ public class PgDiffArguments {
                 setAddDefaults(true);
             } else if ("--add-transaction".equals(args[i])) {
                 setAddTransaction(true);
+            } else if ("--ignore-function-whitespace".equals(args[i])) {
+                setIgnoreFunctionWhitespace(true);
             } else if ("--ignore-start-with".equals(args[i])) {
                 setIgnoreStartWith(true);
             } else if ("--quote-names".equals(args[i])) {
@@ -241,8 +260,8 @@ public class PgDiffArguments {
     private void printUsage(final PrintWriter writer) {
         final BufferedReader reader =
             new BufferedReader(
-                    new InputStreamReader(
-                            getClass().getResourceAsStream("usage.txt")));
+            new InputStreamReader(
+            getClass().getResourceAsStream("usage.txt")));
 
         try {
             String line = reader.readLine();
@@ -253,15 +272,15 @@ public class PgDiffArguments {
             }
         } catch (final IOException ex) {
             throw new RuntimeException(
-                    "Problem occured while reading usage file",
-                    ex);
+                "Problem occured while reading usage file",
+                ex);
         } finally {
             try {
                 reader.close();
             } catch (final IOException ex) {
                 throw new RuntimeException(
-                        "Problem occured while closing reader",
-                        ex);
+                    "Problem occured while closing reader",
+                    ex);
             }
         }
     }
@@ -277,8 +296,8 @@ public class PgDiffArguments {
     private void printVersion(final PrintWriter writer) {
         final BufferedReader reader =
             new BufferedReader(
-                    new InputStreamReader(
-                            getClass().getResourceAsStream("build_info")));
+            new InputStreamReader(
+            getClass().getResourceAsStream("build_info")));
         writer.print("Version: ");
 
         try {
@@ -290,8 +309,8 @@ public class PgDiffArguments {
                 reader.close();
             } catch (final IOException ex) {
                 throw new RuntimeException(
-                        "Problem occured while closing reader",
-                        ex);
+                    "Problem occured while closing reader",
+                    ex);
             }
         }
     }

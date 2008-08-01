@@ -6,7 +6,6 @@ package cz.startnet.utils.pgdiff.schema;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
  * Stores function information.
  *
@@ -14,26 +13,24 @@ import java.util.regex.Pattern;
  * @version $Id$
  */
 public class PgFunction {
+
     /**
      * Pattern for checking whether function definition contains CREATE
      * OR REPLACE FUNCTION string.
      */
     private static final Pattern PATTERN_CREATE_FUNCTION =
         Pattern.compile(
-                "(?:CREATE[\\s]+FUNCTION)([\\s]+.*)",
-                Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-
+        "(?:CREATE[\\s]+FUNCTION)([\\s]+.*)",
+        Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /**
      * Declaration of the function. Contains function name and
      * arguments.
      */
     private String declaration;
-
     /**
      * Whole definition of the function.
      */
     private String definition;
-
     /**
      * Name of the function including argument types.
      */
@@ -129,16 +126,42 @@ public class PgFunction {
      */
     @Override
     public boolean equals(final Object object) {
+        return equals(object, false);
+    }
+
+    /**
+     * Compares two objects whether they are equal. If both objects are of the
+     * same class but they equal just in whitespace in {@link #definition},
+     * they are considered being equal.
+     *
+     * @param object object to be compared
+     * @param ignoreFunctionWhitespace whether multiple whitespaces in function
+     * {@link #definition} should be ignored
+     *
+     * @return {@inheritDoc}
+     */
+    public boolean equals(final Object object,
+        final boolean ignoreFunctionWhitespace) {
         boolean equals = false;
 
         if (this == object) {
             equals = true;
         } else if (object instanceof PgFunction) {
             final PgFunction function = (PgFunction) object;
+            final String thisDefinition;
+            final String thatDefinition;
+
+            if (ignoreFunctionWhitespace) {
+                thisDefinition = getDefinition().replaceAll("\\s+", " ");
+                thatDefinition =
+                    function.getDefinition().replaceAll("\\s+", " ");
+            } else {
+                thisDefinition = getDefinition();
+                thatDefinition = function.getDefinition();
+            }
             equals =
-                declaration.equals(function.declaration)
-                && getDefinition().equals(function.getDefinition())
-                && name.equals(function.name);
+                declaration.equals(function.declaration) && thisDefinition.
+                equals(thatDefinition) && name.equals(function.name);
         }
 
         return equals;
@@ -151,7 +174,7 @@ public class PgFunction {
      */
     @Override
     public int hashCode() {
-        return (getClass().getName() + "|" + declaration + "|"
-        + getDefinition() + "|" + name).hashCode();
+        return (getClass().getName() + "|" + declaration + "|" + getDefinition() +
+            "|" + name).hashCode();
     }
 }

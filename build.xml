@@ -10,6 +10,7 @@
     <property name="test.reports" value="${build}/test-reports"/>
     <property name="test.output" value="${build}/test-classes"/>
     <property name="src" value="src/main/java"/>
+    <property name="src.resources" value="src/main/resources"/>
     <property name="test.src" value="src/test/java"/>
     <property name="test.resources.src" value="src/test/resources"/>
     <property name="source" value="1.5"/>
@@ -39,7 +40,7 @@
                target="${target}" debug="true" deprecation="true"
                optimize="false"/>
         <copy todir="${build.output}">
-            <fileset dir="${src}" excludes="**/*.java"/>
+            <fileset dir="${src.resources}"/>
         </copy>
      </target>
 
@@ -69,7 +70,7 @@
             </classpath>
         </javac>
         <copy todir="${test.output}">
-            <fileset dir="${test.resources.src}" excludes="**/*.java"/>
+            <fileset dir="${test.resources.src}"/>
         </copy>
     </target>
 
