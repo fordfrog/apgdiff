@@ -49,7 +49,8 @@ public class PgDumpLoaderTest {
                     { 2 },
                     { 3 },
                     { 4 },
-                    { 5 }
+                    { 5 },
+                    { 6 }
                 });
     }
 
@@ -59,7 +60,6 @@ public class PgDumpLoaderTest {
     @Test(timeout = 1000)
     public void loadSchema() {
         PgDumpLoader.loadDatabaseSchema(
-                this.getClass()
-                    .getResourceAsStream("schema_" + fileIndex + ".sql"));
+                getClass().getResourceAsStream("schema_" + fileIndex + ".sql"));
     }
 }

@@ -11,6 +11,7 @@
     <property name="test.output" value="${build}/test-classes"/>
     <property name="src" value="src/main/java"/>
     <property name="test.src" value="src/test/java"/>
+    <property name="test.resources.src" value="src/test/resources"/>
     <property name="source" value="1.5"/>
     <property name="target" value="1.5"/>
     <property name="main.class" value="cz.startnet.utils.pgdiff.Main"/>
@@ -68,7 +69,7 @@
             </classpath>
         </javac>
         <copy todir="${test.output}">
-            <fileset dir="${test.src}" excludes="**/*.java"/>
+            <fileset dir="${test.resources.src}" excludes="**/*.java"/>
         </copy>
     </target>
 
