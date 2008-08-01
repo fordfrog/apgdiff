@@ -13,7 +13,6 @@ import org.junit.runners.Parameterized.Parameters;
 import java.util.Arrays;
 import java.util.Collection;
 
-
 /**
  * Tests for PgDiffLoader class.
  *
@@ -22,6 +21,7 @@ import java.util.Collection;
  */
 @RunWith(value = Parameterized.class)
 public class PgDumpLoaderTest {
+
     /**
      * Index of the file that should be tested.
      */
@@ -44,14 +44,14 @@ public class PgDumpLoaderTest {
     @Parameters
     public static Collection parameters() {
         return Arrays.asList(
-                new Object[][] {
-                    { 1 },
-                    { 2 },
-                    { 3 },
-                    { 4 },
-                    { 5 },
-                    { 6 }
-                });
+            new Object[][]{
+                {1},
+                {2},
+                {3},
+                {4},
+                {5},
+                {6}
+            });
     }
 
     /**
@@ -60,6 +60,7 @@ public class PgDumpLoaderTest {
     @Test(timeout = 1000)
     public void loadSchema() {
         PgDumpLoader.loadDatabaseSchema(
-                getClass().getResourceAsStream("schema_" + fileIndex + ".sql"));
+            getClass().getResourceAsStream("schema_" + fileIndex + ".sql"),
+            "UTF-8");
     }
 }

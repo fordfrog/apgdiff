@@ -17,6 +17,10 @@ import java.io.PrintWriter;
 public class PgDiffArguments {
 
     /**
+     * Input file charset name.
+     */
+    private String inCharsetName = "UTF-8";
+    /**
      * Path to the new dump file.
      */
     private String newDumpFile;
@@ -24,6 +28,10 @@ public class PgDiffArguments {
      * Path to the original dump file.
      */
     private String oldDumpFile;
+    /**
+     * Output file charset name.
+     */
+    private String outCharsetName = "UTF-8";
     /**
      * Whether DEFAULT ... should be added in case new column has NOT
      * NULL constraint. The default value is dropped later.
@@ -223,6 +231,12 @@ public class PgDiffArguments {
                 setIgnoreFunctionWhitespace(true);
             } else if ("--ignore-start-with".equals(args[i])) {
                 setIgnoreStartWith(true);
+            } else if ("--in-charset-name".equals(args[i])) {
+                setInCharsetName(args[i + 1]);
+                i++;
+            } else if ("--out-charset-name".equals(args[i])) {
+                setOutCharsetName(args[i + 1]);
+                i++;
             } else if ("--quote-names".equals(args[i])) {
                 setQuoteNames(true);
             } else if ("--version".equals(args[i])) {
@@ -313,5 +327,41 @@ public class PgDiffArguments {
                     ex);
             }
         }
+    }
+
+    /**
+     * Getter for {@link #inCharsetName}.
+     *
+     * @return {@link #inCharsetName}
+     */
+    public String getInCharsetName() {
+        return inCharsetName;
+    }
+
+    /**
+     * Setter for {@link #inCharsetName}.
+     *
+     * @param inCharsetName {@link #inCharsetName}
+     */
+    public void setInCharsetName(final String inCharsetName) {
+        this.inCharsetName = inCharsetName;
+    }
+
+    /**
+     * Getter for {@link #outCharsetName}.
+     *
+     * @return {@link #outCharsetName}
+     */
+    public String getOutCharsetName() {
+        return outCharsetName;
+    }
+
+    /**
+     * Setter for {@link #outCharsetName}.
+     *
+     * @param outCharsetName {@link #outCharsetName}
+     */
+    public void setOutCharsetName(final String outCharsetName) {
+        this.outCharsetName = outCharsetName;
     }
 }

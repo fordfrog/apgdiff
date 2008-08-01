@@ -12,4 +12,8 @@ Options:
                               if you know what you are doing
 --ignore-start-with:          ignores START WITH modifications on SEQUENCEs (default is
                               not to ignore these changes)
+--in-charset-name <charset>:  charset that should be used for reading input files (standard
+                              charset name supported by Java)
+--out-charset-name <charset>: charset that should be used for writing output (standard
+                              charset name supported by Java)
 --quote-names:                adds quotes to names

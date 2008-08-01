@@ -37,8 +37,10 @@ public class PgDiff {
         diffDatabaseSchemas(
             writer,
             arguments,
-            PgDumpLoader.loadDatabaseSchema(arguments.getOldDumpFile()),
-            PgDumpLoader.loadDatabaseSchema(arguments.getNewDumpFile()));
+            PgDumpLoader.loadDatabaseSchema(arguments.getOldDumpFile(),
+            arguments.getInCharsetName()),
+            PgDumpLoader.loadDatabaseSchema(arguments.getNewDumpFile(),
+            arguments.getInCharsetName()));
     }
 
     /**
@@ -59,8 +61,10 @@ public class PgDiff {
         diffDatabaseSchemas(
             writer,
             arguments,
-            PgDumpLoader.loadDatabaseSchema(oldInputStream),
-            PgDumpLoader.loadDatabaseSchema(newInputStream));
+            PgDumpLoader.loadDatabaseSchema(oldInputStream, arguments.
+            getInCharsetName()),
+            PgDumpLoader.loadDatabaseSchema(newInputStream, arguments.
+            getInCharsetName()));
     }
 
     /**
