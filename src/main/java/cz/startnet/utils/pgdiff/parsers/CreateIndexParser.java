@@ -10,7 +10,6 @@ import cz.startnet.utils.pgdiff.schema.PgTable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
  * Parses CREATE INDEX commands.
  *
@@ -18,14 +17,15 @@ import java.util.regex.Pattern;
  * @version $Id$
  */
 public class CreateIndexParser {
+
     /**
      * Pattern for parsing CREATE INDEX definition.
      */
     private static final Pattern PATTERN =
         Pattern.compile(
-                "CREATE[\\s]+INDEX[\\s]+\"?([^\\s\"]+)\"?[\\s]+"
-                + "ON[\\s]+\"?([^\\s\"(]+)\"?[\\s]*([^;]+)[;]?",
-                Pattern.CASE_INSENSITIVE);
+        "CREATE[\\s](UNIQUE[\\s]+)?+INDEX[\\s]+\"?([^\\s\"]+)\"?[\\s]+" +
+        "ON[\\s]+\"?([^\\s\"(]+)\"?[\\s]*([^;]+)[;]?",
+        Pattern.CASE_INSENSITIVE);
 
     /**
      * Creates a new instance of CreateIndexParser.
@@ -47,26 +47,28 @@ public class CreateIndexParser {
         final Matcher matcher = PATTERN.matcher(command.trim());
 
         if (matcher.matches()) {
-            final String indexName = matcher.group(1);
-            final String tableName = matcher.group(2);
-            final String def = matcher.group(3);
+            final boolean unique = matcher.group(1) != null;
+            final String indexName = matcher.group(2);
+            final String tableName = matcher.group(3);
+            final String def = matcher.group(4);
 
             if ((indexName == null) || (tableName == null) || (def == null)) {
                 throw new ParserException(
-                        ParserException.CANNOT_PARSE_COMMAND + command);
+                    ParserException.CANNOT_PARSE_COMMAND + command);
             }
 
             final PgTable table =
                 database.getSchema(
-                        ParserUtils.getSchemaName(tableName.trim(), database)).getTable(
-                        tableName.trim());
+                ParserUtils.getSchemaName(tableName.trim(), database)).getTable(
+                tableName.trim());
             final PgIndex index = new PgIndex(indexName);
             table.addIndex(index);
             index.setDefinition(def.trim());
             index.setTableName(table.getName());
+            index.setUnique(unique);
         } else {
             throw new ParserException(
-                    ParserException.CANNOT_PARSE_COMMAND + command);
+                ParserException.CANNOT_PARSE_COMMAND + command);
         }
     }
 }

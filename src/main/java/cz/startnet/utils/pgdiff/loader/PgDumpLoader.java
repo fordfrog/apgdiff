@@ -77,7 +77,7 @@ public class PgDumpLoader { //NOPMD
      */
     private static final Pattern PATTERN_CREATE_INDEX =
         Pattern.compile(
-        "^CREATE[\\s]+INDEX[\\s]+.*$",
+        "^CREATE[\\s]+(?:UNIQUE[\\s]+)?INDEX[\\s]+.*$",
         Pattern.CASE_INSENSITIVE);
     /**
      * Pattern for testing whether command is SET command.

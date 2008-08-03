@@ -5,7 +5,6 @@ package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
 
-
 /**
  * Stores table index information.
  *
@@ -13,20 +12,23 @@ import cz.startnet.utils.pgdiff.PgDiffUtils;
  * @version $Id$
  */
 public class PgIndex {
+
     /**
      * Definition of the index.
      */
     private String definition;
-
     /**
      * Name of the index.
      */
     private String name;
-
     /**
      * Table name the index is defined on.
      */
     private String tableName;
+    /**
+     * Whether the index is unique.
+     */
+    private boolean unique;
 
     /**
      * Creates a new PgIndex object.
@@ -47,7 +49,13 @@ public class PgIndex {
      */
     public String getCreationSQL(final boolean quoteNames) {
         final StringBuilder sbSQL = new StringBuilder();
-        sbSQL.append("CREATE INDEX ");
+        sbSQL.append("CREATE ");
+
+        if (isUnique()) {
+            sbSQL.append("UNIQUE ");
+        }
+
+        sbSQL.append("INDEX ");
         sbSQL.append(PgDiffUtils.getQuotedName(getName(), quoteNames));
         sbSQL.append(" ON ");
         sbSQL.append(PgDiffUtils.getQuotedName(getTableName(), quoteNames));
@@ -84,8 +92,8 @@ public class PgIndex {
      * @return created SQL command
      */
     public String getDropSQL(final boolean quoteNames) {
-        return "DROP INDEX " + PgDiffUtils.getQuotedName(getName(), quoteNames)
-        + ";";
+        return "DROP INDEX " + PgDiffUtils.getQuotedName(getName(), quoteNames) +
+            ";";
     }
 
     /**
@@ -140,8 +148,8 @@ public class PgIndex {
         } else if (object instanceof PgIndex) {
             final PgIndex index = (PgIndex) object;
             equals =
-                definition.equals(index.definition) && name.equals(index.name)
-                && tableName.equals(index.tableName);
+                definition.equals(index.definition) && name.equals(index.name) &&
+                tableName.equals(index.tableName) && unique == index.unique;
         }
 
         return equals;
@@ -154,7 +162,25 @@ public class PgIndex {
      */
     @Override
     public int hashCode() {
-        return (getClass().getName() + "|" + definition + "|" + name + "|"
-        + tableName).hashCode();
+        return (getClass().getName() + "|" + definition + "|" + name + "|" +
+            tableName + "|" + unique).hashCode();
+    }
+
+    /**
+     * Getter for {@link #unique}.
+     *
+     * @return {@link #unique}
+     */
+    public boolean isUnique() {
+        return unique;
+    }
+
+    /**
+     * Setter for {@link #unique}.
+     *
+     * @param unique {@link #unique}
+     */
+    public void setUnique(final boolean unique) {
+        this.unique = unique;
     }
 }

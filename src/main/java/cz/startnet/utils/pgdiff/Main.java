@@ -41,6 +41,9 @@ public class Main {
                 new PrintWriter(new OutputStreamWriter(System.out, arguments.
                 getOutCharsetName()));
             PgDiff.createDiff(encodedWriter, arguments);
+            encodedWriter.close();
         }
+
+        writer.close();
     }
 }
