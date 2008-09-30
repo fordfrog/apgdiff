@@ -12,7 +12,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Diffs indexes.
  *
@@ -20,6 +19,7 @@ import java.util.List;
  * @version $Id$
  */
 public class PgDiffIndexes {
+
     /**
      * Creates a new instance of PgDiffIndexes.
      */
@@ -36,10 +36,10 @@ public class PgDiffIndexes {
      * @param newSchema new schema
      */
     public static void diffIndexes(
-        final PrintWriter writer,
-        final PgDiffArguments arguments,
-        final PgSchema oldSchema,
-        final PgSchema newSchema) {
+            final PrintWriter writer,
+            final PgDiffArguments arguments,
+            final PgSchema oldSchema,
+            final PgSchema newSchema) {
         for (PgTable newTable : newSchema.getTables()) {
             final String newTableName = newTable.getName();
             final PgTable oldTable;
@@ -57,10 +57,16 @@ public class PgDiffIndexes {
             }
 
             // Add new indexes
-            if (oldSchema != null) {
+            if (oldSchema == null) {
+                for (PgIndex index : newTable.getIndexes()) {
+                    writer.println();
+                    writer.println(
+                            index.getCreationSQL(arguments.isQuoteNames()));
+                }
+            } else {
                 for (PgIndex index : getNewIndexes(
-                            oldSchema.getTable(newTableName),
-                            newTable)) {
+                        oldSchema.getTable(newTableName),
+                        newTable)) {
                     writer.println();
                     writer.println(
                             index.getCreationSQL(arguments.isQuoteNames()));
@@ -81,15 +87,14 @@ public class PgDiffIndexes {
      *       to drop because they are already removed.
      */
     private static List<PgIndex> getDropIndexes(
-        final PgTable oldTable,
-        final PgTable newTable) {
+            final PgTable oldTable,
+            final PgTable newTable) {
         final List<PgIndex> list = new ArrayList<PgIndex>();
 
         if ((newTable != null) && (oldTable != null)) {
             for (final PgIndex index : oldTable.getIndexes()) {
-                if (
-                    !newTable.containsIndex(index.getName())
-                        || !newTable.getIndex(index.getName()).equals(index)) {
+                if (!newTable.containsIndex(index.getName()) || !newTable.
+                        getIndex(index.getName()).equals(index)) {
                     list.add(index);
                 }
             }
@@ -107,8 +112,8 @@ public class PgDiffIndexes {
      * @return list of indexes that should be added
      */
     private static List<PgIndex> getNewIndexes(
-        final PgTable oldTable,
-        final PgTable newTable) {
+            final PgTable oldTable,
+            final PgTable newTable) {
         final List<PgIndex> list = new ArrayList<PgIndex>();
 
         if (newTable != null) {
@@ -118,10 +123,9 @@ public class PgDiffIndexes {
                 }
             } else {
                 for (final PgIndex index : newTable.getIndexes()) {
-                    if (
-                        !oldTable.containsIndex(index.getName())
-                            || !oldTable.getIndex(index.getName()).equals(
-                                    index)) {
+                    if (!oldTable.containsIndex(index.getName()) || !oldTable.
+                            getIndex(index.getName()).equals(
+                            index)) {
                         list.add(index);
                     }
                 }

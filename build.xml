@@ -93,8 +93,10 @@
     <target name="get-deps" description="Download all dependencies"
             unless="noget">
         <mkdir dir="${lib}"/>
-        <get src="http://www.ibiblio.org/maven/junit/jars/junit-4.2.jar"
+        <get src="http://www.ibiblio.org/maven/junit/jars/junit-4.4.jar"
              dest="${lib}/junit.jar"/>
+	<get src="http://www.ibiblio.org/maven/org.hamcrest/jars/hamcrest-all-1.0.jar"
+	     dest="${lib}/hamcrest-all.jar"/>
     </target>
 
     <target name="javadoc" description="Generates javadoc">

@@ -108,11 +108,11 @@ public class PgSequence {
 
         sbSQL.append("\n\t");
 
-        if (maxValue == null) {
+        if (minValue == null) {
             sbSQL.append("NO MINVALUE");
         } else {
             sbSQL.append("MINVALUE ");
-            sbSQL.append(maxValue);
+            sbSQL.append(minValue);
         }
 
         if (cache != null) {

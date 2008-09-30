@@ -87,7 +87,7 @@ public class PgSchema {
         sbSQL.append(PgDiffUtils.getQuotedName(getName(), quoteNames));
 
         if (getAuthorization() != null) {
-            sbSQL.append(" AUTHORIOZATION ");
+            sbSQL.append(" AUTHORIZATION ");
             sbSQL.append(
                     PgDiffUtils.getQuotedName(getAuthorization(), quoteNames));
         }

@@ -23,9 +23,9 @@ public class CreateViewParser {
      */
     private static final Pattern PATTERN =
         Pattern.compile(
-                "CREATE[\\s]+(?:OR[\\s]+REPLACE[\\s+])?VIEW[\\s]+"
+                "CREATE[\\s]+(?:OR[\\s]+REPLACE[\\s]+)?VIEW[\\s]+"
                 + "\"?([^\\s\"]+)\"?[\\s]+(?:\\(([^)]+)\\)[\\s]+)?"
-                + "AS[\\s]+([^;]+)[;]?",
+                + "AS[\\s]+(.+)?(?:;)",
                 Pattern.CASE_INSENSITIVE);
 
     /**

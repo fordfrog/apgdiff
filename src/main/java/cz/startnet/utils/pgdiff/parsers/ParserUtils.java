@@ -51,7 +51,7 @@ public class ParserUtils {
                     bracesCount--;
                 }
             } else if (chr == '\'') {
-                singleQuoteOn ^= singleQuoteOn;
+                singleQuoteOn = !singleQuoteOn;
             } else if ((chr == ',') && !singleQuoteOn && (bracesCount == 0)) {
                 break;
             }
