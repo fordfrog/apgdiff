@@ -60,9 +60,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:svn:https://apgdiff.svn.sourceforge.net/svnroot/apgdiff</connection>
-        <developerConnection>scm:svn:https://apgdiff.svn.sourceforge.net/svnroot/apgdiff</developerConnection>
-        <url>https://apgdiff.svn.sourceforge.net/svnroot/apgdiff</url>
+        <connection>scm:hg:ssh://fordfrog@apgdiff.hg.sourceforge.net/hgroot/apgdiff/apgdiff</connection>
+        <developerConnection>scm:hg:ssh://apgdiff.hg.sourceforge.net/hgroot/apgdiff/apgdiff</developerConnection>
+        <url>http://apgdiff.hg.sourceforge.net/hgweb/apgdiff/</url>
     </scm>
     <organization>
         <name>StartNet s.r.o.</name>
@@ -80,11 +80,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <!--
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-                -->
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-report-plugin</artifactId>
@@ -103,61 +98,6 @@
             </plugin>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <id>netbeans-public</id>
-            <activation>
-                <property>
-                    <name>netbeans.execution</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-jar-plugin</artifactId>
-                        <configuration>
-                            <archive>
-                                <manifest>
-                                    <addClasspath>true</addClasspath>
-                                    <classpathPrefix>lib</classpathPrefix>
-                                    <mainClass>cz.startnet.utils.pgdiff.Main</mainClass>
-                                </manifest>
-                            </archive>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>net.unto.maven.plugins</groupId>
-                        <artifactId>maven-junit4-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>test</phase>
-                                <goals>
-                                    <goal>test</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>nb</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>directory</goal>
-                                </goals>
-                                <configuration>
-                                    <descriptor>${basedir}/src/main/assemblies/netbeans-run.xml</descriptor>
-                                    <finalName>executable</finalName>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
     <pluginRepositories>
         <pluginRepository>
             <releases />
@@ -202,13 +142,13 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.4</version>
+            <version>4.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
-            <version>1.0</version>
+            <version>1.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
