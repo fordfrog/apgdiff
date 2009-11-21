@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff;
 
 import java.io.BufferedReader;
@@ -12,7 +9,6 @@ import java.io.PrintWriter;
  * Contains parsed command line arguments.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class PgDiffArguments {
 
@@ -97,10 +93,10 @@ public class PgDiffArguments {
     /**
      * Setter for {@link #ignoreFunctionWhitespace}.
      *
-     * @param ignoreStartWith {@link #ignoreFunctionWhitespace}
+     * @param ignoreFunctionWhitespace {@link #ignoreFunctionWhitespace}
      */
     public void setIgnoreFunctionWhitespace(
-        final boolean ignoreFunctionWhitespace) {
+            final boolean ignoreFunctionWhitespace) {
         this.ignoreFunctionWhitespace = ignoreFunctionWhitespace;
     }
 
@@ -273,9 +269,9 @@ public class PgDiffArguments {
      */
     private void printUsage(final PrintWriter writer) {
         final BufferedReader reader =
-            new BufferedReader(
-            new InputStreamReader(
-            getClass().getResourceAsStream("usage.txt")));
+                new BufferedReader(
+                new InputStreamReader(
+                getClass().getResourceAsStream("usage.txt")));
 
         try {
             String line = reader.readLine();
@@ -286,15 +282,15 @@ public class PgDiffArguments {
             }
         } catch (final IOException ex) {
             throw new RuntimeException(
-                "Problem occured while reading usage file",
-                ex);
+                    "Problem occured while reading usage file",
+                    ex);
         } finally {
             try {
                 reader.close();
             } catch (final IOException ex) {
                 throw new RuntimeException(
-                    "Problem occured while closing reader",
-                    ex);
+                        "Problem occured while closing reader",
+                        ex);
             }
         }
     }
@@ -309,9 +305,9 @@ public class PgDiffArguments {
      */
     private void printVersion(final PrintWriter writer) {
         final BufferedReader reader =
-            new BufferedReader(
-            new InputStreamReader(
-            getClass().getResourceAsStream("build_info")));
+                new BufferedReader(
+                new InputStreamReader(
+                getClass().getResourceAsStream("build_info")));
         writer.print("Version: ");
 
         try {
@@ -323,8 +319,8 @@ public class PgDiffArguments {
                 reader.close();
             } catch (final IOException ex) {
                 throw new RuntimeException(
-                    "Problem occured while closing reader",
-                    ex);
+                        "Problem occured while closing reader",
+                        ex);
             }
         }
     }

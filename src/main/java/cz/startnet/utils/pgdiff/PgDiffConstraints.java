@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff;
 
 import cz.startnet.utils.pgdiff.schema.PgConstraint;
@@ -12,14 +9,13 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Diffs constraints.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class PgDiffConstraints {
+
     /**
      * Creates a new instance of PgDiffConstraints.
      */
@@ -28,7 +24,7 @@ public class PgDiffConstraints {
     }
 
     /**
-     * Outputs commands for differences in constraints.
+     * Outputs commands for creation of new constraints.
      *
      * @param writer writer the output should be written to
      * @param arguments object containing arguments settings
@@ -37,13 +33,42 @@ public class PgDiffConstraints {
      * @param primaryKey determines whether primery keys should be processed or
      *        any other constraints should be processed
      */
-    public static void diffConstraints(
-        final PrintWriter writer,
-        final PgDiffArguments arguments,
-        final PgSchema oldSchema,
-        final PgSchema newSchema,
-        final boolean primaryKey) {
-        for (PgTable newTable : newSchema.getTables()) {
+    public static void createConstraints(final PrintWriter writer,
+            final PgDiffArguments arguments, final PgSchema oldSchema,
+            final PgSchema newSchema, final boolean primaryKey) {
+        for (final PgTable newTable : newSchema.getTables()) {
+            final PgTable oldTable;
+
+            if (oldSchema == null) {
+                oldTable = null;
+            } else {
+                oldTable = oldSchema.getTable(newTable.getName());
+            }
+
+            // Add new constraints
+            for (final PgConstraint constraint :
+                    getNewConstraints(oldTable, newTable, primaryKey)) {
+                writer.println();
+                writer.println(
+                        constraint.getCreationSQL(arguments.isQuoteNames()));
+            }
+        }
+    }
+
+    /**
+     * Outputs commands for dropping non-existant or modified constraints.
+     *
+     * @param writer writer the output should be written to
+     * @param arguments object containing arguments settings
+     * @param oldSchema original schema
+     * @param newSchema new schema
+     * @param primaryKey determines whether primery keys should be processed or
+     *        any other constraints should be processed
+     */
+    public static void dropConstraints(final PrintWriter writer,
+            final PgDiffArguments arguments, final PgSchema oldSchema,
+            final PgSchema newSchema, final boolean primaryKey) {
+        for (final PgTable newTable : newSchema.getTables()) {
             final PgTable oldTable;
 
             if (oldSchema == null) {
@@ -53,22 +78,10 @@ public class PgDiffConstraints {
             }
 
             // Drop constraints that no more exist or are modified
-            for (PgConstraint constraint : getDropConstraints(
-                        oldTable,
-                        newTable,
-                        primaryKey)) {
+            for (final PgConstraint constraint :
+                    getDropConstraints(oldTable, newTable, primaryKey)) {
                 writer.println();
                 writer.println(constraint.getDropSQL(arguments.isQuoteNames()));
-            }
-
-            // Add new constraints
-            for (PgConstraint constraint : getNewConstraints(
-                        oldTable,
-                        newTable,
-                        primaryKey)) {
-                writer.println();
-                writer.println(
-                        constraint.getCreationSQL(arguments.isQuoteNames()));
             }
         }
     }
@@ -86,19 +99,16 @@ public class PgDiffConstraints {
      * @todo Constraints that are depending on a removed field should not be
      *       added to drop because they are already removed.
      */
-    private static List<PgConstraint> getDropConstraints(
-        final PgTable oldTable,
-        final PgTable newTable,
-        final boolean primaryKey) {
+    private static List<PgConstraint> getDropConstraints(final PgTable oldTable,
+            final PgTable newTable, final boolean primaryKey) {
         final List<PgConstraint> list = new ArrayList<PgConstraint>();
 
         if ((newTable != null) && (oldTable != null)) {
             for (final PgConstraint constraint : oldTable.getConstraints()) {
-                if (
-                    (constraint.isPrimaryKeyConstraint() == primaryKey)
+                if ((constraint.isPrimaryKeyConstraint() == primaryKey)
                         && (!newTable.containsConstraint(constraint.getName())
                         || !newTable.getConstraint(constraint.getName()).equals(
-                                constraint))) {
+                        constraint))) {
                     list.add(constraint);
                 }
             }
@@ -117,27 +127,26 @@ public class PgDiffConstraints {
      *
      * @return list of constraints that should be added
      */
-    private static List<PgConstraint> getNewConstraints(
-        final PgTable oldTable,
-        final PgTable newTable,
-        final boolean primaryKey) {
+    private static List<PgConstraint> getNewConstraints(final PgTable oldTable,
+            final PgTable newTable, final boolean primaryKey) {
         final List<PgConstraint> list = new ArrayList<PgConstraint>();
 
         if (newTable != null) {
             if (oldTable == null) {
-                for (final PgConstraint constraint : newTable.getConstraints()) {
+                for (final PgConstraint constraint :
+                        newTable.getConstraints()) {
                     if (constraint.isPrimaryKeyConstraint() == primaryKey) {
                         list.add(constraint);
                     }
                 }
             } else {
-                for (final PgConstraint constraint : newTable.getConstraints()) {
-                    if (
-                        (constraint.isPrimaryKeyConstraint() == primaryKey)
+                for (final PgConstraint constraint :
+                        newTable.getConstraints()) {
+                    if ((constraint.isPrimaryKeyConstraint() == primaryKey)
                             && (!oldTable.containsConstraint(
-                                    constraint.getName())
-                            || !oldTable.getConstraint(constraint.getName()).equals(
-                                    constraint))) {
+                            constraint.getName())
+                            || !oldTable.getConstraint(constraint.getName()).
+                            equals(constraint))) {
                         list.add(constraint);
                     }
                 }

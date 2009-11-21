@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
@@ -9,7 +6,6 @@ import cz.startnet.utils.pgdiff.PgDiffUtils;
  * Stores table index information.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class PgIndex {
 
@@ -92,8 +88,8 @@ public class PgIndex {
      * @return created SQL command
      */
     public String getDropSQL(final boolean quoteNames) {
-        return "DROP INDEX " + PgDiffUtils.getQuotedName(getName(), quoteNames) +
-            ";";
+        return "DROP INDEX " + PgDiffUtils.getQuotedName(getName(), quoteNames)
+                + ";";
     }
 
     /**
@@ -147,9 +143,10 @@ public class PgIndex {
             equals = true;
         } else if (object instanceof PgIndex) {
             final PgIndex index = (PgIndex) object;
-            equals =
-                definition.equals(index.definition) && name.equals(index.name) &&
-                tableName.equals(index.tableName) && unique == index.unique;
+            equals = definition.equals(index.definition)
+                    && name.equals(index.name)
+                    && tableName.equals(index.tableName)
+                    && unique == index.unique;
         }
 
         return equals;
@@ -162,8 +159,8 @@ public class PgIndex {
      */
     @Override
     public int hashCode() {
-        return (getClass().getName() + "|" + definition + "|" + name + "|" +
-            tableName + "|" + unique).hashCode();
+        return (getClass().getName() + "|" + definition + "|" + name + "|"
+                + tableName + "|" + unique).hashCode();
     }
 
     /**

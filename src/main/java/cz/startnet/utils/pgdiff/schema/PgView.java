@@ -1,28 +1,22 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
-
 
 /**
  * Stores view information.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class PgView {
+
     /**
      * String specifying column names.
      */
     private String columnNames;
-
     /**
      * Name of the view.
      */
     private final String name;
-
     /**
      * SQL query of the view.
      */
@@ -90,7 +84,7 @@ public class PgView {
      */
     public String getDropSQL(final boolean quoteNames) {
         return "DROP VIEW " + PgDiffUtils.getQuotedName(getName(), quoteNames)
-        + ";";
+                + ";";
     }
 
     /**

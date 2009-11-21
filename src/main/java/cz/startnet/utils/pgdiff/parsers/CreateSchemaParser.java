@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff.parsers;
 
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
@@ -9,30 +6,27 @@ import cz.startnet.utils.pgdiff.schema.PgSchema;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
  * Parses CREATE SCHEMA commands.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class CreateSchemaParser {
+
     /**
      * Pattern for parsing CREATE SCHEMA ... AUTHORIZATION ...
      */
-    private static final Pattern PATTERN_CREATE_SCHEMA =
-        Pattern.compile(
-                "^CREATE[\\s]+SCHEMA[\\s]+([^\\s;]+)"
-                + "(?:[\\s]+AUTHORIZATION[\\s]+([^\\s;]+))?;$",
-                Pattern.CASE_INSENSITIVE);
-
+    private static final Pattern PATTERN_CREATE_SCHEMA = Pattern.compile(
+            "^CREATE[\\s]+SCHEMA[\\s]+([^\\s;]+)"
+            + "(?:[\\s]+AUTHORIZATION[\\s]+([^\\s;]+))?;$",
+            Pattern.CASE_INSENSITIVE);
     /**
      * Pattern for parsing CREATE SCHEMA AUTHORIZATION ...
      */
     private static final Pattern PATTERN_CREATE_SCHEMA_AUTHORIZATION =
-        Pattern.compile(
-                "^CREATE[\\s]+SCHEMA[\\s]+AUTHORIZATION[\\s]+([^\\s;]+);$",
-                Pattern.CASE_INSENSITIVE);
+            Pattern.compile(
+            "^CREATE[\\s]+SCHEMA[\\s]+AUTHORIZATION[\\s]+([^\\s;]+);$",
+            Pattern.CASE_INSENSITIVE);
 
     /**
      * Creates a new CreateSchemaParser object.
@@ -64,7 +58,7 @@ public class CreateSchemaParser {
             database.addSchema(schema);
         } else {
             final Matcher matcher2 =
-                PATTERN_CREATE_SCHEMA_AUTHORIZATION.matcher(command);
+                    PATTERN_CREATE_SCHEMA_AUTHORIZATION.matcher(command);
 
             if (matcher2.matches()) {
                 final PgSchema schema = new PgSchema(matcher.group(1));

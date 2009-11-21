@@ -1,48 +1,38 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
-
 
 /**
  * Stores sequence information.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class PgSequence {
+
     /**
      * Value for CACHE or null if no value is specified.
      */
     private String cache;
-
     /**
      * Value for INCREMENT BY or null if no value is specified.
      */
     private String increment;
-
     /**
      * Value for MAXVALUE or null if no value is specified.
      */
     private String maxValue;
-
     /**
      * Value for MINVALUE or null if no value is specified.
      */
     private String minValue;
-
     /**
      * Name of the sequence.
      */
     private String name;
-
     /**
      * Value for START WITH or null if no value is specified.
      */
     private String startWith;
-
     /**
      * True if CYCLE, false if NO CYCLE.
      */
@@ -156,7 +146,7 @@ public class PgSequence {
      */
     public String getDropSQL(final boolean quoteNames) {
         return "DROP SEQUENCE "
-        + PgDiffUtils.getQuotedName(getName(), quoteNames) + ";";
+                + PgDiffUtils.getQuotedName(getName(), quoteNames) + ";";
     }
 
     /**

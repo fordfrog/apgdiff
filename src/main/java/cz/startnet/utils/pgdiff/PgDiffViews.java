@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff;
 
 import cz.startnet.utils.pgdiff.schema.PgSchema;
@@ -8,14 +5,13 @@ import cz.startnet.utils.pgdiff.schema.PgView;
 
 import java.io.PrintWriter;
 
-
 /**
  * Diffs views.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class PgDiffViews {
+
     /**
      * Creates a new instance of PgDiffViews.
      */
@@ -31,18 +27,14 @@ public class PgDiffViews {
      * @param oldSchema original schema
      * @param newSchema new schema
      */
-    public static void createViews(
-        final PrintWriter writer,
-        final PgDiffArguments arguments,
-        final PgSchema oldSchema,
-        final PgSchema newSchema) {
-        for (PgView newView : newSchema.getViews()) {
-            if (
-                (oldSchema == null)
+    public static void createViews(final PrintWriter writer,
+            final PgDiffArguments arguments, final PgSchema oldSchema,
+            final PgSchema newSchema) {
+        for (final PgView newView : newSchema.getViews()) {
+            if (oldSchema == null
                     || !oldSchema.containsView(newView.getName())
                     || isViewModified(
-                            oldSchema.getView(newView.getName()),
-                            newView)) {
+                    oldSchema.getView(newView.getName()), newView)) {
                 writer.println();
                 writer.println(
                         newView.getCreationSQL(arguments.isQuoteNames()));
@@ -58,13 +50,11 @@ public class PgDiffViews {
      * @param oldSchema original schema
      * @param newSchema new schema
      */
-    public static void dropViews(
-        final PrintWriter writer,
-        final PgDiffArguments arguments,
-        final PgSchema oldSchema,
-        final PgSchema newSchema) {
+    public static void dropViews(final PrintWriter writer,
+            final PgDiffArguments arguments, final PgSchema oldSchema,
+            final PgSchema newSchema) {
         if (oldSchema != null) {
-            for (PgView oldView : oldSchema.getViews()) {
+            for (final PgView oldView : oldSchema.getViews()) {
                 final PgView newView = newSchema.getView(oldView.getName());
 
                 if ((newView == null) || isViewModified(oldView, newView)) {
@@ -85,9 +75,8 @@ public class PgDiffViews {
      *
      * @return true if view has been modified, otherwise false
      */
-    private static boolean isViewModified(
-        final PgView oldView,
-        final PgView newView) {
+    private static boolean isViewModified(final PgView oldView,
+            final PgView newView) {
         final String oldViewColumnNames;
 
         if (oldView.getColumnNames() == null) {
@@ -105,6 +94,6 @@ public class PgDiffViews {
         }
 
         return (!oldViewColumnNames.equals(newViewColumnNames)
-        || !oldView.getQuery().equals(newView.getQuery()));
+                || !oldView.getQuery().equals(newView.getQuery()));
     }
 }

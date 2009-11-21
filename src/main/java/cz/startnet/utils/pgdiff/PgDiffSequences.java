@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff;
 
 import cz.startnet.utils.pgdiff.schema.PgSchema;
@@ -8,14 +5,13 @@ import cz.startnet.utils.pgdiff.schema.PgSequence;
 
 import java.io.PrintWriter;
 
-
 /**
  * Diffs sequences.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class PgDiffSequences {
+
     /**
      * Creates a new instance of PgDiffSequences.
      */
@@ -24,21 +20,41 @@ public class PgDiffSequences {
     }
 
     /**
-     * Outputs commands for differences in sequences.
+     * Outputs commands for creation of new sequences.
      *
      * @param writer writer the output should be written to
      * @param arguments object containing arguments settings
      * @param oldSchema original schema
      * @param newSchema new schema
      */
-    public static void diffSequences(
-        final PrintWriter writer,
-        final PgDiffArguments arguments,
-        final PgSchema oldSchema,
-        final PgSchema newSchema) {
+    public static void createSequences(final PrintWriter writer,
+            final PgDiffArguments arguments, final PgSchema oldSchema,
+            final PgSchema newSchema) {
+        // Add new sequences
+        for (final PgSequence sequence : newSchema.getSequences()) {
+            if (oldSchema == null
+                    || !oldSchema.containsSequence(sequence.getName())) {
+                writer.println();
+                writer.println(
+                        sequence.getCreationSQL(arguments.isQuoteNames()));
+            }
+        }
+    }
+
+    /**
+     * Outputs commands for dropping of sequences that do not exist anymore.
+     *
+     * @param writer writer the output should be written to
+     * @param arguments object containing arguments settings
+     * @param oldSchema original schema
+     * @param newSchema new schema
+     */
+    public static void dropSequences(final PrintWriter writer,
+            final PgDiffArguments arguments, final PgSchema oldSchema,
+            final PgSchema newSchema) {
         // Drop sequences that do not exist in new schema
         if (oldSchema != null) {
-            for (PgSequence sequence : oldSchema.getSequences()) {
+            for (final PgSequence sequence : oldSchema.getSequences()) {
                 if (!newSchema.containsSequence(sequence.getName())) {
                     writer.println();
                     writer.println(
@@ -46,50 +62,32 @@ public class PgDiffSequences {
                 }
             }
         }
-
-        // Add new sequences
-        for (PgSequence sequence : newSchema.getSequences()) {
-            if (
-                (oldSchema == null)
-                    || !oldSchema.containsSequence(sequence.getName())) {
-                writer.println();
-                writer.println(
-                        sequence.getCreationSQL(arguments.isQuoteNames()));
-            }
-        }
-
-        // Alter modified sequences
-        addModifiedSequences(writer, arguments, oldSchema, newSchema);
     }
 
     /**
-     * Returns list of modified sequences.
+     * Outputs command for modified sequences.
      *
      * @param writer writer the output should be written to
      * @param arguments object containing arguments settings
      * @param oldSchema original schema
      * @param newSchema new schema
      */
-    private static void addModifiedSequences(
-        final PrintWriter writer,
-        final PgDiffArguments arguments,
-        final PgSchema oldSchema,
-        final PgSchema newSchema) {
+    public static void alterSequences(final PrintWriter writer,
+            final PgDiffArguments arguments, final PgSchema oldSchema,
+            final PgSchema newSchema) {
         final StringBuilder sbSQL = new StringBuilder();
 
         for (final PgSequence newSequence : newSchema.getSequences()) {
-            if (
-                (oldSchema != null)
+            if (oldSchema != null
                     && oldSchema.containsSequence(newSequence.getName())) {
                 final PgSequence oldSequence =
-                    oldSchema.getSequence(newSequence.getName());
+                        oldSchema.getSequence(newSequence.getName());
                 sbSQL.setLength(0);
 
                 final String oldIncrement = oldSequence.getIncrement();
                 final String newIncrement = newSequence.getIncrement();
 
-                if (
-                    (newIncrement != null)
+                if (newIncrement != null
                         && !newIncrement.equals(oldIncrement)) {
                     sbSQL.append("\n\tINCREMENT BY ");
                     sbSQL.append(newIncrement);
@@ -100,8 +98,7 @@ public class PgDiffSequences {
 
                 if ((newMinValue == null) && (oldMinValue != null)) {
                     sbSQL.append("\n\tNO MINVALUE");
-                } else if (
-                    (newMinValue != null)
+                } else if (newMinValue != null
                         && !newMinValue.equals(oldMinValue)) {
                     sbSQL.append("\n\tMINVALUE ");
                     sbSQL.append(newMinValue);
@@ -112,8 +109,7 @@ public class PgDiffSequences {
 
                 if ((newMaxValue == null) && (oldMaxValue != null)) {
                     sbSQL.append("\n\tNO MAXVALUE");
-                } else if (
-                    (newMaxValue != null)
+                } else if (newMaxValue != null
                         && !newMaxValue.equals(oldMaxValue)) {
                     sbSQL.append("\n\tMAXVALUE ");
                     sbSQL.append(newMaxValue);
@@ -148,11 +144,9 @@ public class PgDiffSequences {
 
                 if (sbSQL.length() > 0) {
                     writer.println();
-                    writer.print(
-                            "ALTER SEQUENCE "
-                            + PgDiffUtils.getQuotedName(
-                                    newSequence.getName(),
-                                    arguments.isQuoteNames()));
+                    writer.print("ALTER SEQUENCE "
+                            + PgDiffUtils.getQuotedName(newSequence.getName(),
+                            arguments.isQuoteNames()));
                     writer.print(sbSQL.toString());
                     writer.println(';');
                 }

@@ -1,15 +1,12 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff.parsers;
 
 /**
  * Thrown if parsing problem occured.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class ParserException extends RuntimeException {
+
     /**
      * Predefined message string that can be used as default exception
      * message with provided parsed line.
@@ -30,7 +27,7 @@ public class ParserException extends RuntimeException {
      *
      * @param msg the detail message
      */
-    public ParserException(String msg) {
+    public ParserException(final String msg) {
         super(msg);
     }
 
@@ -41,7 +38,7 @@ public class ParserException extends RuntimeException {
      * @param msg the detail message
      * @param cause cause of the exception
      */
-    public ParserException(String msg, Throwable cause) {
+    public ParserException(final String msg, final Throwable cause) {
         super(msg, cause);
     }
 }

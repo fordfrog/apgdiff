@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff.parsers;
 
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
@@ -14,18 +11,16 @@ import java.util.regex.Pattern;
  * Parses CREATE INDEX commands.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class CreateIndexParser {
 
     /**
      * Pattern for parsing CREATE INDEX definition.
      */
-    private static final Pattern PATTERN =
-        Pattern.compile(
-        "CREATE[\\s](UNIQUE[\\s]+)?+INDEX[\\s]+\"?([^\\s\"]+)\"?[\\s]+" +
-        "ON[\\s]+\"?([^\\s\"(]+)\"?[\\s]*([^;]+)[;]?",
-        Pattern.CASE_INSENSITIVE);
+    private static final Pattern PATTERN = Pattern.compile(
+            "CREATE[\\s](UNIQUE[\\s]+)?+INDEX[\\s]+\"?([^\\s\"]+)\"?[\\s]+"
+            + "ON[\\s]+\"?([^\\s\"(]+)\"?[\\s]*([^;]+)[;]?",
+            Pattern.CASE_INSENSITIVE);
 
     /**
      * Creates a new instance of CreateIndexParser.
@@ -54,13 +49,12 @@ public class CreateIndexParser {
 
             if ((indexName == null) || (tableName == null) || (def == null)) {
                 throw new ParserException(
-                    ParserException.CANNOT_PARSE_COMMAND + command);
+                        ParserException.CANNOT_PARSE_COMMAND + command);
             }
 
-            final PgTable table =
-                database.getSchema(
-                ParserUtils.getSchemaName(tableName.trim(), database)).getTable(
-                tableName.trim());
+            final PgTable table = database.getSchema(
+                    ParserUtils.getSchemaName(
+                    tableName.trim(), database)).getTable(tableName.trim());
             final PgIndex index = new PgIndex(indexName);
             table.addIndex(index);
             index.setDefinition(def.trim());
@@ -68,7 +62,7 @@ public class CreateIndexParser {
             index.setUnique(unique);
         } else {
             throw new ParserException(
-                ParserException.CANNOT_PARSE_COMMAND + command);
+                    ParserException.CANNOT_PARSE_COMMAND + command);
         }
     }
 }

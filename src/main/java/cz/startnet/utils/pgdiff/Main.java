@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff;
 
 import java.io.OutputStreamWriter;
@@ -12,7 +9,6 @@ import java.io.UnsupportedEncodingException;
  * in the database schemas.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class Main {
 
@@ -31,15 +27,15 @@ public class Main {
      * @throws UnsupportedEncodingException Thrown if unsupported output
      * encoding has been encountered.
      */
-    public static void main(final String[] args) throws
-        UnsupportedEncodingException {
+    public static void main(final String[] args)
+            throws UnsupportedEncodingException {
         final PrintWriter writer = new PrintWriter(System.out, true);
         final PgDiffArguments arguments = new PgDiffArguments();
 
         if (arguments.parse(writer, args)) {
-            final PrintWriter encodedWriter =
-                new PrintWriter(new OutputStreamWriter(System.out, arguments.
-                getOutCharsetName()));
+            final PrintWriter encodedWriter = new PrintWriter(
+                    new OutputStreamWriter(
+                    System.out, arguments.getOutCharsetName()));
             PgDiff.createDiff(encodedWriter, arguments);
             encodedWriter.close();
         }

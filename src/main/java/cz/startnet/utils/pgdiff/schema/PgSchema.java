@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
@@ -8,39 +5,33 @@ import cz.startnet.utils.pgdiff.PgDiffUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Stores schema information.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class PgSchema {
+
     /**
      * List of functions defined in the schema.
      */
     private final List<PgFunction> functions = new ArrayList<PgFunction>();
-
     /**
      * List of sequences defined in the schema.
      */
     private final List<PgSequence> sequences = new ArrayList<PgSequence>();
-
     /**
      * List of tables defined in the schema.
      */
     private final List<PgTable> tables = new ArrayList<PgTable>();
-
     /**
      * List of views defined in the schema.
      */
     private final List<PgView> views = new ArrayList<PgView>();
-
     /**
      * Name of the schema.
      */
     private final String name;
-
     /**
      * Schema authorization.
      */

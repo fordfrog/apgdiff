@@ -1,24 +1,19 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff.schema;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Stores database information.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class PgDatabase {
+
     /**
      * List of database schemas.
      */
     private final List<PgSchema> schemas = new ArrayList<PgSchema>();
-
     /**
      * Current default schema.
      */

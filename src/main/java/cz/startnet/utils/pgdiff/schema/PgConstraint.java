@@ -1,37 +1,30 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
 
 import java.util.regex.Pattern;
 
-
 /**
  * Stores table constraint information.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class PgConstraint {
+
     /**
      * Pattern for checking whether the constraint is PRIMARY KEY
      * constraint.
      */
     private static final Pattern PATTERN_PRIMARY_KEY =
-        Pattern.compile(".*PRIMARY[\\s]+KEY.*", Pattern.CASE_INSENSITIVE);
-
+            Pattern.compile(".*PRIMARY[\\s]+KEY.*", Pattern.CASE_INSENSITIVE);
     /**
      * Definition of the constraint.
      */
     private String definition;
-
     /**
      * Name of the constraint.
      */
     private String name;
-
     /**
      * Name of the table the constraint is defined on.
      */
@@ -163,10 +156,9 @@ public class PgConstraint {
             equals = true;
         } else if (object instanceof PgConstraint) {
             final PgConstraint constraint = (PgConstraint) object;
-            equals =
-                definition.equals(constraint.definition)
-                && name.equals(constraint.name)
-                && tableName.equals(constraint.tableName);
+            equals = definition.equals(constraint.definition)
+                    && name.equals(constraint.name)
+                    && tableName.equals(constraint.tableName);
         }
 
         return equals;
@@ -180,6 +172,6 @@ public class PgConstraint {
     @Override
     public int hashCode() {
         return (getClass().getName() + "|" + definition + "|" + name + "|"
-        + tableName).hashCode();
+                + tableName).hashCode();
     }
 }

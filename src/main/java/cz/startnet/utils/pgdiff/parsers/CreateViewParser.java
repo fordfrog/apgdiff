@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff.parsers;
 
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
@@ -10,23 +7,20 @@ import cz.startnet.utils.pgdiff.schema.PgView;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
  * Parses CREATE VIEW commands.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class CreateViewParser {
+
     /**
      * Pattern for parsing CREATE VIEW definition.
      */
-    private static final Pattern PATTERN =
-        Pattern.compile(
-                "CREATE[\\s]+(?:OR[\\s]+REPLACE[\\s]+)?VIEW[\\s]+"
-                + "\"?([^\\s\"]+)\"?[\\s]+(?:\\(([^)]+)\\)[\\s]+)?"
-                + "AS[\\s]+(.+)?(?:;)",
-                Pattern.CASE_INSENSITIVE);
+    private static final Pattern PATTERN = Pattern.compile(
+            "CREATE[\\s]+(?:OR[\\s]+REPLACE[\\s]+)?VIEW[\\s]+"
+            + "\"?([^\\s\"]+)\"?[\\s]+(?:\\(([^)]+)\\)[\\s]+)?"
+            + "AS[\\s]+(.+)?(?:;)", Pattern.CASE_INSENSITIVE);
 
     /**
      * Creates a new instance of CreateViewParser.
@@ -62,8 +56,8 @@ public class CreateViewParser {
             view.setQuery(query);
 
             final PgSchema schema =
-                database.getSchema(
-                        ParserUtils.getSchemaName(viewName, database));
+                    database.getSchema(
+                    ParserUtils.getSchemaName(viewName, database));
             schema.addView(view);
         } else {
             throw new ParserException(

@@ -5,6 +5,8 @@ CREATE SCHEMA testschema2;
 
 SET search_path = public, pg_catalog;
 
+DROP TABLE testtable2;
+
 DROP SEQUENCE testtable2_id_seq;
 
 CREATE SEQUENCE testtable3_id_seq
@@ -13,8 +15,6 @@ CREATE SEQUENCE testtable3_id_seq
 	NO MAXVALUE
 	NO MINVALUE
 	CACHE 1;
-
-DROP TABLE testtable2;
 
 CREATE TABLE testtable3 (
 	id bigint DEFAULT nextval('testtable3_id_seq'::regclass) NOT NULL

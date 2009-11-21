@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
@@ -8,50 +5,42 @@ import cz.startnet.utils.pgdiff.PgDiffUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Stores table information.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class PgTable {
+
     /**
      * List of columns defined on the table.
      */
     private final List<PgColumn> columns = new ArrayList<PgColumn>();
-
     /**
      * List of constraints defined on the table.
      */
     private final List<PgConstraint> constraints =
-        new ArrayList<PgConstraint>();
-
+            new ArrayList<PgConstraint>();
     /**
      * List of indexes defined on the table.
      */
     private final List<PgIndex> indexes = new ArrayList<PgIndex>();
-
     /**
      * List of triggers defined on the table.
      */
     private final List<PgTrigger> triggers = new ArrayList<PgTrigger>();
-
     /**
      * Name of the index on which the table is clustered
      */
     private String clusterIndexName;
-
     /**
      * Definition of names of inherited tables.
      */
     private String inherits;
-
     /**
      * Name of the table.
      */
     private String name;
-
     /**
      * Whether WITH OIDS is used.
      */
@@ -197,7 +186,7 @@ public class PgTable {
      */
     public String getDropSQL(final boolean quoteNames) {
         return "DROP TABLE " + PgDiffUtils.getQuotedName(getName(), quoteNames)
-        + ";";
+                + ";";
     }
 
     /**

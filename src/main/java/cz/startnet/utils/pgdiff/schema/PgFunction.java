@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff.schema;
 
 import java.util.regex.Matcher;
@@ -10,7 +7,6 @@ import java.util.regex.Pattern;
  * Stores function information.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class PgFunction {
 
@@ -18,10 +14,9 @@ public class PgFunction {
      * Pattern for checking whether function definition contains CREATE
      * OR REPLACE FUNCTION string.
      */
-    private static final Pattern PATTERN_CREATE_FUNCTION =
-        Pattern.compile(
-        "(?:CREATE[\\s]+FUNCTION)([\\s]+.*)",
-        Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    private static final Pattern PATTERN_CREATE_FUNCTION = Pattern.compile(
+            "(?:CREATE[\\s]+FUNCTION)([\\s]+.*)",
+            Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /**
      * Declaration of the function. Contains function name and
      * arguments.
@@ -141,7 +136,7 @@ public class PgFunction {
      * @return {@inheritDoc}
      */
     public boolean equals(final Object object,
-        final boolean ignoreFunctionWhitespace) {
+            final boolean ignoreFunctionWhitespace) {
         boolean equals = false;
 
         if (this == object) {
@@ -154,14 +149,14 @@ public class PgFunction {
             if (ignoreFunctionWhitespace) {
                 thisDefinition = getDefinition().replaceAll("\\s+", " ");
                 thatDefinition =
-                    function.getDefinition().replaceAll("\\s+", " ");
+                        function.getDefinition().replaceAll("\\s+", " ");
             } else {
                 thisDefinition = getDefinition();
                 thatDefinition = function.getDefinition();
             }
-            equals =
-                declaration.equals(function.declaration) && thisDefinition.
-                equals(thatDefinition) && name.equals(function.name);
+            equals = declaration.equals(function.declaration)
+                    && thisDefinition.equals(thatDefinition)
+                    && name.equals(function.name);
         }
 
         return equals;
@@ -174,7 +169,7 @@ public class PgFunction {
      */
     @Override
     public int hashCode() {
-        return (getClass().getName() + "|" + declaration + "|" + getDefinition() +
-            "|" + name).hashCode();
+        return (getClass().getName() + "|" + declaration + "|" + getDefinition()
+                + "|" + name).hashCode();
     }
 }

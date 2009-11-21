@@ -1,20 +1,16 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff.parsers;
 
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
 
 import java.util.regex.Pattern;
 
-
 /**
  * Parser utilities.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class ParserUtils {
+
     /**
      * Creates a new instance of ParserUtils.
      */
@@ -88,9 +84,8 @@ public class ParserUtils {
      *
      * @return name of the schema
      */
-    public static String getSchemaName(
-        final String name,
-        final PgDatabase database) {
+    public static String getSchemaName(final String name,
+            final PgDatabase database) {
         final String result;
         final int pos = name.indexOf('.');
 
@@ -133,18 +128,15 @@ public class ParserUtils {
      *
      * @return <code>string</code> without given substring
      */
-    public static String removeSubString(
-        final String string,
-        final int start,
-        final int end) {
+    public static String removeSubString(final String string, final int start,
+            final int end) {
         final String result;
 
         if (start == 0) {
             result = string.substring(end).trim();
         } else {
-            result =
-                string.substring(0, start).trim() + " "
-                + string.substring(end).trim();
+            result = string.substring(0, start).trim() + " "
+                    + string.substring(end).trim();
         }
 
         return result;
@@ -159,10 +151,9 @@ public class ParserUtils {
      *
      * @return <code>string</code> without <code>subString</code>
      */
-    public static String removeSubString(
-        final String string,
-        final String subString) {
-        return Pattern.compile(subString, Pattern.CASE_INSENSITIVE)
-                      .matcher(string).replaceAll("");
+    public static String removeSubString(final String string,
+            final String subString) {
+        return Pattern.compile(subString,
+                Pattern.CASE_INSENSITIVE).matcher(string).replaceAll("");
     }
 }

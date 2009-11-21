@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff.parsers;
 
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
@@ -12,31 +9,27 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
  * Parses CREATE FUNCTION and CREATE OR REPLACE FUNCTION commands.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class CreateFunctionParser {
+
     /**
      * Pattern for parsing CREATE FUNCTION and CREATE OR REPLACE
      * FUNCTION command.
      */
-    private static final Pattern PATTERN =
-        Pattern.compile(
-                "^CREATE[\\s]+(?:OR[\\s]+REPLACE[\\s]+)?FUNCTION[\\s]+"
-                + "([^\\s(]+)\\(([^)]*)\\).*$",
-                Pattern.CASE_INSENSITIVE + Pattern.DOTALL);
-
+    private static final Pattern PATTERN = Pattern.compile(
+            "^CREATE[\\s]+(?:OR[\\s]+REPLACE[\\s]+)?FUNCTION[\\s]+"
+            + "([^\\s(]+)\\(([^)]*)\\).*$",
+            Pattern.CASE_INSENSITIVE + Pattern.DOTALL);
     /**
      * Pattern for parsing function arguments.
      */
-    private static final Pattern PATTERN_ARGUMENT =
-        Pattern.compile(
-                "^(?:(?:IN|OUT|INOUT)[\\s]+)?(?:\"?[^\\s\"]+\"?[\\s]+)?(.+)$",
-                Pattern.CASE_INSENSITIVE);
+    private static final Pattern PATTERN_ARGUMENT = Pattern.compile(
+            "^(?:(?:IN|OUT|INOUT)[\\s]+)?(?:\"?[^\\s\"]+\"?[\\s]+)?(.+)$",
+            Pattern.CASE_INSENSITIVE);
 
     /**
      * Creates a new instance of CreateFunctionParser.
@@ -65,9 +58,8 @@ public class CreateFunctionParser {
                     getFunctionDeclaration(functionName, arguments));
             function.setDefinition(command);
             function.setName(ParserUtils.getObjectName(functionName));
-            database.getSchema(
-                    ParserUtils.getSchemaName(functionName, database))
-                    .addFunction(function);
+            database.getSchema(ParserUtils.getSchemaName(
+                    functionName, database)).addFunction(function);
         } else {
             throw new ParserException(
                     ParserException.CANNOT_PARSE_COMMAND + command);
@@ -86,9 +78,8 @@ public class CreateFunctionParser {
      *
      * @throws ParserException Thrown if cannot parse function arguments.
      */
-    private static String getFunctionDeclaration(
-        final String functionName,
-        final String arguments) {
+    private static String getFunctionDeclaration(final String functionName,
+            final String arguments) {
         final String result;
 
         if ((arguments == null) || (arguments.trim().length() == 0)) {

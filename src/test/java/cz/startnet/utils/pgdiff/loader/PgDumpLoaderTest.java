@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff.loader;
 
 import org.junit.Test;
@@ -17,7 +14,6 @@ import java.util.Collection;
  * Tests for PgDiffLoader class.
  *
  * @author fordfrog
- * @version $Id$
  */
 @RunWith(value = Parameterized.class)
 public class PgDumpLoaderTest {
@@ -42,16 +38,16 @@ public class PgDumpLoaderTest {
      * @return parameters for the tests
      */
     @Parameters
-    public static Collection parameters() {
+    public static Collection<?> parameters() {
         return Arrays.asList(
-            new Object[][]{
-                {1},
-                {2},
-                {3},
-                {4},
-                {5},
-                {6}
-            });
+                new Object[][]{
+                    {1},
+                    {2},
+                    {3},
+                    {4},
+                    {5},
+                    {6}
+                });
     }
 
     /**
@@ -60,7 +56,7 @@ public class PgDumpLoaderTest {
     @Test(timeout = 1000)
     public void loadSchema() {
         PgDumpLoader.loadDatabaseSchema(
-            getClass().getResourceAsStream("schema_" + fileIndex + ".sql"),
-            "UTF-8");
+                getClass().getResourceAsStream("schema_" + fileIndex + ".sql"),
+                "UTF-8");
     }
 }

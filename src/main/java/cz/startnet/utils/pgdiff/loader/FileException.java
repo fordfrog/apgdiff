@@ -1,15 +1,12 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff.loader;
 
 /**
  * Exception thrown if problem occured while reading or writing file.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class FileException extends RuntimeException {
+
     /**
      * Predefined message that can be used when cannot read file.
      */
@@ -29,7 +26,7 @@ public class FileException extends RuntimeException {
      *
      * @param msg the detail message
      */
-    public FileException(String msg) {
+    public FileException(final String msg) {
         super(msg);
     }
 
@@ -40,7 +37,7 @@ public class FileException extends RuntimeException {
      * @param msg the detail message
      * @param cause cause of the exception
      */
-    public FileException(String msg, Throwable cause) {
+    public FileException(final String msg, final Throwable cause) {
         super(msg, cause);
     }
 }

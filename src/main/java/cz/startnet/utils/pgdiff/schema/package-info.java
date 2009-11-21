@@ -1,6 +1,5 @@
 /**
- * Contains PostgreSQL schema objects.<br/>
- * $Id$
+ * Contains PostgreSQL schema objects.
  */
 package cz.startnet.utils.pgdiff.schema;
 

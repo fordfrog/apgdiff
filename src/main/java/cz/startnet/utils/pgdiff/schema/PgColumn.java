@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
@@ -8,54 +5,44 @@ import cz.startnet.utils.pgdiff.PgDiffUtils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
  * Stores column information.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class PgColumn {
+
     /**
      * Pattern for parsing NULL arguments.
      */
     private static final Pattern PATTERN_NULL =
-        Pattern.compile("^(.+)[\\s]+NULL$", Pattern.CASE_INSENSITIVE);
-
+            Pattern.compile("^(.+)[\\s]+NULL$", Pattern.CASE_INSENSITIVE);
     /**
      * Pattern for parsing NOT NULL arguments.
      */
-    private static final Pattern PATTERN_NOT_NULL =
-        Pattern.compile("^(.+)[\\s]+NOT[\\s]+NULL$", Pattern.CASE_INSENSITIVE);
-
+    private static final Pattern PATTERN_NOT_NULL = Pattern.compile(
+            "^(.+)[\\s]+NOT[\\s]+NULL$", Pattern.CASE_INSENSITIVE);
     /**
      * Pattern for parsing DEFAULT value.
      */
-    private static final Pattern PATTERN_DEFAULT =
-        Pattern.compile(
-                "^(.+)[\\s]+DEFAULT[\\s]+(.+)$",
-                Pattern.CASE_INSENSITIVE);
-
+    private static final Pattern PATTERN_DEFAULT = Pattern.compile(
+            "^(.+)[\\s]+DEFAULT[\\s]+(.+)$", Pattern.CASE_INSENSITIVE);
     /**
      * Specific statistics value.
      */
     private Integer statistics;
-
     /**
      * Default value of the column.
      */
     private String defaultValue;
-
     /**
      * Name of the column.
      */
     private String name;
-
     /**
      * Type of the column.
      */
     private String type;
-
     /**
      * Determines whether null value is allowed in the column.
      */
@@ -97,9 +84,8 @@ public class PgColumn {
      *
      * @return full definition of the column
      */
-    public String getFullDefinition(
-        final boolean quoteName,
-        final boolean addDefaults) {
+    public String getFullDefinition(final boolean quoteName,
+            final boolean addDefaults) {
         final StringBuilder sbDefinition = new StringBuilder();
         sbDefinition.append(PgDiffUtils.getQuotedName(name, quoteName));
         sbDefinition.append(' ');

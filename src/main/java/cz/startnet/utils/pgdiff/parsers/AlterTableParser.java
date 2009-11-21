@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff.parsers;
 
 import cz.startnet.utils.pgdiff.schema.PgColumn;
@@ -11,71 +8,56 @@ import cz.startnet.utils.pgdiff.schema.PgTable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
  * Parses ALTER TABLE commands.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class AlterTableParser {
+
     /**
      * Pattern for matching ALTER TABLE ... OWNER TO ...;.
      */
-    private static final Pattern PATTERN_OWNER =
-        Pattern.compile(
-                "^ALTER[\\s]+TABLE[\\s]+.*[\\s]+OWNER[\\s]+TO[\\s]+.*;$",
-                Pattern.CASE_INSENSITIVE);
-
+    private static final Pattern PATTERN_OWNER = Pattern.compile(
+            "^ALTER[\\s]+TABLE[\\s]+.*[\\s]+OWNER[\\s]+TO[\\s]+.*;$",
+            Pattern.CASE_INSENSITIVE);
     /**
      * Pattern for matching table name and optional definition.
      */
-    private static final Pattern PATTERN_START =
-        Pattern.compile(
-                "ALTER[\\s]+TABLE[\\s]+(?:ONLY[\\s]+)?\"?([^\\s\"]+)\"?"
-                + "(?:[\\s]+)?(.+)?",
-                Pattern.CASE_INSENSITIVE);
-
+    private static final Pattern PATTERN_START = Pattern.compile(
+            "ALTER[\\s]+TABLE[\\s]+(?:ONLY[\\s]+)?\"?([^\\s\"]+)\"?"
+            + "(?:[\\s]+)?(.+)?", Pattern.CASE_INSENSITIVE);
     /**
      * Pattern for matching of trailing definition of ALTER TABLE
      * command.
      */
-    private static final Pattern PATTERN_TRAILING_DEF =
-        Pattern.compile(
-                "(CLUSTER[\\s]+ON|ALTER[\\s]+COLUMN)[\\s]+\"?([^\\s;\"]+)\"?"
-                + "(?:[\\s]+SET[\\s]+STATISTICS[\\s]+)?(\\d+)?;?",
-                Pattern.CASE_INSENSITIVE);
-
+    private static final Pattern PATTERN_TRAILING_DEF = Pattern.compile(
+            "(CLUSTER[\\s]+ON|ALTER[\\s]+COLUMN)[\\s]+\"?([^\\s;\"]+)\"?"
+            + "(?:[\\s]+SET[\\s]+STATISTICS[\\s]+)?(\\d+)?;?",
+            Pattern.CASE_INSENSITIVE);
     /**
      * Pattern for matching ADD CONSTRAINT row.
      */
-    private static final Pattern PATTERN_ADD_CONSTRAINT =
-        Pattern.compile(
-                "^ADD[\\s]+CONSTRAINT[\\s]+\"?([^\\s\"]+)\"?[\\s]+(.*)$",
-                Pattern.CASE_INSENSITIVE);
-
+    private static final Pattern PATTERN_ADD_CONSTRAINT = Pattern.compile(
+            "^ADD[\\s]+CONSTRAINT[\\s]+\"?([^\\s\"]+)\"?[\\s]+(.*)$",
+            Pattern.CASE_INSENSITIVE);
     /**
      * Pattern for matching ADD FOREIGN KEY row.
      */
-    private static final Pattern PATTERN_ADD_FOREIGN_KEY =
-        Pattern.compile(
-                "^ADD[\\s]+(FOREIGN[\\s]+KEY[\\s]+\\(([^\\s]+)\\)[\\s]+.*)$",
-                Pattern.CASE_INSENSITIVE);
-
+    private static final Pattern PATTERN_ADD_FOREIGN_KEY = Pattern.compile(
+            "^ADD[\\s]+(FOREIGN[\\s]+KEY[\\s]+\\(([^\\s]+)\\)[\\s]+.*)$",
+            Pattern.CASE_INSENSITIVE);
     /**
      * Pattern for matching ALTER COLUMN ... SET DEFAULT ...
      */
-    private static final Pattern PATTERN_SET_DEFAULT =
-        Pattern.compile(
-                "^ALTER[\\s]+COLUMN[\\s]+\"?([^\\s\"]+)\"?[\\s]+SET[\\s]+"
-                + "DEFAULT[\\s]+(.*)$",
-                Pattern.CASE_INSENSITIVE);
-
+    private static final Pattern PATTERN_SET_DEFAULT = Pattern.compile(
+            "^ALTER[\\s]+COLUMN[\\s]+\"?([^\\s\"]+)\"?[\\s]+SET[\\s]+"
+            + "DEFAULT[\\s]+(.*)$", Pattern.CASE_INSENSITIVE);
     /**
      * Pattern for checking whether string is ALTER COLUMN.
      */
     private static final Pattern PATTERN_ALTER_COLUMN =
-        Pattern.compile("ALTER[\\s]+COLUMN", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("ALTER[\\s]+COLUMN", Pattern.CASE_INSENSITIVE);
 
     /**
      * Creates a new instance of AlterTableParser.
@@ -106,9 +88,9 @@ public class AlterTableParser {
             }
 
             final PgTable table =
-                database.getSchema(
-                        ParserUtils.getSchemaName(tableName, database)).getTable(
-                        ParserUtils.getObjectName(tableName));
+                    database.getSchema(
+                    ParserUtils.getSchemaName(tableName, database)).getTable(
+                    ParserUtils.getObjectName(tableName));
             line = ParserUtils.removeLastSemicolon(matcher.group(2));
 
             if (PATTERN_TRAILING_DEF.matcher(line).matches()) {
@@ -135,17 +117,15 @@ public class AlterTableParser {
             try {
                 final int commandEnd = ParserUtils.getCommandEnd(line, 0);
                 subCommand = line.substring(0, commandEnd).trim();
-                line =
-                    (commandEnd >= line.length()) ? ""
-                                                  : line.substring(
-                            commandEnd + 1);
+                line = (commandEnd >= line.length()) ? ""
+                        : line.substring(commandEnd + 1);
 
                 Matcher matcher = PATTERN_ADD_CONSTRAINT.matcher(subCommand);
 
                 if (matcher.matches()) {
                     final String constraintName = matcher.group(1).trim();
                     final PgConstraint constraint =
-                        new PgConstraint(constraintName);
+                            new PgConstraint(constraintName);
                     table.addConstraint(constraint);
                     constraint.setDefinition(matcher.group(2).trim());
                     constraint.setTableName(table.getName());
@@ -158,9 +138,9 @@ public class AlterTableParser {
                     if (matcher.matches()) {
                         final String columnName = matcher.group(2).trim();
                         final String constraintName =
-                            table.getName() + "_" + columnName + "_fkey";
+                                table.getName() + "_" + columnName + "_fkey";
                         final PgConstraint constraint =
-                            new PgConstraint(constraintName);
+                                new PgConstraint(constraintName);
                         table.addConstraint(constraint);
                         constraint.setDefinition(matcher.group(1).trim());
                         constraint.setTableName(table.getName());
@@ -190,8 +170,7 @@ public class AlterTableParser {
             } catch (RuntimeException ex) {
                 throw new ParserException(
                         "Cannot parse ALTER TABLE '" + table.getName()
-                        + "', line '" + subCommand + "'",
-                        ex);
+                        + "', line '" + subCommand + "'", ex);
             }
 
             if (subCommand.length() > 0) {
@@ -207,13 +186,13 @@ public class AlterTableParser {
      * @param table table being parsed
      * @param traillingDef trailling definition
      */
-    private static void parseTraillingDef(
-        final PgTable table,
-        final String traillingDef) {
+    private static void parseTraillingDef(final PgTable table,
+            final String traillingDef) {
         final Matcher matcher = PATTERN_TRAILING_DEF.matcher(traillingDef);
 
         if (matcher.matches()) {
-            if (PATTERN_ALTER_COLUMN.matcher(matcher.group(1).trim()).matches()) {
+            if (PATTERN_ALTER_COLUMN.matcher(
+                    matcher.group(1).trim()).matches()) {
                 //Stats
                 final String columnName = matcher.group(2).trim();
                 final Integer value = Integer.valueOf(matcher.group(3).trim());

@@ -1,15 +1,12 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff;
 
 /**
  * Utilities for creation of diffs.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class PgDiffUtils {
+
     /**
      * Creates a new PgDiffUtils object.
      */
@@ -27,9 +24,8 @@ public class PgDiffUtils {
      * @return if <code>quoteName</code> is true then returns quoted name
      *         otherwise returns the original name
      */
-    public static String getQuotedName(
-        final String name,
-        final boolean quoteName) {
+    public static String getQuotedName(final String name,
+            final boolean quoteName) {
         return quoteName ? ("\"" + name + "\"") : name;
     }
 }

@@ -1,18 +1,14 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff.schema;
 
 import java.util.Locale;
 
-
 /**
- * Utilities for {@link Pgcolumn}.
+ * Utilities for {@link PgColumn}.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class PgColumnUtils {
+
     /**
      * Creates a new PgColumnUtils object.
      */
@@ -32,8 +28,7 @@ public class PgColumnUtils {
         final String defaultValue;
         final String adjType = type.toLowerCase(Locale.ENGLISH);
 
-        if (
-            "smallint".equals(adjType)
+        if ("smallint".equals(adjType)
                 || "integer".equals(adjType)
                 || "bigint".equals(adjType)
                 || adjType.startsWith("decimal")
@@ -47,8 +42,7 @@ public class PgColumnUtils {
                 || "double".equals(adjType)
                 || "money".equals(adjType)) {
             defaultValue = "0";
-        } else if (
-            adjType.startsWith("character varying")
+        } else if (adjType.startsWith("character varying")
                 || adjType.startsWith("varchar")
                 || adjType.startsWith("character")
                 || adjType.startsWith("char")

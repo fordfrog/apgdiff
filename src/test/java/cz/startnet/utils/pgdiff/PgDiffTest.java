@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff;
 
 import org.junit.Assert;
@@ -25,7 +22,6 @@ import java.util.Collection;
  * Tests for PgDiff class.
  *
  * @author fordfrog
- * @version $Id$
  */
 @RunWith(value = Parameterized.class)
 public class PgDiffTest {
@@ -62,10 +58,8 @@ public class PgDiffTest {
      * @param ignoreFunctionWhitespace {@link #ignoreFunctionWhitespace}
      * @param ignoreStartWith {@link #ignoreStartWith}
      */
-    public PgDiffTest(
-            final String fileNameTemplate,
-            final boolean addDefaults,
-            final boolean addTransaction,
+    public PgDiffTest(final String fileNameTemplate,
+            final boolean addDefaults, final boolean addTransaction,
             final boolean ignoreFunctionWhitespace,
             final boolean ignoreStartWith) {
         super();
@@ -82,7 +76,7 @@ public class PgDiffTest {
      * @return parameters for the tests
      */
     @Parameters
-    public static Collection parameters() {
+    public static Collection<?> parameters() {
         return Arrays.asList(
                 new Object[][]{
                     // Tests scenario where COLUMN type is modified.
@@ -236,7 +230,7 @@ public class PgDiffTest {
      * @throws IOException Thrown if problem occured while reading expected
      *         diff.
      */
-    @Test(/*timeout = 1000*/)
+    @Test(timeout = 1000)
     public void runDiff() throws FileNotFoundException, IOException {
         final ByteArrayOutputStream diffInput = new ByteArrayOutputStream();
         final PrintWriter writer = new PrintWriter(diffInput, true);
@@ -244,18 +238,14 @@ public class PgDiffTest {
         arguments.setAddDefaults(addDefaults);
         arguments.setIgnoreFunctionWhitespace(ignoreFunctionWhitespace);
         arguments.setIgnoreStartWith(ignoreStartWith);
-        PgDiff.createDiff(
-                writer,
-                arguments,
+        PgDiff.createDiff(writer, arguments,
                 PgDiffTest.class.getResourceAsStream(
                 fileNameTemplate + "_original.sql"),
                 PgDiffTest.class.getResourceAsStream(
                 fileNameTemplate + "_new.sql"));
         writer.flush();
 
-        final BufferedReader reader =
-                new BufferedReader(
-                new InputStreamReader(
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(
                 PgDiffTest.class.getResourceAsStream(
                 fileNameTemplate + "_diff.sql")));
         final char[] part = new char[1024];

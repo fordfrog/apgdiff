@@ -1,55 +1,44 @@
-/*
- * $Id$
- */
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
-
 
 /**
  * Stores trigger information.
  *
  * @author fordfrog
- * @version $Id$
  */
 public class PgTrigger {
+
     /**
      * Function name and arguments that should be fired on the trigger.
      */
     private String function;
-
     /**
      * Name of the trigger.
      */
     private String name;
-
     /**
      * Name of the table the trigger is defined on.
      */
     private String tableName;
-
     /**
      * Whether the trigger should be fired BEFORE or AFTER action.
      * Default is before.
      */
     private boolean before = true;
-
     /**
      * Whether the trigger should be fired FOR EACH ROW or FOR EACH
      * STATEMENT. Default is FOR EACH STATEMENT.
      */
     private boolean forEachRow;
-
     /**
      * Whether the trigger should be fired on DELETE.
      */
     private boolean onDelete;
-
     /**
      * Whether the trigger should be fired on INSERT.
      */
     private boolean onInsert;
-
     /**
      * Whether the trigger should be fired on UPDATE.
      */
@@ -132,8 +121,8 @@ public class PgTrigger {
      */
     public String getDropSQL(final boolean quoteNames) {
         return "DROP TRIGGER "
-        + PgDiffUtils.getQuotedName(getName(), quoteNames) + " ON "
-        + PgDiffUtils.getQuotedName(getTableName(), quoteNames) + ";";
+                + PgDiffUtils.getQuotedName(getName(), quoteNames) + " ON "
+                + PgDiffUtils.getQuotedName(getTableName(), quoteNames) + ";";
     }
 
     /**
@@ -269,6 +258,7 @@ public class PgTrigger {
      *
      * @return {@inheritDoc}
      */
+    @Override
     public boolean equals(final Object object) {
         boolean equals = false;
 
@@ -276,14 +266,14 @@ public class PgTrigger {
             equals = true;
         } else if (object instanceof PgTrigger) {
             final PgTrigger trigger = (PgTrigger) object;
-            equals =
-                (before == trigger.before)
-                && (forEachRow == trigger.forEachRow)
-                && function.equals(trigger.function)
-                && name.equals(trigger.name) && (onDelete == trigger.onDelete)
-                && (onInsert == trigger.onInsert)
-                && (onUpdate == trigger.onUpdate)
-                && tableName.equals(trigger.tableName);
+            equals = (before == trigger.before)
+                    && (forEachRow == trigger.forEachRow)
+                    && function.equals(trigger.function)
+                    && name.equals(trigger.name)
+                    && (onDelete == trigger.onDelete)
+                    && (onInsert == trigger.onInsert)
+                    && (onUpdate == trigger.onUpdate)
+                    && tableName.equals(trigger.tableName);
         }
 
         return equals;
@@ -297,7 +287,7 @@ public class PgTrigger {
     @Override
     public int hashCode() {
         return (getClass().getName() + "|" + before + "|" + forEachRow + "|"
-        + function + "|" + name + "|" + onDelete + "|" + onInsert + "|"
-        + onUpdate + "|" + tableName).hashCode();
+                + function + "|" + name + "|" + onDelete + "|" + onInsert + "|"
+                + onUpdate + "|" + tableName).hashCode();
     }
 }
