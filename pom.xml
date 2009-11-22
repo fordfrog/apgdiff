@@ -209,7 +209,7 @@
         <site>
             <id>website</id>
             <name>SourceForge.Net</name>
-            <url>scp://shell.sourceforge.net/home/groups/a/ap/apgdiff/htdocs/</url>
+            <url>sftp://web.sourceforge.net/home/groups/a/ap/apgdiff/htdocs/</url>
         </site>
     </distributionManagement>
 </project>
