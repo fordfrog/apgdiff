@@ -36,13 +36,6 @@ public class PgDiffIndexes {
             final PgSchema newSchema) {
         for (final PgTable newTable : newSchema.getTables()) {
             final String newTableName = newTable.getName();
-            final PgTable oldTable;
-
-            if (oldSchema == null) {
-                oldTable = null;
-            } else {
-                oldTable = oldSchema.getTable(newTableName);
-            }
 
             // Add new indexes
             if (oldSchema == null) {

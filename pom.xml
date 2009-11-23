@@ -60,7 +60,7 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:hg:ssh://fordfrog@apgdiff.hg.sourceforge.net/hgroot/apgdiff/apgdiff</connection>
+        <connection>scm:hg:http://apgdiff.hg.sourceforge.net/hgweb/apgdiff/</connection>
         <developerConnection>scm:hg:ssh://apgdiff.hg.sourceforge.net/hgroot/apgdiff/apgdiff</developerConnection>
         <url>http://apgdiff.hg.sourceforge.net/hgweb/apgdiff/</url>
     </scm>
@@ -209,7 +209,7 @@
         <site>
             <id>website</id>
             <name>SourceForge.Net</name>
-            <url>sftp://web.sourceforge.net/home/groups/a/ap/apgdiff/htdocs/</url>
+            <url>scp://shell.sourceforge.net/home/groups/a/ap/apgdiff/htdocs/</url>
         </site>
     </distributionManagement>
 </project>

@@ -52,7 +52,7 @@ public class PgDiffTest {
     /**
      * Creates a new PgDiffTest object.
      *
-     * @param fileNameTemplate {@link #originalFileName}
+     * @param fileNameTemplate {@link #fileNameTemplate}
      * @param addDefaults {@link #addDefaults}
      * @param addTransaction {@link #addTransaction}
      * @param ignoreFunctionWhitespace {@link #ignoreFunctionWhitespace}

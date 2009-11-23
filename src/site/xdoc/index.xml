@@ -128,9 +128,9 @@
                 Here are some links mentioning apgdiff i found on internet:
             </p>
             <ul>
-                <li><a href="https://www.ohloh.net/p/apgdiff">apgdiff page on ohloh</a></li>
+                <li>apgdiff page on <a href="https://www.ohloh.net/p/apgdiff">ohloh</a></li>
                 <li><a href="http://maksim07.blogspot.com/2008/10/postgres_24.html">maksim07's blog</a></li>
-                <li>apgdiff in <a href="http://search.postgresql.org/search?q=apgdiff&amp;m=1&amp;l=&amp;d=-1&amp;s=r">PostgreSQL mailing lists</li>
+                <li>apgdiff in <a href="http://search.postgresql.org/search?q=apgdiff&amp;m=1&amp;l=&amp;d=-1&amp;s=r">PostgreSQL mailing lists</a></li>
                 <li>apgdiff on <a href="http://www.experts-exchange.com/Database/PostgreSQL/Q_24799045.html">experts-exchange.com</a></li>
                 <li>apgdiff as solution on <a href="http://stackoverflow.com/questions/255905/how-to-synchronize-development-and-production-database">stackoverflow.com</a></li>
                 <li><a href="http://mac.softpedia.com/progScreenshots/apgdiff-Screenshot-56688.html">screenshot</a> of apgdiff on Mac OS X</li>

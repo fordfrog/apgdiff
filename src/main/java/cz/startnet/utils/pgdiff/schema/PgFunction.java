@@ -133,7 +133,8 @@ public class PgFunction {
      * @param ignoreFunctionWhitespace whether multiple whitespaces in function
      * {@link #definition} should be ignored
      *
-     * @return {@inheritDoc}
+     * @return true if <code>object</code> is pg function and the function code
+     * is the same when compared ignoring whitespace, otherwise returns false
      */
     public boolean equals(final Object object,
             final boolean ignoreFunctionWhitespace) {
