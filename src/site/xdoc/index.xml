@@ -24,6 +24,26 @@
                 let me know and I may create a Used By section here at the site.
             </p>
         </section>
+        <section name="Installation">
+            <p>
+                You can use the binary distribution from <a
+                href="http://sourceforge.net/project/showfiles.php?group_id=163508">download</a>
+                page. Just unpack it on your disk and run it using:
+            </p>
+            <code>java -jar apgdiff.jar</code>
+            <p>
+                apgdiff is also available as installable package on some Linux
+                distributions:
+            </p>
+            <ul>
+                <li>Debian</li>
+                <li>Gentoo</li>
+                <li>Ubuntu</li>
+            </ul>
+            <p>
+                (If I missed some distribution then please let me know.)
+            </p>
+        </section>
         <section name="How the Program Works">
             <p>
                 apgdiff is a command-line tool. It takes two parameters. One is
@@ -103,6 +123,19 @@
                 <a href="http://sourceforge.net/tracker/?group_id=163508&amp;atid=828025">Patches</a>.
             </p>
         </section>
+        <section name="Some Links">
+            <p>
+                Here are some links mentioning apgdiff i found on internet:
+            </p>
+            <ul>
+                <li><a href="https://www.ohloh.net/p/apgdiff">apgdiff page on ohloh</a></li>
+                <li><a href="http://maksim07.blogspot.com/2008/10/postgres_24.html">maksim07's blog</a></li>
+                <li>apgdiff in <a href="http://search.postgresql.org/search?q=apgdiff&amp;m=1&amp;l=&amp;d=-1&amp;s=r">PostgreSQL mailing lists</li>
+                <li>apgdiff on <a href="http://www.experts-exchange.com/Database/PostgreSQL/Q_24799045.html">experts-exchange.com</a></li>
+                <li>apgdiff as solution on <a href="http://stackoverflow.com/questions/255905/how-to-synchronize-development-and-production-database">stackoverflow.com</a></li>
+                <li><a href="http://mac.softpedia.com/progScreenshots/apgdiff-Screenshot-56688.html">screenshot</a> of apgdiff on Mac OS X</li>
+            </ul>
+        </section>
         <section name="Future">
             <p>
                 As I use this tool quite often I will probably release new
@@ -116,7 +149,8 @@
         </section>
         <section name="Contact">
             <p>
-                You can contact me at <a href="mailto:miroslav.sulc@startnet.cz">miroslav.sulc@startnet.cz</a>.
+                You can contact me at
+                <a href="mailto:miroslav.sulc@startnet.cz">miroslav.sulc@startnet.cz</a>.
             </p>
         </section>
     </body>
