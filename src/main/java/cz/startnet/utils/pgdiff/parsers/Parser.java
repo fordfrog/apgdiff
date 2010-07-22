@@ -13,7 +13,7 @@ public final class Parser {
     /**
      * String to be parsed.
      */
-    private final String string;
+    private String string;
     /**
      * Current position.
      */
@@ -502,5 +502,58 @@ public final class Parser {
      */
     public void setPosition(final int position) {
         this.position = position;
+    }
+
+    /**
+     * Parses data type from the string. Position is updated. If data type
+     * definition is not found then exception is thrown.
+     *
+     * @return data type string
+     */
+    public String parseDataType() {
+        int endPos = position;
+
+        while (endPos < string.length()
+                && !Character.isWhitespace(string.charAt(endPos))
+                && string.charAt(endPos) != '(') {
+            endPos++;
+        }
+
+        if (endPos == position) {
+            throw new ParserException("Cannot parse string: " + string
+                    + "\nExpected data type definition at position: "
+                    + (position + 1) + " '"
+                    + string.substring(position, position + 20) + "'");
+        }
+
+        String dataType = string.substring(position, endPos);
+
+        position = endPos;
+        skipWhitespace();
+
+        if ("character".equalsIgnoreCase(dataType)
+                && expectOptional("varying")) {
+            dataType = "character varying";
+        } else if ("double".equalsIgnoreCase(dataType)
+                && expectOptional("precision")) {
+            dataType = "double precision";
+        }
+
+        if (string.charAt(position) == '(') {
+            dataType += getExpression();
+        }
+
+        return dataType;
+    }
+
+    /**
+     * Checks whether the whole string has been consumed.
+     * 
+     * @return true if there is nothing left to parse, otherwise false
+     */
+    public boolean isConsumed() {
+        return position == string.length()
+                || position + 1 == string.length()
+                && string.charAt(position) == ';';
     }
 }

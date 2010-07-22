@@ -125,6 +125,7 @@ public class PgDiffTables {
             updateTableColumns(writer, arguments, oldTable, newTable);
             checkWithOIDS(writer, oldTable, newTable);
             checkInherits(writer, oldTable, newTable);
+            checkTablespace(writer, oldTable, newTable);
             addAlterStatistics(writer, oldTable, newTable);
         }
     }
@@ -333,18 +334,39 @@ public class PgDiffTables {
      */
     private static void checkWithOIDS(final PrintWriter writer,
             final PgTable oldTable, final PgTable newTable) {
-        if (oldTable.isWithOIDS() && !newTable.isWithOIDS()) {
-            writer.println();
-            writer.println("ALTER TABLE "
-                    + PgDiffUtils.getQuotedName(newTable.getName()));
-            writer.println("\tSET WITHOUT OIDS;");
-        } else if (!oldTable.isWithOIDS() && newTable.isWithOIDS()) {
-            writer.println();
-            writer.println("WARNING: Table "
-                    + PgDiffUtils.getQuotedName(newTable.getName())
-                    + " adds WITH OIDS but there is no equivalent command "
-                    + "for adding of OIDS in PostgreSQL");
+        if (oldTable.getWith() == null && newTable.getWith() == null
+                || oldTable.getWith() != null
+                && oldTable.getWith().equals(newTable.getWith())) {
+            return;
         }
+
+        writer.println();
+        writer.println("ALTER TABLE "
+                + PgDiffUtils.getQuotedName(newTable.getName()));
+
+        if (newTable.getWith() == null
+                || "OIDS=false".equalsIgnoreCase(newTable.getWith())) {
+            writer.println("\tSET WITHOUT OIDS;");
+        } else if ("OIDS".equalsIgnoreCase(newTable.getWith())
+                || "OIDS=true".equalsIgnoreCase(newTable.getWith())) {
+            writer.println("\tSET WITH OIDS;");
+        } else {
+            writer.println("\tSET " + newTable.getWith() + ";");
+        }
+    }
+
+    private static void checkTablespace(final PrintWriter writer,
+            final PgTable oldTable, final PgTable newTable) {
+        if (oldTable.getTablespace() == null && newTable.getTablespace() == null
+                || oldTable.getTablespace() != null
+                && oldTable.getTablespace().equals(newTable.getTablespace())) {
+            return;
+        }
+
+        writer.println();
+        writer.println("ALTER TABLE "
+                + PgDiffUtils.getQuotedName(newTable.getName()));
+        writer.println("\tTABLESPACE " + newTable.getTablespace() + ';');
     }
 
     /**

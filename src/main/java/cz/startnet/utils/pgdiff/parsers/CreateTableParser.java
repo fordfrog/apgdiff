@@ -6,49 +6,12 @@ import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Parses CREATE TABLE commands.
  *
  * @author fordfrog
  */
 public class CreateTableParser {
-
-    /**
-     * Pattern for getting table name from CREATE TABLE.
-     */
-    private static final Pattern PATTERN_TABLE_NAME = Pattern.compile(
-            "CREATE[\\s]+TABLE[\\s]+\"?([^\\s\"]+)\"?[\\s]*\\(",
-            Pattern.CASE_INSENSITIVE);
-    /**
-     * Pattern for getting CONSTRAINT parameters.
-     */
-    private static final Pattern PATTERN_CONSTRAINT = Pattern.compile(
-            "CONSTRAINT[\\s]+\"?([^\\s\"]+)\"?[\\s]+(.*)",
-            Pattern.CASE_INSENSITIVE);
-    /**
-     * Pattern for parsing column definition.
-     */
-    private static final Pattern PATTERN_COLUMN = Pattern.compile(
-            "\"?([^\\s\"]+)\"?[\\s]+(.*)", Pattern.CASE_INSENSITIVE);
-    /**
-     * Pattern for parsing INHERITS.
-     */
-    private static final Pattern PATTERN_INHERITS = Pattern.compile(
-            "INHERITS[\\s]+([^;]+)[;]?", Pattern.CASE_INSENSITIVE);
-    /**
-     * Pattern for checking whether string contains WITH OIDS string.
-     */
-    private static final Pattern PATTERN_WITH_OIDS =
-            Pattern.compile(".*WITH[\\s]+OIDS.*", Pattern.CASE_INSENSITIVE);
-    /**
-     * Pattern for checking whether string contains WITHOUT OIDS
-     * string.
-     */
-    private static final Pattern PATTERN_WITHOUT_OIDS =
-            Pattern.compile(".*WITHOUT[\\s]+OIDS.*", Pattern.CASE_INSENSITIVE);
 
     /**
      * Creates a new instance of CreateTableParser.
@@ -66,19 +29,10 @@ public class CreateTableParser {
      * @throws RuntimeException DOCUMENT ME!
      */
     public static void parse(final PgDatabase database, final String command) {
-        String line = command;
-        final Matcher matcher = PATTERN_TABLE_NAME.matcher(line);
-        final String tableName;
+        final Parser parser = new Parser(command);
+        parser.expect("CREATE", "TABLE");
 
-        if (matcher.find()) {
-            tableName = matcher.group(1).trim();
-            line = ParserUtils.removeSubString(
-                    line, matcher.start(), matcher.end());
-        } else {
-            throw new ParserException(
-                    ParserException.CANNOT_PARSE_COMMAND + line);
-        }
-
+        final String tableName = parser.parseIdentifier();
         final PgTable table = new PgTable(ParserUtils.getObjectName(tableName));
         final String schemaName =
                 ParserUtils.getSchemaName(tableName, database);
@@ -92,125 +46,69 @@ public class CreateTableParser {
         }
 
         schema.addTable(table);
-        parseRows(table, ParserUtils.removeLastSemicolon(line));
-    }
 
-    /**
-     * Parses COLUMN and other DDL within '(' and ')' in CREATE TABLE
-     * definition.
-     *
-     * @param table table being parsed
-     * @param line line being processed
-     *
-     * @throws ParserException Thrown if problem occured while parsing DDL.
-     */
-    private static void parseColumnDefs(final PgTable table,
-            final String line) {
-        if (line.length() > 0) {
-            boolean matched = false;
-            Matcher matcher = PATTERN_CONSTRAINT.matcher(line.trim());
+        parser.expect("(");
 
-            if (matcher.matches()) {
-                final PgConstraint constraint =
-                        new PgConstraint(matcher.group(1).trim());
-                table.addConstraint(constraint);
-                constraint.setDefinition(matcher.group(2).trim());
-                constraint.setTableName(table.getName());
-                matched = true;
+        while (!parser.expectOptional(")")) {
+            if (parser.expectOptional("CONSTRAINT")) {
+                parseConstraint(parser, table);
+            } else {
+                parseColumn(parser, table);
             }
 
-            if (!matched) {
-                matcher = PATTERN_COLUMN.matcher(line);
+            if (parser.expectOptional(")")) {
+                break;
+            } else {
+                parser.expect(",");
+            }
+        }
 
-                if (matcher.matches()) {
-                    final PgColumn column =
-                            new PgColumn(matcher.group(1).trim());
-                    table.addColumn(column);
-                    column.parseDefinition(matcher.group(2).trim());
-                    matched = true;
+        while (!parser.expectOptional(";")) {
+            if (parser.expectOptional("INHERITS")) {
+                table.setInherits(parser.getExpression());
+            } else if (parser.expectOptional("WITHOUT")) {
+                table.setWith("OIDS=false");
+            } else if (parser.expectOptional("WITH")) {
+                if (parser.expectOptional("OIDS")
+                        || parser.expectOptional("OIDS=true")) {
+                    table.setWith("OIDS=true");
+                } else if (parser.expectOptional("OIDS=false")) {
+                    table.setWith("OIDS=false");
+                } else {
+                    table.setWith(parser.getExpression());
                 }
-            }
-
-            if (!matched) {
-                throw new ParserException(
-                        ParserException.CANNOT_PARSE_COMMAND + line);
+            } else if (parser.expectOptional("TABLESPACE")) {
+                table.setTablespace(parser.parseString());
+            } else {
+                parser.throwUnsupportedCommand();
             }
         }
     }
 
     /**
-     * Parses definitions that are present after column definition is
-     * closed with ')'.
+     * Parses CONSTRAINT definition.
      *
-     * @param table table being parsed
-     * @param commands commands being processed
-     *
-     * @return true if the command was the last command for CREATE TABLE,
-     *         otherwise false
+     * @param parser parser
+     * @param table pg table
      */
-    private static String parsePostColumns(final PgTable table,
-            final String commands) {
-        String line = commands;
-        final Matcher matcher = PATTERN_INHERITS.matcher(line);
-
-        if (matcher.find()) {
-            table.setInherits(matcher.group(1).trim());
-            line = ParserUtils.removeSubString(
-                    line, matcher.start(), matcher.end());
-        }
-
-        if (PATTERN_WITH_OIDS.matcher(line).matches()) {
-            table.setWithOIDS(true);
-            line = ParserUtils.removeSubString(line, "WITH OIDS");
-        } else if (PATTERN_WITHOUT_OIDS.matcher(line).matches()) {
-            table.setWithOIDS(false);
-            line = ParserUtils.removeSubString(line, "WITHOUT OIDS");
-        }
-
-        return line;
+    private static void parseConstraint(final Parser parser,
+            final PgTable table) {
+        final PgConstraint constraint =
+                new PgConstraint(parser.parseIdentifier());
+        table.addConstraint(constraint);
+        constraint.setDefinition(parser.getExpression());
+        constraint.setTableName(table.getName());
     }
 
     /**
-     * Parses all rows in CREATE TABLE command.
+     * Parses column definition.
      *
-     * @param table table being parsed
-     * @param command command without 'CREATE SEQUENCE ... (' string
-     *
-     * @throws ParserException Thrown if problem occured with parsing of DDL.
+     * @param parser parser
+     * @param table pg table
      */
-    private static void parseRows(final PgTable table, final String command) {
-        String line = command;
-        boolean postColumns = false;
-
-        try {
-            while (line.length() > 0) {
-                final int commandEnd = ParserUtils.getCommandEnd(line, 0);
-                final String subCommand = line.substring(0, commandEnd).trim();
-
-                if (postColumns) {
-                    line = parsePostColumns(table, subCommand);
-
-                    break;
-                } else if (line.charAt(commandEnd) == ')') {
-                    postColumns = true;
-                }
-
-                parseColumnDefs(table, subCommand);
-                line = (commandEnd >= line.length()) ? ""
-                        : line.substring(commandEnd + 1);
-            }
-        } catch (RuntimeException ex) {
-            throw new ParserException(
-                    ParserException.CANNOT_PARSE_COMMAND + "CREATE TABLE "
-                    + table.getName() + " ( " + command, ex);
-        }
-
-        line = line.trim();
-
-        if (line.length() > 0) {
-            throw new ParserException(
-                    "Cannot parse CREATE TABLE '" + table.getName()
-                    + "' - do not know how to parse '" + line + "'");
-        }
+    private static void parseColumn(final Parser parser, final PgTable table) {
+        final PgColumn column = new PgColumn(parser.parseIdentifier());
+        table.addColumn(column);
+        column.parseDefinition(parser.getExpression());
     }
 }

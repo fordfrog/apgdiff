@@ -47,9 +47,14 @@ public class PgTable {
      */
     private String name;
     /**
-     * Whether WITH OIDS is used.
+     * WITH clause. If value is null then it is not set, otherwise can be set to
+     * OIDS=true, OIDS=false, or storage parameters can be set.
      */
-    private boolean withOIDS;
+    private String with;
+    /**
+     * Tablespace value.
+     */
+    private String tablespace;
 
     /**
      * Creates a new PgTable object.
@@ -164,6 +169,28 @@ public class PgTable {
             sbSQL.append(inherits);
         }
 
+        if (with != null && !with.isEmpty()) {
+            sbSQL.append("\n");
+
+            if ("OIDS=false".equalsIgnoreCase(with)) {
+                sbSQL.append("WITHOUT OIDS");
+            } else {
+                sbSQL.append("WITH ");
+
+                if ("OIDS".equalsIgnoreCase(with)
+                        || "OIDS=true".equalsIgnoreCase(with)) {
+                    sbSQL.append("OIDS");
+                } else {
+                    sbSQL.append(with);
+                }
+            }
+        }
+
+        if (tablespace != null && !tablespace.isEmpty()) {
+            sbSQL.append("\nTABLESPACE ");
+            sbSQL.append(tablespace);
+        }
+
         sbSQL.append(';');
 
         for (PgColumn column : getColumnsWithStatistics()) {
@@ -265,21 +292,39 @@ public class PgTable {
     }
 
     /**
-     * Setter for {@link #withOIDS}.
+     * Setter for {@link #with}.
      *
-     * @param withOIDS {@link #withOIDS}
+     * @param with {@link #with}
      */
-    public void setWithOIDS(final boolean withOIDS) {
-        this.withOIDS = withOIDS;
+    public void setWith(final String with) {
+        this.with = with;
     }
 
     /**
-     * Getter for {@link #withOIDS}
+     * Getter for {@link #with}
      *
-     * @return {@link #withOIDS}
+     * @return {@link #with}
      */
-    public boolean isWithOIDS() {
-        return withOIDS;
+    public String getWith() {
+        return with;
+    }
+
+    /**
+     * Getter for {@link #tablespace}.
+     *
+     * @return {@link #tablespace}
+     */
+    public String getTablespace() {
+        return tablespace;
+    }
+
+    /**
+     * Setter for {@link #tablespace}.
+     *
+     * @param tablespace {@link #tablespace}
+     */
+    public void setTablespace(final String tablespace) {
+        this.tablespace = tablespace;
     }
 
     /**
