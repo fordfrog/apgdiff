@@ -63,6 +63,11 @@ public class PgDumpLoader { //NOPMD
     private static final Pattern PATTERN_CREATE_SEQUENCE = Pattern.compile(
             "^CREATE[\\s]+SEQUENCE[\\s]+.*$", Pattern.CASE_INSENSITIVE);
     /**
+     * Pattern for testing whether command is CREATE SEQUENCE command.
+     */
+    private static final Pattern PATTERN_ALTER_SEQUENCE = Pattern.compile(
+            "^ALTER[\\s]+SEQUENCE[\\s]+.*$", Pattern.CASE_INSENSITIVE);
+    /**
      * Pattern for testing whether command is CREATE INDEX command.
      */
     private static final Pattern PATTERN_CREATE_INDEX = Pattern.compile(
@@ -196,7 +201,8 @@ public class PgDumpLoader { //NOPMD
                         || PATTERN_SELECT.matcher(line).matches()
                         || PATTERN_INSERT_INTO.matcher(line).matches()
                         || PATTERN_REVOKE.matcher(line).matches()
-                        || PATTERN_GRANT.matcher(line).matches()) {
+                        || PATTERN_GRANT.matcher(line).matches()
+                        || PATTERN_ALTER_SEQUENCE.matcher(line).matches()) {
                     getWholeCommand(reader, line);
                 }
 
