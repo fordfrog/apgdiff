@@ -134,7 +134,7 @@ public class PgDiff {
             if (setSearchPath) {
                 writer.println();
                 writer.println("SET search_path = "
-                        + PgDiffUtils.getQuotedName(newSchema.getName())
+                        + PgDiffUtils.getQuotedName(newSchema.getName(), true)
                         + ", pg_catalog;");
             }
 
