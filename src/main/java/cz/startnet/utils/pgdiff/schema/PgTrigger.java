@@ -43,6 +43,14 @@ public class PgTrigger {
      * Whether the trigger should be fired on UPDATE.
      */
     private boolean onUpdate;
+    /**
+     * Whether the trigger should be fired on TRUNCATE.
+     */
+    private boolean onTruncate;
+    /**
+     * WHEN condition.
+     */
+    private String when;
 
     /**
      * Setter for {@link #before}.
@@ -68,16 +76,16 @@ public class PgTrigger {
      * @return created SQL
      */
     public String getCreationSQL() {
-        final StringBuilder sbDDL = new StringBuilder();
-        sbDDL.append("CREATE TRIGGER ");
-        sbDDL.append(PgDiffUtils.getQuotedName(getName()));
-        sbDDL.append("\n\t");
-        sbDDL.append(isBefore() ? "BEFORE" : "AFTER");
+        final StringBuilder sbSQL = new StringBuilder(100);
+        sbSQL.append("CREATE TRIGGER ");
+        sbSQL.append(PgDiffUtils.getQuotedName(getName()));
+        sbSQL.append("\n\t");
+        sbSQL.append(isBefore() ? "BEFORE" : "AFTER");
 
         boolean firstEvent = true;
 
         if (isOnInsert()) {
-            sbDDL.append(" INSERT");
+            sbSQL.append(" INSERT");
             firstEvent = false;
         }
 
@@ -85,29 +93,44 @@ public class PgTrigger {
             if (firstEvent) {
                 firstEvent = false;
             } else {
-                sbDDL.append(" OR");
+                sbSQL.append(" OR");
             }
 
-            sbDDL.append(" UPDATE");
+            sbSQL.append(" UPDATE");
         }
 
         if (isOnDelete()) {
             if (!firstEvent) {
-                sbDDL.append(" OR");
+                sbSQL.append(" OR");
             }
 
-            sbDDL.append(" DELETE");
+            sbSQL.append(" DELETE");
         }
 
-        sbDDL.append(" ON ");
-        sbDDL.append(PgDiffUtils.getQuotedName(getTableName()));
-        sbDDL.append("\n\tFOR EACH ");
-        sbDDL.append(isForEachRow() ? "ROW" : "STATEMENT");
-        sbDDL.append("\n\tEXECUTE PROCEDURE ");
-        sbDDL.append(getFunction());
-        sbDDL.append(';');
+        if (isOnTruncate()) {
+            if (!firstEvent) {
+                sbSQL.append(" OR");
+            }
 
-        return sbDDL.toString();
+            sbSQL.append(" TRUNCATE");
+        }
+
+        sbSQL.append(" ON ");
+        sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
+        sbSQL.append("\n\tFOR EACH ");
+        sbSQL.append(isForEachRow() ? "ROW" : "STATEMENT");
+
+        if (when != null && !when.isEmpty()) {
+            sbSQL.append("\n\tWHEN (");
+            sbSQL.append(when);
+            sbSQL.append(')');
+        }
+
+        sbSQL.append("\n\tEXECUTE PROCEDURE ");
+        sbSQL.append(getFunction());
+        sbSQL.append(';');
+
+        return sbSQL.toString();
     }
 
     /**
@@ -229,6 +252,24 @@ public class PgTrigger {
     }
 
     /**
+     * Getter for {@link #onTruncate}.
+     *
+     * @return {@link #onTruncate}
+     */
+    public boolean isOnTruncate() {
+        return onTruncate;
+    }
+
+    /**
+     * Setter for {@link #onTruncate}.
+     *
+     * @param onTruncate {@link #onTruncate}
+     */
+    public void setOnTruncate(final boolean onTruncate) {
+        this.onTruncate = onTruncate;
+    }
+
+    /**
      * Setter for {@link #tableName}.
      *
      * @param tableName {@link #tableName}
@@ -247,12 +288,23 @@ public class PgTrigger {
     }
 
     /**
-     * {@inheritDoc}
+     * Getter for {@link #when}.
      *
-     * @param object {@inheritDoc}
-     *
-     * @return {@inheritDoc}
+     * @return {@link #when}
      */
+    public String getWhen() {
+        return when;
+    }
+
+    /**
+     * Setter for {@link #when}.
+     *
+     * @param when {@link #when}
+     */
+    public void setWhen(final String when) {
+        this.when = when;
+    }
+
     @Override
     public boolean equals(final Object object) {
         boolean equals = false;
@@ -261,28 +313,24 @@ public class PgTrigger {
             equals = true;
         } else if (object instanceof PgTrigger) {
             final PgTrigger trigger = (PgTrigger) object;
-            equals = (before == trigger.before)
-                    && (forEachRow == trigger.forEachRow)
-                    && function.equals(trigger.function)
-                    && name.equals(trigger.name)
-                    && (onDelete == trigger.onDelete)
-                    && (onInsert == trigger.onInsert)
-                    && (onUpdate == trigger.onUpdate)
-                    && tableName.equals(trigger.tableName);
+            equals = (before == trigger.isBefore())
+                    && (forEachRow == trigger.isForEachRow())
+                    && function.equals(trigger.getFunction())
+                    && name.equals(trigger.getName())
+                    && (onDelete == trigger.isOnDelete())
+                    && (onInsert == trigger.isOnInsert())
+                    && (onUpdate == trigger.isOnUpdate())
+                    && (onTruncate == trigger.isOnTruncate())
+                    && tableName.equals(trigger.getTableName());
         }
 
         return equals;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return (getClass().getName() + "|" + before + "|" + forEachRow + "|"
                 + function + "|" + name + "|" + onDelete + "|" + onInsert + "|"
-                + onUpdate + "|" + tableName).hashCode();
+                + onUpdate + "|" + onTruncate + "|" + tableName).hashCode();
     }
 }

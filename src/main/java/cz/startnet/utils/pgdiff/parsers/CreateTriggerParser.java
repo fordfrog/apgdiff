@@ -3,26 +3,12 @@ package cz.startnet.utils.pgdiff.parsers;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgTrigger;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Parses CREATE TRIGGER commands.
  *
  * @author fordfrog
  */
 public class CreateTriggerParser {
-
-    /**
-     * Pattern for parsing CREATE TRIGGER command.
-     */
-    private static final Pattern PATTERN = Pattern.compile(
-            "^CREATE[\\s]+TRIGGER[\\s]+\"?([^\\s\"]+)\"?[\\s]+(BEFORE|AFTER)[\\s]+"
-            + "(INSERT|UPDATE|DELETE)(?:[\\s]+OR[\\s]+)?(INSERT|UPDATE|DELETE)?"
-            + "(?:[\\s]+OR[\\s]+)?(INSERT|UPDATE|DELETE)?[\\s]+"
-            + "ON[\\s]+\"?([^\\s\"]+)\"?[\\s]+(?:FOR[\\s]+)?(?:EACH[\\s]+)?"
-            + "(ROW|STATEMENT)?[\\s]+EXECUTE[\\s]+PROCEDURE[\\s]+([^;]+);$",
-            Pattern.CASE_INSENSITIVE);
 
     /**
      * Creates a new CreateTableParser object.
@@ -40,61 +26,67 @@ public class CreateTriggerParser {
      *         command.
      */
     public static void parse(final PgDatabase database, final String command) {
-        final Matcher matcher = PATTERN.matcher(command.trim());
+        final Parser parser = new Parser(command);
+        parser.expect("CREATE", "TRIGGER");
 
-        if (matcher.matches()) {
-            final String triggerName = matcher.group(1);
-            final String when = matcher.group(2);
-            final String[] events = new String[3];
-            events[0] = matcher.group(3);
-            events[1] = matcher.group(4);
-            events[2] = matcher.group(5);
+        final PgTrigger trigger = new PgTrigger();
+        trigger.setName(parser.parseIdentifier());
 
-            final String tableName = matcher.group(6);
-            final String fireOn = matcher.group(7);
-            final String procedure = matcher.group(8);
-
-            final PgTrigger trigger = new PgTrigger();
-            trigger.setBefore("BEFORE".equalsIgnoreCase(when));
-            trigger.setForEachRow(
-                    (fireOn != null) && "ROW".equalsIgnoreCase(fireOn));
-            trigger.setFunction(procedure.trim());
-            trigger.setName(triggerName.trim());
-            trigger.setOnDelete(isEventPresent(events, "DELETE"));
-            trigger.setOnInsert(isEventPresent(events, "INSERT"));
-            trigger.setOnUpdate(isEventPresent(events, "UPDATE"));
-            trigger.setTableName(tableName.trim());
-
-            database.getDefaultSchema().getTable(
-                    trigger.getTableName()).addTrigger(trigger);
-        } else {
-            throw new ParserException(
-                    ParserException.CANNOT_PARSE_COMMAND + command);
+        if (parser.expectOptional("BEFORE")) {
+            trigger.setBefore(true);
+        } else if (parser.expectOptional("AFTER")) {
+            trigger.setBefore(false);
         }
-    }
 
-    /**
-     * Returns true if <code>event</code> is present in
-     * <code>events</code>, otherwise false.
-     *
-     * @param events array of events
-     * @param event event to be searched
-     *
-     * @return true if <code>event</code> is present in <code>events</code>,
-     *         otherwise false
-     */
-    private static boolean isEventPresent(final String[] events,
-            final String event) {
-        boolean present = false;
+        boolean first = true;
 
-        for (String curEvent : events) {
-            if (event.equalsIgnoreCase(curEvent)) {
-                present = true;
-
+        while (true) {
+            if (!first && !parser.expectOptional("OR")) {
                 break;
+            }
+            if (parser.expectOptional("INSERT")) {
+                trigger.setOnInsert(true);
+            } else if (parser.expectOptional("UPDATE")) {
+                trigger.setOnUpdate(true);
+            } else if (parser.expectOptional("DELETE")) {
+                trigger.setOnDelete(true);
+            } else if (parser.expectOptional("TRUNCATE")) {
+                trigger.setOnTruncate(true);
+            } else if (first) {
+                break;
+            } else {
+                parser.throwUnsupportedCommand();
+            }
+
+            first = false;
+        }
+
+        parser.expect("ON");
+
+        trigger.setTableName(parser.parseIdentifier());
+
+        if (parser.expectOptional("FOR")) {
+            parser.expectOptional("EACH");
+
+            if (parser.expectOptional("ROW")) {
+                trigger.setForEachRow(true);
+            } else if (parser.expectOptional("STATEMENT")) {
+                trigger.setForEachRow(false);
+            } else {
+                parser.throwUnsupportedCommand();
             }
         }
 
-        return present;
+        if (parser.expectOptional("WHEN")) {
+            parser.expect("(");
+            trigger.setWhen(parser.getExpression());
+            parser.expect(")");
+        }
+
+        parser.expect("EXECUTE", "PROCEDURE");
+        trigger.setFunction(parser.getRest());
+
+        database.getDefaultSchema().getTable(
+                trigger.getTableName()).addTrigger(trigger);
     }
 }
