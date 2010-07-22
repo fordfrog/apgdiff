@@ -141,9 +141,9 @@ public class PgDiff {
             final PgSchema oldSchema =
                     oldDatabase.getSchema(newSchema.getName());
 
+            PgDiffTriggers.dropTriggers(writer, oldSchema, newSchema);
             PgDiffFunctions.dropFunctions(
                     writer, arguments, oldSchema, newSchema);
-            PgDiffTriggers.dropTriggers(writer, oldSchema, newSchema);
             PgDiffFunctions.createFunctions(
                     writer, arguments, oldSchema, newSchema);
             PgDiffViews.dropViews(writer, oldSchema, newSchema);
