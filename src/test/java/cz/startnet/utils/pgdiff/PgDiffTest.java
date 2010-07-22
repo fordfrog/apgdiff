@@ -257,7 +257,7 @@ public class PgDiffTest {
 
         reader.close();
 
-        Assert.assertEquals(
+        Assert.assertEquals("File name template: " + fileNameTemplate,
                 sbExpDiff.toString().trim(),
                 diffInput.toString().trim());
     }

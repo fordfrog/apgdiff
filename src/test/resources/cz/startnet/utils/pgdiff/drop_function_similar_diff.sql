@@ -1,2 +1,2 @@
 
-DROP FUNCTION multiply_numbers(smallint,smallint);
+DROP FUNCTION multiply_numbers(number2 smallint, number1 smallint);

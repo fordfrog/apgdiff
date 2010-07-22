@@ -90,25 +90,20 @@ public class PgSchema {
     }
 
     /**
-     * Finds function according to specified function
-     * <code>declaration</code>.
+     * Finds function according to specified function <code>signature</code>.
      *
-     * @param declaration declaration of the function to be searched
+     * @param signature signature of the function to be searched
      *
      * @return found function or null if no such function has been found
      */
-    public PgFunction getFunction(final String declaration) {
-        PgFunction function = null;
-
-        for (PgFunction curFunction : functions) {
-            if (curFunction.getDeclaration().equals(declaration)) {
-                function = curFunction;
-
-                break;
+    public PgFunction getFunction(final String signature) {
+        for (PgFunction function : functions) {
+            if (function.getSignature().equals(signature)) {
+                return function;
             }
         }
 
-        return function;
+        return null;
     }
 
     /**
@@ -258,25 +253,21 @@ public class PgSchema {
 
     /**
      * Returns true if schema contains function with given
-     * <code>declaration</code>, otherwise false.
+     * <code>signature</code>, otherwise false.
      *
-     * @param declaration declaration of the function
+     * @param signature signature of the function
      *
      * @return true if schema contains function with given
-     *         <code>declaration</code>, otherwise false
+     *         <code>signature</code>, otherwise false
      */
-    public boolean containsFunction(final String declaration) {
-        boolean found = false;
-
+    public boolean containsFunction(final String signature) {
         for (PgFunction function : functions) {
-            if (function.getDeclaration().equals(declaration)) {
-                found = true;
-
-                break;
+            if (function.getSignature().equals(signature)) {
+                return true;
             }
         }
 
-        return found;
+        return false;
     }
 
     /**

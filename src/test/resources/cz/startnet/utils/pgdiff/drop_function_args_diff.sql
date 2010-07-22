@@ -1,2 +1,2 @@
 
-DROP FUNCTION power_number(integer);
+DROP FUNCTION power_number(input integer);

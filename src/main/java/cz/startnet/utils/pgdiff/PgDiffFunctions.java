@@ -36,8 +36,7 @@ public class PgDiffFunctions {
             if (oldSchema == null) {
                 oldFunction = null;
             } else {
-                oldFunction = oldSchema.getFunction(
-                        newFunction.getDeclaration());
+                oldFunction = oldSchema.getFunction(newFunction.getSignature());
             }
 
             if ((oldFunction == null) || !newFunction.equals(oldFunction,
@@ -62,7 +61,7 @@ public class PgDiffFunctions {
         // Drop functions that exist no more
         if (oldSchema != null) {
             for (final PgFunction oldFunction : oldSchema.getFunctions()) {
-                if (!newSchema.containsFunction(oldFunction.getDeclaration())) {
+                if (!newSchema.containsFunction(oldFunction.getSignature())) {
                     writer.println();
                     writer.println(oldFunction.getDropSQL());
                 }

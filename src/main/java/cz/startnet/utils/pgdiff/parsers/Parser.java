@@ -1,5 +1,6 @@
 package cz.startnet.utils.pgdiff.parsers;
 
+import java.util.Arrays;
 import java.util.Locale;
 
 /**
@@ -58,7 +59,8 @@ public final class Parser {
         if (wordEnd <= string.length()
                 && string.substring(position, wordEnd).equalsIgnoreCase(word)
                 && (wordEnd == string.length()
-                || !Character.isLetter(wordEnd))) {
+                || !Character.isLetter(string.charAt(wordEnd))
+                || "(".equals(word) || ",".equals(","))) {
             position = wordEnd;
             skipWhitespace();
 
@@ -70,7 +72,8 @@ public final class Parser {
         }
 
         throw new ParserException("Cannot parse string: " + string
-                + "\nExpected " + word + " at position " + position);
+                + "\nExpected " + word + " at position " + (position + 1)
+                + " '" + string.substring(position, position + 20) + "'");
     }
 
     /**
@@ -130,14 +133,15 @@ public final class Parser {
             if (!Character.isLetter(string.charAt(endPos))) {
                 throw new ParserException("Cannot parse string: " + string
                         + "\nIdentifier must begin with letter at position "
-                        + position);
+                        + (position + 1) + " '"
+                        + string.substring(position, position + 20) + "'");
             }
 
             for (endPos++; endPos < string.length(); endPos++) {
                 final char chr = string.charAt(endPos);
 
                 if (Character.isWhitespace(chr) || chr == ',' || chr == ')'
-                        || chr == ';') {
+                        || chr == '(' || chr == ';') {
                     break;
                 }
             }
@@ -198,7 +202,8 @@ public final class Parser {
             return result;
         } catch (final NumberFormatException ex) {
             throw new ParserException("Cannot parse string: " + string
-                    + "\nExpected integer at position: " + position);
+                    + "\nExpected integer at position: " + (position + 1)
+                    + " '" + string.substring(position, position + 20) + "'");
         }
     }
 
@@ -213,7 +218,8 @@ public final class Parser {
 
         if (position == endPos) {
             throw new ParserException("Cannot parse string: " + string
-                    + "\nExpected expression at position " + position);
+                    + "\nExpected expression at position " + (position + 1)
+                    + " '" + string.substring(position, position + 20) + "'");
         }
 
         final String result = string.substring(position, endPos).trim();
@@ -286,6 +292,150 @@ public final class Parser {
      */
     public void throwUnsupportedCommand() {
         throw new ParserException("Cannot parse string: " + string
-                + "\nUnsupported command at position " + position);
+                + "\nUnsupported command at position " + (position + 1)
+                + " '" + string.substring(position, position + 20) + "'");
+    }
+
+    /**
+     * Checks whether one of the words is present at current position. If the
+     * word is present then the word is returned and position is updated.
+     *
+     * @param words words to check
+     *
+     * @return found word or null if non of the words has been found
+     *
+     * @see #expectOptional(java.lang.String[])
+     */
+    public String expectOptionalOneOf(final String... words) {
+        for (final String word : words) {
+            if (expectOptional(word)) {
+                return word;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Searches string forward from position to find one of following. If none
+     * of words is found, exception is thrown, unless optional is true. Position
+     * is not updated.
+     * 
+     * @param optional true if the strings are optional, otherwise false
+     * @param words list of words
+     *
+     * @return position of the closest occurance of any of the words, or end of
+     * expression if optional is true
+     */
+    public int findOneOfInExpression(final boolean optional,
+            final String... words) {
+        final int endOfExpression = getExpressionEnd();
+        int minWordPos = -1;
+
+        for (final String word : words) {
+            final int pos = string.indexOf(word, position);
+
+            if (pos != -1 && pos < endOfExpression
+                    && (minWordPos == -1 || pos < minWordPos)) {
+                minWordPos = pos;
+            }
+        }
+
+        if (minWordPos != -1) {
+            return minWordPos;
+        } else if (optional) {
+            return endOfExpression;
+        }
+
+        throw new RuntimeException("Cannot parse string: " + string
+                + "\nCannot find one of " + Arrays.toString(words)
+                + " from position " + position);
+    }
+
+    /**
+     * Parses data type backward from given end position excluded. If parsing of
+     * data type fails, exception is thrown. Position is not updated.
+     *
+     * @param endPosition end position from which data type should be parsed
+     *
+     * @return start position of the data type
+     */
+    public int parseDataTypeBackward(final int endPosition) {
+        int curPos = endPosition;
+
+        // get rid of whitespace
+        while (Character.isWhitespace(string.charAt(curPos - 1))) {
+            curPos--;
+        }
+
+        // if ')' is present we are handling something like 'varchar(num)'
+        if (string.charAt(curPos - 1) == ')') {
+            curPos--;
+
+            while (string.charAt(curPos - 1) != '(') {
+                curPos--;
+            }
+
+            curPos--;
+
+            // get rid of whitespace
+            while (Character.isWhitespace(string.charAt(curPos - 1))) {
+                curPos--;
+            }
+        }
+
+        final int wordEndPos = curPos - 1;
+        while (!Character.isWhitespace(string.charAt(curPos - 1))
+                && string.charAt(curPos - 1) != ','
+                && string.charAt(curPos - 1) != '(') {
+            curPos--;
+        }
+
+        // now we must handle multiword data types
+        final String word = string.substring(curPos, wordEndPos + 1);
+
+        if (word.equalsIgnoreCase("varying")
+                || word.equalsIgnoreCase("precision")) {
+            // get rid of whitespace
+            while (Character.isWhitespace(string.charAt(curPos - 1))) {
+                curPos--;
+            }
+
+            // parse to previous word beginning
+            while (!Character.isWhitespace(string.charAt(curPos - 1))
+                    && string.charAt(curPos - 1) != ','
+                    && string.charAt(curPos - 1) != '(') {
+                curPos--;
+            }
+        }
+
+        if (curPos < position) {
+            throw new RuntimeException("Cannot parse string: " + string
+                    + "\nCannot parse data type between positions "
+                    + position + " and " + endPosition);
+        }
+
+        return curPos;
+    }
+
+    /**
+     * Returns substring from the string.
+     *
+     * @param startPos start position
+     * @param endPos end position exclusive
+     *
+     * @return substring
+     */
+    public String getSubString(final int startPos, final int endPos) {
+        return string.substring(startPos, endPos);
+    }
+
+    /**
+     * Changes current position in the string.
+     *
+     * @param position new position
+     */
+    public void setPosition(final int position) {
+        this.position = position;
     }
 }
