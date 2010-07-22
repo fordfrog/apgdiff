@@ -37,6 +37,10 @@ public class PgSequence {
      * True if CYCLE, false if NO CYCLE.
      */
     private boolean cycle;
+    /**
+     * Column the sequence is owned by.
+     */
+    private String ownedBy;
 
     /**
      * Creates a new PgSequence object.
@@ -110,6 +114,11 @@ public class PgSequence {
 
         if (cycle) {
             sbSQL.append("\n\tCYCLE");
+        }
+
+        if (ownedBy != null && !ownedBy.isEmpty()) {
+            sbSQL.append("\n\tOWNED BY ");
+            sbSQL.append(PgDiffUtils.getQuotedName(ownedBy));
         }
 
         sbSQL.append(';');
@@ -232,5 +241,23 @@ public class PgSequence {
      */
     public String getStartWith() {
         return startWith;
+    }
+
+    /**
+     * Getter for {@link #ownedBy}.
+     *
+     * @return {@link #ownedBy}
+     */
+    public String getOwnedBy() {
+        return ownedBy;
+    }
+
+    /**
+     * Setter for {@link #ownedBy}.
+     *
+     * @param ownedBy {@link #ownedBy}
+     */
+    public void setOwnedBy(final String ownedBy) {
+        this.ownedBy = ownedBy;
     }
 }

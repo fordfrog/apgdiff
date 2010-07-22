@@ -214,6 +214,65 @@ public final class Parser {
     }
 
     /**
+     * Parses string from the string. String can be either quoted or unqouted.
+     * Quoted string is parsed till next unescaped quote. Unquoted string is
+     * parsed till whitespace, ',' ')' or ';' is found. If string should be
+     * empty, exception is thrown.
+     *
+     * @return parsed string, if quoted then including quotes
+     */
+    public String parseString() {
+        final boolean quoted = string.charAt(position) == '\'';
+
+        if (quoted) {
+            boolean escape = false;
+            int endPos = position;
+
+            for (; endPos < string.length(); endPos++) {
+                final char chr = string.charAt(endPos);
+
+                if (chr == '\\') {
+                    escape = !escape;
+                } else if (chr == '\'' && !escape
+                        && endPos + 1 < string.length()
+                        && string.charAt(endPos + 1) != '\'') {
+                    break;
+                }
+            }
+
+            final String result = string.substring(position, endPos + 1);
+
+            position = endPos + 1;
+            skipWhitespace();
+
+            return result;
+        } else {
+            int endPos = position;
+
+            for (; endPos < string.length(); endPos++) {
+                final char chr = string.charAt(endPos);
+
+                if (Character.isWhitespace(chr) || chr == ',' || chr == ')'
+                        || chr == ';') {
+                    break;
+                }
+            }
+
+            if (position == endPos) {
+                throw new ParserException("Cannot parse string: " + string
+                        + "\nExpected string at position: " + (position + 1));
+            }
+
+            final String result = string.substring(position, endPos);
+
+            position = endPos;
+            skipWhitespace();
+
+            return result;
+        }
+    }
+
+    /**
      * Returns expression that is ended either with ',', ')' or with end of the
      * string. If expression is empty then exception is thrown.
      *
