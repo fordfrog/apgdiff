@@ -32,7 +32,6 @@ public class CreateSchemaParser {
      * Creates a new CreateSchemaParser object.
      */
     private CreateSchemaParser() {
-        super();
     }
 
     /**

@@ -20,20 +20,17 @@ public class PgDiffIndexes {
      * Creates a new instance of PgDiffIndexes.
      */
     private PgDiffIndexes() {
-        super();
     }
 
     /**
      * Outputs commands for creation of new indexes.
      *
      * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
      * @param oldSchema original schema
      * @param newSchema new schema
      */
     public static void createIndexes(final PrintWriter writer,
-            final PgDiffArguments arguments, final PgSchema oldSchema,
-            final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema) {
         for (final PgTable newTable : newSchema.getTables()) {
             final String newTableName = newTable.getName();
 
@@ -41,15 +38,13 @@ public class PgDiffIndexes {
             if (oldSchema == null) {
                 for (PgIndex index : newTable.getIndexes()) {
                     writer.println();
-                    writer.println(
-                            index.getCreationSQL(arguments.isQuoteNames()));
+                    writer.println(index.getCreationSQL());
                 }
             } else {
                 for (PgIndex index : getNewIndexes(
                         oldSchema.getTable(newTableName), newTable)) {
                     writer.println();
-                    writer.println(
-                            index.getCreationSQL(arguments.isQuoteNames()));
+                    writer.println(index.getCreationSQL());
                 }
             }
         }
@@ -59,13 +54,11 @@ public class PgDiffIndexes {
      * Outputs commands for dropping indexes that exist no more.
      *
      * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
      * @param oldSchema original schema
      * @param newSchema new schema
      */
     public static void dropIndexes(final PrintWriter writer,
-            final PgDiffArguments arguments, final PgSchema oldSchema,
-            final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema) {
         for (final PgTable newTable : newSchema.getTables()) {
             final String newTableName = newTable.getName();
             final PgTable oldTable;
@@ -79,7 +72,7 @@ public class PgDiffIndexes {
             // Drop indexes that do not exist in new schema or are modified
             for (final PgIndex index : getDropIndexes(oldTable, newTable)) {
                 writer.println();
-                writer.println(index.getDropSQL(arguments.isQuoteNames()));
+                writer.println(index.getDropSQL());
             }
         }
     }
@@ -97,6 +90,7 @@ public class PgDiffIndexes {
      */
     private static List<PgIndex> getDropIndexes(final PgTable oldTable,
             final PgTable newTable) {
+        @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<PgIndex> list = new ArrayList<PgIndex>();
 
         if ((newTable != null) && (oldTable != null)) {
@@ -121,6 +115,7 @@ public class PgDiffIndexes {
      */
     private static List<PgIndex> getNewIndexes(final PgTable oldTable,
             final PgTable newTable) {
+        @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<PgIndex> list = new ArrayList<PgIndex>();
 
         if (newTable != null) {

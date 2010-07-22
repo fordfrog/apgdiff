@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>cz.startnet.utils.pgdiff</groupId>
     <artifactId>apgdiff</artifactId>
     <name>Another PostgreSQL Diff Tool</name>
-    <version>1.4</version>
+    <version>2.0-SNAPSHOT</version>
     <description>Simple PostgreSQL diff tool that is useful for schema upgrades. The tool compares two schema dump files and creates output file that is (after some hand-made modifications) suitable for upgrade of old schema.</description>
+
     <url>http://apgdiff.sourceforge.net</url>
+
     <issueManagement>
         <system>SouceForge Tracker</system>
         <url>http://sourceforge.net/tracker/?group_id=163508</url>
     </issueManagement>
+
     <inceptionYear>2006</inceptionYear>
+
     <developers>
         <developer>
             <id>fordfrog</id>
@@ -25,6 +30,7 @@
             <timezone>+2</timezone>
         </developer>
     </developers>
+
     <contributors>
         <contributor>
             <name>Matthieu Patou</name>
@@ -51,6 +57,7 @@
             </roles>
         </contributor>
     </contributors>
+
     <licenses>
         <license>
             <name>MIT</name>
@@ -59,15 +66,18 @@
             <comments>A business-friendly OSS license</comments>
         </license>
     </licenses>
+
     <scm>
-        <connection>scm:hg:http://apgdiff.hg.sourceforge.net/hgweb/apgdiff/</connection>
+        <connection>scm:hg:http://apgdiff.hg.sourceforge.net:8000/hgroot/apgdiff/apgdiff</connection>
         <developerConnection>scm:hg:ssh://apgdiff.hg.sourceforge.net/hgroot/apgdiff/apgdiff</developerConnection>
         <url>http://apgdiff.hg.sourceforge.net/hgweb/apgdiff/</url>
     </scm>
+    
     <organization>
         <name>StartNet s.r.o.</name>
         <url>http://www.startnet.cz</url>
     </organization>
+    
     <build>
         <plugins>
             <plugin>
@@ -98,6 +108,7 @@
             </plugin>
         </plugins>
     </build>
+
     <pluginRepositories>
         <pluginRepository>
             <releases />
@@ -138,11 +149,12 @@
             <url>http://stat-scm.sourceforge.net/maven2-snapshots</url>
         </pluginRepository>
     </pluginRepositories>
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.7</version>
+            <version>4.8.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -152,6 +164,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
     <reporting>
         <plugins>
             <plugin>
@@ -205,6 +218,7 @@
             </plugin>
         </plugins>
     </reporting>
+
     <distributionManagement>
         <site>
             <id>website</id>
@@ -212,4 +226,5 @@
             <url>scp://shell.sourceforge.net/home/groups/a/ap/apgdiff/htdocs/</url>
         </site>
     </distributionManagement>
+    
 </project>

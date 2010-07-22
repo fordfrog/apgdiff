@@ -16,27 +16,23 @@ public class PgDiffSequences {
      * Creates a new instance of PgDiffSequences.
      */
     private PgDiffSequences() {
-        super();
     }
 
     /**
      * Outputs commands for creation of new sequences.
      *
      * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
      * @param oldSchema original schema
      * @param newSchema new schema
      */
     public static void createSequences(final PrintWriter writer,
-            final PgDiffArguments arguments, final PgSchema oldSchema,
-            final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema) {
         // Add new sequences
         for (final PgSequence sequence : newSchema.getSequences()) {
             if (oldSchema == null
                     || !oldSchema.containsSequence(sequence.getName())) {
                 writer.println();
-                writer.println(
-                        sequence.getCreationSQL(arguments.isQuoteNames()));
+                writer.println(sequence.getCreationSQL());
             }
         }
     }
@@ -45,20 +41,17 @@ public class PgDiffSequences {
      * Outputs commands for dropping of sequences that do not exist anymore.
      *
      * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
      * @param oldSchema original schema
      * @param newSchema new schema
      */
     public static void dropSequences(final PrintWriter writer,
-            final PgDiffArguments arguments, final PgSchema oldSchema,
-            final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema) {
         // Drop sequences that do not exist in new schema
         if (oldSchema != null) {
             for (final PgSequence sequence : oldSchema.getSequences()) {
                 if (!newSchema.containsSequence(sequence.getName())) {
                     writer.println();
-                    writer.println(
-                            sequence.getDropSQL(arguments.isQuoteNames()));
+                    writer.println(sequence.getDropSQL());
                 }
             }
         }
@@ -75,7 +68,7 @@ public class PgDiffSequences {
     public static void alterSequences(final PrintWriter writer,
             final PgDiffArguments arguments, final PgSchema oldSchema,
             final PgSchema newSchema) {
-        final StringBuilder sbSQL = new StringBuilder();
+        final StringBuilder sbSQL = new StringBuilder(100);
 
         for (final PgSequence newSequence : newSchema.getSequences()) {
             if (oldSchema != null
@@ -145,8 +138,7 @@ public class PgDiffSequences {
                 if (sbSQL.length() > 0) {
                     writer.println();
                     writer.print("ALTER SEQUENCE "
-                            + PgDiffUtils.getQuotedName(newSequence.getName(),
-                            arguments.isQuoteNames()));
+                            + PgDiffUtils.getQuotedName(newSequence.getName()));
                     writer.print(sbSQL.toString());
                     writer.println(';');
                 }

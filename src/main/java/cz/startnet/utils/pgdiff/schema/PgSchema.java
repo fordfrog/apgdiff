@@ -3,6 +3,7 @@ package cz.startnet.utils.pgdiff.schema;
 import cz.startnet.utils.pgdiff.PgDiffUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -15,18 +16,22 @@ public class PgSchema {
     /**
      * List of functions defined in the schema.
      */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final List<PgFunction> functions = new ArrayList<PgFunction>();
     /**
      * List of sequences defined in the schema.
      */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final List<PgSequence> sequences = new ArrayList<PgSequence>();
     /**
      * List of tables defined in the schema.
      */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final List<PgTable> tables = new ArrayList<PgTable>();
     /**
      * List of views defined in the schema.
      */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final List<PgView> views = new ArrayList<PgView>();
     /**
      * Name of the schema.
@@ -43,7 +48,6 @@ public class PgSchema {
      * @param name {@link #name}
      */
     public PgSchema(final String name) {
-        super();
         this.name = name;
     }
 
@@ -68,19 +72,16 @@ public class PgSchema {
     /**
      * Creates and returns SQL for creation of the schema.
      *
-     * @param quoteNames whether names should be quoted
-     *
      * @return created SQL
      */
-    public String getCreationSQL(final boolean quoteNames) {
-        final StringBuilder sbSQL = new StringBuilder();
+    public String getCreationSQL() {
+        final StringBuilder sbSQL = new StringBuilder(50);
         sbSQL.append("CREATE SCHEMA ");
-        sbSQL.append(PgDiffUtils.getQuotedName(getName(), quoteNames));
+        sbSQL.append(PgDiffUtils.getQuotedName(getName()));
 
         if (getAuthorization() != null) {
             sbSQL.append(" AUTHORIZATION ");
-            sbSQL.append(
-                    PgDiffUtils.getQuotedName(getAuthorization(), quoteNames));
+            sbSQL.append(PgDiffUtils.getQuotedName(getAuthorization()));
         }
 
         sbSQL.append(';');
@@ -111,12 +112,12 @@ public class PgSchema {
     }
 
     /**
-     * Getter for {@link #functions}.
+     * Getter for {@link #functions}. The list cannot be modified.
      *
      * @return {@link #functions}
      */
     public List<PgFunction> getFunctions() {
-        return functions;
+        return Collections.unmodifiableList(functions);
     }
 
     /**
@@ -151,12 +152,12 @@ public class PgSchema {
     }
 
     /**
-     * Getter for {@link #sequences}.
+     * Getter for {@link #sequences}. The list cannot be modified.
      *
      * @return {@link #sequences}
      */
     public List<PgSequence> getSequences() {
-        return sequences;
+        return Collections.unmodifiableList(sequences);
     }
 
     /**
@@ -181,12 +182,12 @@ public class PgSchema {
     }
 
     /**
-     * Getter for {@link #tables}.
+     * Getter for {@link #tables}. The list cannot be modified.
      *
      * @return {@link #tables}
      */
     public List<PgTable> getTables() {
-        return tables;
+        return Collections.unmodifiableList(tables);
     }
 
     /**
@@ -211,12 +212,12 @@ public class PgSchema {
     }
 
     /**
-     * Getter for {@link #views}.
+     * Getter for {@link #views}. The list cannot be modified.
      *
      * @return {@link #views}
      */
     public List<PgView> getViews() {
-        return views;
+        return Collections.unmodifiableList(views);
     }
 
     /**

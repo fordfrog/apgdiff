@@ -32,19 +32,16 @@ public class PgIndex {
      * @param name {@link #name}
      */
     public PgIndex(final String name) {
-        super();
         this.name = name;
     }
 
     /**
      * Creates and returns SQL for creation of the index.
      *
-     * @param quoteNames whether names should be quoted
-     *
      * @return created SQL
      */
-    public String getCreationSQL(final boolean quoteNames) {
-        final StringBuilder sbSQL = new StringBuilder();
+    public String getCreationSQL() {
+        final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("CREATE ");
 
         if (isUnique()) {
@@ -52,9 +49,9 @@ public class PgIndex {
         }
 
         sbSQL.append("INDEX ");
-        sbSQL.append(PgDiffUtils.getQuotedName(getName(), quoteNames));
+        sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(" ON ");
-        sbSQL.append(PgDiffUtils.getQuotedName(getTableName(), quoteNames));
+        sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
         sbSQL.append(' ');
         sbSQL.append(getDefinition());
         sbSQL.append(';');
@@ -83,13 +80,10 @@ public class PgIndex {
     /**
      * Creates and returns SQL command for dropping the index.
      *
-     * @param quoteNames whether names should be quoted
-     *
      * @return created SQL command
      */
-    public String getDropSQL(final boolean quoteNames) {
-        return "DROP INDEX " + PgDiffUtils.getQuotedName(getName(), quoteNames)
-                + ";";
+    public String getDropSQL() {
+        return "DROP INDEX " + PgDiffUtils.getQuotedName(getName()) + ";";
     }
 
     /**
@@ -143,10 +137,10 @@ public class PgIndex {
             equals = true;
         } else if (object instanceof PgIndex) {
             final PgIndex index = (PgIndex) object;
-            equals = definition.equals(index.definition)
-                    && name.equals(index.name)
-                    && tableName.equals(index.tableName)
-                    && unique == index.unique;
+            equals = definition.equals(index.getDefinition())
+                    && name.equals(index.getName())
+                    && tableName.equals(index.getTableName())
+                    && unique == index.isUnique();
         }
 
         return equals;

@@ -3,9 +3,8 @@ package cz.startnet.utils.pgdiff.parsers;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgView;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Parses CREATE VIEW commands.
@@ -15,18 +14,9 @@ import java.util.regex.Pattern;
 public class CreateViewParser {
 
     /**
-     * Pattern for parsing CREATE VIEW definition.
-     */
-    private static final Pattern PATTERN = Pattern.compile(
-            "CREATE[\\s]+(?:OR[\\s]+REPLACE[\\s]+)?VIEW[\\s]+"
-            + "\"?([^\\s\"]+)\"?[\\s]+(?:\\(([^)]+)\\)[\\s]+)?"
-            + "AS[\\s]+(.+)?(?:;)", Pattern.CASE_INSENSITIVE);
-
-    /**
      * Creates a new instance of CreateViewParser.
      */
     private CreateViewParser() {
-        super();
     }
 
     /**
@@ -39,29 +29,33 @@ public class CreateViewParser {
      *         command.
      */
     public static void parse(final PgDatabase database, final String command) {
-        final Matcher matcher = PATTERN.matcher(command.trim());
+        final Parser parser = new Parser(command);
+        parser.expect("CREATE");
+        parser.expectOptional("OR", "REPLACE");
+        parser.expect("VIEW");
 
-        if (matcher.matches()) {
-            final String viewName = matcher.group(1);
-            final String columnNames = matcher.group(2);
-            final String query = matcher.group(3);
+        final String viewName = parser.parseIdentifier();
 
-            if ((viewName == null) || (query == null)) {
-                throw new ParserException(
-                        ParserException.CANNOT_PARSE_COMMAND + command);
+        final boolean columnsExist = parser.expectOptional("(");
+        final List<String> columnNames = new ArrayList<String>(10);
+
+        if (columnsExist) {
+            while (!parser.expectOptional(")")) {
+                columnNames.add(parser.parseIdentifier());
+                parser.expectOptional(",");
             }
-
-            final PgView view = new PgView(ParserUtils.getObjectName(viewName));
-            view.setColumnNames(columnNames);
-            view.setQuery(query);
-
-            final PgSchema schema =
-                    database.getSchema(
-                    ParserUtils.getSchemaName(viewName, database));
-            schema.addView(view);
-        } else {
-            throw new ParserException(
-                    ParserException.CANNOT_PARSE_COMMAND + command);
         }
+
+        parser.expect("AS");
+
+        final String query = parser.getRest();
+
+        final PgView view = new PgView(ParserUtils.getObjectName(viewName));
+        view.setColumnNames(columnNames);
+        view.setQuery(query);
+
+        final PgSchema schema = database.getSchema(
+                ParserUtils.getSchemaName(viewName, database));
+        schema.addView(view);
     }
 }

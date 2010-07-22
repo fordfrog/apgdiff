@@ -65,14 +65,12 @@ public class PgTrigger {
     /**
      * Creates and returns SQL for creation of trigger.
      *
-     * @param quoteNames whether names should be quoted
-     *
      * @return created SQL
      */
-    public String getCreationSQL(final boolean quoteNames) {
+    public String getCreationSQL() {
         final StringBuilder sbDDL = new StringBuilder();
         sbDDL.append("CREATE TRIGGER ");
-        sbDDL.append(PgDiffUtils.getQuotedName(getName(), quoteNames));
+        sbDDL.append(PgDiffUtils.getQuotedName(getName()));
         sbDDL.append("\n\t");
         sbDDL.append(isBefore() ? "BEFORE" : "AFTER");
 
@@ -102,7 +100,7 @@ public class PgTrigger {
         }
 
         sbDDL.append(" ON ");
-        sbDDL.append(PgDiffUtils.getQuotedName(getTableName(), quoteNames));
+        sbDDL.append(PgDiffUtils.getQuotedName(getTableName()));
         sbDDL.append("\n\tFOR EACH ");
         sbDDL.append(isForEachRow() ? "ROW" : "STATEMENT");
         sbDDL.append("\n\tEXECUTE PROCEDURE ");
@@ -115,14 +113,11 @@ public class PgTrigger {
     /**
      * Creates and returns SQL for dropping the trigger.
      *
-     * @param quoteNames whether names should be quoted
-     *
      * @return created SQL
      */
-    public String getDropSQL(final boolean quoteNames) {
-        return "DROP TRIGGER "
-                + PgDiffUtils.getQuotedName(getName(), quoteNames) + " ON "
-                + PgDiffUtils.getQuotedName(getTableName(), quoteNames) + ";";
+    public String getDropSQL() {
+        return "DROP TRIGGER " + PgDiffUtils.getQuotedName(getName()) + " ON "
+                + PgDiffUtils.getQuotedName(getTableName()) + ";";
     }
 
     /**

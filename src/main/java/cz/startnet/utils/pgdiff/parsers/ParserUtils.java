@@ -1,6 +1,7 @@
 package cz.startnet.utils.pgdiff.parsers;
 
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
+import java.util.List;
 
 import java.util.regex.Pattern;
 
@@ -15,7 +16,6 @@ public class ParserUtils {
      * Creates a new instance of ParserUtils.
      */
     private ParserUtils() {
-        super();
     }
 
     /**
@@ -155,5 +155,49 @@ public class ParserUtils {
             final String subString) {
         return Pattern.compile(subString,
                 Pattern.CASE_INSENSITIVE).matcher(string).replaceAll("");
+    }
+
+    /**
+     * Generates unique name from the prefix, list of names, and postfix.
+     *
+     * @param prefix prefix
+     * @param names list of names
+     * @param postfix postfix
+     *
+     * @return generated name
+     */
+    public static String generateName(final String prefix,
+            final List<String> names, final String postfix) {
+        final String adjName;
+
+        if (names.size() == 1) {
+            adjName = names.get(0);
+        } else {
+            final StringBuilder sbString = new StringBuilder(names.size() * 15);
+
+            for (final String name : names) {
+                if (sbString.length() > 0) {
+                    sbString.append(',');
+                }
+
+                sbString.append(name);
+            }
+
+            adjName = Integer.toHexString(sbString.toString().hashCode());
+        }
+
+        final StringBuilder sbResult = new StringBuilder(30);
+
+        if (prefix != null && !prefix.isEmpty()) {
+            sbResult.append(prefix);
+        }
+
+        sbResult.append(adjName);
+
+        if (postfix != null && !postfix.isEmpty()) {
+            sbResult.append(postfix);
+        }
+
+        return sbResult.toString();
     }
 }

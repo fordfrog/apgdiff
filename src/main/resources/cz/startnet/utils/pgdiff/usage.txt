@@ -16,4 +16,3 @@ Options:
                               charset name supported by Java)
 --out-charset-name <charset>: charset that should be used for writing output (standard
                               charset name supported by Java)
---quote-names:                adds quotes to names

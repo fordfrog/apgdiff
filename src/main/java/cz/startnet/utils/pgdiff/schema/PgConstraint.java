@@ -42,16 +42,14 @@ public class PgConstraint {
     /**
      * Creates and returns SQL for creation of the constraint.
      *
-     * @param quoteNames whether names should be quoted
-     *
      * @return created SQL
      */
-    public String getCreationSQL(final boolean quoteNames) {
-        final StringBuilder sbSQL = new StringBuilder();
+    public String getCreationSQL() {
+        final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("ALTER TABLE ");
-        sbSQL.append(PgDiffUtils.getQuotedName(getTableName(), quoteNames));
+        sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
         sbSQL.append("\n\tADD CONSTRAINT ");
-        sbSQL.append(PgDiffUtils.getQuotedName(getName(), quoteNames));
+        sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(' ');
         sbSQL.append(getDefinition());
         sbSQL.append(';');
@@ -80,16 +78,14 @@ public class PgConstraint {
     /**
      * Creates and returns SQL for dropping the constraint.
      *
-     * @param quoteNames whether names should be quoted
-     *
      * @return created SQL
      */
-    public String getDropSQL(final boolean quoteNames) {
-        final StringBuilder sbSQL = new StringBuilder();
+    public String getDropSQL() {
+        final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("ALTER TABLE ");
-        sbSQL.append(PgDiffUtils.getQuotedName(getTableName(), quoteNames));
+        sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
         sbSQL.append("\n\tDROP CONSTRAINT ");
-        sbSQL.append(PgDiffUtils.getQuotedName(getName(), quoteNames));
+        sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(';');
 
         return sbSQL.toString();
@@ -156,9 +152,9 @@ public class PgConstraint {
             equals = true;
         } else if (object instanceof PgConstraint) {
             final PgConstraint constraint = (PgConstraint) object;
-            equals = definition.equals(constraint.definition)
-                    && name.equals(constraint.name)
-                    && tableName.equals(constraint.tableName);
+            equals = definition.equals(constraint.getDefinition())
+                    && name.equals(constraint.getName())
+                    && tableName.equals(constraint.getTableName());
         }
 
         return equals;

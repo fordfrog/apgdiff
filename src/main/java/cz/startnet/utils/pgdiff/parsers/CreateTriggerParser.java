@@ -28,7 +28,6 @@ public class CreateTriggerParser {
      * Creates a new CreateTableParser object.
      */
     private CreateTriggerParser() {
-        super();
     }
 
     /**

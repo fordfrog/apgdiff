@@ -3,6 +3,7 @@ package cz.startnet.utils.pgdiff.schema;
 import cz.startnet.utils.pgdiff.PgDiffUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -15,19 +16,23 @@ public class PgTable {
     /**
      * List of columns defined on the table.
      */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final List<PgColumn> columns = new ArrayList<PgColumn>();
     /**
      * List of constraints defined on the table.
      */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final List<PgConstraint> constraints =
             new ArrayList<PgConstraint>();
     /**
      * List of indexes defined on the table.
      */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final List<PgIndex> indexes = new ArrayList<PgIndex>();
     /**
      * List of triggers defined on the table.
      */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final List<PgTrigger> triggers = new ArrayList<PgTrigger>();
     /**
      * Name of the index on which the table is clustered
@@ -95,12 +100,12 @@ public class PgTable {
     }
 
     /**
-     * Getter for {@link #columns}.
+     * Getter for {@link #columns}. The list cannot be modified.
      *
      * @return {@link #columns}
      */
     public List<PgColumn> getColumns() {
-        return columns;
+        return Collections.unmodifiableList(columns);
     }
 
     /**
@@ -126,30 +131,28 @@ public class PgTable {
     }
 
     /**
-     * Getter for {@link #constraints}.
+     * Getter for {@link #constraints}. The list cannot be modified.
      *
      * @return {@link #constraints}
      */
     public List<PgConstraint> getConstraints() {
-        return constraints;
+        return Collections.unmodifiableList(constraints);
     }
 
     /**
      * Creates and returns SQL for creation of the table.
      *
-     * @param quoteNames whether names should be quoted
-     *
      * @return created SQL command
      */
-    public String getCreationSQL(final boolean quoteNames) {
-        final StringBuilder sbSQL = new StringBuilder();
+    public String getCreationSQL() {
+        final StringBuilder sbSQL = new StringBuilder(1000);
         sbSQL.append("CREATE TABLE ");
-        sbSQL.append(PgDiffUtils.getQuotedName(name, quoteNames));
+        sbSQL.append(PgDiffUtils.getQuotedName(name));
         sbSQL.append(" (\n");
 
         for (PgColumn column : columns) {
             sbSQL.append("\t");
-            sbSQL.append(column.getFullDefinition(quoteNames, false));
+            sbSQL.append(column.getFullDefinition(false));
             sbSQL.append(",\n");
         }
 
@@ -165,10 +168,10 @@ public class PgTable {
 
         for (PgColumn column : getColumnsWithStatistics()) {
             sbSQL.append("\nALTER TABLE ONLY ");
-            sbSQL.append(PgDiffUtils.getQuotedName(name, quoteNames));
+            sbSQL.append(PgDiffUtils.getQuotedName(name));
             sbSQL.append(" ALTER COLUMN ");
             sbSQL.append(
-                    PgDiffUtils.getQuotedName(column.getName(), quoteNames));
+                    PgDiffUtils.getQuotedName(column.getName()));
             sbSQL.append(" SET STATISTICS ");
             sbSQL.append(column.getStatistics());
             sbSQL.append(';');
@@ -180,13 +183,10 @@ public class PgTable {
     /**
      * Creates and returns SQL command for dropping the table.
      *
-     * @param quoteNames whether names should be quoted
-     *
      * @return created SQL command
      */
-    public String getDropSQL(final boolean quoteNames) {
-        return "DROP TABLE " + PgDiffUtils.getQuotedName(getName(), quoteNames)
-                + ";";
+    public String getDropSQL() {
+        return "DROP TABLE " + PgDiffUtils.getQuotedName(getName()) + ";";
     }
 
     /**
@@ -211,12 +211,12 @@ public class PgTable {
     }
 
     /**
-     * Getter for {@link #indexes}.
+     * Getter for {@link #indexes}. The list cannot be modified.
      *
      * @return {@link #indexes}
      */
     public List<PgIndex> getIndexes() {
-        return indexes;
+        return Collections.unmodifiableList(indexes);
     }
 
     /**
@@ -256,12 +256,12 @@ public class PgTable {
     }
 
     /**
-     * Getter for {@link #triggers}.
+     * Getter for {@link #triggers}. The list cannot be modified.
      *
      * @return {@link #triggers}
      */
     public List<PgTrigger> getTriggers() {
-        return triggers;
+        return Collections.unmodifiableList(triggers);
     }
 
     /**
@@ -393,6 +393,7 @@ public class PgTable {
      * @return list of columns that have statistics defined
      */
     private List<PgColumn> getColumnsWithStatistics() {
+        @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<PgColumn> list = new ArrayList<PgColumn>();
 
         for (PgColumn column : columns) {

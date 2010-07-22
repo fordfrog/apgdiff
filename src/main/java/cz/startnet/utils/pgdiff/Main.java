@@ -16,7 +16,6 @@ public class Main {
      * Creates a new Main object.
      */
     private Main() {
-        super();
     }
 
     /**
@@ -29,13 +28,15 @@ public class Main {
      */
     public static void main(final String[] args)
             throws UnsupportedEncodingException {
+        @SuppressWarnings("UseOfSystemOutOrSystemErr")
         final PrintWriter writer = new PrintWriter(System.out, true);
         final PgDiffArguments arguments = new PgDiffArguments();
 
         if (arguments.parse(writer, args)) {
+            @SuppressWarnings("UseOfSystemOutOrSystemErr")
             final PrintWriter encodedWriter = new PrintWriter(
-                    new OutputStreamWriter(
-                    System.out, arguments.getOutCharsetName()));
+                    new OutputStreamWriter(System.out,
+                    arguments.getOutCharsetName()));
             PgDiff.createDiff(encodedWriter, arguments);
             encodedWriter.close();
         }

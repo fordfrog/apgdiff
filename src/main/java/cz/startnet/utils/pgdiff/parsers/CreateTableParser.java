@@ -54,7 +54,6 @@ public class CreateTableParser {
      * Creates a new instance of CreateTableParser.
      */
     private CreateTableParser() {
-        super();
     }
 
     /**

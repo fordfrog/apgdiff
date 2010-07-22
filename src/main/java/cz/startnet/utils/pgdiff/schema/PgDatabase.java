@@ -1,6 +1,7 @@
 package cz.startnet.utils.pgdiff.schema;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -13,7 +14,7 @@ public class PgDatabase {
     /**
      * List of database schemas.
      */
-    private final List<PgSchema> schemas = new ArrayList<PgSchema>();
+    private final List<PgSchema> schemas = new ArrayList<PgSchema>(1);
     /**
      * Current default schema.
      */
@@ -23,7 +24,6 @@ public class PgDatabase {
      * Creates a new PgDatabase object.
      */
     public PgDatabase() {
-        super();
         schemas.add(new PgSchema("public"));
         defaultSchema = schemas.get(0);
     }
@@ -70,12 +70,12 @@ public class PgDatabase {
     }
 
     /**
-     * Getter for {@link #schemas}.
+     * Getter for {@link #schemas}. The list cannot be modified.
      *
      * @return {@link #schemas}
      */
     public List<PgSchema> getSchemas() {
-        return schemas;
+        return Collections.unmodifiableList(schemas);
     }
 
     /**

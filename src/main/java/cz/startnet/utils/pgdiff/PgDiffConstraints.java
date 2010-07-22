@@ -20,22 +20,20 @@ public class PgDiffConstraints {
      * Creates a new instance of PgDiffConstraints.
      */
     private PgDiffConstraints() {
-        super();
     }
 
     /**
      * Outputs commands for creation of new constraints.
      *
      * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
      * @param oldSchema original schema
      * @param newSchema new schema
      * @param primaryKey determines whether primery keys should be processed or
      *        any other constraints should be processed
      */
     public static void createConstraints(final PrintWriter writer,
-            final PgDiffArguments arguments, final PgSchema oldSchema,
-            final PgSchema newSchema, final boolean primaryKey) {
+            final PgSchema oldSchema, final PgSchema newSchema,
+            final boolean primaryKey) {
         for (final PgTable newTable : newSchema.getTables()) {
             final PgTable oldTable;
 
@@ -49,8 +47,7 @@ public class PgDiffConstraints {
             for (final PgConstraint constraint :
                     getNewConstraints(oldTable, newTable, primaryKey)) {
                 writer.println();
-                writer.println(
-                        constraint.getCreationSQL(arguments.isQuoteNames()));
+                writer.println(constraint.getCreationSQL());
             }
         }
     }
@@ -59,15 +56,14 @@ public class PgDiffConstraints {
      * Outputs commands for dropping non-existant or modified constraints.
      *
      * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
      * @param oldSchema original schema
      * @param newSchema new schema
      * @param primaryKey determines whether primery keys should be processed or
      *        any other constraints should be processed
      */
     public static void dropConstraints(final PrintWriter writer,
-            final PgDiffArguments arguments, final PgSchema oldSchema,
-            final PgSchema newSchema, final boolean primaryKey) {
+            final PgSchema oldSchema, final PgSchema newSchema,
+            final boolean primaryKey) {
         for (final PgTable newTable : newSchema.getTables()) {
             final PgTable oldTable;
 
@@ -81,7 +77,7 @@ public class PgDiffConstraints {
             for (final PgConstraint constraint :
                     getDropConstraints(oldTable, newTable, primaryKey)) {
                 writer.println();
-                writer.println(constraint.getDropSQL(arguments.isQuoteNames()));
+                writer.println(constraint.getDropSQL());
             }
         }
     }
@@ -101,9 +97,10 @@ public class PgDiffConstraints {
      */
     private static List<PgConstraint> getDropConstraints(final PgTable oldTable,
             final PgTable newTable, final boolean primaryKey) {
+        @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<PgConstraint> list = new ArrayList<PgConstraint>();
 
-        if ((newTable != null) && (oldTable != null)) {
+        if (newTable != null && oldTable != null) {
             for (final PgConstraint constraint : oldTable.getConstraints()) {
                 if ((constraint.isPrimaryKeyConstraint() == primaryKey)
                         && (!newTable.containsConstraint(constraint.getName())
@@ -129,6 +126,7 @@ public class PgDiffConstraints {
      */
     private static List<PgConstraint> getNewConstraints(final PgTable oldTable,
             final PgTable newTable, final boolean primaryKey) {
+        @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<PgConstraint> list = new ArrayList<PgConstraint>();
 
         if (newTable != null) {

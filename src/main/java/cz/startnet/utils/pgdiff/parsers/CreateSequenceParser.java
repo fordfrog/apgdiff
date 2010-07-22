@@ -70,7 +70,6 @@ public class CreateSequenceParser {
      * Creates a new instance of CreateSequenceParser.
      */
     private CreateSequenceParser() {
-        super();
     }
 
     /**

@@ -16,7 +16,6 @@ public class PgDiffFunctions {
      * Creates a new instance of PgDiffFunctions.
      */
     private PgDiffFunctions() {
-        super();
     }
 
     /**

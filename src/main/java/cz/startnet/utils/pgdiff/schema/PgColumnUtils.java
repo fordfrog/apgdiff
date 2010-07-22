@@ -13,7 +13,6 @@ public class PgColumnUtils {
      * Creates a new PgColumnUtils object.
      */
     private PgColumnUtils() {
-        super();
     }
 
     /**

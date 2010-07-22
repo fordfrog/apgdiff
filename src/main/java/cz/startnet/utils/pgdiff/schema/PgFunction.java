@@ -121,6 +121,10 @@ public class PgFunction {
      */
     @Override
     public boolean equals(final Object object) {
+        if (!(object instanceof PgFunction)) {
+            return false;
+        }
+
         return equals(object, false);
     }
 
@@ -155,9 +159,9 @@ public class PgFunction {
                 thisDefinition = getDefinition();
                 thatDefinition = function.getDefinition();
             }
-            equals = declaration.equals(function.declaration)
+            equals = declaration.equals(function.getDeclaration())
                     && thisDefinition.equals(thatDefinition)
-                    && name.equals(function.name);
+                    && name.equals(function.getName());
         }
 
         return equals;

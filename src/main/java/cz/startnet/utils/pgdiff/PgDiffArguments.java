@@ -46,10 +46,6 @@ public class PgDiffArguments {
      */
     private boolean ignoreStartWith;
     /**
-     * Whether to quote names when creating the diff SQL commands.
-     */
-    private boolean quoteNames;
-    /**
      * Whether to display apgdiff version.
      */
     private boolean version;
@@ -164,24 +160,6 @@ public class PgDiffArguments {
     }
 
     /**
-     * Setter for {@link #quoteNames}.
-     *
-     * @param quoteNames {@link #quoteNames}
-     */
-    public void setQuoteNames(final boolean quoteNames) {
-        this.quoteNames = quoteNames;
-    }
-
-    /**
-     * Getter for {@link #quoteNames}.
-     *
-     * @return {@link #quoteNames}
-     */
-    public boolean isQuoteNames() {
-        return quoteNames;
-    }
-
-    /**
      * Setter for {@link #version}.
      *
      * @param version {@link #version}
@@ -233,8 +211,6 @@ public class PgDiffArguments {
             } else if ("--out-charset-name".equals(args[i])) {
                 setOutCharsetName(args[i + 1]);
                 i++;
-            } else if ("--quote-names".equals(args[i])) {
-                setQuoteNames(true);
             } else if ("--version".equals(args[i])) {
                 setVersion(true);
             } else {

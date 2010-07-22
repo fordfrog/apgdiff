@@ -20,20 +20,17 @@ public class PgDiffTriggers {
      * Creates a new instance of PgDiffTriggers.
      */
     private PgDiffTriggers() {
-        super();
     }
 
     /**
      * Outputs commands for creation of new triggers.
      *
      * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
      * @param oldSchema original schema
      * @param newSchema new schema
      */
     public static void createTriggers(final PrintWriter writer,
-            final PgDiffArguments arguments, final PgSchema oldSchema,
-            final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema) {
         for (final PgTable newTable : newSchema.getTables()) {
             final PgTable oldTable;
 
@@ -46,8 +43,7 @@ public class PgDiffTriggers {
             // Add new triggers
             for (final PgTrigger trigger : getNewTriggers(oldTable, newTable)) {
                 writer.println();
-                writer.println(
-                        trigger.getCreationSQL(arguments.isQuoteNames()));
+                writer.println(trigger.getCreationSQL());
             }
         }
     }
@@ -56,13 +52,11 @@ public class PgDiffTriggers {
      * Outputs commands for dropping triggers.
      *
      * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
      * @param oldSchema original schema
      * @param newSchema new schema
      */
     public static void dropTriggers(final PrintWriter writer,
-            final PgDiffArguments arguments, final PgSchema oldSchema,
-            final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema) {
         for (final PgTable newTable : newSchema.getTables()) {
             final PgTable oldTable;
 
@@ -76,7 +70,7 @@ public class PgDiffTriggers {
             for (final PgTrigger trigger :
                     getDropTriggers(oldTable, newTable)) {
                 writer.println();
-                writer.println(trigger.getDropSQL(arguments.isQuoteNames()));
+                writer.println(trigger.getDropSQL());
             }
         }
     }
@@ -91,6 +85,7 @@ public class PgDiffTriggers {
      */
     private static List<PgTrigger> getDropTriggers(final PgTable oldTable,
             final PgTable newTable) {
+        @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<PgTrigger> list = new ArrayList<PgTrigger>();
 
         if ((newTable != null) && (oldTable != null)) {
@@ -116,6 +111,7 @@ public class PgDiffTriggers {
      */
     private static List<PgTrigger> getNewTriggers(final PgTable oldTable,
             final PgTable newTable) {
+        @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<PgTrigger> list = new ArrayList<PgTrigger>();
 
         if (newTable != null) {

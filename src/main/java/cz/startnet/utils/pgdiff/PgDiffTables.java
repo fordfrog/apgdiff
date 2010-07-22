@@ -23,20 +23,17 @@ public class PgDiffTables {
      * Creates a new instance of PgDiffTables.
      */
     private PgDiffTables() {
-        super();
     }
 
     /**
      * Outputs commands for creation of clusters.
      *
      * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
      * @param oldSchema original schema
      * @param newSchema new schema
      */
     public static void dropClusters(final PrintWriter writer,
-            final PgDiffArguments arguments, final PgSchema oldSchema,
-            final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema) {
         for (final PgTable newTable : newSchema.getTables()) {
             final PgTable oldTable;
 
@@ -60,8 +57,7 @@ public class PgDiffTables {
                     && newTable.containsIndex(oldCluster)) {
                 writer.println();
                 writer.print("ALTER TABLE ");
-                writer.print(PgDiffUtils.getQuotedName(
-                        newTable.getName(), arguments.isQuoteNames()));
+                writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
                 writer.println(" SET WITHOUT CLUSTER;");
             }
         }
@@ -71,13 +67,11 @@ public class PgDiffTables {
      * Outputs commands for dropping of clusters.
      *
      * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
      * @param oldSchema original schema
      * @param newSchema new schema
      */
     public static void createClusters(final PrintWriter writer,
-            final PgDiffArguments arguments, final PgSchema oldSchema,
-            final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema) {
         for (final PgTable newTable : newSchema.getTables()) {
             final PgTable oldTable;
 
@@ -102,11 +96,9 @@ public class PgDiffTables {
                     && (newCluster.compareTo(oldCluster) != 0))) {
                 writer.println();
                 writer.print("ALTER TABLE ");
-                writer.print(PgDiffUtils.getQuotedName(
-                        newTable.getName(), arguments.isQuoteNames()));
+                writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
                 writer.print(" CLUSTER ON ");
-                writer.print(PgDiffUtils.getQuotedName(
-                        newCluster, arguments.isQuoteNames()));
+                writer.print(PgDiffUtils.getQuotedName(newCluster));
                 writer.println(';');
             }
         }
@@ -131,9 +123,9 @@ public class PgDiffTables {
 
             final PgTable oldTable = oldSchema.getTable(newTable.getName());
             updateTableColumns(writer, arguments, oldTable, newTable);
-            checkWithOIDS(writer, arguments, oldTable, newTable);
-            checkInherits(writer, arguments, oldTable, newTable);
-            addAlterStatistics(writer, arguments, oldTable, newTable);
+            checkWithOIDS(writer, oldTable, newTable);
+            checkInherits(writer, oldTable, newTable);
+            addAlterStatistics(writer, oldTable, newTable);
         }
     }
 
@@ -141,13 +133,12 @@ public class PgDiffTables {
      * Generate the needed alter table xxx set statistics when needed.
      *
      * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
      * @param oldTable original table
      * @param newTable new table
      */
     private static void addAlterStatistics(final PrintWriter writer,
-            final PgDiffArguments arguments, final PgTable oldTable,
-            final PgTable newTable) {
+            final PgTable oldTable, final PgTable newTable) {
+        @SuppressWarnings("CollectionWithoutInitialCapacity")
         final Map<String, Integer> stats = new HashMap<String, Integer>();
 
         for (final PgColumn newColumn : newTable.getColumns()) {
@@ -174,11 +165,9 @@ public class PgDiffTables {
         for (final Map.Entry<String, Integer> entry : stats.entrySet()) {
             writer.println();
             writer.print("ALTER TABLE ONLY ");
-            writer.print(PgDiffUtils.getQuotedName(
-                    newTable.getName(), arguments.isQuoteNames()));
+            writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
             writer.print(" ALTER COLUMN ");
-            writer.print(PgDiffUtils.getQuotedName(
-                    entry.getKey(), arguments.isQuoteNames()));
+            writer.print(PgDiffUtils.getQuotedName(entry.getKey()));
             writer.print(" SET STATISTICS ");
             writer.print(entry.getValue());
             writer.println(';');
@@ -201,8 +190,8 @@ public class PgDiffTables {
             final PgTable newTable, final List<PgColumn> dropDefaultsColumns) {
         for (final PgColumn column : newTable.getColumns()) {
             if (!oldTable.containsColumn(column.getName())) {
-                commands.add("\tADD COLUMN " + column.getFullDefinition(
-                        arguments.isQuoteNames(), arguments.isAddDefaults()));
+                commands.add("\tADD COLUMN "
+                        + column.getFullDefinition(arguments.isAddDefaults()));
 
                 if (arguments.isAddDefaults() && !column.getNullValue()) {
                     dropDefaultsColumns.add(column);
@@ -215,17 +204,15 @@ public class PgDiffTables {
      * Adds commands for removal of columns to the list of commands.
      *
      * @param commands list of commands
-     * @param arguments object containing arguments settings
      * @param oldTable original table
      * @param newTable new table
      */
     private static void addDropTableColumns(final List<String> commands,
-            final PgDiffArguments arguments, final PgTable oldTable,
-            final PgTable newTable) {
+            final PgTable oldTable, final PgTable newTable) {
         for (final PgColumn column : oldTable.getColumns()) {
             if (!newTable.containsColumn(column.getName())) {
-                commands.add("\tDROP COLUMN " + PgDiffUtils.getQuotedName(
-                        column.getName(), arguments.isQuoteNames()));
+                commands.add("\tDROP COLUMN "
+                        + PgDiffUtils.getQuotedName(column.getName()));
             }
         }
     }
@@ -250,8 +237,8 @@ public class PgDiffTables {
             }
 
             final PgColumn oldColumn = oldTable.getColumn(newColumn.getName());
-            final String newColumnName = PgDiffUtils.getQuotedName(
-                    newColumn.getName(), arguments.isQuoteNames());
+            final String newColumnName =
+                    PgDiffUtils.getQuotedName(newColumn.getName());
 
             if (!oldColumn.getType().equals(newColumn.getType())) {
                 commands.add("\tALTER COLUMN " + newColumnName + " TYPE "
@@ -305,36 +292,31 @@ public class PgDiffTables {
      * and new table.
      *
      * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
      * @param oldTable original table
      * @param newTable new table
      */
     private static void checkInherits(final PrintWriter writer,
-            final PgDiffArguments arguments, final PgTable oldTable,
-            final PgTable newTable) {
+            final PgTable oldTable, final PgTable newTable) {
         final String oldInherits = oldTable.getInherits();
         final String newInherits = newTable.getInherits();
 
         if ((oldInherits == null) && (newInherits != null)) {
             writer.println();
             writer.println("Modified INHERITS on TABLE "
-                    + PgDiffUtils.getQuotedName(
-                    newTable.getName(), arguments.isQuoteNames())
+                    + PgDiffUtils.getQuotedName(newTable.getName())
                     + ": original table doesn't use INHERITS but new table "
                     + "uses INHERITS " + newTable.getInherits());
         } else if ((oldInherits != null) && (newInherits == null)) {
             writer.println();
             writer.println("Modified INHERITS on TABLE "
-                    + PgDiffUtils.getQuotedName(
-                    newTable.getName(), arguments.isQuoteNames())
+                    + PgDiffUtils.getQuotedName(newTable.getName())
                     + ": original table uses INHERITS " + oldTable.getInherits()
                     + " but new table doesn't use INHERITS");
         } else if ((oldInherits != null) && (newInherits != null)
                 && !oldInherits.equals(newInherits)) {
             writer.println();
             writer.println("Modified INHERITS on TABLE "
-                    + PgDiffUtils.getQuotedName(
-                    newTable.getName(), arguments.isQuoteNames())
+                    + PgDiffUtils.getQuotedName(newTable.getName())
                     + ": original table uses INHERITS " + oldTable.getInherits()
                     + " but new table uses INHERITS " + newTable.getInherits());
         }
@@ -346,22 +328,20 @@ public class PgDiffTables {
      * addition of OIDS but we issue warning.
      *
      * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
      * @param oldTable original table
      * @param newTable new table
      */
     private static void checkWithOIDS(final PrintWriter writer,
-            final PgDiffArguments arguments, final PgTable oldTable,
-            final PgTable newTable) {
+            final PgTable oldTable, final PgTable newTable) {
         if (oldTable.isWithOIDS() && !newTable.isWithOIDS()) {
             writer.println();
-            writer.println("ALTER TABLE " + PgDiffUtils.getQuotedName(
-                    newTable.getName(), arguments.isQuoteNames()));
+            writer.println("ALTER TABLE "
+                    + PgDiffUtils.getQuotedName(newTable.getName()));
             writer.println("\tSET WITHOUT OIDS;");
         } else if (!oldTable.isWithOIDS() && newTable.isWithOIDS()) {
             writer.println();
-            writer.println("WARNING: Table " + PgDiffUtils.getQuotedName(
-                    newTable.getName(), arguments.isQuoteNames())
+            writer.println("WARNING: Table "
+                    + PgDiffUtils.getQuotedName(newTable.getName())
                     + " adds WITH OIDS but there is no equivalent command "
                     + "for adding of OIDS in PostgreSQL");
         }
@@ -371,18 +351,16 @@ public class PgDiffTables {
      * Outputs commands for creation of new tables.
      *
      * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
      * @param oldSchema original schema
      * @param newSchema new schema
      */
     public static void createTables(final PrintWriter writer,
-            final PgDiffArguments arguments, final PgSchema oldSchema,
-            final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema) {
         for (final PgTable table : newSchema.getTables()) {
             if ((oldSchema == null)
                     || !oldSchema.containsTable(table.getName())) {
                 writer.println();
-                writer.println(table.getCreationSQL(arguments.isQuoteNames()));
+                writer.println(table.getCreationSQL());
             }
         }
     }
@@ -391,18 +369,16 @@ public class PgDiffTables {
      * Outputs commands for dropping tables.
      *
      * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
      * @param oldSchema original schema
      * @param newSchema new schema
      */
     public static void dropTables(final PrintWriter writer,
-            final PgDiffArguments arguments, final PgSchema oldSchema,
-            final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema) {
         if (oldSchema != null) {
             for (final PgTable table : oldSchema.getTables()) {
                 if (!newSchema.containsTable(table.getName())) {
                     writer.println();
-                    writer.println(table.getDropSQL(arguments.isQuoteNames()));
+                    writer.println(table.getDropSQL());
                 }
             }
         }
@@ -420,17 +396,19 @@ public class PgDiffTables {
     private static void updateTableColumns(final PrintWriter writer,
             final PgDiffArguments arguments, final PgTable oldTable,
             final PgTable newTable) {
+        @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<String> commands = new ArrayList<String>();
+        @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<PgColumn> dropDefaultsColumns = new ArrayList<PgColumn>();
-        addDropTableColumns(commands, arguments, oldTable, newTable);
+        addDropTableColumns(commands, oldTable, newTable);
         addCreateTableColumns(
                 commands, arguments, oldTable, newTable, dropDefaultsColumns);
         addModifyTableColumns(
                 commands, arguments, oldTable, newTable, dropDefaultsColumns);
 
         if (commands.size() > 0) {
-            final String quotedTableName = PgDiffUtils.getQuotedName(
-                    newTable.getName(), arguments.isQuoteNames());
+            final String quotedTableName =
+                    PgDiffUtils.getQuotedName(newTable.getName());
             writer.println();
             writer.println("ALTER TABLE " + quotedTableName);
 
@@ -446,8 +424,7 @@ public class PgDiffTables {
                 for (int i = 0; i < dropDefaultsColumns.size(); i++) {
                     writer.print("\tALTER COLUMN ");
                     writer.print(PgDiffUtils.getQuotedName(
-                            dropDefaultsColumns.get(i).getName(),
-                            arguments.isQuoteNames()));
+                            dropDefaultsColumns.get(i).getName()));
                     writer.print(" DROP DEFAULT");
                     writer.println(
                             ((i + 1) < dropDefaultsColumns.size()) ? "," : ";");

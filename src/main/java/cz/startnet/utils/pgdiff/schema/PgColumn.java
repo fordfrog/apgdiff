@@ -78,16 +78,14 @@ public class PgColumn {
     /**
      * Returns full definition of the column.
      *
-     * @param quoteName whether name should be quoted
      * @param addDefaults whether default value should be added in case NOT
      *        NULL constraint is specified but no default value is set
      *
      * @return full definition of the column
      */
-    public String getFullDefinition(final boolean quoteName,
-            final boolean addDefaults) {
-        final StringBuilder sbDefinition = new StringBuilder();
-        sbDefinition.append(PgDiffUtils.getQuotedName(name, quoteName));
+    public String getFullDefinition(final boolean addDefaults) {
+        final StringBuilder sbDefinition = new StringBuilder(100);
+        sbDefinition.append(PgDiffUtils.getQuotedName(name));
         sbDefinition.append(' ');
         sbDefinition.append(type);
 

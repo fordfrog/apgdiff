@@ -120,7 +120,6 @@ public class PgDumpLoader { //NOPMD
      * Creates a new instance of PgDumpLoader.
      */
     private PgDumpLoader() {
-        super();
     }
 
     /**
@@ -275,7 +274,7 @@ public class PgDumpLoader { //NOPMD
     private static String getWholeFunction(final BufferedReader reader,
             final String line) {
         final String firstLine = line;
-        final StringBuilder sbCommand = new StringBuilder();
+        final StringBuilder sbCommand = new StringBuilder(1000);
         String newLine = line;
         Pattern endOfFunctionPattern = null;
         boolean searchForSemicolon = false;

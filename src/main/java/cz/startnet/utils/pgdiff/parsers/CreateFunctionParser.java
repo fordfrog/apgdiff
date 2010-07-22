@@ -35,7 +35,6 @@ public class CreateFunctionParser {
      * Creates a new instance of CreateFunctionParser.
      */
     private CreateFunctionParser() {
-        super();
     }
 
     /**

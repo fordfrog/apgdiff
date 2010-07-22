@@ -11,21 +11,26 @@ public class PgDiffUtils {
      * Creates a new PgDiffUtils object.
      */
     private PgDiffUtils() {
-        super();
     }
 
     /**
-     * If <code>quoteName</code> is true then returns quoted name
-     * otherwise returns the original name.
+     * If name contains only lower case characters and digits, it is returned
+     * not quoted, otherwise the string is returned quoted.
      *
      * @param name name
-     * @param quoteName whether the name should be quoted
      *
-     * @return if <code>quoteName</code> is true then returns quoted name
-     *         otherwise returns the original name
+     * @return quoted string if needed, otherwise not quoted string
      */
-    public static String getQuotedName(final String name,
-            final boolean quoteName) {
-        return quoteName ? ("\"" + name + "\"") : name;
+    public static String getQuotedName(final String name) {
+        boolean isAllLowerCase = true;
+
+        for (int i = 0; i < name.length(); i++) {
+            final char chr = name.charAt(i);
+
+            if (Character.isUpperCase(chr)) {
+                isAllLowerCase = false;
+            }
+        }
+        return isAllLowerCase ? name : ("\"" + name + "\"");
     }
 }

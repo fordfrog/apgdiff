@@ -68,14 +68,12 @@ public class PgSequence {
     /**
      * Creates and returns SQL command for creation of the sequence.
      *
-     * @param quoteNames whether names should be quoted
-     *
      * @return created SQL command
      */
-    public String getCreationSQL(final boolean quoteNames) {
-        final StringBuilder sbSQL = new StringBuilder();
+    public String getCreationSQL() {
+        final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("CREATE SEQUENCE ");
-        sbSQL.append(PgDiffUtils.getQuotedName(name, quoteNames));
+        sbSQL.append(PgDiffUtils.getQuotedName(name));
 
         if (startWith != null) {
             sbSQL.append("\n\tSTART WITH ");
@@ -140,13 +138,10 @@ public class PgSequence {
     /**
      * Creates and returns SQL command for dropping the sequence.
      *
-     * @param quoteNames whether names should be quoted
-     *
      * @return created SQL
      */
-    public String getDropSQL(final boolean quoteNames) {
-        return "DROP SEQUENCE "
-                + PgDiffUtils.getQuotedName(getName(), quoteNames) + ";";
+    public String getDropSQL() {
+        return "DROP SEQUENCE " + PgDiffUtils.getQuotedName(getName()) + ";";
     }
 
     /**

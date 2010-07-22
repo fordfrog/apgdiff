@@ -1,6 +1,8 @@
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Stores view information.
@@ -10,9 +12,9 @@ import cz.startnet.utils.pgdiff.PgDiffUtils;
 public class PgView {
 
     /**
-     * String specifying column names.
+     * List of column names.
      */
-    private String columnNames;
+    private List<String> columnNames;
     /**
      * Name of the view.
      */
@@ -28,7 +30,6 @@ public class PgView {
      * @param name {@link #name}
      */
     public PgView(final String name) {
-        super();
         this.name = name;
     }
 
@@ -37,34 +38,40 @@ public class PgView {
      *
      * @param columnNames {@link #columnNames}
      */
-    public void setColumnNames(final String columnNames) {
+    @SuppressWarnings("AssignmentToCollectionOrArrayFieldFromParameter")
+    public void setColumnNames(final List<String> columnNames) {
         this.columnNames = columnNames;
     }
 
     /**
-     * Getter for {@link #columnNames}.
+     * Getter for {@link #columnNames}. The list cannot be modified.
      *
      * @return {@link #columnNames}
      */
-    public String getColumnNames() {
-        return columnNames;
+    public List<String> getColumnNames() {
+        return Collections.unmodifiableList(columnNames);
     }
 
     /**
      * Creates and returns SQL for creation of the view.
      *
-     * @param quoteNames whether names should be quoted
-     *
      * @return created SQL command
      */
-    public String getCreationSQL(final boolean quoteNames) {
-        final StringBuilder sbSQL = new StringBuilder();
+    public String getCreationSQL() {
+        final StringBuilder sbSQL = new StringBuilder(query.length() * 2);
         sbSQL.append("CREATE VIEW ");
-        sbSQL.append(PgDiffUtils.getQuotedName(name, quoteNames));
+        sbSQL.append(PgDiffUtils.getQuotedName(name));
 
-        if ((columnNames != null) && (columnNames.length() > 0)) {
+        if (columnNames != null && columnNames.size() > 0) {
             sbSQL.append(" (");
-            sbSQL.append(columnNames);
+
+            for (int i = 0; i < columnNames.size(); i++) {
+                if (i > 0) {
+                    sbSQL.append(", ");
+                }
+
+                sbSQL.append(PgDiffUtils.getQuotedName(columnNames.get(i)));
+            }
             sbSQL.append(')');
         }
 
@@ -78,13 +85,10 @@ public class PgView {
     /**
      * Creates and returns SQL command for dropping the view.
      *
-     * @param quoteNames whether names should be quoted
-     *
      * @return created SQL command
      */
-    public String getDropSQL(final boolean quoteNames) {
-        return "DROP VIEW " + PgDiffUtils.getQuotedName(getName(), quoteNames)
-                + ";";
+    public String getDropSQL() {
+        return "DROP VIEW " + PgDiffUtils.getQuotedName(getName()) + ";";
     }
 
     /**

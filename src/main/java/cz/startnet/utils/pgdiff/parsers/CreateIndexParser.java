@@ -26,7 +26,6 @@ public class CreateIndexParser {
      * Creates a new instance of CreateIndexParser.
      */
     private CreateIndexParser() {
-        super();
     }
 
     /**
