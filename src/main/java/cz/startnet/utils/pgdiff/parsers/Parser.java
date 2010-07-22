@@ -159,15 +159,21 @@ public final class Parser {
 
     /**
      * Returns rest of the string. If the string ends with ';' then it is
-     * removed from the string before returned.
+     * removed from the string before returned. If there is nothing more in the
+     * string, null is returned.
      *
-     * @return rest of the string, without trailing ';' if present
+     * @return rest of the string, without trailing ';' if present, or null if
+     * there is nothing more in the string
      */
     public String getRest() {
         final String result;
 
         if (string.charAt(string.length() - 1) == ';') {
-            result = string.substring(position, string.length() - 1);
+            if (position == string.length() - 1) {
+                return null;
+            } else {
+                result = string.substring(position, string.length() - 1);
+            }
         } else {
             result = string.substring(position);
         }

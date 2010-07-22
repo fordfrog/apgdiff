@@ -3,30 +3,12 @@ package cz.startnet.utils.pgdiff.parsers;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Parses CREATE SCHEMA commands.
  *
  * @author fordfrog
  */
 public class CreateSchemaParser {
-
-    /**
-     * Pattern for parsing CREATE SCHEMA ... AUTHORIZATION ...
-     */
-    private static final Pattern PATTERN_CREATE_SCHEMA = Pattern.compile(
-            "^CREATE[\\s]+SCHEMA[\\s]+([^\\s;]+)"
-            + "(?:[\\s]+AUTHORIZATION[\\s]+([^\\s;]+))?;$",
-            Pattern.CASE_INSENSITIVE);
-    /**
-     * Pattern for parsing CREATE SCHEMA AUTHORIZATION ...
-     */
-    private static final Pattern PATTERN_CREATE_SCHEMA_AUTHORIZATION =
-            Pattern.compile(
-            "^CREATE[\\s]+SCHEMA[\\s]+AUTHORIZATION[\\s]+([^\\s;]+);$",
-            Pattern.CASE_INSENSITIVE);
 
     /**
      * Creates a new CreateSchemaParser object.
@@ -44,28 +26,31 @@ public class CreateSchemaParser {
      *         command.
      */
     public static void parse(final PgDatabase database, final String command) {
-        final Matcher matcher = PATTERN_CREATE_SCHEMA.matcher(command);
+        final Parser parser = new Parser(command);
+        parser.expect("CREATE", "SCHEMA");
 
-        if (matcher.matches()) {
-            final PgSchema schema = new PgSchema(matcher.group(1));
-            final String authorization = matcher.group(2);
+        if (parser.expectOptional("AUTHORIZATION")) {
+            final PgSchema schema = new PgSchema(parser.parseIdentifier());
+            database.addSchema(schema);
+            schema.setAuthorization(schema.getName());
 
-            if (authorization != null) {
-                schema.setAuthorization(authorization);
+            final String definition = parser.getRest();
+
+            if (definition != null && !definition.isEmpty()) {
+                schema.setDefinition(definition);
+            }
+        } else {
+            final PgSchema schema = new PgSchema(parser.parseIdentifier());
+            database.addSchema(schema);
+
+            if (parser.expectOptional("AUTHORIZATION")) {
+                schema.setAuthorization(parser.parseIdentifier());
             }
 
-            database.addSchema(schema);
-        } else {
-            final Matcher matcher2 =
-                    PATTERN_CREATE_SCHEMA_AUTHORIZATION.matcher(command);
+            final String definition = parser.getRest();
 
-            if (matcher2.matches()) {
-                final PgSchema schema = new PgSchema(matcher.group(1));
-                schema.setAuthorization(schema.getName());
-                database.addSchema(schema);
-            } else {
-                throw new ParserException(
-                        ParserException.CANNOT_PARSE_COMMAND + command);
+            if (definition != null && !definition.isEmpty()) {
+                schema.setDefinition(definition);
             }
         }
     }

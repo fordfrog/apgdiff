@@ -41,6 +41,10 @@ public class PgSchema {
      * Schema authorization.
      */
     private String authorization;
+    /**
+     * Optional definition of schema elements.
+     */
+    private String definition;
 
     /**
      * Creates a new PgSchema object.
@@ -67,6 +71,24 @@ public class PgSchema {
      */
     public String getAuthorization() {
         return authorization;
+    }
+
+    /**
+     * Getter for {@link #definition}.
+     *
+     * @return {@link #definition}
+     */
+    public String getDefinition() {
+        return definition;
+    }
+
+    /**
+     * Setter for {@link #definition}.
+     *
+     * @param definition {@link #definition}
+     */
+    public void setDefinition(final String definition) {
+        this.definition = definition;
     }
 
     /**
