@@ -89,7 +89,7 @@ public class PgDiffSequences {
                 final String oldMinValue = oldSequence.getMinValue();
                 final String newMinValue = newSequence.getMinValue();
 
-                if ((newMinValue == null) && (oldMinValue != null)) {
+                if (newMinValue == null && oldMinValue != null) {
                     sbSQL.append("\n\tNO MINVALUE");
                 } else if (newMinValue != null
                         && !newMinValue.equals(oldMinValue)) {
@@ -100,7 +100,7 @@ public class PgDiffSequences {
                 final String oldMaxValue = oldSequence.getMaxValue();
                 final String newMaxValue = newSequence.getMaxValue();
 
-                if ((newMaxValue == null) && (oldMaxValue != null)) {
+                if (newMaxValue == null && oldMaxValue != null) {
                     sbSQL.append("\n\tNO MAXVALUE");
                 } else if (newMaxValue != null
                         && !newMaxValue.equals(oldMaxValue)) {
@@ -112,7 +112,7 @@ public class PgDiffSequences {
                     final String oldStart = oldSequence.getStartWith();
                     final String newStart = newSequence.getStartWith();
 
-                    if ((newStart != null) && !newStart.equals(oldStart)) {
+                    if (newStart != null && !newStart.equals(oldStart)) {
                         sbSQL.append("\n\tRESTART WITH ");
                         sbSQL.append(newStart);
                     }
@@ -121,7 +121,7 @@ public class PgDiffSequences {
                 final String oldCache = oldSequence.getCache();
                 final String newCache = newSequence.getCache();
 
-                if ((newCache != null) && !newCache.equals(oldCache)) {
+                if (newCache != null && !newCache.equals(oldCache)) {
                     sbSQL.append("\n\tCACHE ");
                     sbSQL.append(newCache);
                 }

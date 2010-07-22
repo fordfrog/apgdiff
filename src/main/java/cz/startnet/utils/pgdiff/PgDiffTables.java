@@ -53,7 +53,7 @@ public class PgDiffTables {
 
             final String newCluster = newTable.getClusterIndexName();
 
-            if ((oldCluster != null) && (newCluster == null)
+            if (oldCluster != null && newCluster == null
                     && newTable.containsIndex(oldCluster)) {
                 writer.println();
                 writer.print("ALTER TABLE ");
@@ -91,9 +91,9 @@ public class PgDiffTables {
 
             final String newCluster = newTable.getClusterIndexName();
 
-            if (((oldCluster == null) && (newCluster != null))
-                    || ((oldCluster != null) && (newCluster != null)
-                    && (newCluster.compareTo(oldCluster) != 0))) {
+            if ((oldCluster == null && newCluster != null)
+                    || (oldCluster != null && newCluster != null
+                    && newCluster.compareTo(oldCluster) != 0)) {
                 writer.println();
                 writer.print("ALTER TABLE ");
                 writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
@@ -116,7 +116,7 @@ public class PgDiffTables {
             final PgDiffArguments arguments, final PgSchema oldSchema,
             final PgSchema newSchema) {
         for (final PgTable newTable : newSchema.getTables()) {
-            if ((oldSchema == null)
+            if (oldSchema == null
                     || !oldSchema.containsTable(newTable.getName())) {
                 continue;
             }
@@ -150,10 +150,10 @@ public class PgDiffTables {
                 final Integer newStat = newColumn.getStatistics();
                 Integer newStatValue = null;
 
-                if ((newStat != null) && ((oldStat == null)
+                if (newStat != null && (oldStat == null
                         || !newStat.equals(oldStat))) {
                     newStatValue = newStat;
-                } else if ((oldStat != null) && (newStat == null)) {
+                } else if (oldStat != null && newStat == null) {
                     newStatValue = Integer.valueOf(-1);
                 }
 
@@ -298,28 +298,24 @@ public class PgDiffTables {
      */
     private static void checkInherits(final PrintWriter writer,
             final PgTable oldTable, final PgTable newTable) {
-        final String oldInherits = oldTable.getInherits();
-        final String newInherits = newTable.getInherits();
+        for (final String tableName : oldTable.getInherits()) {
+            if (!newTable.getInherits().contains(tableName)) {
+                writer.println();
+                writer.println("ALTER TABLE "
+                        + PgDiffUtils.getQuotedName(newTable.getName()));
+                writer.println("\tNO INHERIT "
+                        + PgDiffUtils.getQuotedName(tableName) + ';');
+            }
+        }
 
-        if ((oldInherits == null) && (newInherits != null)) {
-            writer.println();
-            writer.println("Modified INHERITS on TABLE "
-                    + PgDiffUtils.getQuotedName(newTable.getName())
-                    + ": original table doesn't use INHERITS but new table "
-                    + "uses INHERITS " + newTable.getInherits());
-        } else if ((oldInherits != null) && (newInherits == null)) {
-            writer.println();
-            writer.println("Modified INHERITS on TABLE "
-                    + PgDiffUtils.getQuotedName(newTable.getName())
-                    + ": original table uses INHERITS " + oldTable.getInherits()
-                    + " but new table doesn't use INHERITS");
-        } else if ((oldInherits != null) && (newInherits != null)
-                && !oldInherits.equals(newInherits)) {
-            writer.println();
-            writer.println("Modified INHERITS on TABLE "
-                    + PgDiffUtils.getQuotedName(newTable.getName())
-                    + ": original table uses INHERITS " + oldTable.getInherits()
-                    + " but new table uses INHERITS " + newTable.getInherits());
+        for (final String tableName : newTable.getInherits()) {
+            if (!oldTable.getInherits().contains(tableName)) {
+                writer.println();
+                writer.println("ALTER TABLE "
+                        + PgDiffUtils.getQuotedName(newTable.getName()));
+                writer.println("\tINHERIT "
+                        + PgDiffUtils.getQuotedName(tableName) + ';');
+            }
         }
     }
 
@@ -355,6 +351,13 @@ public class PgDiffTables {
         }
     }
 
+    /**
+     * Checks tablespace modification.
+     *
+     * @param writer writer
+     * @param oldTable old table
+     * @param newTable new table
+     */
     private static void checkTablespace(final PrintWriter writer,
             final PgTable oldTable, final PgTable newTable) {
         if (oldTable.getTablespace() == null && newTable.getTablespace() == null
@@ -379,7 +382,7 @@ public class PgDiffTables {
     public static void createTables(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema) {
         for (final PgTable table : newSchema.getTables()) {
-            if ((oldSchema == null)
+            if (oldSchema == null
                     || !oldSchema.containsTable(table.getName())) {
                 writer.println();
                 writer.println(table.getCreationSQL());
@@ -428,7 +431,7 @@ public class PgDiffTables {
         addModifyTableColumns(
                 commands, arguments, oldTable, newTable, dropDefaultsColumns);
 
-        if (commands.size() > 0) {
+        if (!commands.isEmpty()) {
             final String quotedTableName =
                     PgDiffUtils.getQuotedName(newTable.getName());
             writer.println();
@@ -436,7 +439,7 @@ public class PgDiffTables {
 
             for (int i = 0; i < commands.size(); i++) {
                 writer.print(commands.get(i));
-                writer.println(((i + 1) < commands.size()) ? "," : ";");
+                writer.println((i + 1) < commands.size() ? "," : ";");
             }
 
             if (!dropDefaultsColumns.isEmpty()) {
@@ -449,7 +452,7 @@ public class PgDiffTables {
                             dropDefaultsColumns.get(i).getName()));
                     writer.print(" DROP DEFAULT");
                     writer.println(
-                            ((i + 1) < dropDefaultsColumns.size()) ? "," : ";");
+                            (i + 1) < dropDefaultsColumns.size() ? "," : ";");
                 }
             }
         }

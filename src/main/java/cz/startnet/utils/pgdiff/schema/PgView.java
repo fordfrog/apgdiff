@@ -62,7 +62,7 @@ public class PgView {
         sbSQL.append("CREATE VIEW ");
         sbSQL.append(PgDiffUtils.getQuotedName(name));
 
-        if (columnNames != null && columnNames.size() > 0) {
+        if (columnNames != null && !columnNames.isEmpty()) {
             sbSQL.append(" (");
 
             for (int i = 0; i < columnNames.size(); i++) {

@@ -35,8 +35,8 @@ public class Main {
         if (arguments.parse(writer, args)) {
             @SuppressWarnings("UseOfSystemOutOrSystemErr")
             final PrintWriter encodedWriter = new PrintWriter(
-                    new OutputStreamWriter(System.out,
-                    arguments.getOutCharsetName()));
+                    new OutputStreamWriter(
+                    System.out, arguments.getOutCharsetName()));
             PgDiff.createDiff(encodedWriter, arguments);
             encodedWriter.close();
         }

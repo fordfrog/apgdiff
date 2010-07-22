@@ -8,10 +8,9 @@ package cz.startnet.utils.pgdiff.parsers;
 public class ParserException extends RuntimeException {
 
     /**
-     * Predefined message string that can be used as default exception
-     * message with provided parsed line.
+     * Serial version uid.
      */
-    public static final String CANNOT_PARSE_COMMAND = "Cannot parse command: ";
+    private static final long serialVersionUID = 1L;
 
     /**
      * Creates a new instance of <code>ParserException</code> without

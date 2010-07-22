@@ -54,20 +54,26 @@ public class CreateFunctionParser {
                 mode = null;
             }
 
-            final int endPos =
-                    parser.findOneOfInExpression(true, "=", "DEFAULT");
-            final int startPos = parser.parseDataTypeBackward(endPos);
-            final String dataType =
-                    parser.getSubString(startPos, endPos).trim();
-            final String argumentName;
+            final int position = parser.getPosition();
+            String argumentName = null;
+            String dataType = null;
 
-            if (startPos > parser.getPosition()) {
+            try {
                 argumentName = parser.parseIdentifier();
-            } else {
-                argumentName = null;
-            }
 
-            parser.setPosition(endPos);
+                if (parser.expectOptional(")") || parser.expectOptional(",")
+                        || parser.expectOptional("=")
+                        || parser.expectOptional("DEFAULT")) {
+                    argumentName = null;
+                    parser.setPosition(position);
+                }
+
+                dataType = parser.parseDataType();
+            } catch (final ParserException ex) {
+                parser.setPosition(position);
+                argumentName = null;
+                dataType = parser.parseDataType();
+            }
 
             final String defaultExpression;
 

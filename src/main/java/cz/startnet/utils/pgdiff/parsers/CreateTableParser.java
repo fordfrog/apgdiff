@@ -65,7 +65,7 @@ public class CreateTableParser {
 
         while (!parser.expectOptional(";")) {
             if (parser.expectOptional("INHERITS")) {
-                table.setInherits(parser.getExpression());
+                parseInherits(parser, table);
             } else if (parser.expectOptional("WITHOUT")) {
                 table.setWith("OIDS=false");
             } else if (parser.expectOptional("WITH")) {
@@ -81,6 +81,27 @@ public class CreateTableParser {
                 table.setTablespace(parser.parseString());
             } else {
                 parser.throwUnsupportedCommand();
+            }
+        }
+    }
+
+    /**
+     * Parses INHERITS.
+     *
+     * @param parser parser
+     * @param table pg table
+     */
+    private static void parseInherits(final Parser parser,
+            final PgTable table) {
+        parser.expect("(");
+
+        while (!parser.expectOptional(")")) {
+            table.addInherits(parser.parseIdentifier());
+
+            if (parser.expectOptional(")")) {
+                break;
+            } else {
+                parser.expect(",");
             }
         }
     }

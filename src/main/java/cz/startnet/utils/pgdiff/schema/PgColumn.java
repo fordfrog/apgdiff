@@ -89,7 +89,7 @@ public class PgColumn {
         sbDefinition.append(' ');
         sbDefinition.append(type);
 
-        if ((defaultValue != null) && (defaultValue.length() > 0)) {
+        if (defaultValue != null && !defaultValue.isEmpty()) {
             sbDefinition.append(" DEFAULT ");
             sbDefinition.append(defaultValue);
         } else if (!nullValue && addDefaults) {

@@ -93,7 +93,7 @@ public class PgDiffIndexes {
         @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<PgIndex> list = new ArrayList<PgIndex>();
 
-        if ((newTable != null) && (oldTable != null)) {
+        if (newTable != null && oldTable != null) {
             for (final PgIndex index : oldTable.getIndexes()) {
                 if (!newTable.containsIndex(index.getName())
                         || !newTable.getIndex(index.getName()).equals(index)) {

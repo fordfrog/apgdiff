@@ -39,9 +39,10 @@ public class PgTable {
      */
     private String clusterIndexName;
     /**
-     * Definition of names of inherited tables.
+     * List of names of inherited tables.
      */
-    private String inherits;
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    private final List<String> inherits = new ArrayList<String>();
     /**
      * Name of the table.
      */
@@ -164,9 +165,22 @@ public class PgTable {
         sbSQL.setLength(sbSQL.length() - 2);
         sbSQL.append("\n)");
 
-        if ((inherits != null) && (inherits.length() > 0)) {
-            sbSQL.append("\nINHERITS ");
-            sbSQL.append(inherits);
+        if (inherits != null && !inherits.isEmpty()) {
+            sbSQL.append("\nINHERITS (");
+
+            boolean first = true;
+
+            for (final String tableName : inherits) {
+                if (first) {
+                    first = false;
+                } else {
+                    sbSQL.append(", ");
+                }
+
+                sbSQL.append(tableName);
+            }
+
+            sbSQL.append(")");
         }
 
         if (with != null && !with.isEmpty()) {
@@ -249,10 +263,10 @@ public class PgTable {
     /**
      * Setter for {@link #inherits}.
      *
-     * @param inherits {@link #inherits}
+     * @param tableName name of inherited table
      */
-    public void setInherits(final String inherits) {
-        this.inherits = inherits;
+    public void addInherits(final String tableName) {
+        inherits.add(tableName);
     }
 
     /**
@@ -260,8 +274,8 @@ public class PgTable {
      *
      * @return {@link #inherits}
      */
-    public String getInherits() {
-        return inherits;
+    public List<String> getInherits() {
+        return Collections.unmodifiableList(inherits);
     }
 
     /**

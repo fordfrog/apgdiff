@@ -88,7 +88,7 @@ public class PgDiffTriggers {
         @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<PgTrigger> list = new ArrayList<PgTrigger>();
 
-        if ((newTable != null) && (oldTable != null)) {
+        if (newTable != null && oldTable != null) {
             final List<PgTrigger> newTriggers = newTable.getTriggers();
 
             for (final PgTrigger oldTrigger : oldTable.getTriggers()) {

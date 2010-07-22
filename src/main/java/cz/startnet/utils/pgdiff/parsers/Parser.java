@@ -1,6 +1,5 @@
 package cz.startnet.utils.pgdiff.parsers;
 
-import java.util.Arrays;
 import java.util.Locale;
 
 /**
@@ -382,108 +381,6 @@ public final class Parser {
     }
 
     /**
-     * Searches string forward from position to find one of following. If none
-     * of words is found, exception is thrown, unless optional is true. Position
-     * is not updated.
-     * 
-     * @param optional true if the strings are optional, otherwise false
-     * @param words list of words
-     *
-     * @return position of the closest occurance of any of the words, or end of
-     * expression if optional is true
-     */
-    public int findOneOfInExpression(final boolean optional,
-            final String... words) {
-        final int endOfExpression = getExpressionEnd();
-        int minWordPos = -1;
-
-        for (final String word : words) {
-            final int pos = string.indexOf(word, position);
-
-            if (pos != -1 && pos < endOfExpression
-                    && (minWordPos == -1 || pos < minWordPos)) {
-                minWordPos = pos;
-            }
-        }
-
-        if (minWordPos != -1) {
-            return minWordPos;
-        } else if (optional) {
-            return endOfExpression;
-        }
-
-        throw new RuntimeException("Cannot parse string: " + string
-                + "\nCannot find one of " + Arrays.toString(words)
-                + " from position " + position);
-    }
-
-    /**
-     * Parses data type backward from given end position excluded. If parsing of
-     * data type fails, exception is thrown. Position is not updated.
-     *
-     * @param endPosition end position from which data type should be parsed
-     *
-     * @return start position of the data type
-     */
-    public int parseDataTypeBackward(final int endPosition) {
-        int curPos = endPosition;
-
-        // get rid of whitespace
-        while (Character.isWhitespace(string.charAt(curPos - 1))) {
-            curPos--;
-        }
-
-        // if ')' is present we are handling something like 'varchar(num)'
-        if (string.charAt(curPos - 1) == ')') {
-            curPos--;
-
-            while (string.charAt(curPos - 1) != '(') {
-                curPos--;
-            }
-
-            curPos--;
-
-            // get rid of whitespace
-            while (Character.isWhitespace(string.charAt(curPos - 1))) {
-                curPos--;
-            }
-        }
-
-        final int wordEndPos = curPos - 1;
-        while (!Character.isWhitespace(string.charAt(curPos - 1))
-                && string.charAt(curPos - 1) != ','
-                && string.charAt(curPos - 1) != '(') {
-            curPos--;
-        }
-
-        // now we must handle multiword data types
-        final String word = string.substring(curPos, wordEndPos + 1);
-
-        if (word.equalsIgnoreCase("varying")
-                || word.equalsIgnoreCase("precision")) {
-            // get rid of whitespace
-            while (Character.isWhitespace(string.charAt(curPos - 1))) {
-                curPos--;
-            }
-
-            // parse to previous word beginning
-            while (!Character.isWhitespace(string.charAt(curPos - 1))
-                    && string.charAt(curPos - 1) != ','
-                    && string.charAt(curPos - 1) != '(') {
-                curPos--;
-            }
-        }
-
-        if (curPos < position) {
-            throw new RuntimeException("Cannot parse string: " + string
-                    + "\nCannot parse data type between positions "
-                    + position + " and " + endPosition);
-        }
-
-        return curPos;
-    }
-
-    /**
      * Returns substring from the string.
      *
      * @param startPos start position
@@ -515,7 +412,9 @@ public final class Parser {
 
         while (endPos < string.length()
                 && !Character.isWhitespace(string.charAt(endPos))
-                && string.charAt(endPos) != '(') {
+                && string.charAt(endPos) != '('
+                && string.charAt(endPos) != ')'
+                && string.charAt(endPos) != ',') {
             endPos++;
         }
 
@@ -539,8 +438,24 @@ public final class Parser {
             dataType = "double precision";
         }
 
+        final boolean timestamp = "timestamp".equalsIgnoreCase(dataType)
+                || "time".equalsIgnoreCase(dataType);
+
         if (string.charAt(position) == '(') {
             dataType += getExpression();
+        }
+
+        if (timestamp) {
+            if (expectOptional("with", "time", "zone")) {
+                dataType += " with time zone";
+            } else if (expectOptional("without", "time", "zone")) {
+                dataType += " without time zone";
+            }
+        }
+
+        if (expectOptional("[")) {
+            expect("]");
+            dataType += "[]";
         }
 
         return dataType;

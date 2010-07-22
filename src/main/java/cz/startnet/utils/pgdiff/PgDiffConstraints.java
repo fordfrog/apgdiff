@@ -102,7 +102,7 @@ public class PgDiffConstraints {
 
         if (newTable != null && oldTable != null) {
             for (final PgConstraint constraint : oldTable.getConstraints()) {
-                if ((constraint.isPrimaryKeyConstraint() == primaryKey)
+                if (constraint.isPrimaryKeyConstraint() == primaryKey
                         && (!newTable.containsConstraint(constraint.getName())
                         || !newTable.getConstraint(constraint.getName()).equals(
                         constraint))) {

@@ -55,7 +55,8 @@ public class PgDumpLoader { //NOPMD
      * Pattern for testing whether command is ALTER TABLE command.
      */
     private static final Pattern PATTERN_ALTER_TABLE =
-            Pattern.compile("^ALTER[\\s]+TABLE[\\s]+.*$", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("^ALTER[\\s]+TABLE[\\s]+.*$",
+            Pattern.CASE_INSENSITIVE);
     /**
      * Pattern for testing whether command is CREATE SEQUENCE command.
      */
@@ -86,7 +87,8 @@ public class PgDumpLoader { //NOPMD
      * Pattern for testing whether command is INSERT INTO command.
      */
     private static final Pattern PATTERN_INSERT_INTO =
-            Pattern.compile("^INSERT[\\s]+INTO[\\s]+.*$", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("^INSERT[\\s]+INTO[\\s]+.*$",
+            Pattern.CASE_INSENSITIVE);
     /**
      * Pattern for testing whether command is REVOKE command.
      */

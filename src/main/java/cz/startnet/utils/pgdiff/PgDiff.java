@@ -127,7 +127,7 @@ public class PgDiff {
     private static void updateSchemas(final PrintWriter writer,
             final PgDiffArguments arguments, final PgDatabase oldDatabase,
             final PgDatabase newDatabase) {
-        final boolean setSearchPath = (newDatabase.getSchemas().size() > 1)
+        final boolean setSearchPath = newDatabase.getSchemas().size() > 1
                 || !newDatabase.getSchemas().get(0).getName().equals("public");
 
         for (final PgSchema newSchema : newDatabase.getSchemas()) {

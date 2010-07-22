@@ -39,8 +39,8 @@ public class PgDiffFunctions {
                 oldFunction = oldSchema.getFunction(newFunction.getSignature());
             }
 
-            if ((oldFunction == null) || !newFunction.equals(oldFunction,
-                    arguments.isIgnoreFunctionWhitespace())) {
+            if ((oldFunction == null) || !newFunction.equals(
+                    oldFunction, arguments.isIgnoreFunctionWhitespace())) {
                 writer.println();
                 writer.println(newFunction.getCreationSQL());
             }

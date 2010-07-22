@@ -58,7 +58,7 @@ public class PgDatabase {
     public PgSchema getSchema(final String name) {
         PgSchema schema = null;
 
-        for (PgSchema curSchema : schemas) {
+        for (final PgSchema curSchema : schemas) {
             if (curSchema.getName().equals(name)) {
                 schema = curSchema;
 

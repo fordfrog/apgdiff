@@ -29,6 +29,7 @@ public class PgDiffUtils {
 
             if (Character.isUpperCase(chr)) {
                 isAllLowerCase = false;
+                break;
             }
         }
         return isAllLowerCase ? name : ("\"" + name + "\"");

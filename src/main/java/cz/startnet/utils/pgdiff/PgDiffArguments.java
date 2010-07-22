@@ -244,9 +244,7 @@ public class PgDiffArguments {
      *         info.
      */
     private void printUsage(final PrintWriter writer) {
-        final BufferedReader reader =
-                new BufferedReader(
-                new InputStreamReader(
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(
                 getClass().getResourceAsStream("usage.txt")));
 
         try {
@@ -258,15 +256,13 @@ public class PgDiffArguments {
             }
         } catch (final IOException ex) {
             throw new RuntimeException(
-                    "Problem occured while reading usage file",
-                    ex);
+                    "Problem occured while reading usage file", ex);
         } finally {
             try {
                 reader.close();
             } catch (final IOException ex) {
                 throw new RuntimeException(
-                        "Problem occured while closing reader",
-                        ex);
+                        "Problem occured while closing reader", ex);
             }
         }
     }
@@ -280,9 +276,7 @@ public class PgDiffArguments {
      *         version.
      */
     private void printVersion(final PrintWriter writer) {
-        final BufferedReader reader =
-                new BufferedReader(
-                new InputStreamReader(
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(
                 getClass().getResourceAsStream("build_info")));
         writer.print("Version: ");
 
@@ -295,8 +289,7 @@ public class PgDiffArguments {
                 reader.close();
             } catch (final IOException ex) {
                 throw new RuntimeException(
-                        "Problem occured while closing reader",
-                        ex);
+                        "Problem occured while closing reader", ex);
             }
         }
     }
