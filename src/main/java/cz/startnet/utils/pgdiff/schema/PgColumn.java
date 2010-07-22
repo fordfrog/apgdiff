@@ -47,6 +47,10 @@ public class PgColumn {
      * Determines whether null value is allowed in the column.
      */
     private boolean nullValue = true;
+    /**
+     * Contains information about column storage type.
+     */
+    private String storage;
 
     /**
      * Creates a new PgColumn object.
@@ -160,6 +164,24 @@ public class PgColumn {
      */
     public Integer getStatistics() {
         return statistics;
+    }
+
+    /**
+     * Getter for {@link #storage}.
+     *
+     * @return {@link #storage}
+     */
+    public String getStorage() {
+        return storage;
+    }
+
+    /**
+     * Setter for {@link #storage}.
+     *
+     * @param storage {@link #storage}
+     */
+    public void setStorage(final String storage) {
+        this.storage = storage;
     }
 
     /**

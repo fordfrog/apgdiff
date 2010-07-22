@@ -127,6 +127,7 @@ public class PgDiffTables {
             checkInherits(writer, oldTable, newTable);
             checkTablespace(writer, oldTable, newTable);
             addAlterStatistics(writer, oldTable, newTable);
+            addAlterStorage(writer, oldTable, newTable);
         }
     }
 
@@ -172,6 +173,54 @@ public class PgDiffTables {
             writer.print(" SET STATISTICS ");
             writer.print(entry.getValue());
             writer.println(';');
+        }
+    }
+
+    /**
+     * Generate the needed alter table xxx set storage when needed.
+     *
+     * @param writer writer the output should be written to
+     * @param oldTable original table
+     * @param newTable new table
+     */
+    private static void addAlterStorage(final PrintWriter writer,
+            final PgTable oldTable, final PgTable newTable) {
+        @SuppressWarnings("CollectionWithoutInitialCapacity")
+        final Map<String, Integer> stats = new HashMap<String, Integer>();
+
+        for (final PgColumn newColumn : newTable.getColumns()) {
+            final PgColumn oldColumn = oldTable.getColumn(newColumn.getName());
+            final String oldStorage = (oldColumn == null
+                    || oldColumn.getStorage() == null
+                    || oldColumn.getStorage().isEmpty()) ? null
+                    : oldColumn.getStorage();
+            final String newStorage = (newColumn.getStorage() == null
+                    || newColumn.getStorage().isEmpty()) ? null
+                    : newColumn.getStorage();
+
+            if (newStorage == null && oldStorage != null) {
+                writer.println();
+                writer.println("WARNING: Column " + newTable.getName()
+                        + '.' + newColumn.getName()
+                        + " in new table has no STORAGE set but in old "
+                        + "table storage was set. Unable to determine STORAGE "
+                        + "type");
+
+                continue;
+            }
+
+            if (newStorage == null || newStorage.equalsIgnoreCase(oldStorage)) {
+                continue;
+            }
+
+            writer.println();
+            writer.print("ALTER TABLE ONLY ");
+            writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
+            writer.print(" ALTER COLUMN ");
+            writer.print(PgDiffUtils.getQuotedName(newColumn.getName()));
+            writer.print(" SET STORAGE ");
+            writer.print(newStorage);
+            writer.print(';');
         }
     }
 

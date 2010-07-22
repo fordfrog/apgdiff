@@ -97,8 +97,8 @@ public class AlterTableParser {
 
         if (parser.expectOptional("SET")) {
             if (parser.expectOptional("STATISTICS")) {
-                final PgColumn col = table.getColumn(columnName);
-                col.setStatistics(parser.parseInteger());
+                final PgColumn column = table.getColumn(columnName);
+                column.setStatistics(parser.parseInteger());
             } else if (parser.expectOptional("DEFAULT")) {
                 final String defaultValue = parser.getExpression();
 
@@ -109,6 +109,20 @@ public class AlterTableParser {
                     throw new ParserException("Cannot find column '"
                             + columnName + " 'in table '" + table.getName()
                             + "'");
+                }
+            } else if (parser.expectOptional("STORAGE")) {
+                final PgColumn column = table.getColumn(columnName);
+
+                if (parser.expectOptional("PLAIN")) {
+                    column.setStorage("PLAIN");
+                } else if (parser.expectOptional("EXTERNAL")) {
+                    column.setStorage("EXTERNAL");
+                } else if (parser.expectOptional("EXTENDED")) {
+                    column.setStorage("EXTENDED");
+                } else if (parser.expectOptional("MAIN")) {
+                    column.setStorage("MAIN");
+                } else {
+                    parser.throwUnsupportedCommand();
                 }
             } else {
                 parser.throwUnsupportedCommand();
