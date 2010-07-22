@@ -56,23 +56,18 @@ public class CreateFunctionParser {
 
             final int position = parser.getPosition();
             String argumentName = null;
-            String dataType = null;
+            String dataType = parser.parseDataType();
 
-            try {
-                argumentName = parser.parseIdentifier();
+            final int position2 = parser.getPosition();
 
-                if (parser.expectOptional(")") || parser.expectOptional(",")
-                        || parser.expectOptional("=")
-                        || parser.expectOptional("DEFAULT")) {
-                    argumentName = null;
-                    parser.setPosition(position);
-                }
-
-                dataType = parser.parseDataType();
-            } catch (final ParserException ex) {
+            if (!parser.expectOptional(")") && !parser.expectOptional(",")
+                    && !parser.expectOptional("=")
+                    && !parser.expectOptional("DEFAULT")) {
                 parser.setPosition(position);
-                argumentName = null;
+                argumentName = parser.parseIdentifier();
                 dataType = parser.parseDataType();
+            } else {
+                parser.setPosition(position2);
             }
 
             final String defaultExpression;

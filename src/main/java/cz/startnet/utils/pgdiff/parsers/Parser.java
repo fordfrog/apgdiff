@@ -59,7 +59,7 @@ public final class Parser {
                 && string.substring(position, wordEnd).equalsIgnoreCase(word)
                 && (wordEnd == string.length()
                 || !Character.isLetter(string.charAt(wordEnd))
-                || "(".equals(word) || ",".equals(","))) {
+                || "(".equals(word) || ",".equals(word))) {
             position = wordEnd;
             skipWhitespace();
 
