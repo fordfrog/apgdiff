@@ -170,6 +170,8 @@ public class PgDiffTest {
                     // Tests scenario where CYCLE is modified on SEQUENCE.
                     {"modify_sequence_cycle_on", false, false, false, false},
                     {"modify_sequence_cycle_off", false, false, false, false},
+                    // Tests correct finding of function end.
+                    {"modify_function_end_detection", false, false, false, false},
                     // Tests scenario where new FUNCTION without args is added.
                     {"add_function_noargs", false, false, false, false},
                     // Tests scenario where FUNCTION without args is dropped.

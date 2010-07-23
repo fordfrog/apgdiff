@@ -121,7 +121,7 @@ public class PgDumpLoader { //NOPMD
      * or the function definition itself.
      */
     private static final Pattern PATTERN_END_OF_FUNCTION = Pattern.compile(
-            "^(?:.*[\\s]+)?AS[\\s]+(['$][^\\s]*).*$", Pattern.CASE_INSENSITIVE);
+            "^(?:.*[\\s]+)?AS[\\s]+([\\S]+).*$", Pattern.CASE_INSENSITIVE);
 
     /**
      * Creates a new instance of PgDumpLoader.
@@ -284,45 +284,51 @@ public class PgDumpLoader { //NOPMD
         final String firstLine = line;
         final StringBuilder sbCommand = new StringBuilder(1000);
         String newLine = line;
-        Pattern endOfFunctionPattern = null;
+        String endOfFunction = null;
+        boolean ignoreFirstOccurence = true;
         boolean searchForSemicolon = false;
 
         while (newLine != null) {
-            if (!searchForSemicolon && (endOfFunctionPattern == null)) {
+            if (endOfFunction == null) {
                 final Matcher matcher =
                         PATTERN_END_OF_FUNCTION.matcher(newLine);
 
                 if (matcher.matches()) {
-                    String endOfFunction = matcher.group(1);
+                    final String string = matcher.group(1);
 
-                    if (endOfFunction.charAt(0) == '\'') {
+                    if (string.charAt(0) == '\'') {
                         endOfFunction = "'";
                     } else {
-                        endOfFunction = endOfFunction.substring(
-                                0, endOfFunction.indexOf('$', 1) + 1);
+                        endOfFunction =
+                                string.substring(0, string.indexOf('$', 1) + 1);
                     }
-
-                    if ("'".equals(endOfFunction)) {
-                        endOfFunctionPattern = Pattern.compile(
-                                "(?:.*[^\\\\]'.*|^.*[\\s]*'[\\s]*.*$)");
-                    } else {
-                        endOfFunctionPattern = Pattern.compile(
-                                ".*\\Q" + endOfFunction + "\\E.*$",
-                                Pattern.CASE_INSENSITIVE);
-                    }
-
-                    final String stripped = newLine.replaceAll(
-                            "[\\s]+AS[\\s]+\\Q" + endOfFunction + "\\E", " ");
-                    searchForSemicolon =
-                            endOfFunctionPattern.matcher(stripped).matches();
                 }
             }
 
             sbCommand.append(newLine);
             sbCommand.append('\n');
 
-            if (searchForSemicolon && newLine.trim().endsWith(";")) {
-                break;
+            if (endOfFunction != null) {
+                // count occurences
+                if (!searchForSemicolon) {
+                    int count = ignoreFirstOccurence ? -1 : 0;
+                    int pos = newLine.indexOf(endOfFunction);
+                    ignoreFirstOccurence = false;
+
+                    while (pos != -1) {
+                        count++;
+                        pos = newLine.indexOf(
+                                endOfFunction, pos + endOfFunction.length());
+                    }
+
+                    if (count % 2 == 1) {
+                        searchForSemicolon = true;
+                    }
+                }
+
+                if (searchForSemicolon && newLine.trim().endsWith(";")) {
+                    break;
+                }
             }
 
             try {
@@ -334,11 +340,6 @@ public class PgDumpLoader { //NOPMD
             if (newLine == null) {
                 throw new RuntimeException(
                         "Cannot find end of function: " + firstLine);
-            }
-
-            if (!searchForSemicolon && (endOfFunctionPattern != null)
-                    && endOfFunctionPattern.matcher(newLine).matches()) {
-                searchForSemicolon = true;
             }
         }
 
