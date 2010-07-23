@@ -55,6 +55,10 @@ public class AlterTableParser {
                 } else {
                     parser.throwUnsupportedCommand();
                 }
+            } else if (parser.expectOptional("ENABLE")) {
+                parseEnable(parser);
+            } else if (parser.expectOptional("DISABLE")) {
+                parseDisable(parser);
             } else {
                 parser.throwUnsupportedCommand();
             }
@@ -64,6 +68,46 @@ public class AlterTableParser {
             } else {
                 parser.expect(",");
             }
+        }
+    }
+
+    /**
+     * Parses ENABLE statements.
+     *
+     * @param parser parser
+     */
+    private static void parseEnable(final Parser parser) {
+        if (parser.expectOptional("REPLICA")) {
+            if (parser.expectOptional("TRIGGER")) {
+                parser.parseIdentifier();
+            } else if (parser.expectOptional("RULE")) {
+                parser.parseIdentifier();
+            } else {
+                parser.throwUnsupportedCommand();
+            }
+        } else if (parser.expectOptional("ALWAYS")) {
+            if (parser.expectOptional("TRIGGER")) {
+                parser.parseIdentifier();
+            } else if (parser.expectOptional("RULE")) {
+                parser.parseIdentifier();
+            } else {
+                parser.throwUnsupportedCommand();
+            }
+        }
+    }
+
+    /**
+     * Parses DISABLE statements.
+     *
+     * @param parser parser
+     */
+    private static void parseDisable(final Parser parser) {
+        if (parser.expectOptional("TRIGGER")) {
+            parser.parseIdentifier();
+        } else if (parser.expectOptional("RULE")) {
+            parser.parseIdentifier();
+        } else {
+            parser.throwUnsupportedCommand();
         }
     }
 
