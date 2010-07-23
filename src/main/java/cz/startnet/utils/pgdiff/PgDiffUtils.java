@@ -489,7 +489,7 @@ public class PgDiffUtils {
      */
     public static String getQuotedName(final String name,
             final boolean excludeKeywords) {
-        if (name.indexOf('-') != -1) {
+        if (name.indexOf('-') != -1 || name.indexOf('.') != -1) {
             return '"' + name + '"';
         }
 

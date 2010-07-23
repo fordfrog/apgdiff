@@ -110,37 +110,47 @@ public final class Parser {
 
     /**
      * Parses identifier from current position. If identifier is quoted, it is
-     * returned as it is. If the identifier is not quoted, it is converted to
+     * returned quoted. If the identifier is not quoted, it is converted to
      * lowercase. If identifier does not start with letter then exception is
      * thrown. Position is placed at next first non-whitespace character.
      * 
      * @return parsed identifier
      */
     public String parseIdentifier() {
+        String identifier = parseIdentifierInternal();
+
+        if (string.charAt(position) == '.') {
+            position++;
+            identifier += '.' + parseIdentifierInternal();
+        }
+
+        skipWhitespace();
+
+        return identifier;
+    }
+
+    /**
+     * Parses single part of the identifier.
+     *
+     * @return parsed identifier
+     */
+    private String parseIdentifierInternal() {
         final boolean quoted = string.charAt(position) == '"';
 
         if (quoted) {
             final int endPos = string.indexOf('"', position + 1);
-            final String result = string.substring(position + 1, endPos);
+            final String result = string.substring(position, endPos + 1);
             position = endPos + 1;
-            skipWhitespace();
 
             return result;
         } else {
             int endPos = position;
 
-            if (!Character.isLetter(string.charAt(endPos))) {
-                throw new ParserException("Cannot parse string: " + string
-                        + "\nIdentifier must begin with letter at position "
-                        + (position + 1) + " '"
-                        + string.substring(position, position + 20) + "'");
-            }
-
-            for (endPos++; endPos < string.length(); endPos++) {
+            for (; endPos < string.length(); endPos++) {
                 final char chr = string.charAt(endPos);
 
                 if (Character.isWhitespace(chr) || chr == ',' || chr == ')'
-                        || chr == '(' || chr == ';') {
+                        || chr == '(' || chr == ';' || chr == '.') {
                     break;
                 }
             }
@@ -150,7 +160,6 @@ public final class Parser {
                     Locale.ENGLISH);
 
             position = endPos;
-            skipWhitespace();
 
             return result;
         }

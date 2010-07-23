@@ -1,6 +1,7 @@
 package cz.startnet.utils.pgdiff.parsers;
 
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,16 +25,8 @@ public class ParserUtils {
      * @return name of the object
      */
     public static String getObjectName(final String name) {
-        final String result;
-        final int pos = name.indexOf('.');
-
-        if (pos == -1) {
-            result = name;
-        } else {
-            result = name.substring(pos + 1);
-        }
-
-        return result;
+        final String[] names = splitNames(name);
+        return names[names.length - 1];
     }
 
     /**
@@ -46,16 +39,13 @@ public class ParserUtils {
      */
     public static String getSchemaName(final String name,
             final PgDatabase database) {
-        final String result;
-        final int pos = name.indexOf('.');
+        final String[] names = splitNames(name);
 
-        if (pos == -1) {
-            result = database.getDefaultSchema().getName();
+        if (names.length < 2) {
+            return database.getDefaultSchema().getName();
         } else {
-            result = name.substring(0, pos);
+            return names[names.length - 2];
         }
-
-        return result;
     }
 
     /**
@@ -100,5 +90,47 @@ public class ParserUtils {
         }
 
         return sbResult.toString();
+    }
+
+    /**
+     * Splits qualified names by dots. If names are quoted then quotes are
+     * removed.
+     *
+     * @param string qualified name
+     *
+     * @return array of names
+     */
+    private static String[] splitNames(final String string) {
+        if (string.indexOf('"') == -1) {
+            return string.split("\\.");
+        } else {
+            final List<String> strings = new ArrayList<String>(2);
+            int startPos = 0;
+
+            while (true) {
+                if (string.charAt(startPos) == '"') {
+                    final int endPos = string.indexOf('"', startPos + 1);
+                    strings.add(string.substring(startPos + 1, endPos));
+
+                    if (endPos + 1 == string.length()) {
+                        break;
+                    }
+
+                    startPos = endPos + 1;
+                } else {
+                    final int endPos = string.indexOf('.', startPos);
+
+                    if (endPos == -1) {
+                        strings.add(string.substring(startPos));
+                        break;
+                    } else {
+                        strings.add(string.substring(startPos, endPos));
+                        startPos = endPos + 1;
+                    }
+                }
+            }
+
+            return strings.toArray(new String[strings.size()]);
+        }
     }
 }
