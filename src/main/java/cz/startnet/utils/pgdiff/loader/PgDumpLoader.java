@@ -8,6 +8,7 @@ import cz.startnet.utils.pgdiff.parsers.CreateSequenceParser;
 import cz.startnet.utils.pgdiff.parsers.CreateTableParser;
 import cz.startnet.utils.pgdiff.parsers.CreateTriggerParser;
 import cz.startnet.utils.pgdiff.parsers.CreateViewParser;
+import cz.startnet.utils.pgdiff.parsers.ParserException;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
 
 import java.io.BufferedReader;
@@ -33,6 +34,11 @@ public class PgDumpLoader { //NOPMD
      */
     private static final Pattern PATTERN_CREATE_SCHEMA = Pattern.compile(
             "^CREATE[\\s]+SCHEMA[\\s]+.*$", Pattern.CASE_INSENSITIVE);
+    /**
+     * Pattern for testing whether command is ALTER SCHEMA.
+     */
+    private static final Pattern PATTERN_ALTER_SCHEMA = Pattern.compile(
+            "^ALTER[\\s]+SCHEMA[\\s]+.*$", Pattern.CASE_INSENSITIVE);
     /**
      * Pattern for parsing default schema (search_path).
      */
@@ -116,6 +122,28 @@ public class PgDumpLoader { //NOPMD
     private static final Pattern PATTERN_CREATE_FUNCTION = Pattern.compile(
             "^CREATE[\\s]+(?:OR[\\s]+REPLACE[\\s]+)?FUNCTION[\\s]+.*$",
             Pattern.CASE_INSENSITIVE);
+    /**
+     * Pattern for testing whether command is ALTER FUNCTION.
+     */
+    private static final Pattern PATTERN_ALTER_FUNCTION = Pattern.compile(
+            "^ALTER[\\s]+FUNCTION[\\s]+.*$", Pattern.CASE_INSENSITIVE);
+    /**
+     * Pattern for testing whether command is CREATE LANGUAGE and its variants.
+     */
+    private static final Pattern PATTERN_CREATE_LANGUAGE = Pattern.compile(
+            "^CREATE[\\s]+(?:OR[\\s]+REPLACE[\\s]+)?(?:TRUSTED[\\s]+)?"
+            + "(?:PROCEDURAL[\\s]+)?LANGUAGE[\\s]+.*$",
+            Pattern.CASE_INSENSITIVE);
+    /**
+     * Pattern for testing whether command is CREATE TYPE.
+     */
+    private static final Pattern PATTERN_CREATE_TYPE = Pattern.compile(
+            "^CREATE[\\s]+TYPE[\\s]+.*$", Pattern.CASE_INSENSITIVE);
+    /**
+     * Pattern for testing whether command is ALTER TYPE.
+     */
+    private static final Pattern PATTERN_ALTER_TYPE = Pattern.compile(
+            "^ALTER[\\s]+TYPE[\\s]+.*$", Pattern.CASE_INSENSITIVE);
     /**
      * Pattern for getting the string that is used to end the function
      * or the function definition itself.
@@ -202,8 +230,15 @@ public class PgDumpLoader { //NOPMD
                         || PATTERN_INSERT_INTO.matcher(line).matches()
                         || PATTERN_REVOKE.matcher(line).matches()
                         || PATTERN_GRANT.matcher(line).matches()
-                        || PATTERN_ALTER_SEQUENCE.matcher(line).matches()) {
+                        || PATTERN_ALTER_SEQUENCE.matcher(line).matches()
+                        || PATTERN_CREATE_LANGUAGE.matcher(line).matches()
+                        || PATTERN_CREATE_TYPE.matcher(line).matches()
+                        || PATTERN_ALTER_TYPE.matcher(line).matches()
+                        || PATTERN_ALTER_FUNCTION.matcher(line).matches()
+                        || PATTERN_ALTER_SCHEMA.matcher(line).matches()) {
                     getWholeCommand(reader, line);
+                } else {
+                    throw new ParserException("Command not supported: " + line);
                 }
 
                 line = reader.readLine();
