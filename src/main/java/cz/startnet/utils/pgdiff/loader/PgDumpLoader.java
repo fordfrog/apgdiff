@@ -145,6 +145,11 @@ public class PgDumpLoader { //NOPMD
     private static final Pattern PATTERN_ALTER_TYPE = Pattern.compile(
             "^ALTER[\\s]+TYPE[\\s]+.*$", Pattern.CASE_INSENSITIVE);
     /**
+     * Pattern for testing whether command is CREATE AGGREGATE.
+     */
+    private static final Pattern PATTERN_CREATE_AGGREGATE = Pattern.compile(
+            "^CREATE[\\s]+AGGREGATE[\\s]+.*$", Pattern.CASE_INSENSITIVE);
+    /**
      * Pattern for getting the string that is used to end the function
      * or the function definition itself.
      */
@@ -235,7 +240,8 @@ public class PgDumpLoader { //NOPMD
                         || PATTERN_CREATE_TYPE.matcher(line).matches()
                         || PATTERN_ALTER_TYPE.matcher(line).matches()
                         || PATTERN_ALTER_FUNCTION.matcher(line).matches()
-                        || PATTERN_ALTER_SCHEMA.matcher(line).matches()) {
+                        || PATTERN_ALTER_SCHEMA.matcher(line).matches()
+                        || PATTERN_CREATE_AGGREGATE.matcher(line).matches()) {
                     getWholeCommand(reader, line);
                 } else {
                     throw new ParserException("Command not supported: " + line);
