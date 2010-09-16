@@ -135,6 +135,12 @@ public class PgDumpLoader { //NOPMD
             + "(?:PROCEDURAL[\\s]+)?LANGUAGE[\\s]+.*$",
             Pattern.CASE_INSENSITIVE);
     /**
+     * Pattern for testing whether command is ALTER LANGUAGE and its variants.
+     */
+    private static final Pattern PATTERN_ALTER_LANGUAGE = Pattern.compile(
+            "^ALTER[\\s](?:PROCEDURAL[\\s]+)?LANGUAGE[\\s]+.*$",
+            Pattern.CASE_INSENSITIVE);
+    /**
      * Pattern for testing whether command is CREATE TYPE.
      */
     private static final Pattern PATTERN_CREATE_TYPE = Pattern.compile(
@@ -149,6 +155,11 @@ public class PgDumpLoader { //NOPMD
      */
     private static final Pattern PATTERN_CREATE_AGGREGATE = Pattern.compile(
             "^CREATE[\\s]+AGGREGATE[\\s]+.*$", Pattern.CASE_INSENSITIVE);
+    /**
+     * Pattern for testing whether command is CREATE OPERATOR.
+     */
+    private static final Pattern PATTERN_CREATE_OPERATOR = Pattern.compile(
+            "^CREATE[\\s]+OPERATOR[\\s]+.*$", Pattern.CASE_INSENSITIVE);
     /**
      * Pattern for getting the string that is used to end the function
      * or the function definition itself.
@@ -241,7 +252,9 @@ public class PgDumpLoader { //NOPMD
                         || PATTERN_ALTER_TYPE.matcher(line).matches()
                         || PATTERN_ALTER_FUNCTION.matcher(line).matches()
                         || PATTERN_ALTER_SCHEMA.matcher(line).matches()
-                        || PATTERN_CREATE_AGGREGATE.matcher(line).matches()) {
+                        || PATTERN_CREATE_AGGREGATE.matcher(line).matches()
+                        || PATTERN_ALTER_LANGUAGE.matcher(line).matches()
+                        || PATTERN_CREATE_OPERATOR.matcher(line).matches()) {
                     getWholeCommand(reader, line);
                 } else {
                     throw new ParserException("Command not supported: " + line);
