@@ -5,7 +5,7 @@
     <groupId>cz.startnet.utils.pgdiff</groupId>
     <artifactId>apgdiff</artifactId>
     <name>Another PostgreSQL Diff Tool</name>
-    <version>2.0.1</version>
+    <version>2.0.2</version>
     <description>Simple PostgreSQL diff tool that is useful for schema upgrades. The tool compares two schema dump files and creates output file that is (after some hand-made modifications) suitable for upgrade of old schema.</description>
 
     <url>http://apgdiff.sourceforge.net</url>
