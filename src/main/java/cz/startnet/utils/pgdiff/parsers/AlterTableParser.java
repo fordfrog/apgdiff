@@ -64,7 +64,8 @@ public class AlterTableParser {
             if (parser.expectOptional("ALTER")) {
                 parseAlterColumn(parser, table);
             } else if (parser.expectOptional("CLUSTER", "ON")) {
-                table.setClusterIndexName(parser.parseIdentifier());
+                table.setClusterIndexName(
+                        ParserUtils.getObjectName(parser.parseIdentifier()));
             } else if (parser.expectOptional("OWNER", "TO")) {
                 // we do not parse this one so we just consume the expression
                 parser.getExpression();
@@ -140,9 +141,9 @@ public class AlterTableParser {
      */
     private static void parseAddConstraint(final Parser parser,
             final PgTable table) {
-        final String constraintName = parser.parseIdentifier();
-        final PgConstraint constraint =
-                new PgConstraint(constraintName);
+        final String constraintName =
+                ParserUtils.getObjectName(parser.parseIdentifier());
+        final PgConstraint constraint = new PgConstraint(constraintName);
         table.addConstraint(constraint);
         constraint.setDefinition(parser.getExpression());
         constraint.setTableName(table.getName());
@@ -158,7 +159,8 @@ public class AlterTableParser {
             final PgTable table) {
         parser.expectOptional("COLUMN");
 
-        final String columnName = parser.parseIdentifier();
+        final String columnName =
+                ParserUtils.getObjectName(parser.parseIdentifier());
 
         if (parser.expectOptional("SET")) {
             if (parser.expectOptional("STATISTICS")) {
@@ -209,7 +211,8 @@ public class AlterTableParser {
         parser.expect("(");
 
         while (!parser.expectOptional(")")) {
-            columnNames.add(parser.parseIdentifier());
+            columnNames.add(
+                    ParserUtils.getObjectName(parser.parseIdentifier()));
 
             if (parser.expectOptional(")")) {
                 break;

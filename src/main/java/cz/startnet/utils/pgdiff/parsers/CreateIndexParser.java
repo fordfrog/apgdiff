@@ -35,7 +35,8 @@ public class CreateIndexParser {
         parser.expect("INDEX");
         parser.expectOptional("CONCURRENTLY");
 
-        final String indexName = parser.parseIdentifier();
+        final String indexName =
+                ParserUtils.getObjectName(parser.parseIdentifier());
 
         parser.expect("ON");
 

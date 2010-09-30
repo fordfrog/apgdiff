@@ -30,7 +30,8 @@ public class CreateSchemaParser {
         parser.expect("CREATE", "SCHEMA");
 
         if (parser.expectOptional("AUTHORIZATION")) {
-            final PgSchema schema = new PgSchema(parser.parseIdentifier());
+            final PgSchema schema = new PgSchema(
+                    ParserUtils.getObjectName(parser.parseIdentifier()));
             database.addSchema(schema);
             schema.setAuthorization(schema.getName());
 
@@ -40,11 +41,13 @@ public class CreateSchemaParser {
                 schema.setDefinition(definition);
             }
         } else {
-            final PgSchema schema = new PgSchema(parser.parseIdentifier());
+            final PgSchema schema = new PgSchema(
+                    ParserUtils.getObjectName(parser.parseIdentifier()));
             database.addSchema(schema);
 
             if (parser.expectOptional("AUTHORIZATION")) {
-                schema.setAuthorization(parser.parseIdentifier());
+                schema.setAuthorization(
+                        ParserUtils.getObjectName(parser.parseIdentifier()));
             }
 
             final String definition = parser.getRest();

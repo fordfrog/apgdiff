@@ -96,7 +96,8 @@ public class CreateTableParser {
         parser.expect("(");
 
         while (!parser.expectOptional(")")) {
-            table.addInherits(parser.parseIdentifier());
+            table.addInherits(
+                    ParserUtils.getObjectName(parser.parseIdentifier()));
 
             if (parser.expectOptional(")")) {
                 break;
@@ -114,8 +115,8 @@ public class CreateTableParser {
      */
     private static void parseConstraint(final Parser parser,
             final PgTable table) {
-        final PgConstraint constraint =
-                new PgConstraint(parser.parseIdentifier());
+        final PgConstraint constraint = new PgConstraint(
+                ParserUtils.getObjectName(parser.parseIdentifier()));
         table.addConstraint(constraint);
         constraint.setDefinition(parser.getExpression());
         constraint.setTableName(table.getName());
@@ -128,7 +129,8 @@ public class CreateTableParser {
      * @param table pg table
      */
     private static void parseColumn(final Parser parser, final PgTable table) {
-        final PgColumn column = new PgColumn(parser.parseIdentifier());
+        final PgColumn column = new PgColumn(
+                ParserUtils.getObjectName(parser.parseIdentifier()));
         table.addColumn(column);
         column.parseDefinition(parser.getExpression());
     }

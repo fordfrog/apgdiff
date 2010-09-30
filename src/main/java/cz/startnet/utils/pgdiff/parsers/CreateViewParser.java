@@ -41,7 +41,8 @@ public class CreateViewParser {
 
         if (columnsExist) {
             while (!parser.expectOptional(")")) {
-                columnNames.add(parser.parseIdentifier());
+                columnNames.add(
+                        ParserUtils.getObjectName(parser.parseIdentifier()));
                 parser.expectOptional(",");
             }
         }

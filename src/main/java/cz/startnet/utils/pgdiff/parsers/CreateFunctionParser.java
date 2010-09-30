@@ -65,7 +65,8 @@ public class CreateFunctionParser {
                     && !parser.expectOptional("=")
                     && !parser.expectOptional("DEFAULT")) {
                 parser.setPosition(position);
-                argumentName = parser.parseIdentifier();
+                argumentName =
+                        ParserUtils.getObjectName(parser.parseIdentifier());
                 dataType = parser.parseDataType();
             } else {
                 parser.setPosition(position2);

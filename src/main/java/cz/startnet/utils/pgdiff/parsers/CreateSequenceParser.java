@@ -55,7 +55,8 @@ public class CreateSequenceParser {
                 if (parser.expectOptional("NONE")) {
                     sequence.setOwnedBy(null);
                 } else {
-                    sequence.setOwnedBy(parser.parseIdentifier());
+                    sequence.setOwnedBy(ParserUtils.getObjectName(
+                            parser.parseIdentifier()));
                 }
             } else if (parser.expectOptional("NO")) {
                 if (parser.expectOptional("MINVALUE")) {
