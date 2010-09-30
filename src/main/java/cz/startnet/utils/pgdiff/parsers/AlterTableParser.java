@@ -4,6 +4,7 @@ import cz.startnet.utils.pgdiff.schema.PgColumn;
 import cz.startnet.utils.pgdiff.schema.PgConstraint;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
+import cz.startnet.utils.pgdiff.schema.PgSequence;
 import cz.startnet.utils.pgdiff.schema.PgTable;
 import cz.startnet.utils.pgdiff.schema.PgView;
 import java.util.ArrayList;
@@ -48,6 +49,13 @@ public class AlterTableParser {
 
             if (view != null) {
                 parseView(parser, view);
+                return;
+            }
+
+            final PgSequence sequence = schema.getSequence(objectName);
+
+            if (sequence != null) {
+                parseSequence(parser, sequence);
                 return;
             }
         }
@@ -222,8 +230,8 @@ public class AlterTableParser {
     /**
      * Parses ALTER TABLE view.
      * 
-     * @param parser
-     * @param view
+     * @param parser parser
+     * @param view view
      */
     private static void parseView(final Parser parser, final PgView view) {
         while (!parser.expectOptional(";")) {
@@ -242,6 +250,24 @@ public class AlterTableParser {
                     parser.throwUnsupportedCommand();
                 }
             } else if (parser.expectOptional("OWNER", "TO")) {
+                // we do not support OWNER TO so just consume the rest
+                parser.getExpression();
+            } else {
+                parser.throwUnsupportedCommand();
+            }
+        }
+    }
+
+    /**
+     * Parses ALTER TABLE sequence.
+     *
+     * @param parser parser
+     * @param sequence sequence
+     */
+    private static void parseSequence(final Parser parser,
+            final PgSequence sequence) {
+        while (!parser.expectOptional(";")) {
+            if (parser.expectOptional("OWNER", "TO")) {
                 // we do not support OWNER TO so just consume the rest
                 parser.getExpression();
             } else {
