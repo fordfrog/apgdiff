@@ -5,6 +5,7 @@ import cz.startnet.utils.pgdiff.schema.PgView;
 
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Diffs views.
@@ -52,7 +53,7 @@ public class PgDiffViews {
             for (final PgView oldView : oldSchema.getViews()) {
                 final PgView newView = newSchema.getView(oldView.getName());
 
-                if ((newView == null) || isViewModified(oldView, newView)) {
+                if (newView == null || isViewModified(oldView, newView)) {
                     writer.println();
                     writer.println(oldView.getDropSQL());
                 }
@@ -91,6 +92,105 @@ public class PgDiffViews {
                     new String[newView.getColumnNames().size()]);
         }
 
-        return Arrays.equals(oldViewColumnNames, newViewColumnNames);
+        if (oldViewColumnNames == null && newViewColumnNames == null) {
+            return !oldView.getQuery().trim().equals(newView.getQuery().trim());
+        } else {
+            return !Arrays.equals(oldViewColumnNames, newViewColumnNames);
+        }
+    }
+
+    /**
+     * Outputs commands for altering view default values.
+     *
+     * @param writer writer
+     * @param oldSchema old schema
+     * @param newSchema new schema
+     */
+    public static void alterViews(final PrintWriter writer,
+            final PgSchema oldSchema, final PgSchema newSchema) {
+        if (oldSchema != null) {
+            for (final PgView oldView : oldSchema.getViews()) {
+                final PgView newView = newSchema.getView(oldView.getName());
+
+                if (oldView != null && newView != null) {
+                    diffDefaultValues(writer, oldView, newView);
+                }
+            }
+        }
+    }
+
+    /**
+     * Diffs default values in views.
+     *
+     * @param writer writer
+     * @param oldView old view
+     * @param newView new view
+     */
+    private static void diffDefaultValues(final PrintWriter writer,
+            final PgView oldView, final PgView newView) {
+        final List<PgView.DefaultValue> oldValues =
+                oldView.getDefaultValues();
+        final List<PgView.DefaultValue> newValues =
+                newView.getDefaultValues();
+
+        // modify defaults that are in old view
+        for (final PgView.DefaultValue oldValue : oldValues) {
+            boolean found = false;
+
+            for (final PgView.DefaultValue newValue : newValues) {
+                if (oldValue.getColumnName().equals(newValue.getColumnName())
+                        && !oldValue.getDefaultValue().equals(
+                        newValue.getDefaultValue())) {
+                    found = true;
+
+                    writer.println();
+                    writer.print("ALTER VIEW ");
+                    writer.print(PgDiffUtils.getQuotedName(newView.getName()));
+                    writer.print(" ALTER COLUMN ");
+                    writer.print(PgDiffUtils.getQuotedName(
+                            newValue.getColumnName()));
+                    writer.print(" SET DEFAULT ");
+                    writer.print(newValue.getDefaultValue());
+                    writer.println(';');
+
+                    break;
+                }
+            }
+
+            if (!found) {
+                writer.println();
+                writer.print("ALTER VIEW ");
+                writer.print(PgDiffUtils.getQuotedName(newView.getName()));
+                writer.print(" ALTER COLUMN ");
+                writer.print(PgDiffUtils.getQuotedName(
+                        oldValue.getColumnName()));
+                writer.print(" DROP DEFAULT;");
+            }
+        }
+
+        // add new defaults
+        for (final PgView.DefaultValue newValue : newValues) {
+            boolean found = false;
+
+            for (final PgView.DefaultValue oldValue : oldValues) {
+                if (newValue.getColumnName().equals(oldValue.getColumnName())) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found) {
+                continue;
+            }
+
+            writer.println();
+            writer.print("ALTER VIEW ");
+            writer.print(PgDiffUtils.getQuotedName(newView.getName()));
+            writer.print(" ALTER COLUMN ");
+            writer.print(PgDiffUtils.getQuotedName(newValue.getColumnName()));
+            writer.print(" SET DEFAULT ");
+            writer.print(newValue.getDefaultValue());
+            writer.print(';');
+        }
     }
 }

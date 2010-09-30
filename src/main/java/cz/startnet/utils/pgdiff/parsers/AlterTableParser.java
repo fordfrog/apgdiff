@@ -235,7 +235,7 @@ public class AlterTableParser {
 
                 if (parser.expectOptional("SET", "DEFAULT")) {
                     final String expression = parser.getExpression();
-                    view.addColumnDefaultValue(columnName, columnName);
+                    view.addColumnDefaultValue(columnName, expression);
                 } else if (parser.expectOptional("DROP", "DEFAULT")) {
                     view.removeColumnDefaultValue(columnName);
                 } else {

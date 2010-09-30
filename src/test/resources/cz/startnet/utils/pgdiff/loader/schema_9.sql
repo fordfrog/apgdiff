@@ -22,8 +22,10 @@ CREATE VIEW "user" AS
     SELECT user_data.id, user_data.email, user_data.created FROM user_data;
 
 ALTER TABLE public."user" OWNER TO postgres;
+ALTER VIEW public."user" OWNER TO postgres;
 
 ALTER TABLE "user" ALTER COLUMN created SET DEFAULT now();
+ALTER VIEW "user" ALTER COLUMN created SET DEFAULT now();
 
 CREATE RULE on_delete AS ON DELETE TO "user" DO INSTEAD DELETE FROM user_data WHERE (user_data.id = old.id);
 CREATE RULE on_insert AS ON INSERT TO "user" DO INSTEAD (INSERT INTO user_data (id, email, created) VALUES (new.id, new.email, new.created));

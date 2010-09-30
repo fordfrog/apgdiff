@@ -169,6 +169,7 @@ public class PgDiff {
             PgDiffTables.createClusters(writer, oldSchema, newSchema);
             PgDiffTriggers.createTriggers(writer, oldSchema, newSchema);
             PgDiffViews.createViews(writer, oldSchema, newSchema);
+            PgDiffViews.alterViews(writer, oldSchema, newSchema);
         }
     }
 }

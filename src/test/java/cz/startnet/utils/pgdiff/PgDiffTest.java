@@ -219,6 +219,12 @@ public class PgDiffTest {
                     {"multiple_schemas", false, false, false, false},
                     // Tests scenario where --add-transaction is specified.
                     {"multiple_schemas", false, true, false, false},
+                    // Tests dropping view default value
+                    {"alter_view_drop_default", false, true, false, false},
+                    // Tests adding view default value
+                    {"alter_view_add_default", false, true, false, false},
+                    // Tests changing view default value
+                    {"alter_view_change_default", false, true, false, false},
                     // Tests creation of sequence with bug in MINVALUE value
                     {"add_sequence_bug2100013", false, true, false, false}
                 });
@@ -251,7 +257,7 @@ public class PgDiffTest {
                 PgDiffTest.class.getResourceAsStream(
                 fileNameTemplate + "_diff.sql")));
         final char[] part = new char[1024];
-        final StringBuilder sbExpDiff = new StringBuilder();
+        final StringBuilder sbExpDiff = new StringBuilder(1024);
 
         while (reader.read(part) != -1) {
             sbExpDiff.append(part);

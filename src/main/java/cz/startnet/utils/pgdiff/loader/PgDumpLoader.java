@@ -1,6 +1,7 @@
 package cz.startnet.utils.pgdiff.loader;
 
 import cz.startnet.utils.pgdiff.parsers.AlterTableParser;
+import cz.startnet.utils.pgdiff.parsers.AlterViewParser;
 import cz.startnet.utils.pgdiff.parsers.CreateFunctionParser;
 import cz.startnet.utils.pgdiff.parsers.CreateIndexParser;
 import cz.startnet.utils.pgdiff.parsers.CreateSchemaParser;
@@ -171,6 +172,11 @@ public class PgDumpLoader { //NOPMD
     private static final Pattern PATTERN_CREATE_RULE = Pattern.compile(
             "^CREATE[\\s]+RULE[\\s]+.*$", Pattern.CASE_INSENSITIVE);
     /**
+     * Pattern for testing whether command is ALTER VIEW.
+     */
+    private static final Pattern PATTERN_ALTER_VIEW = Pattern.compile(
+            "^ALTER[\\s]+VIEW[\\s]+.*$", Pattern.CASE_INSENSITIVE);
+    /**
      * Pattern for getting the string that is used to end the function
      * or the function definition itself.
      */
@@ -243,6 +249,9 @@ public class PgDumpLoader { //NOPMD
                             database, getWholeCommand(reader, line));
                 } else if (PATTERN_CREATE_VIEW.matcher(line).matches()) {
                     CreateViewParser.parse(
+                            database, getWholeCommand(reader, line));
+                } else if (PATTERN_ALTER_VIEW.matcher(line).matches()) {
+                    AlterViewParser.parse(
                             database, getWholeCommand(reader, line));
                 } else if (PATTERN_CREATE_TRIGGER.matcher(line).matches()) {
                     CreateTriggerParser.parse(

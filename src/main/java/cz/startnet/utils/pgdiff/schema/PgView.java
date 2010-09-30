@@ -85,6 +85,17 @@ public class PgView {
         sbSQL.append(query);
         sbSQL.append(';');
 
+        for (final DefaultValue defaultValue : defaultValues) {
+            sbSQL.append("\n\nALTER VIEW");
+            sbSQL.append(PgDiffUtils.getQuotedName(name));
+            sbSQL.append(" ALTER COLUMN");
+            sbSQL.append(
+                    PgDiffUtils.getQuotedName(defaultValue.getColumnName()));
+            sbSQL.append(" SET DEFAULT ");
+            sbSQL.append(defaultValue.getDefaultValue());
+            sbSQL.append(';');
+        }
+
         return sbSQL.toString();
     }
 
@@ -151,9 +162,19 @@ public class PgView {
     }
 
     /**
+     * Getter for {@link #defaultValues}.
+     *
+     * @return {@link #defaultValues}
+     */
+    public List<DefaultValue> getDefaultValues() {
+        return Collections.unmodifiableList(defaultValues);
+    }
+
+    /**
      * Contains information about default value of column.
      */
-    private class DefaultValue {
+    @SuppressWarnings("PublicInnerClass")
+    public class DefaultValue {
 
         /**
          * Column name.

@@ -1,0 +1,1 @@
+ALTER VIEW test ALTER COLUMN test_col SET DEFAULT 1;
