@@ -63,7 +63,8 @@ public class CreateTriggerParser {
 
         parser.expect("ON");
 
-        trigger.setTableName(parser.parseIdentifier());
+        trigger.setTableName(
+                ParserUtils.getObjectName(parser.parseIdentifier()));
 
         if (parser.expectOptional("FOR")) {
             parser.expectOptional("EACH");
