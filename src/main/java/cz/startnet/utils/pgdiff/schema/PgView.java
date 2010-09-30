@@ -86,9 +86,9 @@ public class PgView {
         sbSQL.append(';');
 
         for (final DefaultValue defaultValue : defaultValues) {
-            sbSQL.append("\n\nALTER VIEW");
+            sbSQL.append("\n\nALTER VIEW ");
             sbSQL.append(PgDiffUtils.getQuotedName(name));
-            sbSQL.append(" ALTER COLUMN");
+            sbSQL.append(" ALTER COLUMN ");
             sbSQL.append(
                     PgDiffUtils.getQuotedName(defaultValue.getColumnName()));
             sbSQL.append(" SET DEFAULT ");
