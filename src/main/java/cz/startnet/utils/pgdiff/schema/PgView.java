@@ -1,6 +1,7 @@
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,6 +24,11 @@ public class PgView {
      * SQL query of the view.
      */
     private String query;
+    /**
+     * List of optional column default values.
+     */
+    private final List<DefaultValue> defaultValues =
+            new ArrayList<DefaultValue>(0);
 
     /**
      * Creates a new PgView object.
@@ -116,5 +122,75 @@ public class PgView {
      */
     public String getQuery() {
         return query;
+    }
+
+    /**
+     * Adds/replaces column default value specification.
+     *
+     * @param columnName column name
+     * @param defaultValue default value
+     */
+    public void addColumnDefaultValue(final String columnName,
+            final String defaultValue) {
+        removeColumnDefaultValue(columnName);
+        defaultValues.add(new DefaultValue(columnName, defaultValue));
+    }
+
+    /**
+     * Removes column default value if present.
+     *
+     * @param columnName column name
+     */
+    public void removeColumnDefaultValue(final String columnName) {
+        for (final DefaultValue item : defaultValues) {
+            if (item.getColumnName().equals(columnName)) {
+                defaultValues.remove(item);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Contains information about default value of column.
+     */
+    private class DefaultValue {
+
+        /**
+         * Column name.
+         */
+        private final String columnName;
+        /**
+         * Default value.
+         */
+        private final String defaultValue;
+
+        /**
+         * Creates new instance of DefaultValue.
+         *
+         * @param columnName {@link #columnName}
+         * @param defaultValue {@link #defaultValue}
+         */
+        DefaultValue(final String columnName, final String defaultValue) {
+            this.columnName = columnName;
+            this.defaultValue = defaultValue;
+        }
+
+        /**
+         * Getter for {@link #columnName}.
+         *
+         * @return {@link #columnName}
+         */
+        public String getColumnName() {
+            return columnName;
+        }
+
+        /**
+         * Getter for {@link #defaultValue}.
+         *
+         * @return {@link #defaultValue}
+         */
+        public String getDefaultValue() {
+            return defaultValue;
+        }
     }
 }

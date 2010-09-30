@@ -3,7 +3,9 @@ package cz.startnet.utils.pgdiff.parsers;
 import cz.startnet.utils.pgdiff.schema.PgColumn;
 import cz.startnet.utils.pgdiff.schema.PgConstraint;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
+import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
+import cz.startnet.utils.pgdiff.schema.PgView;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,10 +36,21 @@ public class AlterTableParser {
         parser.expectOptional("ONLY");
 
         final String tableName = parser.parseIdentifier();
+        final String schemaName =
+                ParserUtils.getSchemaName(tableName, database);
+        final PgSchema schema = database.getSchema(schemaName);
+        final String objectName = ParserUtils.getObjectName(tableName);
 
-        final PgTable table = database.getSchema(
-                ParserUtils.getSchemaName(tableName, database)).getTable(
-                ParserUtils.getObjectName(tableName));
+        final PgTable table = schema.getTable(objectName);
+
+        if (table == null) {
+            final PgView view = schema.getView(objectName);
+
+            if (view != null) {
+                parseView(parser, view);
+                return;
+            }
+        }
 
         while (!parser.expectOptional(";")) {
             if (parser.expectOptional("ALTER")) {
@@ -204,5 +217,36 @@ public class AlterTableParser {
         table.addConstraint(constraint);
         constraint.setDefinition(parser.getExpression());
         constraint.setTableName(table.getName());
+    }
+
+    /**
+     * Parses ALTER TABLE view.
+     * 
+     * @param parser
+     * @param view
+     */
+    private static void parseView(final Parser parser, final PgView view) {
+        while (!parser.expectOptional(";")) {
+            if (parser.expectOptional("ALTER")) {
+                parser.expectOptional("COLUMN");
+
+                final String columnName =
+                        ParserUtils.getObjectName(parser.parseIdentifier());
+
+                if (parser.expectOptional("SET", "DEFAULT")) {
+                    final String expression = parser.getExpression();
+                    view.addColumnDefaultValue(columnName, columnName);
+                } else if (parser.expectOptional("DROP", "DEFAULT")) {
+                    view.removeColumnDefaultValue(columnName);
+                } else {
+                    parser.throwUnsupportedCommand();
+                }
+            } else if (parser.expectOptional("OWNER", "TO")) {
+                // we do not support OWNER TO so just consume the rest
+                parser.getExpression();
+            } else {
+                parser.throwUnsupportedCommand();
+            }
+        }
     }
 }

@@ -166,6 +166,11 @@ public class PgDumpLoader { //NOPMD
     private static final Pattern PATTERN_CREATE_DOMAIN = Pattern.compile(
             "^CREATE[\\s]+DOMAIN[\\s]+.*$", Pattern.CASE_INSENSITIVE);
     /**
+     * Pattern for testing whether command is CREATE RULE.
+     */
+    private static final Pattern PATTERN_CREATE_RULE = Pattern.compile(
+            "^CREATE[\\s]+RULE[\\s]+.*$", Pattern.CASE_INSENSITIVE);
+    /**
      * Pattern for getting the string that is used to end the function
      * or the function definition itself.
      */
@@ -260,7 +265,8 @@ public class PgDumpLoader { //NOPMD
                         || PATTERN_CREATE_AGGREGATE.matcher(line).matches()
                         || PATTERN_ALTER_LANGUAGE.matcher(line).matches()
                         || PATTERN_CREATE_OPERATOR.matcher(line).matches()
-                        || PATTERN_CREATE_DOMAIN.matcher(line).matches()) {
+                        || PATTERN_CREATE_DOMAIN.matcher(line).matches()
+                        || PATTERN_CREATE_RULE.matcher(line).matches()) {
                     getWholeCommand(reader, line);
                 } else {
                     throw new ParserException("Command not supported: " + line);
