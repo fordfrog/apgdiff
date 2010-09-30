@@ -32,10 +32,11 @@ public class CreateFunctionParser {
         parser.expect("FUNCTION");
 
         final String functionName = parser.parseIdentifier();
+        final String schemaName =
+                ParserUtils.getSchemaName(functionName, database);
         final PgFunction function = new PgFunction();
         function.setName(ParserUtils.getObjectName(functionName));
-        database.getSchema(ParserUtils.getSchemaName(
-                functionName, database)).addFunction(function);
+        database.getSchema(schemaName).addFunction(function);
 
         parser.expect("(");
 

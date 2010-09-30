@@ -32,8 +32,9 @@ public class CreateSequenceParser {
         final String sequenceName = parser.parseIdentifier();
         final PgSequence sequence =
                 new PgSequence(ParserUtils.getObjectName(sequenceName));
-        database.getSchema(ParserUtils.getSchemaName(
-                sequenceName, database)).addSequence(sequence);
+        final String schemaName =
+                ParserUtils.getSchemaName(sequenceName, database);
+        database.getSchema(schemaName).addSequence(sequence);
 
         while (!parser.expectOptional(";")) {
             if (parser.expectOptional("INCREMENT")) {

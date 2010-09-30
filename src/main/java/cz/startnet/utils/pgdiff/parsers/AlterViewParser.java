@@ -30,9 +30,10 @@ public class AlterViewParser {
         parser.expect("ALTER", "VIEW");
 
         final String viewName = parser.parseIdentifier();
-        final PgView view = database.getSchema(
-                ParserUtils.getSchemaName(viewName, database)).getView(
-                ParserUtils.getObjectName(viewName));
+        final String schemaName = ParserUtils.getSchemaName(viewName, database);
+        final String objectName = ParserUtils.getObjectName(viewName);
+
+        final PgView view = database.getSchema(schemaName).getView(objectName);
 
         while (!parser.expectOptional(";")) {
             if (parser.expectOptional("ALTER")) {

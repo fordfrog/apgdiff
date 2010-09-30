@@ -41,10 +41,12 @@ public class CreateIndexParser {
 
         final String tableName = parser.parseIdentifier();
         final String definition = parser.getRest();
+        final String schemaName =
+                ParserUtils.getSchemaName(tableName, database);
+        final String objectName = ParserUtils.getObjectName(tableName);
 
-        final PgTable table = database.getSchema(
-                ParserUtils.getSchemaName(
-                tableName.trim(), database)).getTable(tableName.trim());
+        final PgTable table =
+                database.getSchema(schemaName).getTable(objectName);
         final PgIndex index = new PgIndex(indexName);
         table.addIndex(index);
         index.setDefinition(definition.trim());
