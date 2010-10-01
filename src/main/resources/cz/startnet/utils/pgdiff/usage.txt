@@ -16,3 +16,6 @@ Options:
                               charset name supported by Java)
 --out-charset-name <charset>: charset that should be used for writing output (standard
                               charset name supported by Java)
+--output-ignored-statements:  outputs information about DDL statements that apgdiff ignores
+                              at this moment (it will not output any SELECT, INSERT, UPDATE
+                              and/or DELETE statements)

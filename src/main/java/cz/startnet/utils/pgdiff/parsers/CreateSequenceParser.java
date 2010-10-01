@@ -9,7 +9,7 @@ import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgSequence;
 
 /**
- * Parses CREATE SEQUENCE commands.
+ * Parses CREATE SEQUENCE statements.
  *
  * @author fordfrog
  */
@@ -22,16 +22,14 @@ public class CreateSequenceParser {
     }
 
     /**
-     * Parses CREATE SEQUENCE command.
+     * Parses CREATE SEQUENCE statement.
      *
      * @param database database
-     * @param command CREATE SEQUENCE command
-     *
-     * @throws ParserException Thrown if problem occured while parsing the
-     *         command.
+     * @param statement CREATE SEQUENCE statement
      */
-    public static void parse(final PgDatabase database, final String command) {
-        final Parser parser = new Parser(command);
+    public static void parse(final PgDatabase database,
+            final String statement) {
+        final Parser parser = new Parser(statement);
         parser.expect("CREATE", "SEQUENCE");
 
         final String sequenceName = parser.parseIdentifier();

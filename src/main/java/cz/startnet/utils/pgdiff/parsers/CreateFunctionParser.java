@@ -9,7 +9,7 @@ import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgFunction;
 
 /**
- * Parses CREATE FUNCTION and CREATE OR REPLACE FUNCTION commands.
+ * Parses CREATE FUNCTION and CREATE OR REPLACE FUNCTION statements.
  *
  * @author fordfrog
  */
@@ -22,16 +22,14 @@ public class CreateFunctionParser {
     }
 
     /**
-     * Parses CREATE FUNCTION and CREATE OR REPLACE FUNCTION command.
+     * Parses CREATE FUNCTION and CREATE OR REPLACE FUNCTION statement.
      *
      * @param database database
-     * @param command CREATE FUNCTION command
-     *
-     * @throws ParserException Thrown if problem occured while parsing the
-     *         command.
+     * @param statement CREATE FUNCTION statement
      */
-    public static void parse(final PgDatabase database, final String command) {
-        final Parser parser = new Parser(command);
+    public static void parse(final PgDatabase database,
+            final String statement) {
+        final Parser parser = new Parser(statement);
         parser.expect("CREATE");
         parser.expectOptional("OR", "REPLACE");
         parser.expect("FUNCTION");

@@ -39,7 +39,7 @@ public class PgDiffArguments {
      */
     private boolean addDefaults;
     /**
-     * Whether to enclose all commands in transaction.
+     * Whether to enclose all statements in transaction.
      */
     private boolean addTransaction;
     /**
@@ -54,6 +54,10 @@ public class PgDiffArguments {
      * Whether to display apgdiff version.
      */
     private boolean version;
+    /**
+     * Whether to output information about ignored statements.
+     */
+    private boolean outputIgnoredStatements;
 
     /**
      * Setter for {@link #addDefaults}.
@@ -165,6 +169,25 @@ public class PgDiffArguments {
     }
 
     /**
+     * Getter for {@link #outputIgnoredStatements}.
+     *
+     * @return {@link #outputIgnoredStatements}
+     */
+    public boolean isOutputIgnoredStatements() {
+        return outputIgnoredStatements;
+    }
+
+    /**
+     * Setter for {@link #outputIgnoredStatements}.
+     *
+     * @param outputIgnoredStatements {@link #outputIgnoredStatements}
+     */
+    public void setOutputIgnoredStatements(
+            final boolean outputIgnoredStatements) {
+        this.outputIgnoredStatements = outputIgnoredStatements;
+    }
+
+    /**
      * Setter for {@link #version}.
      *
      * @param version {@link #version}
@@ -216,6 +239,8 @@ public class PgDiffArguments {
             } else if ("--out-charset-name".equals(args[i])) {
                 setOutCharsetName(args[i + 1]);
                 i++;
+            } else if ("--output-ignored-statements".equals(args[i])) {
+                setOutputIgnoredStatements(true);
             } else if ("--version".equals(args[i])) {
                 setVersion(true);
             } else {
@@ -244,9 +269,6 @@ public class PgDiffArguments {
      * Prints program usage.
      *
      * @param writer writer to print the usage to
-     *
-     * @throws RuntimeException Thrown if problem occured while reading usage
-     *         info.
      */
     private void printUsage(final PrintWriter writer) {
         final BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -276,9 +298,6 @@ public class PgDiffArguments {
      * Prints program version.
      *
      * @param writer writer to print the usage to
-     *
-     * @throws RuntimeException Thrown if problem occured while reading program
-     *         version.
      */
     private void printVersion(final PrintWriter writer) {
         final BufferedReader reader = new BufferedReader(new InputStreamReader(

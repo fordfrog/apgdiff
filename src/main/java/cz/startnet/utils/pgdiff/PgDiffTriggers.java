@@ -28,7 +28,7 @@ public class PgDiffTriggers {
     }
 
     /**
-     * Outputs commands for creation of new triggers.
+     * Outputs statements for creation of new triggers.
      *
      * @param writer writer the output should be written to
      * @param oldSchema original schema
@@ -54,7 +54,7 @@ public class PgDiffTriggers {
     }
 
     /**
-     * Outputs commands for dropping triggers.
+     * Outputs statements for dropping triggers.
      *
      * @param writer writer the output should be written to
      * @param oldSchema original schema

@@ -24,7 +24,7 @@ public class PgDiffFunctions {
     }
 
     /**
-     * Outputs commands for new or modified functions.
+     * Outputs statements for new or modified functions.
      *
      * @param writer writer the output should be written to
      * @param arguments object containing arguments settings
@@ -53,7 +53,7 @@ public class PgDiffFunctions {
     }
 
     /**
-     * Outputs commands for dropping of functions that exist no more.
+     * Outputs statements for dropping of functions that exist no more.
      *
      * @param writer writer the output should be written to
      * @param arguments object containing arguments settings

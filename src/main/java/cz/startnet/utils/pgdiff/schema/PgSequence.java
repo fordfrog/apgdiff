@@ -75,9 +75,9 @@ public class PgSequence {
     }
 
     /**
-     * Creates and returns SQL command for creation of the sequence.
+     * Creates and returns SQL statement for creation of the sequence.
      *
-     * @return created SQL command
+     * @return created SQL statement
      */
     public String getCreationSQL() {
         final StringBuilder sbSQL = new StringBuilder(100);
@@ -150,7 +150,7 @@ public class PgSequence {
     }
 
     /**
-     * Creates and returns SQL command for dropping the sequence.
+     * Creates and returns SQL statement for dropping the sequence.
      *
      * @return created SQL
      */

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Parses ALTER TABLE commands.
+ * Parses ALTER TABLE statements.
  *
  * @author fordfrog
  */
@@ -29,15 +29,14 @@ public class AlterTableParser {
     }
 
     /**
-     * Parses ALTER TABLE command.
+     * Parses ALTER TABLE statement.
      *
      * @param database database
-     * @param command ALTER TABLE command
-     *
-     * @throws ParserException Thrown if problem occured while parsing DDL.
+     * @param statement ALTER TABLE statement
      */
-    public static void parse(final PgDatabase database, final String command) {
-        final Parser parser = new Parser(command);
+    public static void parse(final PgDatabase database,
+            final String statement) {
+        final Parser parser = new Parser(statement);
         parser.expect("ALTER", "TABLE");
         parser.expectOptional("ONLY");
 

@@ -9,7 +9,7 @@ import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgView;
 
 /**
- * Parses ALTER VIEW commands.
+ * Parses ALTER VIEW statements.
  * 
  * @author fordfrog
  */
@@ -22,13 +22,14 @@ public class AlterViewParser {
     }
 
     /**
-     * Parses ALTER VIEW command.
+     * Parses ALTER VIEW statement.
      * 
      * @param database database
-     * @param command ALTER VIEW command
+     * @param statement ALTER VIEW statement
      */
-    public static void parse(final PgDatabase database, final String command) {
-        final Parser parser = new Parser(command);
+    public static void parse(final PgDatabase database,
+            final String statement) {
+        final Parser parser = new Parser(statement);
         parser.expect("ALTER", "VIEW");
 
         final String viewName = parser.parseIdentifier();

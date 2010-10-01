@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Parses CREATE VIEW commands.
+ * Parses CREATE VIEW statements.
  *
  * @author fordfrog
  */
@@ -25,16 +25,14 @@ public class CreateViewParser {
     }
 
     /**
-     * Parses CREATE VIEW command.
+     * Parses CREATE VIEW statement.
      *
      * @param database database
-     * @param command CREATE VIEW command
-     *
-     * @throws ParserException Thrown if problem occured while parsing the
-     *         command.
+     * @param statement CREATE VIEW statement
      */
-    public static void parse(final PgDatabase database, final String command) {
-        final Parser parser = new Parser(command);
+    public static void parse(final PgDatabase database,
+            final String statement) {
+        final Parser parser = new Parser(statement);
         parser.expect("CREATE");
         parser.expectOptional("OR", "REPLACE");
         parser.expect("VIEW");

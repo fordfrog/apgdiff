@@ -83,9 +83,9 @@ public class PgIndex {
     }
 
     /**
-     * Creates and returns SQL command for dropping the index.
+     * Creates and returns SQL statement for dropping the index.
      *
-     * @return created SQL command
+     * @return created SQL statement
      */
     public String getDropSQL() {
         return "DROP INDEX " + PgDiffUtils.getQuotedName(getName()) + ";";

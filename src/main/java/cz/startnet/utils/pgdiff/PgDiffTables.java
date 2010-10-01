@@ -31,7 +31,7 @@ public class PgDiffTables {
     }
 
     /**
-     * Outputs commands for creation of clusters.
+     * Outputs statements for creation of clusters.
      *
      * @param writer writer the output should be written to
      * @param oldSchema original schema
@@ -69,7 +69,7 @@ public class PgDiffTables {
     }
 
     /**
-     * Outputs commands for dropping of clusters.
+     * Outputs statements for dropping of clusters.
      *
      * @param writer writer the output should be written to
      * @param oldSchema original schema
@@ -110,7 +110,7 @@ public class PgDiffTables {
     }
 
     /**
-     * Outputs commands for altering tables.
+     * Outputs statements for altering tables.
      *
      * @param writer writer the output should be written to
      * @param arguments object containing arguments settings
@@ -230,22 +230,21 @@ public class PgDiffTables {
     }
 
     /**
-     * Adds commands for creation of new columns to the list of
-     * commands.
+     * Adds statements for creation of new columns to the list of statements.
      *
-     * @param commands list of commands
+     * @param statements list of statements
      * @param arguments object containing arguments settings
      * @param oldTable original table
      * @param newTable new table
      * @param dropDefaultsColumns list for storing columns for which default
      *        value should be dropped
      */
-    private static void addCreateTableColumns(final List<String> commands,
+    private static void addCreateTableColumns(final List<String> statements,
             final PgDiffArguments arguments, final PgTable oldTable,
             final PgTable newTable, final List<PgColumn> dropDefaultsColumns) {
         for (final PgColumn column : newTable.getColumns()) {
             if (!oldTable.containsColumn(column.getName())) {
-                commands.add("\tADD COLUMN "
+                statements.add("\tADD COLUMN "
                         + column.getFullDefinition(arguments.isAddDefaults()));
 
                 if (arguments.isAddDefaults() && !column.getNullValue()) {
@@ -256,34 +255,33 @@ public class PgDiffTables {
     }
 
     /**
-     * Adds commands for removal of columns to the list of commands.
+     * Adds statements for removal of columns to the list of statements.
      *
-     * @param commands list of commands
+     * @param statements list of statements
      * @param oldTable original table
      * @param newTable new table
      */
-    private static void addDropTableColumns(final List<String> commands,
+    private static void addDropTableColumns(final List<String> statements,
             final PgTable oldTable, final PgTable newTable) {
         for (final PgColumn column : oldTable.getColumns()) {
             if (!newTable.containsColumn(column.getName())) {
-                commands.add("\tDROP COLUMN "
+                statements.add("\tDROP COLUMN "
                         + PgDiffUtils.getQuotedName(column.getName()));
             }
         }
     }
 
     /**
-     * Adds commands for modification of columns to the list of
-     * commands.
+     * Adds statements for modification of columns to the list of statements.
      *
-     * @param commands list of commands
+     * @param statements list of statements
      * @param arguments object containing arguments settings
      * @param oldTable original table
      * @param newTable new table
      * @param dropDefaultsColumns list for storing columns for which default
      *        value should be dropped
      */
-    private static void addModifyTableColumns(final List<String> commands,
+    private static void addModifyTableColumns(final List<String> statements,
             final PgDiffArguments arguments, final PgTable oldTable,
             final PgTable newTable, final List<PgColumn> dropDefaultsColumns) {
         for (final PgColumn newColumn : newTable.getColumns()) {
@@ -296,7 +294,7 @@ public class PgDiffTables {
                     PgDiffUtils.getQuotedName(newColumn.getName());
 
             if (!oldColumn.getType().equals(newColumn.getType())) {
-                commands.add("\tALTER COLUMN " + newColumnName + " TYPE "
+                statements.add("\tALTER COLUMN " + newColumnName + " TYPE "
                         + newColumn.getType() + " /* TYPE change - table: "
                         + newTable.getName() + " original: "
                         + oldColumn.getType() + " new: " + newColumn.getType()
@@ -310,17 +308,17 @@ public class PgDiffTables {
 
             if (!oldDefault.equals(newDefault)) {
                 if (newDefault.length() == 0) {
-                    commands.add("\tALTER COLUMN " + newColumnName
+                    statements.add("\tALTER COLUMN " + newColumnName
                             + " DROP DEFAULT");
                 } else {
-                    commands.add("\tALTER COLUMN " + newColumnName
+                    statements.add("\tALTER COLUMN " + newColumnName
                             + " SET DEFAULT " + newDefault);
                 }
             }
 
             if (oldColumn.getNullValue() != newColumn.getNullValue()) {
                 if (newColumn.getNullValue()) {
-                    commands.add("\tALTER COLUMN " + newColumnName
+                    statements.add("\tALTER COLUMN " + newColumnName
                             + " DROP NOT NULL");
                 } else {
                     if (arguments.isAddDefaults()) {
@@ -329,13 +327,13 @@ public class PgDiffTables {
                                 newColumn.getType());
 
                         if (defaultValue != null) {
-                            commands.add("\tALTER COLUMN " + newColumnName
+                            statements.add("\tALTER COLUMN " + newColumnName
                                     + " SET DEFAULT " + defaultValue);
                             dropDefaultsColumns.add(newColumn);
                         }
                     }
 
-                    commands.add("\tALTER COLUMN " + newColumnName
+                    statements.add("\tALTER COLUMN " + newColumnName
                             + " SET NOT NULL");
                 }
             }
@@ -375,7 +373,7 @@ public class PgDiffTables {
 
     /**
      * Checks whether OIDS are dropped from the new table. There is no
-     * way to add OIDS to existing table so we do not create SQL command for
+     * way to add OIDS to existing table so we do not create SQL statement for
      * addition of OIDS but we issue warning.
      *
      * @param writer writer the output should be written to
@@ -427,7 +425,7 @@ public class PgDiffTables {
     }
 
     /**
-     * Outputs commands for creation of new tables.
+     * Outputs statements for creation of new tables.
      *
      * @param writer writer the output should be written to
      * @param oldSchema original schema
@@ -445,7 +443,7 @@ public class PgDiffTables {
     }
 
     /**
-     * Outputs commands for dropping tables.
+     * Outputs statements for dropping tables.
      *
      * @param writer writer the output should be written to
      * @param oldSchema original schema
@@ -464,7 +462,7 @@ public class PgDiffTables {
     }
 
     /**
-     * Outputs commands for addition, removal and modifications of
+     * Outputs statements for addition, removal and modifications of
      * table columns.
      *
      * @param writer writer the output should be written to
@@ -476,24 +474,24 @@ public class PgDiffTables {
             final PgDiffArguments arguments, final PgTable oldTable,
             final PgTable newTable) {
         @SuppressWarnings("CollectionWithoutInitialCapacity")
-        final List<String> commands = new ArrayList<String>();
+        final List<String> statements = new ArrayList<String>();
         @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<PgColumn> dropDefaultsColumns = new ArrayList<PgColumn>();
-        addDropTableColumns(commands, oldTable, newTable);
+        addDropTableColumns(statements, oldTable, newTable);
         addCreateTableColumns(
-                commands, arguments, oldTable, newTable, dropDefaultsColumns);
+                statements, arguments, oldTable, newTable, dropDefaultsColumns);
         addModifyTableColumns(
-                commands, arguments, oldTable, newTable, dropDefaultsColumns);
+                statements, arguments, oldTable, newTable, dropDefaultsColumns);
 
-        if (!commands.isEmpty()) {
+        if (!statements.isEmpty()) {
             final String quotedTableName =
                     PgDiffUtils.getQuotedName(newTable.getName());
             writer.println();
             writer.println("ALTER TABLE " + quotedTableName);
 
-            for (int i = 0; i < commands.size(); i++) {
-                writer.print(commands.get(i));
-                writer.println((i + 1) < commands.size() ? "," : ";");
+            for (int i = 0; i < statements.size(); i++) {
+                writer.print(statements.get(i));
+                writer.println((i + 1) < statements.size() ? "," : ";");
             }
 
             if (!dropDefaultsColumns.isEmpty()) {

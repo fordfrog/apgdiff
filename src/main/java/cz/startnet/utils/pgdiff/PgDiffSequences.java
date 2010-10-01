@@ -24,7 +24,7 @@ public class PgDiffSequences {
     }
 
     /**
-     * Outputs commands for creation of new sequences.
+     * Outputs statements for creation of new sequences.
      *
      * @param writer writer the output should be written to
      * @param oldSchema original schema
@@ -43,7 +43,7 @@ public class PgDiffSequences {
     }
 
     /**
-     * Outputs commands for dropping of sequences that do not exist anymore.
+     * Outputs statements for dropping of sequences that do not exist anymore.
      *
      * @param writer writer the output should be written to
      * @param oldSchema original schema
@@ -63,7 +63,7 @@ public class PgDiffSequences {
     }
 
     /**
-     * Outputs command for modified sequences.
+     * Outputs statement for modified sequences.
      *
      * @param writer writer the output should be written to
      * @param arguments object containing arguments settings

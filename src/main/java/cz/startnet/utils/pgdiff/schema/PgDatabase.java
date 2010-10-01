@@ -21,6 +21,11 @@ public class PgDatabase {
      */
     private final List<PgSchema> schemas = new ArrayList<PgSchema>(1);
     /**
+     * Array of ignored statements.
+     */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    private final List<String> ignoredStatements = new ArrayList<String>();
+    /**
      * Current default schema.
      */
     private PgSchema defaultSchema;
@@ -50,6 +55,24 @@ public class PgDatabase {
      */
     public PgSchema getDefaultSchema() {
         return defaultSchema;
+    }
+
+    /**
+     * Getter for {@link #ignoredStatements}.
+     *
+     * @return {@link #ignoredStatements}
+     */
+    public List<String> getIgnoredStatements() {
+        return Collections.unmodifiableList(ignoredStatements);
+    }
+
+    /**
+     * Adds ignored statement to the list of ignored statements.
+     *
+     * @param ignoredStatement ignored statement
+     */
+    public void addIgnoredStatement(final String ignoredStatement) {
+        ignoredStatements.add(ignoredStatement);
     }
 
     /**

@@ -28,7 +28,7 @@ public class PgDiffIndexes {
     }
 
     /**
-     * Outputs commands for creation of new indexes.
+     * Outputs statements for creation of new indexes.
      *
      * @param writer writer the output should be written to
      * @param oldSchema original schema
@@ -56,7 +56,7 @@ public class PgDiffIndexes {
     }
 
     /**
-     * Outputs commands for dropping indexes that exist no more.
+     * Outputs statements for dropping indexes that exist no more.
      *
      * @param writer writer the output should be written to
      * @param oldSchema original schema

@@ -238,10 +238,9 @@ public class PgDiffTest {
     /**
      * Runs single test using class member variables.
      *
-     * @throws FileNotFoundException Thrown if expected diff file was not
-     *         found.
+     * @throws FileNotFoundException Thrown if expected diff file was not found.
      * @throws IOException Thrown if problem occured while reading expected
-     *         diff.
+     * diff.
      */
     @Test(timeout = 1000)
     public void runDiff() throws FileNotFoundException, IOException {

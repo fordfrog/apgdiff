@@ -14,7 +14,6 @@ import cz.startnet.utils.pgdiff.parsers.CreateSequenceParser;
 import cz.startnet.utils.pgdiff.parsers.CreateTableParser;
 import cz.startnet.utils.pgdiff.parsers.CreateTriggerParser;
 import cz.startnet.utils.pgdiff.parsers.CreateViewParser;
-import cz.startnet.utils.pgdiff.parsers.ParserException;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
 
 import java.io.BufferedReader;
@@ -36,15 +35,10 @@ import java.util.regex.Pattern;
 public class PgDumpLoader { //NOPMD
 
     /**
-     * Pattern for testing whether command is CREATE SCHEMA command.
+     * Pattern for testing whether it is CREATE SCHEMA statement.
      */
     private static final Pattern PATTERN_CREATE_SCHEMA = Pattern.compile(
             "^CREATE[\\s]+SCHEMA[\\s]+.*$", Pattern.CASE_INSENSITIVE);
-    /**
-     * Pattern for testing whether command is ALTER SCHEMA.
-     */
-    private static final Pattern PATTERN_ALTER_SCHEMA = Pattern.compile(
-            "^ALTER[\\s]+SCHEMA[\\s]+.*$", Pattern.CASE_INSENSITIVE);
     /**
      * Pattern for parsing default schema (search_path).
      */
@@ -53,131 +47,69 @@ public class PgDumpLoader { //NOPMD
             "^SET[\\s]+search_path[\\s]*=[\\s]*([^,\\s]+)(?:,[\\s]+.*)?;$",
             Pattern.CASE_INSENSITIVE);
     /**
-     * Pattern for testing whether command is CREATE TABLE command.
+     * Pattern for testing whether it is CREATE TABLE statement.
      */
     private static final Pattern PATTERN_CREATE_TABLE = Pattern.compile(
             "^CREATE[\\s]+TABLE[\\s]+.*$", Pattern.CASE_INSENSITIVE);
     /**
-     * Pattern for testing whether command is CREATE VIEW command.
+     * Pattern for testing whether it is CREATE VIEW statement.
      */
     private static final Pattern PATTERN_CREATE_VIEW = Pattern.compile(
             "^CREATE[\\s]+(?:OR[\\s]+REPLACE[\\s]+)?VIEW[\\s]+.*$",
             Pattern.CASE_INSENSITIVE);
     /**
-     * Pattern for testing whether command is ALTER TABLE command.
+     * Pattern for testing whether it is ALTER TABLE statement.
      */
     private static final Pattern PATTERN_ALTER_TABLE =
             Pattern.compile("^ALTER[\\s]+TABLE[\\s]+.*$",
             Pattern.CASE_INSENSITIVE);
     /**
-     * Pattern for testing whether command is CREATE SEQUENCE command.
+     * Pattern for testing whether it is CREATE SEQUENCE statement.
      */
     private static final Pattern PATTERN_CREATE_SEQUENCE = Pattern.compile(
             "^CREATE[\\s]+SEQUENCE[\\s]+.*$", Pattern.CASE_INSENSITIVE);
     /**
-     * Pattern for testing whether command is CREATE SEQUENCE command.
-     */
-    private static final Pattern PATTERN_ALTER_SEQUENCE = Pattern.compile(
-            "^ALTER[\\s]+SEQUENCE[\\s]+.*$", Pattern.CASE_INSENSITIVE);
-    /**
-     * Pattern for testing whether command is CREATE INDEX command.
+     * Pattern for testing whether it is CREATE INDEX statement.
      */
     private static final Pattern PATTERN_CREATE_INDEX = Pattern.compile(
             "^CREATE[\\s]+(?:UNIQUE[\\s]+)?INDEX[\\s]+.*$",
             Pattern.CASE_INSENSITIVE);
     /**
-     * Pattern for testing whether command is SET command.
-     */
-    private static final Pattern PATTERN_SET =
-            Pattern.compile("^SET[\\s]+.*$", Pattern.CASE_INSENSITIVE);
-    /**
-     * Pattern for testing whether command is COMMENT command.
-     */
-    private static final Pattern PATTERN_COMMENT =
-            Pattern.compile("^COMMENT[\\s]+.*$", Pattern.CASE_INSENSITIVE);
-    /**
-     * Pattern for testing whether command is SELECT command.
+     * Pattern for testing whether it is SELECT statement.
      */
     private static final Pattern PATTERN_SELECT =
             Pattern.compile("^SELECT[\\s]+.*$", Pattern.CASE_INSENSITIVE);
     /**
-     * Pattern for testing whether command is INSERT INTO command.
+     * Pattern for testing whether it is INSERT INTO statement.
      */
     private static final Pattern PATTERN_INSERT_INTO =
             Pattern.compile("^INSERT[\\s]+INTO[\\s]+.*$",
             Pattern.CASE_INSENSITIVE);
     /**
-     * Pattern for testing whether command is REVOKE command.
+     * Pattern for testing whether it is UPDATE statement.
      */
-    private static final Pattern PATTERN_REVOKE =
-            Pattern.compile("^REVOKE[\\s]+.*$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PATTERN_UPDATE =
+            Pattern.compile("^UPDATE[\\s].*$", Pattern.CASE_INSENSITIVE);
     /**
-     * Pattern for testing whether command is GRANT command.
+     * Pattern for testing whether it is DELETE FROM statement.
      */
-    private static final Pattern PATTERN_GRANT =
-            Pattern.compile("^GRANT[\\s]+.*$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PATTERN_DELETE_FROM =
+            Pattern.compile("^DELETE[\\s]+FROM[\\s]+.*$",
+            Pattern.CASE_INSENSITIVE);
     /**
-     * Pattern for testing whether command is CREATE TRIGGER command.
+     * Pattern for testing whether it is CREATE TRIGGER statement.
      */
     private static final Pattern PATTERN_CREATE_TRIGGER = Pattern.compile(
             "^CREATE[\\s]+TRIGGER[\\s]+.*$", Pattern.CASE_INSENSITIVE);
     /**
-     * Pattern for testing whether command is CREATE FUNCTION or CREATE
-     * OR REPLACE FUNCTION command.
+     * Pattern for testing whether it is CREATE FUNCTION or CREATE OR REPLACE
+     * FUNCTION statement.
      */
     private static final Pattern PATTERN_CREATE_FUNCTION = Pattern.compile(
             "^CREATE[\\s]+(?:OR[\\s]+REPLACE[\\s]+)?FUNCTION[\\s]+.*$",
             Pattern.CASE_INSENSITIVE);
     /**
-     * Pattern for testing whether command is ALTER FUNCTION.
-     */
-    private static final Pattern PATTERN_ALTER_FUNCTION = Pattern.compile(
-            "^ALTER[\\s]+FUNCTION[\\s]+.*$", Pattern.CASE_INSENSITIVE);
-    /**
-     * Pattern for testing whether command is CREATE LANGUAGE and its variants.
-     */
-    private static final Pattern PATTERN_CREATE_LANGUAGE = Pattern.compile(
-            "^CREATE[\\s]+(?:OR[\\s]+REPLACE[\\s]+)?(?:TRUSTED[\\s]+)?"
-            + "(?:PROCEDURAL[\\s]+)?LANGUAGE[\\s]+.*$",
-            Pattern.CASE_INSENSITIVE);
-    /**
-     * Pattern for testing whether command is ALTER LANGUAGE and its variants.
-     */
-    private static final Pattern PATTERN_ALTER_LANGUAGE = Pattern.compile(
-            "^ALTER[\\s](?:PROCEDURAL[\\s]+)?LANGUAGE[\\s]+.*$",
-            Pattern.CASE_INSENSITIVE);
-    /**
-     * Pattern for testing whether command is CREATE TYPE.
-     */
-    private static final Pattern PATTERN_CREATE_TYPE = Pattern.compile(
-            "^CREATE[\\s]+TYPE[\\s]+.*$", Pattern.CASE_INSENSITIVE);
-    /**
-     * Pattern for testing whether command is ALTER TYPE.
-     */
-    private static final Pattern PATTERN_ALTER_TYPE = Pattern.compile(
-            "^ALTER[\\s]+TYPE[\\s]+.*$", Pattern.CASE_INSENSITIVE);
-    /**
-     * Pattern for testing whether command is CREATE AGGREGATE.
-     */
-    private static final Pattern PATTERN_CREATE_AGGREGATE = Pattern.compile(
-            "^CREATE[\\s]+AGGREGATE[\\s]+.*$", Pattern.CASE_INSENSITIVE);
-    /**
-     * Pattern for testing whether command is CREATE OPERATOR.
-     */
-    private static final Pattern PATTERN_CREATE_OPERATOR = Pattern.compile(
-            "^CREATE[\\s]+OPERATOR[\\s]+.*$", Pattern.CASE_INSENSITIVE);
-    /**
-     * Pattern for testing whether command is CREATE DOMAIN.
-     */
-    private static final Pattern PATTERN_CREATE_DOMAIN = Pattern.compile(
-            "^CREATE[\\s]+DOMAIN[\\s]+.*$", Pattern.CASE_INSENSITIVE);
-    /**
-     * Pattern for testing whether command is CREATE RULE.
-     */
-    private static final Pattern PATTERN_CREATE_RULE = Pattern.compile(
-            "^CREATE[\\s]+RULE[\\s]+.*$", Pattern.CASE_INSENSITIVE);
-    /**
-     * Pattern for testing whether command is ALTER VIEW.
+     * Pattern for testing whether it is ALTER VIEW statement.
      */
     private static final Pattern PATTERN_ALTER_VIEW = Pattern.compile(
             "^ALTER[\\s]+VIEW[\\s]+.*$", Pattern.CASE_INSENSITIVE);
@@ -199,16 +131,13 @@ public class PgDumpLoader { //NOPMD
      *
      * @param inputStream input stream that should be read
      * @param charsetName charset that should be used to read the file
+     * @param outputIgnoredStatements whether ignored statements should be
+     * included in the output
      *
-     * @return database schema from dump fle
-     *
-     * @throws UnsupportedOperationException Thrown if unsupported encoding has
-     *         been encountered.
-     * @throws FileException Thrown if problem occured while reading input
-     *         stream.
+     * @return database schema from dump file
      */
     public static PgDatabase loadDatabaseSchema(final InputStream inputStream,
-            final String charsetName) { //NOPMD
+            final String charsetName, final boolean outputIgnoredStatements) {
 
         final PgDatabase database = new PgDatabase();
         BufferedReader reader = null;
@@ -234,7 +163,7 @@ public class PgDumpLoader { //NOPMD
                     continue;
                 } else if (PATTERN_CREATE_SCHEMA.matcher(line).matches()) {
                     CreateSchemaParser.parse(
-                            database, getWholeCommand(reader, line));
+                            database, getWholeStatement(reader, line));
                 } else if (PATTERN_DEFAULT_SCHEMA.matcher(line).matches()) {
                     final Matcher matcher =
                             PATTERN_DEFAULT_SCHEMA.matcher(line);
@@ -242,48 +171,37 @@ public class PgDumpLoader { //NOPMD
                     database.setDefaultSchema(matcher.group(1));
                 } else if (PATTERN_CREATE_TABLE.matcher(line).matches()) {
                     CreateTableParser.parse(
-                            database, getWholeCommand(reader, line));
+                            database, getWholeStatement(reader, line));
                 } else if (PATTERN_ALTER_TABLE.matcher(line).matches()) {
                     AlterTableParser.parse(
-                            database, getWholeCommand(reader, line));
+                            database, getWholeStatement(reader, line));
                 } else if (PATTERN_CREATE_SEQUENCE.matcher(line).matches()) {
                     CreateSequenceParser.parse(
-                            database, getWholeCommand(reader, line));
+                            database, getWholeStatement(reader, line));
                 } else if (PATTERN_CREATE_INDEX.matcher(line).matches()) {
                     CreateIndexParser.parse(
-                            database, getWholeCommand(reader, line));
+                            database, getWholeStatement(reader, line));
                 } else if (PATTERN_CREATE_VIEW.matcher(line).matches()) {
                     CreateViewParser.parse(
-                            database, getWholeCommand(reader, line));
+                            database, getWholeStatement(reader, line));
                 } else if (PATTERN_ALTER_VIEW.matcher(line).matches()) {
                     AlterViewParser.parse(
-                            database, getWholeCommand(reader, line));
+                            database, getWholeStatement(reader, line));
                 } else if (PATTERN_CREATE_TRIGGER.matcher(line).matches()) {
                     CreateTriggerParser.parse(
-                            database, getWholeCommand(reader, line));
+                            database, getWholeStatement(reader, line));
                 } else if (PATTERN_CREATE_FUNCTION.matcher(line).matches()) {
                     CreateFunctionParser.parse(
                             database, getWholeFunction(reader, line));
-                } else if (PATTERN_SET.matcher(line).matches()
-                        || PATTERN_COMMENT.matcher(line).matches()
-                        || PATTERN_SELECT.matcher(line).matches()
+                } else if (PATTERN_SELECT.matcher(line).matches()
                         || PATTERN_INSERT_INTO.matcher(line).matches()
-                        || PATTERN_REVOKE.matcher(line).matches()
-                        || PATTERN_GRANT.matcher(line).matches()
-                        || PATTERN_ALTER_SEQUENCE.matcher(line).matches()
-                        || PATTERN_CREATE_LANGUAGE.matcher(line).matches()
-                        || PATTERN_CREATE_TYPE.matcher(line).matches()
-                        || PATTERN_ALTER_TYPE.matcher(line).matches()
-                        || PATTERN_ALTER_FUNCTION.matcher(line).matches()
-                        || PATTERN_ALTER_SCHEMA.matcher(line).matches()
-                        || PATTERN_CREATE_AGGREGATE.matcher(line).matches()
-                        || PATTERN_ALTER_LANGUAGE.matcher(line).matches()
-                        || PATTERN_CREATE_OPERATOR.matcher(line).matches()
-                        || PATTERN_CREATE_DOMAIN.matcher(line).matches()
-                        || PATTERN_CREATE_RULE.matcher(line).matches()) {
-                    getWholeCommand(reader, line);
+                        || PATTERN_UPDATE.matcher(line).matches()
+                        || PATTERN_DELETE_FROM.matcher(line).matches()) {
+                    getWholeStatement(reader, line);
+                } else if (outputIgnoredStatements) {
+                    database.addIgnoredStatement(getWholeStatement(reader, line));
                 } else {
-                    throw new ParserException("Command not supported: " + line);
+                    getWholeStatement(reader, line);
                 }
 
                 line = reader.readLine();
@@ -300,35 +218,33 @@ public class PgDumpLoader { //NOPMD
      *
      * @param file name of file containing the dump
      * @param charsetName charset that should be used to read the file
+     * @param outputIgnoredStatements whether ignored statements should be
+     * included in the output
      *
      * @return database schema from dump file
-     *
-     * @throws FileException Thrown if file not found.
      */
     public static PgDatabase loadDatabaseSchema(final String file,
-            final String charsetName) {
+            final String charsetName, final boolean outputIgnoredStatements) {
         try {
-            return loadDatabaseSchema(new FileInputStream(file), charsetName);
+            return loadDatabaseSchema(new FileInputStream(file), charsetName,
+                    outputIgnoredStatements);
         } catch (final FileNotFoundException ex) {
             throw new FileException("File '" + file + "' not found", ex);
         }
     }
 
     /**
-     * Reads whole command from the reader into single-line string.
+     * Reads whole statement from the reader into single-line string.
      *
      * @param reader reader to be read
      * @param line first line read
      *
-     * @return whole command from the reader into single-line string
-     *
-     * @throws FileException Thrown if problem occured while reading string
-     *         from <code>reader</code>.
+     * @return whole statement from the reader into single-line string
      */
-    private static String getWholeCommand(final BufferedReader reader,
+    private static String getWholeStatement(final BufferedReader reader,
             final String line) {
         String newLine = line.trim();
-        final StringBuilder sbCommand = new StringBuilder(newLine);
+        final StringBuilder sbStatement = new StringBuilder(newLine);
 
         while (!newLine.trim().endsWith(";")) {
             try {
@@ -338,12 +254,12 @@ public class PgDumpLoader { //NOPMD
             }
 
             if (newLine.length() > 0) {
-                sbCommand.append(' ');
-                sbCommand.append(newLine);
+                sbStatement.append(' ');
+                sbStatement.append(newLine);
             }
         }
 
-        return sbCommand.toString();
+        return sbStatement.toString();
     }
 
     /**
@@ -354,15 +270,11 @@ public class PgDumpLoader { //NOPMD
      * @param line first line read
      *
      * @return whole CREATE FUNCTION DDL from the reader into multi-line string
-     *
-     * @throws FileException Thrown if problem occured while reading string
-     *         from<code>reader</code>.
-     * @throws RuntimeException Thrown if cannot find end of function.
      */
     private static String getWholeFunction(final BufferedReader reader,
             final String line) {
         final String firstLine = line;
-        final StringBuilder sbCommand = new StringBuilder(1000);
+        final StringBuilder sbStatement = new StringBuilder(1000);
         String newLine = line;
         String endOfFunction = null;
         boolean ignoreFirstOccurence = true;
@@ -385,8 +297,8 @@ public class PgDumpLoader { //NOPMD
                 }
             }
 
-            sbCommand.append(newLine);
-            sbCommand.append('\n');
+            sbStatement.append(newLine);
+            sbStatement.append('\n');
 
             if (endOfFunction != null) {
                 // count occurences
@@ -423,19 +335,19 @@ public class PgDumpLoader { //NOPMD
             }
         }
 
-        return sbCommand.toString();
+        return sbStatement.toString();
     }
 
     /**
-     * Strips comment from command line.
+     * Strips comment from statement line.
      *
-     * @param command command
+     * @param statement statement
      *
-     * @return if comment was found then command without the comment, otherwise
-     *         the original command
+     * @return if comment was found then statement without the comment,
+     * otherwise the original statement
      */
-    private static String stripComment(final String command) {
-        String result = command;
+    private static String stripComment(final String statement) {
+        String result = statement;
         int pos = result.indexOf("--");
 
         while (pos >= 0) {

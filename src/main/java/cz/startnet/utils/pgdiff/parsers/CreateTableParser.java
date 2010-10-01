@@ -12,7 +12,7 @@ import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
 
 /**
- * Parses CREATE TABLE commands.
+ * Parses CREATE TABLE statements.
  *
  * @author fordfrog
  */
@@ -25,16 +25,14 @@ public class CreateTableParser {
     }
 
     /**
-     * Parses CREATE TABLE command.
+     * Parses CREATE TABLE statement.
      *
      * @param database database
-     * @param command CREATE TABLE command
-     *
-     * @throws ParserException Thrown if problem occured while parsing DDL.
-     * @throws RuntimeException DOCUMENT ME!
+     * @param statement CREATE TABLE statement
      */
-    public static void parse(final PgDatabase database, final String command) {
-        final Parser parser = new Parser(command);
+    public static void parse(final PgDatabase database,
+            final String statement) {
+        final Parser parser = new Parser(statement);
         parser.expect("CREATE", "TABLE");
 
         final String tableName = parser.parseIdentifier();

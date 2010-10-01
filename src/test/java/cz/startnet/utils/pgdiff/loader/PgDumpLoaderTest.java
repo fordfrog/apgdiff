@@ -66,6 +66,6 @@ public class PgDumpLoaderTest {
     public void loadSchema() {
         PgDumpLoader.loadDatabaseSchema(
                 getClass().getResourceAsStream("schema_" + fileIndex + ".sql"),
-                "UTF-8");
+                "UTF-8", false);
     }
 }

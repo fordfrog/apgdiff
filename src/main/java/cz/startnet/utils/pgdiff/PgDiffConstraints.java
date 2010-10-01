@@ -28,7 +28,7 @@ public class PgDiffConstraints {
     }
 
     /**
-     * Outputs commands for creation of new constraints.
+     * Outputs statements for creation of new constraints.
      *
      * @param writer writer the output should be written to
      * @param oldSchema original schema
@@ -58,12 +58,12 @@ public class PgDiffConstraints {
     }
 
     /**
-     * Outputs commands for dropping non-existant or modified constraints.
+     * Outputs statements for dropping non-existent or modified constraints.
      *
      * @param writer writer the output should be written to
      * @param oldSchema original schema
      * @param newSchema new schema
-     * @param primaryKey determines whether primery keys should be processed or
+     * @param primaryKey determines whether primary keys should be processed or
      *        any other constraints should be processed
      */
     public static void dropConstraints(final PrintWriter writer,

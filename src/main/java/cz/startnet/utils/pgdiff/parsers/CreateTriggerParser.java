@@ -9,7 +9,7 @@ import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgTrigger;
 
 /**
- * Parses CREATE TRIGGER commands.
+ * Parses CREATE TRIGGER statements.
  *
  * @author fordfrog
  */
@@ -22,16 +22,14 @@ public class CreateTriggerParser {
     }
 
     /**
-     * Parses CREATE TRIGGER command.
+     * Parses CREATE TRIGGER statement.
      *
      * @param database database
-     * @param command CREATE TRIGGER command
-     *
-     * @throws ParserException Thrown if problem occured while parsing the
-     *         command.
+     * @param statement CREATE TRIGGER statement
      */
-    public static void parse(final PgDatabase database, final String command) {
-        final Parser parser = new Parser(command);
+    public static void parse(final PgDatabase database,
+            final String statement) {
+        final Parser parser = new Parser(statement);
         parser.expect("CREATE", "TRIGGER");
 
         final PgTrigger trigger = new PgTrigger();

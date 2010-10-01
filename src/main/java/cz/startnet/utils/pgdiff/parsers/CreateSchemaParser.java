@@ -9,7 +9,7 @@ import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 
 /**
- * Parses CREATE SCHEMA commands.
+ * Parses CREATE SCHEMA statements.
  *
  * @author fordfrog
  */
@@ -22,16 +22,14 @@ public class CreateSchemaParser {
     }
 
     /**
-     * Parses CREATE SCHEMA command.
+     * Parses CREATE SCHEMA statement.
      *
      * @param database database
-     * @param command CREATE SCHEMA command
-     *
-     * @throws ParserException Thrown if problem occured while parsing the
-     *         command.
+     * @param statement CREATE SCHEMA statement
      */
-    public static void parse(final PgDatabase database, final String command) {
-        final Parser parser = new Parser(command);
+    public static void parse(final PgDatabase database,
+            final String statement) {
+        final Parser parser = new Parser(statement);
         parser.expect("CREATE", "SCHEMA");
 
         if (parser.expectOptional("AUTHORIZATION")) {

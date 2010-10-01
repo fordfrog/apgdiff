@@ -35,9 +35,11 @@ public class PgDiff {
             final PgDiffArguments arguments) {
         diffDatabaseSchemas(writer, arguments,
                 PgDumpLoader.loadDatabaseSchema(arguments.getOldDumpFile(),
-                arguments.getInCharsetName()),
+                arguments.getInCharsetName(),
+                arguments.isOutputIgnoredStatements()),
                 PgDumpLoader.loadDatabaseSchema(arguments.getNewDumpFile(),
-                arguments.getInCharsetName()));
+                arguments.getInCharsetName(),
+                arguments.isOutputIgnoredStatements()));
     }
 
     /**
@@ -54,10 +56,12 @@ public class PgDiff {
             final PgDiffArguments arguments, final InputStream oldInputStream,
             final InputStream newInputStream) {
         diffDatabaseSchemas(writer, arguments,
-                PgDumpLoader.loadDatabaseSchema(
-                oldInputStream, arguments.getInCharsetName()),
-                PgDumpLoader.loadDatabaseSchema(
-                newInputStream, arguments.getInCharsetName()));
+                PgDumpLoader.loadDatabaseSchema(oldInputStream,
+                arguments.getInCharsetName(),
+                arguments.isOutputIgnoredStatements()),
+                PgDumpLoader.loadDatabaseSchema(newInputStream,
+                arguments.getInCharsetName(),
+                arguments.isOutputIgnoredStatements()));
     }
 
     /**
@@ -99,6 +103,34 @@ public class PgDiff {
         if (arguments.isAddTransaction()) {
             writer.println();
             writer.println("COMMIT TRANSACTION;");
+        }
+
+        if (arguments.isOutputIgnoredStatements()) {
+            if (!oldDatabase.getIgnoredStatements().isEmpty()) {
+                writer.println();
+                writer.println("/* Original database ignored statements");
+
+                for (final String statement :
+                        oldDatabase.getIgnoredStatements()) {
+                    writer.println();
+                    writer.println(statement);
+                }
+
+                writer.println("*/");
+            }
+
+            if (!newDatabase.getIgnoredStatements().isEmpty()) {
+                writer.println();
+                writer.println("/* New database ignored statements");
+
+                for (final String statement :
+                        newDatabase.getIgnoredStatements()) {
+                    writer.println();
+                    writer.println(statement);
+                }
+
+                writer.println("*/");
+            }
         }
     }
 

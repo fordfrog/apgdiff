@@ -153,7 +153,7 @@ public class PgTable {
     /**
      * Creates and returns SQL for creation of the table.
      *
-     * @return created SQL command
+     * @return created SQL statement
      */
     public String getCreationSQL() {
         final StringBuilder sbSQL = new StringBuilder(1000);
@@ -227,9 +227,9 @@ public class PgTable {
     }
 
     /**
-     * Creates and returns SQL command for dropping the table.
+     * Creates and returns SQL statement for dropping the table.
      *
-     * @return created SQL command
+     * @return created SQL statement
      */
     public String getDropSQL() {
         return "DROP TABLE " + PgDiffUtils.getQuotedName(getName()) + ";";

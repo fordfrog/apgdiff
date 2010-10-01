@@ -26,7 +26,7 @@ public class PgDiffViews {
     }
 
     /**
-     * Outputs commands for creation of views.
+     * Outputs statements for creation of views.
      *
      * @param writer writer the output should be written to
      * @param oldSchema original schema
@@ -46,7 +46,7 @@ public class PgDiffViews {
     }
 
     /**
-     * Outputs commands for dropping views.
+     * Outputs statements for dropping views.
      *
      * @param writer writer the output should be written to
      * @param oldSchema original schema
@@ -105,7 +105,7 @@ public class PgDiffViews {
     }
 
     /**
-     * Outputs commands for altering view default values.
+     * Outputs statements for altering view default values.
      *
      * @param writer writer
      * @param oldSchema old schema

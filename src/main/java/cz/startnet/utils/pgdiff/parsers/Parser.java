@@ -309,13 +309,10 @@ public final class Parser {
 
     /**
      * Returns position of last character of single command within
-     * larger command (like CREATE TABLE). Last character is either ',' or
+     * statement (like CREATE TABLE). Last character is either ',' or
      * ')'. If no such character is found and method reaches the end of the
      * command then position after the last character in the command is
      * returned.
-     *
-     * @param command command
-     * @param start start position
      *
      * @return end position of the command
      */
@@ -366,7 +363,7 @@ public final class Parser {
     }
 
     /**
-     * Throws exception about unsupported command.
+     * Throws exception about unsupported command in statement.
      */
     public void throwUnsupportedCommand() {
         throw new ParserException("Cannot parse string: " + string

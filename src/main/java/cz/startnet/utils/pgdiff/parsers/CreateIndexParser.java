@@ -10,7 +10,7 @@ import cz.startnet.utils.pgdiff.schema.PgIndex;
 import cz.startnet.utils.pgdiff.schema.PgTable;
 
 /**
- * Parses CREATE INDEX commands.
+ * Parses CREATE INDEX statements.
  *
  * @author fordfrog
  */
@@ -23,16 +23,14 @@ public class CreateIndexParser {
     }
 
     /**
-     * Parses CREATE INDEX command.
+     * Parses CREATE INDEX statement.
      *
      * @param database database
-     * @param command CREATE INDEX command
-     *
-     * @throws ParserException Thrown if problem occured while parsing the
-     *         command.
+     * @param statement CREATE INDEX statement
      */
-    public static void parse(final PgDatabase database, final String command) {
-        final Parser parser = new Parser(command);
+    public static void parse(final PgDatabase database,
+            final String statement) {
+        final Parser parser = new Parser(statement);
         parser.expect("CREATE");
 
         final boolean unique = parser.expectOptional("UNIQUE");

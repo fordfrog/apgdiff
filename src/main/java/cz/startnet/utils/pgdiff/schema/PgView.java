@@ -66,7 +66,7 @@ public class PgView {
     /**
      * Creates and returns SQL for creation of the view.
      *
-     * @return created SQL command
+     * @return created SQL statement
      */
     public String getCreationSQL() {
         final StringBuilder sbSQL = new StringBuilder(query.length() * 2);
@@ -105,9 +105,9 @@ public class PgView {
     }
 
     /**
-     * Creates and returns SQL command for dropping the view.
+     * Creates and returns SQL statement for dropping the view.
      *
-     * @return created SQL command
+     * @return created SQL statement
      */
     public String getDropSQL() {
         return "DROP VIEW " + PgDiffUtils.getQuotedName(getName()) + ";";

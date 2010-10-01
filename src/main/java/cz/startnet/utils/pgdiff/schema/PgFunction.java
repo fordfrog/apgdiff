@@ -151,7 +151,7 @@ public class PgFunction {
      * Returns function signature. It consists of unquoted name and argument
      * data types.
      * 
-     * @return
+     * @return function signature
      */
     public String getSignature() {
         final StringBuilder sbString = new StringBuilder(100);
