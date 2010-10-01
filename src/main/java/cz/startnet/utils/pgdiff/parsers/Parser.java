@@ -1,3 +1,8 @@
+/**
+ * Copyright 2006 StartNet s.r.o.
+ *
+ * Distributed under MIT license
+ */
 package cz.startnet.utils.pgdiff.parsers;
 
 import java.util.Locale;
