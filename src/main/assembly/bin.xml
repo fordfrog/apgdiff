@@ -1,0 +1,21 @@
+<assembly>
+    <id>bin</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <baseDirectory>${project.artifactId}-${project.version}</baseDirectory>
+    <files>
+        <file>
+            <source>${project.build.directory}/${project.build.finalName}.${project.packaging}</source>
+            <outputDirectory></outputDirectory>
+        </file>
+        <file>
+            <source>${basedir}/license.txt</source>
+            <outputDirectory></outputDirectory>
+        </file>
+        <file>
+            <source>${basedir}/changelog.txt</source>
+            <outputDirectory></outputDirectory>
+        </file>
+    </files>
+</assembly>

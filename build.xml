@@ -93,9 +93,9 @@
     <target name="get-deps" description="Download all dependencies"
             unless="noget">
         <mkdir dir="${lib}"/>
-        <get src="http://www.ibiblio.org/maven/junit/jars/junit-4.7.jar"
+        <get src="http://mirrors.ibiblio.org/pub/mirrors/maven2/junit/junit/4.8.1/junit-4.8.1.jar"
              dest="${lib}/junit.jar"/>
-	<get src="http://www.ibiblio.org/maven/org.hamcrest/jars/hamcrest-all-1.1.jar"
+	<get src="http://mirrors.ibiblio.org/pub/mirrors/maven2/org/hamcrest/hamcrest-all/1.1/hamcrest-all-1.1.jar"
 	     dest="${lib}/hamcrest-all.jar"/>
     </target>
 
@@ -107,23 +107,6 @@
                  author="true" version="true" private="false" use="true"
                  splitindex="true" windowtitle="${name} ${version}"
                  doctitle="${name} ${version}"/>
-    </target>
-
-    <target name="distsrc" description="Creates source distribution file">
-        <zip destfile="${dist}/${build.final.name}-src.zip">
-            <zipfileset prefix="${build.final.name}" dir="."
-                excludes="${build}/**, ${dist}/**, target/**, stats/**, lib/**, nbproject/**"/>
-        </zip>
-    </target>
-
-    <target name="distbin" depends="jar"
-        description="Creates binary distribution file">
-        <zip destfile="${dist}/${build.final.name}-bin.zip">
-            <zipfileset prefix="${build.final.name}" dir="."
-                includes="**/license.txt"/>
-            <zipfileset dir="." includes="${dist}/${build.final.name}.jar"
-                fullpath="${build.final.name}/${build.final.name}.jar"/>
-        </zip>
     </target>
 
 </project>

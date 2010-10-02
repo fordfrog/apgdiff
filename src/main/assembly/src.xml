@@ -1,0 +1,23 @@
+<assembly>
+    <id>src</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <baseDirectory>${project.artifactId}-${project.version}</baseDirectory>
+    <fileSets>
+        <fileSet>
+            <directory>${basedir}/src</directory>
+            <outputDirectory>src</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${basedir}</directory>
+            <outputDirectory></outputDirectory>
+            <includes>
+                <include>build.xml</include>
+                <include>pom.xml</include>
+                <include>changelog.txt</include>
+                <include>license.txt</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>
