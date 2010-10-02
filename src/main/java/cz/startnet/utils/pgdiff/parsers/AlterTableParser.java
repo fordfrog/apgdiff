@@ -33,9 +33,11 @@ public class AlterTableParser {
      *
      * @param database database
      * @param statement ALTER TABLE statement
+     * @param outputIgnoredStatements whether ignored statements should be
+     * output in the diff
      */
     public static void parse(final PgDatabase database,
-            final String statement) {
+            final String statement, final boolean outputIgnoredStatements) {
         final Parser parser = new Parser(statement);
         parser.expect("ALTER", "TABLE");
         parser.expectOptional("ONLY");
@@ -52,14 +54,16 @@ public class AlterTableParser {
             final PgView view = schema.getView(objectName);
 
             if (view != null) {
-                parseView(parser, view);
+                parseView(parser, view, outputIgnoredStatements, tableName,
+                        database);
                 return;
             }
 
             final PgSequence sequence = schema.getSequence(objectName);
 
             if (sequence != null) {
-                parseSequence(parser, sequence);
+                parseSequence(parser, sequence, outputIgnoredStatements,
+                        tableName, database);
                 return;
             }
         }
@@ -71,8 +75,13 @@ public class AlterTableParser {
                 table.setClusterIndexName(
                         ParserUtils.getObjectName(parser.parseIdentifier()));
             } else if (parser.expectOptional("OWNER", "TO")) {
-                // we do not parse this one so we just consume the expression
-                parser.getExpression();
+                // we do not parse this one so we just consume the identifier
+                if (outputIgnoredStatements) {
+                    database.addIgnoredStatement("ALTER TABLE " + tableName
+                            + " OWNER TO " + parser.parseIdentifier() + ';');
+                } else {
+                    parser.parseIdentifier();
+                }
             } else if (parser.expectOptional("ADD")) {
                 if (parser.expectOptional("FOREIGN", "KEY")) {
                     parseAddForeignKey(parser, table);
@@ -82,9 +91,11 @@ public class AlterTableParser {
                     parser.throwUnsupportedCommand();
                 }
             } else if (parser.expectOptional("ENABLE")) {
-                parseEnable(parser);
+                parseEnable(
+                        parser, outputIgnoredStatements, tableName, database);
             } else if (parser.expectOptional("DISABLE")) {
-                parseDisable(parser);
+                parseDisable(
+                        parser, outputIgnoredStatements, tableName, database);
             } else {
                 parser.throwUnsupportedCommand();
             }
@@ -101,21 +112,50 @@ public class AlterTableParser {
      * Parses ENABLE statements.
      *
      * @param parser parser
+     * @param outputIgnoredStatements whether ignored statements should be
+     * output in the diff
+     * @param tableName table name as it was specified in the statement
+     * @param database database information
      */
-    private static void parseEnable(final Parser parser) {
+    private static void parseEnable(final Parser parser,
+            final boolean outputIgnoredStatements, final String tableName,
+            final PgDatabase database) {
         if (parser.expectOptional("REPLICA")) {
             if (parser.expectOptional("TRIGGER")) {
-                parser.parseIdentifier();
+                if (outputIgnoredStatements) {
+                    database.addIgnoredStatement("ALTER TABLE " + tableName
+                            + " ENABLE REPLICA TRIGGER "
+                            + parser.parseIdentifier() + ';');
+                } else {
+                    parser.parseIdentifier();
+                }
             } else if (parser.expectOptional("RULE")) {
-                parser.parseIdentifier();
+                if (outputIgnoredStatements) {
+                    database.addIgnoredStatement("ALTER TABLE " + tableName
+                            + " ENABLE REPLICA RULE "
+                            + parser.parseIdentifier() + ';');
+                } else {
+                    parser.parseIdentifier();
+                }
             } else {
                 parser.throwUnsupportedCommand();
             }
         } else if (parser.expectOptional("ALWAYS")) {
             if (parser.expectOptional("TRIGGER")) {
-                parser.parseIdentifier();
+                if (outputIgnoredStatements) {
+                    database.addIgnoredStatement("ALTER TABLE " + tableName
+                            + " ENABLE ALWAYS TRIGGER "
+                            + parser.parseIdentifier() + ';');
+                } else {
+                    parser.parseIdentifier();
+                }
             } else if (parser.expectOptional("RULE")) {
-                parser.parseIdentifier();
+                if (outputIgnoredStatements) {
+                    database.addIgnoredStatement("ALTER TABLE " + tableName
+                            + " ENABLE RULE " + parser.parseIdentifier() + ';');
+                } else {
+                    parser.parseIdentifier();
+                }
             } else {
                 parser.throwUnsupportedCommand();
             }
@@ -126,12 +166,28 @@ public class AlterTableParser {
      * Parses DISABLE statements.
      *
      * @param parser parser
+     * @param outputIgnoredStatements whether ignored statements should be
+     * output in the diff
+     * @param tableName table name as it was specified in the statement
+     * @param database database information
      */
-    private static void parseDisable(final Parser parser) {
+    private static void parseDisable(final Parser parser,
+            final boolean outputIgnoredStatements, final String tableName,
+            final PgDatabase database) {
         if (parser.expectOptional("TRIGGER")) {
-            parser.parseIdentifier();
+            if (outputIgnoredStatements) {
+                database.addIgnoredStatement("ALTER TABLE " + tableName
+                        + " DISABLE TRIGGER " + parser.parseIdentifier() + ';');
+            } else {
+                parser.parseIdentifier();
+            }
         } else if (parser.expectOptional("RULE")) {
-            parser.parseIdentifier();
+            if (outputIgnoredStatements) {
+                database.addIgnoredStatement("ALTER TABLE " + tableName
+                        + " DISABLE RULE " + parser.parseIdentifier() + ';');
+            } else {
+                parser.parseIdentifier();
+            }
         } else {
             parser.throwUnsupportedCommand();
         }
@@ -239,8 +295,14 @@ public class AlterTableParser {
      * 
      * @param parser parser
      * @param view view
+     * @param outputIgnoredStatements whether ignored statements should be
+     * output in the diff
+     * @param viewName view name as it was specified in the statement
+     * @param database database information
      */
-    private static void parseView(final Parser parser, final PgView view) {
+    private static void parseView(final Parser parser, final PgView view,
+            final boolean outputIgnoredStatements, final String viewName,
+            final PgDatabase database) {
         while (!parser.expectOptional(";")) {
             if (parser.expectOptional("ALTER")) {
                 parser.expectOptional("COLUMN");
@@ -257,8 +319,13 @@ public class AlterTableParser {
                     parser.throwUnsupportedCommand();
                 }
             } else if (parser.expectOptional("OWNER", "TO")) {
-                // we do not support OWNER TO so just consume the rest
-                parser.getExpression();
+                // we do not parse this one so we just consume the identifier
+                if (outputIgnoredStatements) {
+                    database.addIgnoredStatement("ALTER TABLE " + viewName
+                            + " OWNER TO " + parser.parseIdentifier() + ';');
+                } else {
+                    parser.parseIdentifier();
+                }
             } else {
                 parser.throwUnsupportedCommand();
             }
@@ -270,13 +337,23 @@ public class AlterTableParser {
      *
      * @param parser parser
      * @param sequence sequence
+     * @param outputIgnoredStatements whether ignored statements should be
+     * output in the diff
+     * @param sequenceName sequence name as it was specified in the statement
+     * @param database database information
      */
     private static void parseSequence(final Parser parser,
-            final PgSequence sequence) {
+            final PgSequence sequence, final boolean outputIgnoredStatements,
+            final String sequenceName, final PgDatabase database) {
         while (!parser.expectOptional(";")) {
             if (parser.expectOptional("OWNER", "TO")) {
-                // we do not support OWNER TO so just consume the rest
-                parser.getExpression();
+                // we do not parse this one so we just consume the identifier
+                if (outputIgnoredStatements) {
+                    database.addIgnoredStatement("ALTER TABLE " + sequenceName
+                            + " OWNER TO " + parser.parseIdentifier() + ';');
+                } else {
+                    parser.parseIdentifier();
+                }
             } else {
                 parser.throwUnsupportedCommand();
             }

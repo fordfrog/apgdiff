@@ -173,8 +173,9 @@ public class PgDumpLoader { //NOPMD
                     CreateTableParser.parse(
                             database, getWholeStatement(reader, line));
                 } else if (PATTERN_ALTER_TABLE.matcher(line).matches()) {
-                    AlterTableParser.parse(
-                            database, getWholeStatement(reader, line));
+                    AlterTableParser.parse(database,
+                            getWholeStatement(reader, line),
+                            outputIgnoredStatements);
                 } else if (PATTERN_CREATE_SEQUENCE.matcher(line).matches()) {
                     CreateSequenceParser.parse(
                             database, getWholeStatement(reader, line));
@@ -185,8 +186,9 @@ public class PgDumpLoader { //NOPMD
                     CreateViewParser.parse(
                             database, getWholeStatement(reader, line));
                 } else if (PATTERN_ALTER_VIEW.matcher(line).matches()) {
-                    AlterViewParser.parse(
-                            database, getWholeStatement(reader, line));
+                    AlterViewParser.parse(database,
+                            getWholeStatement(reader, line),
+                            outputIgnoredStatements);
                 } else if (PATTERN_CREATE_TRIGGER.matcher(line).matches()) {
                     CreateTriggerParser.parse(
                             database, getWholeStatement(reader, line));
