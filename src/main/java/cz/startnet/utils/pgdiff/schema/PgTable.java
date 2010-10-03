@@ -61,6 +61,10 @@ public class PgTable {
      * Tablespace value.
      */
     private String tablespace;
+    /**
+     * Comment.
+     */
+    private String comment;
 
     /**
      * Creates a new PgTable object.
@@ -117,6 +121,24 @@ public class PgTable {
      */
     public List<PgColumn> getColumns() {
         return Collections.unmodifiableList(columns);
+    }
+
+    /**
+     * Getter for {@link #comment}.
+     *
+     * @return {@link #comment}
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Setter for {@link #comment}.
+     *
+     * @param comment {@link #comment}
+     */
+    public void setComment(final String comment) {
+        this.comment = comment;
     }
 
     /**

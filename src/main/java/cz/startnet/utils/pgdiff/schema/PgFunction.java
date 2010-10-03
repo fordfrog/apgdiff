@@ -31,6 +31,28 @@ public class PgFunction {
      * Whole definition of the function from RETURNS keyword.
      */
     private String body;
+    /**
+     * Comment.
+     */
+    private String comment;
+
+    /**
+     * Getter for {@link #comment}.
+     *
+     * @return {@link #comment}
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Setter for {@link #comment}.
+     *
+     * @param comment {@link #comment}
+     */
+    public void setComment(final String comment) {
+        this.comment = comment;
+    }
 
     /**
      * Returns creation SQL of the function.

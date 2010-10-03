@@ -54,7 +54,7 @@ public class CreateTableParser {
 
         while (!parser.expectOptional(")")) {
             if (parser.expectOptional("CONSTRAINT")) {
-                parseConstraint(parser, table);
+                parseConstraint(parser, table, schema);
             } else {
                 parseColumn(parser, table);
             }
@@ -114,13 +114,15 @@ public class CreateTableParser {
      * Parses CONSTRAINT definition.
      *
      * @param parser parser
-     * @param table pg table
+     * @param table table
+     * @param schema schema
      */
     private static void parseConstraint(final Parser parser,
-            final PgTable table) {
+            final PgTable table, final PgSchema schema) {
         final PgConstraint constraint = new PgConstraint(
                 ParserUtils.getObjectName(parser.parseIdentifier()));
         table.addConstraint(constraint);
+        schema.addConstraint(constraint);
         constraint.setDefinition(parser.getExpression());
         constraint.setTableName(table.getName());
     }
@@ -129,7 +131,7 @@ public class CreateTableParser {
      * Parses column definition.
      *
      * @param parser parser
-     * @param table pg table
+     * @param table table
      */
     private static void parseColumn(final Parser parser, final PgTable table) {
         final PgColumn column = new PgColumn(

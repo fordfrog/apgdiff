@@ -29,6 +29,10 @@ public class PgDatabase {
      * Current default schema.
      */
     private PgSchema defaultSchema;
+    /**
+     * Comment.
+     */
+    private String comment;
 
     /**
      * Creates a new PgDatabase object.
@@ -36,6 +40,24 @@ public class PgDatabase {
     public PgDatabase() {
         schemas.add(new PgSchema("public"));
         defaultSchema = schemas.get(0);
+    }
+
+    /**
+     * Getter for {@link #comment}.
+     *
+     * @return {@link #comment}
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Setter for {@link #comment}.
+     *
+     * @param comment {@link #comment}
+     */
+    public void setComment(final String comment) {
+        this.comment = comment;
     }
 
     /**

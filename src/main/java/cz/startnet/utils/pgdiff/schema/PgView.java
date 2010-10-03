@@ -34,6 +34,10 @@ public class PgView {
      */
     private final List<DefaultValue> defaultValues =
             new ArrayList<DefaultValue>(0);
+    /**
+     * Comment.
+     */
+    private String comment;
 
     /**
      * Creates a new PgView object.
@@ -61,6 +65,24 @@ public class PgView {
      */
     public List<String> getColumnNames() {
         return Collections.unmodifiableList(columnNames);
+    }
+
+    /**
+     * Getter for {@link #comment}.
+     *
+     * @return {@link #comment}
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Setter for {@link #comment}.
+     *
+     * @param comment {@link #comment}
+     */
+    public void setComment(final String comment) {
+        this.comment = comment;
     }
 
     /**

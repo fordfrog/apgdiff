@@ -6,6 +6,7 @@
 package cz.startnet.utils.pgdiff.parsers;
 
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
+import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTrigger;
 
 /**
@@ -32,8 +33,15 @@ public class CreateTriggerParser {
         final Parser parser = new Parser(statement);
         parser.expect("CREATE", "TRIGGER");
 
+        final String triggerName = parser.parseIdentifier();
+        final String schemaName =
+                ParserUtils.getSchemaName(triggerName, database);
+        final String objectName = ParserUtils.getObjectName(triggerName);
+        final PgSchema schema = database.getSchema(schemaName);
+
         final PgTrigger trigger = new PgTrigger();
-        trigger.setName(ParserUtils.getObjectName(parser.parseIdentifier()));
+        schema.addTrigger(trigger);
+        trigger.setName(objectName);
 
         if (parser.expectOptional("BEFORE")) {
             trigger.setBefore(true);
@@ -66,8 +74,9 @@ public class CreateTriggerParser {
 
         parser.expect("ON");
 
-        trigger.setTableName(
-                ParserUtils.getObjectName(parser.parseIdentifier()));
+        final String tableName = parser.parseIdentifier();
+
+        trigger.setTableName(ParserUtils.getObjectName(tableName));
 
         if (parser.expectOptional("FOR")) {
             parser.expectOptional("EACH");
@@ -90,7 +99,8 @@ public class CreateTriggerParser {
         parser.expect("EXECUTE", "PROCEDURE");
         trigger.setFunction(parser.getRest());
 
-        database.getDefaultSchema().getTable(
-                trigger.getTableName()).addTrigger(trigger);
+        final PgSchema tableSchema = database.getSchema(
+                ParserUtils.getSchemaName(tableName, database));
+        tableSchema.getTable(trigger.getTableName()).addTrigger(trigger);
     }
 }

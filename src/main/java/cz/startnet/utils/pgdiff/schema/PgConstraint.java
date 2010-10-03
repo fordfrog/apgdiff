@@ -34,6 +34,10 @@ public class PgConstraint {
      * Name of the table the constraint is defined on.
      */
     private String tableName;
+    /**
+     * Comment.
+     */
+    private String comment;
 
     /**
      * Creates a new PgConstraint object.
@@ -60,6 +64,24 @@ public class PgConstraint {
         sbSQL.append(';');
 
         return sbSQL.toString();
+    }
+
+    /**
+     * Getter for {@link #comment}.
+     *
+     * @return {@link #comment}
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Setter for {@link #comment}.
+     *
+     * @param comment {@link #comment}
+     */
+    public void setComment(final String comment) {
+        this.comment = comment;
     }
 
     /**

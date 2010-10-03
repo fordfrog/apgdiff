@@ -30,6 +30,10 @@ public class PgIndex {
      * Whether the index is unique.
      */
     private boolean unique;
+    /**
+     * Comment.
+     */
+    private String comment;
 
     /**
      * Creates a new PgIndex object.
@@ -38,6 +42,24 @@ public class PgIndex {
      */
     public PgIndex(final String name) {
         this.name = name;
+    }
+
+    /**
+     * Getter for {@link #comment}.
+     *
+     * @return {@link #comment}
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Setter for {@link #comment}.
+     *
+     * @param comment {@link #comment}
+     */
+    public void setComment(final String comment) {
+        this.comment = comment;
     }
 
     /**
