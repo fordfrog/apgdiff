@@ -231,7 +231,9 @@ public class PgDiffTest {
                     // Tests changing view default value
                     {"alter_view_change_default", false, true, false, false},
                     // Tests creation of sequence with bug in MINVALUE value
-                    {"add_sequence_bug2100013", false, true, false, false}
+                    {"add_sequence_bug2100013", false, true, false, false},
+                    // Tests view with default value
+                    {"view_bug3080388", false, true, false, false}
                 });
     }
 

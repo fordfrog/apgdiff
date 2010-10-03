@@ -143,20 +143,22 @@ public class PgDiffViews {
             boolean found = false;
 
             for (final PgView.DefaultValue newValue : newValues) {
-                if (oldValue.getColumnName().equals(newValue.getColumnName())
-                        && !oldValue.getDefaultValue().equals(
-                        newValue.getDefaultValue())) {
+                if (oldValue.getColumnName().equals(newValue.getColumnName())) {
                     found = true;
 
-                    writer.println();
-                    writer.print("ALTER VIEW ");
-                    writer.print(PgDiffUtils.getQuotedName(newView.getName()));
-                    writer.print(" ALTER COLUMN ");
-                    writer.print(PgDiffUtils.getQuotedName(
-                            newValue.getColumnName()));
-                    writer.print(" SET DEFAULT ");
-                    writer.print(newValue.getDefaultValue());
-                    writer.println(';');
+                    if (!oldValue.getDefaultValue().equals(
+                            newValue.getDefaultValue())) {
+                        writer.println();
+                        writer.print("ALTER VIEW ");
+                        writer.print(
+                                PgDiffUtils.getQuotedName(newView.getName()));
+                        writer.print(" ALTER COLUMN ");
+                        writer.print(PgDiffUtils.getQuotedName(
+                                newValue.getColumnName()));
+                        writer.print(" SET DEFAULT ");
+                        writer.print(newValue.getDefaultValue());
+                        writer.println(';');
+                    }
 
                     break;
                 }

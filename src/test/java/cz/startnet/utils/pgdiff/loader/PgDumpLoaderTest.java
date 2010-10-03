@@ -62,7 +62,7 @@ public class PgDumpLoaderTest {
     /**
      * Runs single test.
      */
-    @Test(/*timeout = 1000*/)
+    @Test(timeout = 1000)
     public void loadSchema() {
         PgDumpLoader.loadDatabaseSchema(
                 getClass().getResourceAsStream("schema_" + fileIndex + ".sql"),

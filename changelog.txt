@@ -3,13 +3,16 @@
 ------------------------------------------
 
 --------------------------------
-Version 2.2.1 (not released yet)
+2010-10-03: Version 2.2.1
 --------------------------------
 
 New Features
 * Commands like OWNER TO and ENABLE/DISABLE TRIGGER/RULE are now added to the
   diff output even for commands that are otherwise being parsed, like ALTER
   TABLE.
+Fixes
+* Fixed bug where default values were dropped from VIEW columns even if they
+  were not modified.
 
 -----------------------
 2010-10-02: Version 2.2
