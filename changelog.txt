@@ -3,8 +3,15 @@
 ------------------------------------------
 
 --------------------------------
-2010-10-03: Version 2.2.1
+Version 2.2.2 (not released yet)
 --------------------------------
+
+Fixes
+* Added missing new line after ALTER VIEW ... ALTER COLUMN ... SET/DROP DEFAULT.
+
+-------------------------
+2010-10-03: Version 2.2.1
+-------------------------
 
 New Features
 * Commands like OWNER TO and ENABLE/DISABLE TRIGGER/RULE are now added to the

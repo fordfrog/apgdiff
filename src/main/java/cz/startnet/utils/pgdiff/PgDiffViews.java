@@ -171,7 +171,7 @@ public class PgDiffViews {
                 writer.print(" ALTER COLUMN ");
                 writer.print(PgDiffUtils.getQuotedName(
                         oldValue.getColumnName()));
-                writer.print(" DROP DEFAULT;");
+                writer.println(" DROP DEFAULT;");
             }
         }
 
@@ -197,7 +197,7 @@ public class PgDiffViews {
             writer.print(PgDiffUtils.getQuotedName(newValue.getColumnName()));
             writer.print(" SET DEFAULT ");
             writer.print(newValue.getDefaultValue());
-            writer.print(';');
+            writer.println(';');
         }
     }
 }
