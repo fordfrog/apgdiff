@@ -8,6 +8,7 @@ Version 2.2.2 (not released yet)
 
 Fixes
 * Added missing new line after ALTER VIEW ... ALTER COLUMN ... SET/DROP DEFAULT.
+* Fixed parsing of quoted string values.
 
 -------------------------
 2010-10-03: Version 2.2.1

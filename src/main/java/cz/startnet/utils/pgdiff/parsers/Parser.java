@@ -239,7 +239,7 @@ public final class Parser {
 
         if (quoted) {
             boolean escape = false;
-            int endPos = position;
+            int endPos = position + 1;
 
             for (; endPos < string.length(); endPos++) {
                 final char chr = string.charAt(endPos);
