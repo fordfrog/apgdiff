@@ -98,25 +98,25 @@ public class PgDatabase {
     }
 
     /**
-     * Returns schema of given name or null if the schema has not been
-     * found.
+     * Returns schema of given name or null if the schema has not been found. If
+     * schema name is null then default schema is returned.
      *
-     * @param name schema name
+     * @param name schema name or null which means default schema
      *
      * @return found schema or null
      */
     public PgSchema getSchema(final String name) {
-        PgSchema schema = null;
+        if (name == null) {
+            return getDefaultSchema();
+        }
 
-        for (final PgSchema curSchema : schemas) {
-            if (curSchema.getName().equals(name)) {
-                schema = curSchema;
-
-                break;
+        for (final PgSchema schema : schemas) {
+            if (schema.getName().equals(name)) {
+                return schema;
             }
         }
 
-        return schema;
+        return null;
     }
 
     /**

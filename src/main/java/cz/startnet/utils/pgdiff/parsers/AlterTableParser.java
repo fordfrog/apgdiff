@@ -205,10 +205,15 @@ public class AlterTableParser {
         final String constraintName =
                 ParserUtils.getObjectName(parser.parseIdentifier());
         final PgConstraint constraint = new PgConstraint(constraintName);
-        table.addConstraint(constraint);
-        schema.addConstraint(constraint);
-        constraint.setDefinition(parser.getExpression());
         constraint.setTableName(table.getName());
+        table.addConstraint(constraint);
+
+        if (parser.expectOptional("PRIMARY", "KEY")) {
+            schema.addPrimaryKey(constraint);
+            constraint.setDefinition("PRIMARY KEY " + parser.getExpression());
+        } else {
+            constraint.setDefinition(parser.getExpression());
+        }
     }
 
     /**

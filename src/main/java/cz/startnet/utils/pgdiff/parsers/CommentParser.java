@@ -82,7 +82,7 @@ public class CommentParser {
                 database.getSchema(schemaName).getTable(objectName);
 
         parser.expect("IS");
-        table.setComment(parser.parseString());
+        table.setComment(getComment(parser));
         parser.expect(";");
     }
 
@@ -94,16 +94,21 @@ public class CommentParser {
      */
     private static void parseConstraint(final Parser parser,
             final PgDatabase database) {
-        final String constraintName = parser.parseIdentifier();
-        final String objectName = ParserUtils.getObjectName(constraintName);
+        final String constraintName =
+                ParserUtils.getObjectName(parser.parseIdentifier());
+
+        parser.expect("ON");
+
+        final String tableName = parser.parseIdentifier();
+        final String objectName = ParserUtils.getObjectName(tableName);
         final String schemaName =
                 ParserUtils.getSchemaName(constraintName, database);
 
-        final PgConstraint constraint =
-                database.getSchema(schemaName).getConstraint(objectName);
+        final PgConstraint constraint = database.getSchema(schemaName).
+                getTable(objectName).getConstraint(constraintName);
 
         parser.expect("IS");
-        constraint.setComment(parser.parseString());
+        constraint.setComment(getComment(parser));
         parser.expect(";");
     }
 
@@ -117,7 +122,7 @@ public class CommentParser {
             final PgDatabase database) {
         parser.parseIdentifier();
         parser.expect("IS");
-        database.setComment(parser.parseString());
+        database.setComment(getComment(parser));
         parser.expect(";");
     }
 
@@ -133,13 +138,20 @@ public class CommentParser {
         final String objectName = ParserUtils.getObjectName(indexName);
         final String schemaName =
                 ParserUtils.getSchemaName(indexName, database);
+        final PgSchema schema = database.getSchema(schemaName);
 
-        final PgIndex index =
-                database.getSchema(schemaName).getIndex(objectName);
+        final PgIndex index = schema.getIndex(objectName);
 
-        parser.expect("IS");
-        index.setComment(parser.parseString());
-        parser.expect(";");
+        if (index == null) {
+            final PgConstraint primaryKey = schema.getPrimaryKey(objectName);
+            parser.expect("IS");
+            primaryKey.setComment(getComment(parser));
+            parser.expect(";");
+        } else {
+            parser.expect("IS");
+            index.setComment(getComment(parser));
+            parser.expect(";");
+        }
     }
 
     /**
@@ -155,7 +167,7 @@ public class CommentParser {
         final PgSchema schema = database.getSchema(schemaName);
 
         parser.expect("IS");
-        schema.setComment(parser.parseString());
+        schema.setComment(getComment(parser));
         parser.expect(";");
     }
 
@@ -176,7 +188,7 @@ public class CommentParser {
                 database.getSchema(schemaName).getSequence(objectName);
 
         parser.expect("IS");
-        sequence.setComment(parser.parseString());
+        sequence.setComment(getComment(parser));
         parser.expect(";");
     }
 
@@ -188,16 +200,21 @@ public class CommentParser {
      */
     private static void parseTrigger(final Parser parser,
             final PgDatabase database) {
-        final String triggerName = parser.parseIdentifier();
-        final String objectName = ParserUtils.getObjectName(triggerName);
+        final String triggerName =
+                ParserUtils.getObjectName(parser.parseIdentifier());
+
+        parser.expect("ON");
+
+        final String tableName = parser.parseIdentifier();
+        final String objectName = ParserUtils.getObjectName(tableName);
         final String schemaName =
                 ParserUtils.getSchemaName(triggerName, database);
 
-        final PgTrigger trigger =
-                database.getSchema(schemaName).getTrigger(objectName);
+        final PgTrigger trigger = database.getSchema(schemaName).
+                getTable(objectName).getTrigger(triggerName);
 
         parser.expect("IS");
-        trigger.setComment(parser.parseString());
+        trigger.setComment(getComment(parser));
         parser.expect(";");
     }
 
@@ -217,7 +234,7 @@ public class CommentParser {
         final PgView view = database.getSchema(schemaName).getView(objectName);
 
         parser.expect("IS");
-        view.setComment(parser.parseString());
+        view.setComment(getComment(parser));
         parser.expect(";");
     }
 
@@ -232,16 +249,29 @@ public class CommentParser {
         final String columnName = parser.parseIdentifier();
         final String objectName = ParserUtils.getObjectName(columnName);
         final String tableName = ParserUtils.getSecondObjectName(columnName);
-        final String schemaName =
-                ParserUtils.getSchemaName(columnName, database);
+        final String schemaName = ParserUtils.getThirdObjectName(columnName);
+        final PgSchema schema = database.getSchema(schemaName);
 
-        final PgTable table =
-                database.getSchema(schemaName).getTable(tableName);
-        final PgColumn column = table.getColumn(objectName);
+        final PgTable table = schema.getTable(tableName);
 
-        parser.expect("IS");
-        column.setComment(parser.parseString());
-        parser.expect(";");
+        if (table == null) {
+            final PgView view = schema.getView(tableName);
+            parser.expect("IS");
+
+            final String comment = getComment(parser);
+
+            if (comment == null) {
+                view.removeColumnComment(objectName);
+            } else {
+                view.addColumnComment(objectName, comment);
+            }
+            parser.expect(";");
+        } else {
+            final PgColumn column = table.getColumn(objectName);
+            parser.expect("IS");
+            column.setComment(getComment(parser));
+            parser.expect(";");
+        }
     }
 
     /**
@@ -310,7 +340,25 @@ public class CommentParser {
                 schema.getFunction(tmpFunction.getSignature());
 
         parser.expect("IS");
-        schema.setComment(parser.parseString());
+        schema.setComment(getComment(parser));
         parser.expect(";");
+    }
+
+    /**
+     * Parses comment from parser. If comment is "null" string then null is
+     * returned, otherwise the parsed string is returned.
+     *
+     * @param parser parser
+     *
+     * @return string or null
+     */
+    private static String getComment(final Parser parser) {
+        final String comment = parser.parseString();
+
+        if ("null".equalsIgnoreCase(comment)) {
+            return null;
+        }
+
+        return comment;
     }
 }

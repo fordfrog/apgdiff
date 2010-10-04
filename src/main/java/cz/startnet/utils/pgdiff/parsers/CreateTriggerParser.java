@@ -37,10 +37,8 @@ public class CreateTriggerParser {
         final String schemaName =
                 ParserUtils.getSchemaName(triggerName, database);
         final String objectName = ParserUtils.getObjectName(triggerName);
-        final PgSchema schema = database.getSchema(schemaName);
 
         final PgTrigger trigger = new PgTrigger();
-        schema.addTrigger(trigger);
         trigger.setName(objectName);
 
         if (parser.expectOptional("BEFORE")) {

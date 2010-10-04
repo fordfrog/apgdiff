@@ -101,17 +101,13 @@ public class PgTable {
      * @return found column or null if no such column has been found
      */
     public PgColumn getColumn(final String name) {
-        PgColumn column = null;
-
-        for (PgColumn curColumn : columns) {
-            if (curColumn.getName().equals(name)) {
-                column = curColumn;
-
-                break;
+        for (PgColumn column : columns) {
+            if (column.getName().equals(name)) {
+                return column;
             }
         }
 
-        return column;
+        return null;
     }
 
     /**
@@ -150,17 +146,13 @@ public class PgTable {
      * @return found constraint or null if no such constraint has been found
      */
     public PgConstraint getConstraint(final String name) {
-        PgConstraint constraint = null;
-
-        for (PgConstraint curConstraint : constraints) {
-            if (curConstraint.getName().equals(name)) {
-                constraint = curConstraint;
-
-                break;
+        for (PgConstraint constraint : constraints) {
+            if (constraint.getName().equals(name)) {
+                return constraint;
             }
         }
 
-        return constraint;
+        return null;
     }
 
     /**
@@ -265,17 +257,30 @@ public class PgTable {
      * @return found index or null if no such index has been found
      */
     public PgIndex getIndex(final String name) {
-        PgIndex index = null;
-
-        for (PgIndex curIndex : indexes) {
-            if (curIndex.getName().equals(name)) {
-                index = curIndex;
-
-                break;
+        for (PgIndex index : indexes) {
+            if (index.getName().equals(name)) {
+                return index;
             }
         }
 
-        return index;
+        return null;
+    }
+
+    /**
+     * Finds trigger according to specified trigger <code>name</code>.
+     *
+     * @param name name of the trigger to be searched
+     *
+     * @return found trigger or null if no such trigger has been found
+     */
+    public PgTrigger getTrigger(final String name) {
+        for (PgTrigger trigger : triggers) {
+            if (trigger.getName().equals(name)) {
+                return trigger;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -414,17 +419,13 @@ public class PgTable {
      *         false
      */
     public boolean containsColumn(final String name) {
-        boolean found = false;
-
         for (PgColumn column : columns) {
             if (column.getName().equals(name)) {
-                found = true;
-
-                break;
+                return true;
             }
         }
 
-        return found;
+        return false;
     }
 
     /**
@@ -437,17 +438,13 @@ public class PgTable {
      *         otherwise false
      */
     public boolean containsConstraint(final String name) {
-        boolean found = false;
-
         for (PgConstraint constraint : constraints) {
             if (constraint.getName().equals(name)) {
-                found = true;
-
-                break;
+                return true;
             }
         }
 
-        return found;
+        return false;
     }
 
     /**
@@ -460,17 +457,13 @@ public class PgTable {
      *         false
      */
     public boolean containsIndex(final String name) {
-        boolean found = false;
-
         for (PgIndex index : indexes) {
             if (index.getName().equals(name)) {
-                found = true;
-
-                break;
+                return true;
             }
         }
 
-        return found;
+        return false;
     }
 
     /**

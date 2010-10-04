@@ -39,21 +39,16 @@ public class PgSchema {
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final List<PgView> views = new ArrayList<PgView>();
     /**
-     * List of constraints defined in the schema.
-     */
-    @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private final List<PgConstraint> constraints =
-            new ArrayList<PgConstraint>();
-    /**
      * List of indexes defined in the schema.
      */
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final List<PgIndex> indexes = new ArrayList<PgIndex>();
     /**
-     * List of triggers defined in the schema.
+     * List of primary keys defined in the schema.
      */
     @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private final List<PgTrigger> triggers = new ArrayList<PgTrigger>();
+    private final List<PgConstraint> primaryKeys =
+            new ArrayList<PgConstraint>();
     /**
      * Name of the schema.
      */
@@ -190,27 +185,6 @@ public class PgSchema {
     }
 
     /**
-     * Finds constraint according to specified constraint <code>name</code>.
-     *
-     * @param name name of the constraint to be searched
-     *
-     * @return found constraint or null if no such constraint has been found
-     */
-    public PgConstraint getConstraint(final String name) {
-        PgConstraint constraint = null;
-
-        for (PgConstraint curConstraint : constraints) {
-            if (curConstraint.getName().equals(name)) {
-                constraint = curConstraint;
-
-                break;
-            }
-        }
-
-        return constraint;
-    }
-
-    /**
      * Finds index according to specified index <code>name</code>.
      *
      * @param name name of the index to be searched
@@ -218,38 +192,30 @@ public class PgSchema {
      * @return found index or null if no such index has been found
      */
     public PgIndex getIndex(final String name) {
-        PgIndex index = null;
-
-        for (PgIndex curIndex : indexes) {
-            if (curIndex.getName().equals(name)) {
-                index = curIndex;
-
-                break;
+        for (PgIndex index : indexes) {
+            if (index.getName().equals(name)) {
+                return index;
             }
         }
 
-        return index;
+        return null;
     }
 
     /**
-     * Finds trigger according to specified trigger <code>name</code>.
+     * Finds primary key according to specified primary key <code>name</code>.
      *
-     * @param name name of the trigger to be searched
+     * @param name name of the primary key to be searched
      *
-     * @return found trigger or null if no such trigger has been found
+     * @return found primary key or null if no such primary key has been found
      */
-    public PgTrigger getTrigger(final String name) {
-        PgTrigger trigger = null;
-
-        for (PgTrigger curTrigger : triggers) {
-            if (curTrigger.getName().equals(name)) {
-                trigger = curTrigger;
-
-                break;
+    public PgConstraint getPrimaryKey(final String name) {
+        for (PgConstraint constraint : primaryKeys) {
+            if (constraint.getName().equals(name)) {
+                return constraint;
             }
         }
 
-        return trigger;
+        return null;
     }
 
     /**
@@ -260,26 +226,13 @@ public class PgSchema {
      * @return found sequence or null if no such sequence has been found
      */
     public PgSequence getSequence(final String name) {
-        PgSequence sequence = null;
-
-        for (PgSequence curSequence : sequences) {
-            if (curSequence.getName().equals(name)) {
-                sequence = curSequence;
-
-                break;
+        for (PgSequence sequence : sequences) {
+            if (sequence.getName().equals(name)) {
+                return sequence;
             }
         }
 
-        return sequence;
-    }
-
-    /**
-     * Getter for {@link #constraints}. The list cannot be modified.
-     *
-     * @return {@link #constraints}
-     */
-    public List<PgConstraint> getConstraints() {
-        return Collections.unmodifiableList(constraints);
+        return null;
     }
 
     /**
@@ -292,12 +245,12 @@ public class PgSchema {
     }
 
     /**
-     * Getter for {@link #triggers}. The list cannot be modified.
+     * Getter for {@link #primaryKeys}. The list cannot be modified.
      *
-     * @return {@link #triggers}
+     * @return {@link #primaryKeys}
      */
-    public List<PgTrigger> getTriggers() {
-        return Collections.unmodifiableList(triggers);
+    public List<PgConstraint> getPrimaryKeys() {
+        return Collections.unmodifiableList(primaryKeys);
     }
 
     /**
@@ -317,17 +270,13 @@ public class PgSchema {
      * @return found table or null if no such table has been found
      */
     public PgTable getTable(final String name) {
-        PgTable table = null;
-
-        for (PgTable curTable : tables) {
-            if (curTable.getName().equals(name)) {
-                table = curTable;
-
-                break;
+        for (PgTable table : tables) {
+            if (table.getName().equals(name)) {
+                return table;
             }
         }
 
-        return table;
+        return null;
     }
 
     /**
@@ -347,17 +296,13 @@ public class PgSchema {
      * @return found view or null if no such view has been found
      */
     public PgView getView(final String name) {
-        PgView view = null;
-
-        for (PgView curView : views) {
-            if (curView.getName().equals(name)) {
-                view = curView;
-
-                break;
+        for (PgView view : views) {
+            if (view.getName().equals(name)) {
+                return view;
             }
         }
 
-        return view;
+        return null;
     }
 
     /**
@@ -370,15 +315,6 @@ public class PgSchema {
     }
 
     /**
-     * Adds <code>constraint</code> to the list of constraints.
-     *
-     * @param constraint constraint
-     */
-    public void addConstraint(final PgConstraint constraint) {
-        constraints.add(constraint);
-    }
-
-    /**
      * Adds <code>index</code> to the list of indexes.
      *
      * @param index index
@@ -388,12 +324,12 @@ public class PgSchema {
     }
 
     /**
-     * Adds <code>trigger</code> to the list of triggers.
+     * Adds <code>primary key</code> to the list of primary keys.
      *
-     * @param trigger trigger
+     * @param primaryKey index
      */
-    public void addTrigger(final PgTrigger trigger) {
-        triggers.add(trigger);
+    public void addPrimaryKey(final PgConstraint primaryKey) {
+        primaryKeys.add(primaryKey);
     }
 
     /**
@@ -461,17 +397,13 @@ public class PgSchema {
      *         otherwise false
      */
     public boolean containsSequence(final String name) {
-        boolean found = false;
-
         for (PgSequence sequence : sequences) {
             if (sequence.getName().equals(name)) {
-                found = true;
-
-                break;
+                return true;
             }
         }
 
-        return found;
+        return false;
     }
 
     /**
@@ -484,17 +416,13 @@ public class PgSchema {
      *         otherwise false.
      */
     public boolean containsTable(final String name) {
-        boolean found = false;
-
         for (PgTable table : tables) {
             if (table.getName().equals(name)) {
-                found = true;
-
-                break;
+                return true;
             }
         }
 
-        return found;
+        return false;
     }
 
     /**
@@ -507,16 +435,12 @@ public class PgSchema {
      *         otherwise false.
      */
     public boolean containsView(final String name) {
-        boolean found = false;
-
         for (PgView view : views) {
             if (view.getName().equals(name)) {
-                found = true;
-
-                break;
+                return true;
             }
         }
 
-        return found;
+        return false;
     }
 }
