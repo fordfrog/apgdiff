@@ -113,12 +113,6 @@ public class PgDumpLoader { //NOPMD
      */
     private static final Pattern PATTERN_ALTER_VIEW = Pattern.compile(
             "^ALTER[\\s]+VIEW[\\s]+.*$", Pattern.CASE_INSENSITIVE);
-    /**
-     * Pattern for getting the string that is used to end the function
-     * or the function definition itself.
-     */
-    private static final Pattern PATTERN_END_OF_FUNCTION = Pattern.compile(
-            "^(?:.*[\\s]+)?AS[\\s]+([\\S]+).*$", Pattern.CASE_INSENSITIVE);
 
     /**
      * Creates a new instance of PgDumpLoader.
@@ -281,20 +275,36 @@ public class PgDumpLoader { //NOPMD
         String endOfFunction = null;
         boolean ignoreFirstOccurence = true;
         boolean searchForSemicolon = false;
+        boolean nextIsSeparator = false;
 
         while (newLine != null) {
             if (endOfFunction == null) {
-                final Matcher matcher =
-                        PATTERN_END_OF_FUNCTION.matcher(newLine);
+                boolean previousWasWhitespace = true;
 
-                if (matcher.matches()) {
-                    final String string = matcher.group(1);
+                for (int i = 0; i < newLine.length(); i++) {
+                    final char chr = newLine.charAt(i);
 
-                    if (string.charAt(0) == '\'') {
-                        endOfFunction = "'";
+                    if (Character.isWhitespace(chr)) {
+                        previousWasWhitespace = true;
+                        continue;
+                    } else if (nextIsSeparator) {
+                        if (chr == '\'') {
+                            endOfFunction = "'";
+                        } else {
+                            endOfFunction = newLine.substring(
+                                    i, newLine.indexOf('$', i + 1) + 1);
+                        }
+
+                        break;
+                    } else if (previousWasWhitespace
+                            && Character.toUpperCase(chr) == 'A'
+                            && Character.toUpperCase(newLine.charAt(i + 1)) == 'S'
+                            && (i + 2 == newLine.length()
+                            || Character.isWhitespace(newLine.charAt(i + 2)))) {
+                        i += 2;
+                        nextIsSeparator = true;
                     } else {
-                        endOfFunction =
-                                string.substring(0, string.indexOf('$', 1) + 1);
+                        previousWasWhitespace = false;
                     }
                 }
             }

@@ -9,6 +9,9 @@ Version 2.2.2 (not released yet)
 Fixes
 * Added missing new line after ALTER VIEW ... ALTER COLUMN ... SET/DROP DEFAULT.
 * Fixed parsing of quoted string values.
+* Fixed detection of function body separator (did not work when there was
+  another 'AS' specified on the same line after the 'AS' starting function
+  body).
 
 -------------------------
 2010-10-03: Version 2.2.1
