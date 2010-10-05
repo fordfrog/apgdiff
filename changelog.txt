@@ -12,6 +12,9 @@ Fixes
 * Fixed detection of function body separator (did not work when there was
   another 'AS' specified on the same line after the 'AS' starting function
   body).
+* If two dumps are now completely same and there is more than one schema in the
+  dumps, the output now does not contain 'SET search_path = ...'. In other
+  words, if two dumps are completely same, no output is produced.
 
 -------------------------
 2010-10-03: Version 2.2.1

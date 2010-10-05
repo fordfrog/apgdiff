@@ -36,9 +36,11 @@ public class PgDiffTables {
      * @param writer writer the output should be written to
      * @param oldSchema original schema
      * @param newSchema new schema
+     * @param searchPathHelper search path helper
      */
     public static void dropClusters(final PrintWriter writer,
-            final PgSchema oldSchema, final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema,
+            final SearchPathHelper searchPathHelper) {
         for (final PgTable newTable : newSchema.getTables()) {
             final PgTable oldTable;
 
@@ -60,6 +62,7 @@ public class PgDiffTables {
 
             if (oldCluster != null && newCluster == null
                     && newTable.containsIndex(oldCluster)) {
+                searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.print("ALTER TABLE ");
                 writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
@@ -74,9 +77,11 @@ public class PgDiffTables {
      * @param writer writer the output should be written to
      * @param oldSchema original schema
      * @param newSchema new schema
+     * @param searchPathHelper search path helper
      */
     public static void createClusters(final PrintWriter writer,
-            final PgSchema oldSchema, final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema,
+            final SearchPathHelper searchPathHelper) {
         for (final PgTable newTable : newSchema.getTables()) {
             final PgTable oldTable;
 
@@ -99,6 +104,7 @@ public class PgDiffTables {
             if ((oldCluster == null && newCluster != null)
                     || (oldCluster != null && newCluster != null
                     && newCluster.compareTo(oldCluster) != 0)) {
+                searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.print("ALTER TABLE ");
                 writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
@@ -116,10 +122,11 @@ public class PgDiffTables {
      * @param arguments object containing arguments settings
      * @param oldSchema original schema
      * @param newSchema new schema
+     * @param searchPathHelper search path helper
      */
     public static void alterTables(final PrintWriter writer,
             final PgDiffArguments arguments, final PgSchema oldSchema,
-            final PgSchema newSchema) {
+            final PgSchema newSchema, final SearchPathHelper searchPathHelper) {
         for (final PgTable newTable : newSchema.getTables()) {
             if (oldSchema == null
                     || !oldSchema.containsTable(newTable.getName())) {
@@ -127,12 +134,13 @@ public class PgDiffTables {
             }
 
             final PgTable oldTable = oldSchema.getTable(newTable.getName());
-            updateTableColumns(writer, arguments, oldTable, newTable);
-            checkWithOIDS(writer, oldTable, newTable);
-            checkInherits(writer, oldTable, newTable);
-            checkTablespace(writer, oldTable, newTable);
-            addAlterStatistics(writer, oldTable, newTable);
-            addAlterStorage(writer, oldTable, newTable);
+            updateTableColumns(
+                    writer, arguments, oldTable, newTable, searchPathHelper);
+            checkWithOIDS(writer, oldTable, newTable, searchPathHelper);
+            checkInherits(writer, oldTable, newTable, searchPathHelper);
+            checkTablespace(writer, oldTable, newTable, searchPathHelper);
+            addAlterStatistics(writer, oldTable, newTable, searchPathHelper);
+            addAlterStorage(writer, oldTable, newTable, searchPathHelper);
         }
     }
 
@@ -142,9 +150,11 @@ public class PgDiffTables {
      * @param writer writer the output should be written to
      * @param oldTable original table
      * @param newTable new table
+     * @param searchPathHelper search path helper
      */
     private static void addAlterStatistics(final PrintWriter writer,
-            final PgTable oldTable, final PgTable newTable) {
+            final PgTable oldTable, final PgTable newTable,
+            final SearchPathHelper searchPathHelper) {
         @SuppressWarnings("CollectionWithoutInitialCapacity")
         final Map<String, Integer> stats = new HashMap<String, Integer>();
 
@@ -170,6 +180,7 @@ public class PgDiffTables {
         }
 
         for (final Map.Entry<String, Integer> entry : stats.entrySet()) {
+            searchPathHelper.outputSearchPath(writer);
             writer.println();
             writer.print("ALTER TABLE ONLY ");
             writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
@@ -187,12 +198,11 @@ public class PgDiffTables {
      * @param writer writer the output should be written to
      * @param oldTable original table
      * @param newTable new table
+     * @param searchPathHelper search path helper
      */
     private static void addAlterStorage(final PrintWriter writer,
-            final PgTable oldTable, final PgTable newTable) {
-        @SuppressWarnings("CollectionWithoutInitialCapacity")
-        final Map<String, Integer> stats = new HashMap<String, Integer>();
-
+            final PgTable oldTable, final PgTable newTable,
+            final SearchPathHelper searchPathHelper) {
         for (final PgColumn newColumn : newTable.getColumns()) {
             final PgColumn oldColumn = oldTable.getColumn(newColumn.getName());
             final String oldStorage = (oldColumn == null
@@ -204,6 +214,7 @@ public class PgDiffTables {
                     : newColumn.getStorage();
 
             if (newStorage == null && oldStorage != null) {
+                searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println("WARNING: Column " + newTable.getName()
                         + '.' + newColumn.getName()
@@ -218,6 +229,7 @@ public class PgDiffTables {
                 continue;
             }
 
+            searchPathHelper.outputSearchPath(writer);
             writer.println();
             writer.print("ALTER TABLE ONLY ");
             writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
@@ -347,11 +359,14 @@ public class PgDiffTables {
      * @param writer writer the output should be written to
      * @param oldTable original table
      * @param newTable new table
+     * @param searchPathHelper search path helper
      */
     private static void checkInherits(final PrintWriter writer,
-            final PgTable oldTable, final PgTable newTable) {
+            final PgTable oldTable, final PgTable newTable,
+            final SearchPathHelper searchPathHelper) {
         for (final String tableName : oldTable.getInherits()) {
             if (!newTable.getInherits().contains(tableName)) {
+                searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println("ALTER TABLE "
                         + PgDiffUtils.getQuotedName(newTable.getName()));
@@ -362,6 +377,7 @@ public class PgDiffTables {
 
         for (final String tableName : newTable.getInherits()) {
             if (!oldTable.getInherits().contains(tableName)) {
+                searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println("ALTER TABLE "
                         + PgDiffUtils.getQuotedName(newTable.getName()));
@@ -379,15 +395,18 @@ public class PgDiffTables {
      * @param writer writer the output should be written to
      * @param oldTable original table
      * @param newTable new table
+     * @param searchPathHelper search path helper
      */
     private static void checkWithOIDS(final PrintWriter writer,
-            final PgTable oldTable, final PgTable newTable) {
+            final PgTable oldTable, final PgTable newTable,
+            final SearchPathHelper searchPathHelper) {
         if (oldTable.getWith() == null && newTable.getWith() == null
                 || oldTable.getWith() != null
                 && oldTable.getWith().equals(newTable.getWith())) {
             return;
         }
 
+        searchPathHelper.outputSearchPath(writer);
         writer.println();
         writer.println("ALTER TABLE "
                 + PgDiffUtils.getQuotedName(newTable.getName()));
@@ -409,15 +428,18 @@ public class PgDiffTables {
      * @param writer writer
      * @param oldTable old table
      * @param newTable new table
+     * @param searchPathHelper search path helper
      */
     private static void checkTablespace(final PrintWriter writer,
-            final PgTable oldTable, final PgTable newTable) {
+            final PgTable oldTable, final PgTable newTable,
+            final SearchPathHelper searchPathHelper) {
         if (oldTable.getTablespace() == null && newTable.getTablespace() == null
                 || oldTable.getTablespace() != null
                 && oldTable.getTablespace().equals(newTable.getTablespace())) {
             return;
         }
 
+        searchPathHelper.outputSearchPath(writer);
         writer.println();
         writer.println("ALTER TABLE "
                 + PgDiffUtils.getQuotedName(newTable.getName()));
@@ -430,12 +452,15 @@ public class PgDiffTables {
      * @param writer writer the output should be written to
      * @param oldSchema original schema
      * @param newSchema new schema
+     * @param searchPathHelper search path helper
      */
     public static void createTables(final PrintWriter writer,
-            final PgSchema oldSchema, final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema,
+            final SearchPathHelper searchPathHelper) {
         for (final PgTable table : newSchema.getTables()) {
             if (oldSchema == null
                     || !oldSchema.containsTable(table.getName())) {
+                searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(table.getCreationSQL());
             }
@@ -448,12 +473,15 @@ public class PgDiffTables {
      * @param writer writer the output should be written to
      * @param oldSchema original schema
      * @param newSchema new schema
+     * @param searchPathHelper search path helper
      */
     public static void dropTables(final PrintWriter writer,
-            final PgSchema oldSchema, final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema,
+            final SearchPathHelper searchPathHelper) {
         if (oldSchema != null) {
             for (final PgTable table : oldSchema.getTables()) {
                 if (!newSchema.containsTable(table.getName())) {
+                    searchPathHelper.outputSearchPath(writer);
                     writer.println();
                     writer.println(table.getDropSQL());
                 }
@@ -469,10 +497,11 @@ public class PgDiffTables {
      * @param arguments object containing arguments settings
      * @param oldTable original table
      * @param newTable new table
+     * @param searchPathHelper search path helper
      */
     private static void updateTableColumns(final PrintWriter writer,
             final PgDiffArguments arguments, final PgTable oldTable,
-            final PgTable newTable) {
+            final PgTable newTable, final SearchPathHelper searchPathHelper) {
         @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<String> statements = new ArrayList<String>();
         @SuppressWarnings("CollectionWithoutInitialCapacity")
@@ -486,6 +515,7 @@ public class PgDiffTables {
         if (!statements.isEmpty()) {
             final String quotedTableName =
                     PgDiffUtils.getQuotedName(newTable.getName());
+            searchPathHelper.outputSearchPath(writer);
             writer.println();
             writer.println("ALTER TABLE " + quotedTableName);
 

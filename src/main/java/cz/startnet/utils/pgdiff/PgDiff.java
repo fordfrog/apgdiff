@@ -168,45 +168,62 @@ public class PgDiff {
                 || !newDatabase.getSchemas().get(0).getName().equals("public");
 
         for (final PgSchema newSchema : newDatabase.getSchemas()) {
+            final SearchPathHelper searchPathHelper;
+
             if (setSearchPath) {
-                writer.println();
-                writer.println("SET search_path = "
+                searchPathHelper = new SearchPathHelper("SET search_path = "
                         + PgDiffUtils.getQuotedName(newSchema.getName(), true)
                         + ", pg_catalog;");
+            } else {
+                searchPathHelper = new SearchPathHelper(null);
             }
 
             final PgSchema oldSchema =
                     oldDatabase.getSchema(newSchema.getName());
 
-            PgDiffTriggers.dropTriggers(writer, oldSchema, newSchema);
+            PgDiffTriggers.dropTriggers(
+                    writer, oldSchema, newSchema, searchPathHelper);
             PgDiffFunctions.dropFunctions(
-                    writer, arguments, oldSchema, newSchema);
+                    writer, arguments, oldSchema, newSchema, searchPathHelper);
             PgDiffFunctions.createFunctions(
-                    writer, arguments, oldSchema, newSchema);
-            PgDiffViews.dropViews(writer, oldSchema, newSchema);
+                    writer, arguments, oldSchema, newSchema, searchPathHelper);
+            PgDiffViews.dropViews(
+                    writer, oldSchema, newSchema, searchPathHelper);
             PgDiffConstraints.dropConstraints(
-                    writer, oldSchema, newSchema, true);
+                    writer, oldSchema, newSchema, true, searchPathHelper);
             PgDiffConstraints.dropConstraints(
-                    writer, oldSchema, newSchema, false);
-            PgDiffIndexes.dropIndexes(writer, oldSchema, newSchema);
-            PgDiffTables.dropClusters(writer, oldSchema, newSchema);
-            PgDiffTables.dropTables(writer, oldSchema, newSchema);
-            PgDiffSequences.dropSequences(writer, oldSchema, newSchema);
+                    writer, oldSchema, newSchema, false, searchPathHelper);
+            PgDiffIndexes.dropIndexes(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffTables.dropClusters(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffTables.dropTables(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffSequences.dropSequences(
+                    writer, oldSchema, newSchema, searchPathHelper);
 
-            PgDiffSequences.createSequences(writer, oldSchema, newSchema);
+            PgDiffSequences.createSequences(
+                    writer, oldSchema, newSchema, searchPathHelper);
             PgDiffSequences.alterSequences(
-                    writer, arguments, oldSchema, newSchema);
-            PgDiffTables.createTables(writer, oldSchema, newSchema);
-            PgDiffTables.alterTables(writer, arguments, oldSchema, newSchema);
+                    writer, arguments, oldSchema, newSchema, searchPathHelper);
+            PgDiffTables.createTables(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffTables.alterTables(
+                    writer, arguments, oldSchema, newSchema, searchPathHelper);
             PgDiffConstraints.createConstraints(
-                    writer, oldSchema, newSchema, true);
+                    writer, oldSchema, newSchema, true, searchPathHelper);
             PgDiffConstraints.createConstraints(
-                    writer, oldSchema, newSchema, false);
-            PgDiffIndexes.createIndexes(writer, oldSchema, newSchema);
-            PgDiffTables.createClusters(writer, oldSchema, newSchema);
-            PgDiffTriggers.createTriggers(writer, oldSchema, newSchema);
-            PgDiffViews.createViews(writer, oldSchema, newSchema);
-            PgDiffViews.alterViews(writer, oldSchema, newSchema);
+                    writer, oldSchema, newSchema, false, searchPathHelper);
+            PgDiffIndexes.createIndexes(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffTables.createClusters(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffTriggers.createTriggers(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffViews.createViews(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffViews.alterViews(
+                    writer, oldSchema, newSchema, searchPathHelper);
         }
     }
 }

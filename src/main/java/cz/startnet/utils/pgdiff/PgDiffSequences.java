@@ -29,13 +29,16 @@ public class PgDiffSequences {
      * @param writer writer the output should be written to
      * @param oldSchema original schema
      * @param newSchema new schema
+     * @param searchPathHelper search path helper
      */
     public static void createSequences(final PrintWriter writer,
-            final PgSchema oldSchema, final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema,
+            final SearchPathHelper searchPathHelper) {
         // Add new sequences
         for (final PgSequence sequence : newSchema.getSequences()) {
             if (oldSchema == null
                     || !oldSchema.containsSequence(sequence.getName())) {
+                searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(sequence.getCreationSQL());
             }
@@ -48,13 +51,16 @@ public class PgDiffSequences {
      * @param writer writer the output should be written to
      * @param oldSchema original schema
      * @param newSchema new schema
+     * @param searchPathHelper search path helper
      */
     public static void dropSequences(final PrintWriter writer,
-            final PgSchema oldSchema, final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema,
+            final SearchPathHelper searchPathHelper) {
         // Drop sequences that do not exist in new schema
         if (oldSchema != null) {
             for (final PgSequence sequence : oldSchema.getSequences()) {
                 if (!newSchema.containsSequence(sequence.getName())) {
+                    searchPathHelper.outputSearchPath(writer);
                     writer.println();
                     writer.println(sequence.getDropSQL());
                 }
@@ -69,10 +75,11 @@ public class PgDiffSequences {
      * @param arguments object containing arguments settings
      * @param oldSchema original schema
      * @param newSchema new schema
+     * @param searchPathHelper search path helper
      */
     public static void alterSequences(final PrintWriter writer,
             final PgDiffArguments arguments, final PgSchema oldSchema,
-            final PgSchema newSchema) {
+            final PgSchema newSchema, final SearchPathHelper searchPathHelper) {
         final StringBuilder sbSQL = new StringBuilder(100);
 
         for (final PgSequence newSequence : newSchema.getSequences()) {
@@ -141,6 +148,7 @@ public class PgDiffSequences {
                 }
 
                 if (sbSQL.length() > 0) {
+                    searchPathHelper.outputSearchPath(writer);
                     writer.println();
                     writer.print("ALTER SEQUENCE "
                             + PgDiffUtils.getQuotedName(newSequence.getName()));

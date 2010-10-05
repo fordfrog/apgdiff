@@ -33,21 +33,25 @@ public class PgDiffIndexes {
      * @param writer writer the output should be written to
      * @param oldSchema original schema
      * @param newSchema new schema
+     * @param searchPathHelper search path helper
      */
     public static void createIndexes(final PrintWriter writer,
-            final PgSchema oldSchema, final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema,
+            final SearchPathHelper searchPathHelper) {
         for (final PgTable newTable : newSchema.getTables()) {
             final String newTableName = newTable.getName();
 
             // Add new indexes
             if (oldSchema == null) {
                 for (PgIndex index : newTable.getIndexes()) {
+                    searchPathHelper.outputSearchPath(writer);
                     writer.println();
                     writer.println(index.getCreationSQL());
                 }
             } else {
                 for (PgIndex index : getNewIndexes(
                         oldSchema.getTable(newTableName), newTable)) {
+                    searchPathHelper.outputSearchPath(writer);
                     writer.println();
                     writer.println(index.getCreationSQL());
                 }
@@ -61,9 +65,11 @@ public class PgDiffIndexes {
      * @param writer writer the output should be written to
      * @param oldSchema original schema
      * @param newSchema new schema
+     * @param searchPathHelper search path helper
      */
     public static void dropIndexes(final PrintWriter writer,
-            final PgSchema oldSchema, final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema,
+            final SearchPathHelper searchPathHelper) {
         for (final PgTable newTable : newSchema.getTables()) {
             final String newTableName = newTable.getName();
             final PgTable oldTable;
@@ -76,6 +82,7 @@ public class PgDiffIndexes {
 
             // Drop indexes that do not exist in new schema or are modified
             for (final PgIndex index : getDropIndexes(oldTable, newTable)) {
+                searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(index.getDropSQL());
             }

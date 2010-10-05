@@ -238,10 +238,56 @@ public class PgDiffTest {
     }
 
     /**
+     * Runs single test on original schema.
+     *
+     * @throws FileNotFoundException Thrown if expected diff file was not found.
+     * @throws IOException Thrown if problem occurred while reading expected
+     * diff.
+     */
+    @Test(timeout = 1000)
+    public void runDiffSameOriginal() throws FileNotFoundException, IOException {
+        final ByteArrayOutputStream diffInput = new ByteArrayOutputStream();
+        final PrintWriter writer = new PrintWriter(diffInput, true);
+        final PgDiffArguments arguments = new PgDiffArguments();
+        PgDiff.createDiff(writer, arguments,
+                PgDiffTest.class.getResourceAsStream(
+                fileNameTemplate + "_original.sql"),
+                PgDiffTest.class.getResourceAsStream(
+                fileNameTemplate + "_original.sql"));
+        writer.flush();
+
+        Assert.assertEquals("File name template: " + fileNameTemplate,
+                "", diffInput.toString().trim());
+    }
+
+    /**
+     * Runs single test on new schema.
+     *
+     * @throws FileNotFoundException Thrown if expected diff file was not found.
+     * @throws IOException Thrown if problem occurred while reading expected
+     * diff.
+     */
+    @Test(timeout = 1000)
+    public void runDiffSameNew() throws FileNotFoundException, IOException {
+        final ByteArrayOutputStream diffInput = new ByteArrayOutputStream();
+        final PrintWriter writer = new PrintWriter(diffInput, true);
+        final PgDiffArguments arguments = new PgDiffArguments();
+        PgDiff.createDiff(writer, arguments,
+                PgDiffTest.class.getResourceAsStream(
+                fileNameTemplate + "_new.sql"),
+                PgDiffTest.class.getResourceAsStream(
+                fileNameTemplate + "_new.sql"));
+        writer.flush();
+
+        Assert.assertEquals("File name template: " + fileNameTemplate,
+                "", diffInput.toString().trim());
+    }
+
+    /**
      * Runs single test using class member variables.
      *
      * @throws FileNotFoundException Thrown if expected diff file was not found.
-     * @throws IOException Thrown if problem occured while reading expected
+     * @throws IOException Thrown if problem occurred while reading expected
      * diff.
      */
     @Test(timeout = 1000)
