@@ -5,9 +5,6 @@
  */
 package cz.startnet.utils.pgdiff;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 /**
@@ -244,7 +241,9 @@ public class PgDiffArguments {
             } else if ("--version".equals(args[i])) {
                 setVersion(true);
             } else {
-                writer.println("ERROR: Unknown option: " + args[i]);
+                writer.print(Resources.getString("ErrorUnknownOption"));
+                writer.print(": ");
+                writer.println(args[i]);
                 success = false;
 
                 break;
@@ -271,27 +270,8 @@ public class PgDiffArguments {
      * @param writer writer to print the usage to
      */
     private void printUsage(final PrintWriter writer) {
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(
-                getClass().getResourceAsStream("usage.txt")));
-
-        try {
-            String line = reader.readLine();
-
-            while (line != null) {
-                writer.println(line);
-                line = reader.readLine();
-            }
-        } catch (final IOException ex) {
-            throw new RuntimeException(
-                    "Problem occured while reading usage file", ex);
-        } finally {
-            try {
-                reader.close();
-            } catch (final IOException ex) {
-                throw new RuntimeException(
-                        "Problem occured while closing reader", ex);
-            }
-        }
+        writer.println(
+                Resources.getString("UsageHelp").replace("${tab}", "\t"));
     }
 
     /**
@@ -300,22 +280,9 @@ public class PgDiffArguments {
      * @param writer writer to print the usage to
      */
     private void printVersion(final PrintWriter writer) {
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(
-                getClass().getResourceAsStream("build_info")));
-        writer.print("Version: ");
-
-        try {
-            writer.println(reader.readLine());
-        } catch (final IOException ex) {
-            throw new RuntimeException("Cannot read program version", ex);
-        } finally {
-            try {
-                reader.close();
-            } catch (final IOException ex) {
-                throw new RuntimeException(
-                        "Problem occured while closing reader", ex);
-            }
-        }
+        writer.print(Resources.getString("Version"));
+        writer.print(": ");
+        writer.println(Resources.getString("VersionNumber"));
     }
 
     /**

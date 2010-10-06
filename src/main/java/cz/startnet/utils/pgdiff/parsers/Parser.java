@@ -5,6 +5,8 @@
  */
 package cz.startnet.utils.pgdiff.parsers;
 
+import cz.startnet.utils.pgdiff.Resources;
+import java.text.MessageFormat;
 import java.util.Locale;
 
 /**
@@ -75,9 +77,9 @@ public final class Parser {
             return false;
         }
 
-        throw new ParserException("Cannot parse string: " + string
-                + "\nExpected " + word + " at position " + (position + 1)
-                + " '" + string.substring(position, position + 20) + "'");
+        throw new ParserException(MessageFormat.format(
+                Resources.getString("CannotParseStringExpectedWord"), string,
+                word, position + 1, string.substring(position, position + 20)));
     }
 
     /**
@@ -220,9 +222,10 @@ public final class Parser {
 
             return result;
         } catch (final NumberFormatException ex) {
-            throw new ParserException("Cannot parse string: " + string
-                    + "\nExpected integer at position: " + (position + 1)
-                    + " '" + string.substring(position, position + 20) + "'");
+            throw new ParserException(MessageFormat.format(
+                    Resources.getString("CannotParseStringExpectedInteger"),
+                    string, position + 1,
+                    string.substring(position, position + 20)), ex);
         }
     }
 
@@ -272,8 +275,9 @@ public final class Parser {
             }
 
             if (position == endPos) {
-                throw new ParserException("Cannot parse string: " + string
-                        + "\nExpected string at position: " + (position + 1));
+                throw new ParserException(MessageFormat.format(
+                        Resources.getString("CannotParseStringExpectedString"),
+                        string, position + 1));
             }
 
             final String result = string.substring(position, endPos);
@@ -295,9 +299,10 @@ public final class Parser {
         final int endPos = getExpressionEnd();
 
         if (position == endPos) {
-            throw new ParserException("Cannot parse string: " + string
-                    + "\nExpected expression at position " + (position + 1)
-                    + " '" + string.substring(position, position + 20) + "'");
+            throw new ParserException(MessageFormat.format(
+                    Resources.getString("CannotParseStringExpectedExpression"),
+                    string, position + 1,
+                    string.substring(position, position + 20)));
         }
 
         final String result = string.substring(position, endPos).trim();
@@ -366,9 +371,10 @@ public final class Parser {
      * Throws exception about unsupported command in statement.
      */
     public void throwUnsupportedCommand() {
-        throw new ParserException("Cannot parse string: " + string
-                + "\nUnsupported command at position " + (position + 1)
-                + " '" + string.substring(position, position + 20) + "'");
+        throw new ParserException(MessageFormat.format(
+                Resources.getString("CannotParseStringUnsupportedCommand"),
+                string, position + 1,
+                string.substring(position, position + 20)));
     }
 
     /**
@@ -430,10 +436,10 @@ public final class Parser {
         }
 
         if (endPos == position) {
-            throw new ParserException("Cannot parse string: " + string
-                    + "\nExpected data type definition at position: "
-                    + (position + 1) + " '"
-                    + string.substring(position, position + 20) + "'");
+            throw new ParserException(MessageFormat.format(
+                    Resources.getString("CannotParseStringExpectedDataType"),
+                    string, position + 1,
+                    string.substring(position, position + 20)));
         }
 
         String dataType = string.substring(position, endPos);

@@ -11,6 +11,7 @@ import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
 
 import java.io.PrintWriter;
+import java.text.MessageFormat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -216,11 +217,9 @@ public class PgDiffTables {
             if (newStorage == null && oldStorage != null) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println("WARNING: Column " + newTable.getName()
-                        + '.' + newColumn.getName()
-                        + " in new table has no STORAGE set but in old "
-                        + "table storage was set. Unable to determine STORAGE "
-                        + "type");
+                writer.println(MessageFormat.format(Resources.getString(
+                        "WarningUnableToDetermineStorageType"),
+                        newTable.getName() + '.' + newColumn.getName()));
 
                 continue;
             }
@@ -307,10 +306,11 @@ public class PgDiffTables {
 
             if (!oldColumn.getType().equals(newColumn.getType())) {
                 statements.add("\tALTER COLUMN " + newColumnName + " TYPE "
-                        + newColumn.getType() + " /* TYPE change - table: "
-                        + newTable.getName() + " original: "
-                        + oldColumn.getType() + " new: " + newColumn.getType()
-                        + " */");
+                        + newColumn.getType() + " /* "
+                        + MessageFormat.format(
+                        Resources.getString("TypeParameterChange"),
+                        newTable.getName(), oldColumn.getType(),
+                        newColumn.getType()) + " */");
             }
 
             final String oldDefault = (oldColumn.getDefaultValue() == null) ? ""

@@ -22,6 +22,7 @@ import java.io.PrintWriter;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Locale;
 
 /**
  * Tests for PgDiff class.
@@ -73,6 +74,7 @@ public class PgDiffTest {
         this.addTransaction = addTransaction;
         this.ignoreFunctionWhitespace = ignoreFunctionWhitespace;
         this.ignoreStartWith = ignoreStartWith;
+        Locale.setDefault(Locale.ENGLISH);
     }
 
     /**

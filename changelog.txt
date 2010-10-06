@@ -15,6 +15,9 @@ Fixes
 * If two dumps are completely same and there is more than one schema in the
   dumps, the output now does not contain 'SET search_path = ...'. In other
   words, if two dumps are completely same, no output is produced.
+Other
+* Added support for localization of apgdiff.
+* Added Czech localization.
 
 -------------------------
 2010-10-03: Version 2.2.1

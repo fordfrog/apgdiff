@@ -5,6 +5,7 @@
  */
 package cz.startnet.utils.pgdiff.loader;
 
+import cz.startnet.utils.pgdiff.Resources;
 import cz.startnet.utils.pgdiff.parsers.AlterTableParser;
 import cz.startnet.utils.pgdiff.parsers.AlterViewParser;
 import cz.startnet.utils.pgdiff.parsers.CreateFunctionParser;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.text.MessageFormat;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -141,7 +143,8 @@ public class PgDumpLoader { //NOPMD
                     new InputStreamReader(inputStream, charsetName));
         } catch (final UnsupportedEncodingException ex) {
             throw new UnsupportedOperationException(
-                    "Unsupported encoding: " + charsetName, ex);
+                    Resources.getString("UnsupportedEncoding") + ": "
+                    + charsetName, ex);
         }
 
         try {
@@ -195,7 +198,8 @@ public class PgDumpLoader { //NOPMD
                         || PATTERN_DELETE_FROM.matcher(line).matches()) {
                     getWholeStatement(reader, line);
                 } else if (outputIgnoredStatements) {
-                    database.addIgnoredStatement(getWholeStatement(reader, line));
+                    database.addIgnoredStatement(
+                            getWholeStatement(reader, line));
                 } else {
                     getWholeStatement(reader, line);
                 }
@@ -203,7 +207,7 @@ public class PgDumpLoader { //NOPMD
                 line = reader.readLine();
             }
         } catch (final IOException ex) {
-            throw new FileException(FileException.CANNOT_READ_FILE, ex);
+            throw new FileException(Resources.getString("CannotReadFile"), ex);
         }
 
         return database;
@@ -225,7 +229,8 @@ public class PgDumpLoader { //NOPMD
             return loadDatabaseSchema(new FileInputStream(file), charsetName,
                     outputIgnoredStatements);
         } catch (final FileNotFoundException ex) {
-            throw new FileException("File '" + file + "' not found", ex);
+            throw new FileException(MessageFormat.format(
+                    Resources.getString("FileNotFound"), file), ex);
         }
     }
 
@@ -246,7 +251,8 @@ public class PgDumpLoader { //NOPMD
             try {
                 newLine = stripComment(reader.readLine()).trim();
             } catch (IOException ex) {
-                throw new FileException(FileException.CANNOT_READ_FILE, ex);
+                throw new FileException(
+                        Resources.getString("CannotReadFile"), ex);
             }
 
             if (newLine.length() > 0) {
@@ -338,12 +344,14 @@ public class PgDumpLoader { //NOPMD
             try {
                 newLine = reader.readLine();
             } catch (final IOException ex) {
-                throw new FileException(FileException.CANNOT_READ_FILE, ex);
+                throw new FileException(
+                        Resources.getString("CannotReadFile"), ex);
             }
 
             if (newLine == null) {
                 throw new RuntimeException(
-                        "Cannot find end of function: " + firstLine);
+                        Resources.getString("CannotFindEndOfFunction") + ": "
+                        + firstLine);
             }
         }
 

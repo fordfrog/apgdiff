@@ -108,7 +108,9 @@ public class PgDiff {
         if (arguments.isOutputIgnoredStatements()) {
             if (!oldDatabase.getIgnoredStatements().isEmpty()) {
                 writer.println();
-                writer.println("/* Original database ignored statements");
+                writer.print("/* ");
+                writer.println(Resources.getString(
+                        "OriginalDatabaseIgnoredStatements"));
 
                 for (final String statement :
                         oldDatabase.getIgnoredStatements()) {
@@ -121,7 +123,9 @@ public class PgDiff {
 
             if (!newDatabase.getIgnoredStatements().isEmpty()) {
                 writer.println();
-                writer.println("/* New database ignored statements");
+                writer.print("/* ");
+                writer.println(
+                        Resources.getString("NewDatabaseIgnoredStatements"));
 
                 for (final String statement :
                         newDatabase.getIgnoredStatements()) {
