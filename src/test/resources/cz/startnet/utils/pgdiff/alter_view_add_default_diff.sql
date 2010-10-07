@@ -1,1 +1,1 @@
-ALTER VIEW test ALTER COLUMN test_col SET DEFAULT now();
+ALTER TABLE test ALTER COLUMN test_col SET DEFAULT now();

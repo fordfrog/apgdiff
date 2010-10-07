@@ -161,7 +161,7 @@ public class PgDiffViews {
                             newValue.getDefaultValue())) {
                         searchPathHelper.outputSearchPath(writer);
                         writer.println();
-                        writer.print("ALTER VIEW ");
+                        writer.print("ALTER TABLE ");
                         writer.print(
                                 PgDiffUtils.getQuotedName(newView.getName()));
                         writer.print(" ALTER COLUMN ");
@@ -179,7 +179,7 @@ public class PgDiffViews {
             if (!found) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.print("ALTER VIEW ");
+                writer.print("ALTER TABLE ");
                 writer.print(PgDiffUtils.getQuotedName(newView.getName()));
                 writer.print(" ALTER COLUMN ");
                 writer.print(PgDiffUtils.getQuotedName(
@@ -205,7 +205,7 @@ public class PgDiffViews {
 
             searchPathHelper.outputSearchPath(writer);
             writer.println();
-            writer.print("ALTER VIEW ");
+            writer.print("ALTER TABLE ");
             writer.print(PgDiffUtils.getQuotedName(newView.getName()));
             writer.print(" ALTER COLUMN ");
             writer.print(PgDiffUtils.getQuotedName(newValue.getColumnName()));

@@ -15,6 +15,8 @@ Fixes
 * If two dumps are completely same and there is more than one schema in the
   dumps, the output now does not contain 'SET search_path = ...'. In other
   words, if two dumps are completely same, no output is produced.
+* Replaced 'ALTER VIEW name ALTER COLUMN ...' with 'ALTER TABLE view_name ALTER
+  COLUMN ...' to make it compatible with PostgreSQL releases prior to 8.4.
 Other
 * Added support for localization of apgdiff.
 * Added Czech localization.
