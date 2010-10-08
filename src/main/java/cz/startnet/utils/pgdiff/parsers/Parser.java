@@ -249,10 +249,13 @@ public final class Parser {
 
                 if (chr == '\\') {
                     escape = !escape;
-                } else if (chr == '\'' && !escape
-                        && endPos + 1 < string.length()
-                        && string.charAt(endPos + 1) != '\'') {
-                    break;
+                } else if (!escape && chr == '\'') {
+                    if (endPos + 1 < string.length()
+                            && string.charAt(endPos + 1) == '\'') {
+                        endPos++;
+                    } else {
+                        break;
+                    }
                 }
             }
 
