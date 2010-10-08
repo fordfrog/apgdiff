@@ -5,6 +5,7 @@
  */
 package cz.startnet.utils.pgdiff.parsers;
 
+import cz.startnet.utils.pgdiff.Resources;
 import cz.startnet.utils.pgdiff.schema.PgColumn;
 import cz.startnet.utils.pgdiff.schema.PgConstraint;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
@@ -12,6 +13,7 @@ import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgSequence;
 import cz.startnet.utils.pgdiff.schema.PgTable;
 import cz.startnet.utils.pgdiff.schema.PgView;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -240,9 +242,9 @@ public class AlterTableParser {
                     final PgColumn column = table.getColumn(columnName);
                     column.setDefaultValue(defaultValue);
                 } else {
-                    throw new ParserException("Cannot find column '"
-                            + columnName + " 'in table '" + table.getName()
-                            + "'");
+                    throw new ParserException(MessageFormat.format(
+                            Resources.getString("CannotFindColumnInTable"),
+                            columnName, table.getName()));
                 }
             } else if (parser.expectOptional("STORAGE")) {
                 final PgColumn column = table.getColumn(columnName);

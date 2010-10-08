@@ -33,9 +33,11 @@ public class PgDiffTriggers {
      * @param writer writer the output should be written to
      * @param oldSchema original schema
      * @param newSchema new schema
+     * @param searchPathHelper search path helper
      */
     public static void createTriggers(final PrintWriter writer,
-            final PgSchema oldSchema, final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema,
+            final SearchPathHelper searchPathHelper) {
         for (final PgTable newTable : newSchema.getTables()) {
             final PgTable oldTable;
 
@@ -47,6 +49,7 @@ public class PgDiffTriggers {
 
             // Add new triggers
             for (final PgTrigger trigger : getNewTriggers(oldTable, newTable)) {
+                searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(trigger.getCreationSQL());
             }
@@ -59,9 +62,11 @@ public class PgDiffTriggers {
      * @param writer writer the output should be written to
      * @param oldSchema original schema
      * @param newSchema new schema
+     * @param searchPathHelper search path helper
      */
     public static void dropTriggers(final PrintWriter writer,
-            final PgSchema oldSchema, final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema,
+            final SearchPathHelper searchPathHelper) {
         for (final PgTable newTable : newSchema.getTables()) {
             final PgTable oldTable;
 
@@ -74,6 +79,7 @@ public class PgDiffTriggers {
             // Drop triggers that no more exist or are modified
             for (final PgTrigger trigger :
                     getDropTriggers(oldTable, newTable)) {
+                searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(trigger.getDropSQL());
             }
@@ -140,9 +146,11 @@ public class PgDiffTriggers {
      * @param writer writer
      * @param oldSchema old schema
      * @param newSchema new schema
+     * @param searchPathHelper search path helper
      */
     public static void alterComments(final PrintWriter writer,
-            final PgSchema oldSchema, final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema,
+            final SearchPathHelper searchPathHelper) {
         if (oldSchema == null) {
             return;
         }
@@ -168,6 +176,7 @@ public class PgDiffTriggers {
                         && newTrigger.getComment() != null
                         && !oldTrigger.getComment().equals(
                         newTrigger.getComment())) {
+                    searchPathHelper.outputSearchPath(writer);
                     writer.println();
                     writer.print("COMMENT ON TRIGGER ");
                     writer.print(
@@ -180,6 +189,7 @@ public class PgDiffTriggers {
                     writer.println(';');
                 } else if (oldTrigger.getComment() != null
                         && newTrigger.getComment() == null) {
+                    searchPathHelper.outputSearchPath(writer);
                     writer.println();
                     writer.print("COMMENT ON TRIGGER ");
                     writer.print(

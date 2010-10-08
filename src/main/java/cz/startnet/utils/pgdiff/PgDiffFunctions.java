@@ -30,10 +30,11 @@ public class PgDiffFunctions {
      * @param arguments object containing arguments settings
      * @param oldSchema original schema
      * @param newSchema new schema
+     * @param searchPathHelper search path helper
      */
     public static void createFunctions(final PrintWriter writer,
             final PgDiffArguments arguments, final PgSchema oldSchema,
-            final PgSchema newSchema) {
+            final PgSchema newSchema, final SearchPathHelper searchPathHelper) {
         // Add new functions and replace modified functions
         for (final PgFunction newFunction : newSchema.getFunctions()) {
             final PgFunction oldFunction;
@@ -46,6 +47,7 @@ public class PgDiffFunctions {
 
             if ((oldFunction == null) || !newFunction.equals(
                     oldFunction, arguments.isIgnoreFunctionWhitespace())) {
+                searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(newFunction.getCreationSQL());
             }
@@ -59,10 +61,11 @@ public class PgDiffFunctions {
      * @param arguments object containing arguments settings
      * @param oldSchema original schema
      * @param newSchema new schema
+     * @param searchPathHelper search path helper
      */
     public static void dropFunctions(final PrintWriter writer,
             final PgDiffArguments arguments, final PgSchema oldSchema,
-            final PgSchema newSchema) {
+            final PgSchema newSchema, final SearchPathHelper searchPathHelper) {
         if (oldSchema == null) {
             return;
         }
@@ -70,6 +73,7 @@ public class PgDiffFunctions {
         // Drop functions that exist no more
         for (final PgFunction oldFunction : oldSchema.getFunctions()) {
             if (!newSchema.containsFunction(oldFunction.getSignature())) {
+                searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(oldFunction.getDropSQL());
             }
@@ -82,9 +86,11 @@ public class PgDiffFunctions {
      * @param writer writer
      * @param oldSchema old schema
      * @param newSchema new schema
+     * @param searchPathHelper search path helper
      */
     public static void alterComments(final PrintWriter writer,
-            final PgSchema oldSchema, final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema,
+            final SearchPathHelper searchPathHelper) {
         if (oldSchema == null) {
             return;
         }
@@ -103,6 +109,7 @@ public class PgDiffFunctions {
                     && newFunction.getComment() != null
                     && !oldfunction.getComment().equals(
                     newFunction.getComment())) {
+                searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.print("COMMENT ON FUNCTION ");
                 writer.print(PgDiffUtils.getQuotedName(newFunction.getName()));
@@ -126,6 +133,7 @@ public class PgDiffFunctions {
                 writer.println(';');
             } else if (oldfunction.getComment() != null
                     && newFunction.getComment() == null) {
+                searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.print("COMMENT ON FUNCTION ");
                 writer.print(PgDiffUtils.getQuotedName(newFunction.getName()));

@@ -6,16 +6,12 @@
 package cz.startnet.utils.pgdiff.loader;
 
 /**
- * Exception thrown if problem occured while reading or writing file.
+ * Exception thrown if problem occurred while reading or writing file.
  *
  * @author fordfrog
  */
 public class FileException extends RuntimeException {
 
-    /**
-     * Predefined message that can be used when cannot read file.
-     */
-    public static final String CANNOT_READ_FILE = "Cannot read file";
     /**
      * Serial version uid.
      */

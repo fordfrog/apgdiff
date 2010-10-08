@@ -22,6 +22,7 @@ import java.io.PrintWriter;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Locale;
 
 /**
  * Tests for PgDiff class.
@@ -73,6 +74,7 @@ public class PgDiffTest {
         this.addTransaction = addTransaction;
         this.ignoreFunctionWhitespace = ignoreFunctionWhitespace;
         this.ignoreStartWith = ignoreStartWith;
+        Locale.setDefault(Locale.ENGLISH);
     }
 
     /**
@@ -241,6 +243,52 @@ public class PgDiffTest {
                     // Tests view with default value
                     {"view_bug3080388", false, true, false, false}
                 });
+    }
+
+    /**
+     * Runs single test on original schema.
+     *
+     * @throws FileNotFoundException Thrown if expected diff file was not found.
+     * @throws IOException Thrown if problem occurred while reading expected
+     * diff.
+     */
+    @Test(timeout = 1000)
+    public void runDiffSameOriginal() throws FileNotFoundException, IOException {
+        final ByteArrayOutputStream diffInput = new ByteArrayOutputStream();
+        final PrintWriter writer = new PrintWriter(diffInput, true);
+        final PgDiffArguments arguments = new PgDiffArguments();
+        PgDiff.createDiff(writer, arguments,
+                PgDiffTest.class.getResourceAsStream(
+                fileNameTemplate + "_original.sql"),
+                PgDiffTest.class.getResourceAsStream(
+                fileNameTemplate + "_original.sql"));
+        writer.flush();
+
+        Assert.assertEquals("File name template: " + fileNameTemplate,
+                "", diffInput.toString().trim());
+    }
+
+    /**
+     * Runs single test on new schema.
+     *
+     * @throws FileNotFoundException Thrown if expected diff file was not found.
+     * @throws IOException Thrown if problem occurred while reading expected
+     * diff.
+     */
+    @Test(timeout = 1000)
+    public void runDiffSameNew() throws FileNotFoundException, IOException {
+        final ByteArrayOutputStream diffInput = new ByteArrayOutputStream();
+        final PrintWriter writer = new PrintWriter(diffInput, true);
+        final PgDiffArguments arguments = new PgDiffArguments();
+        PgDiff.createDiff(writer, arguments,
+                PgDiffTest.class.getResourceAsStream(
+                fileNameTemplate + "_new.sql"),
+                PgDiffTest.class.getResourceAsStream(
+                fileNameTemplate + "_new.sql"));
+        writer.flush();
+
+        Assert.assertEquals("File name template: " + fileNameTemplate,
+                "", diffInput.toString().trim());
     }
 
     /**

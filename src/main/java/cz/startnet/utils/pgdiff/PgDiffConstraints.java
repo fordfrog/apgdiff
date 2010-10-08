@@ -33,12 +33,13 @@ public class PgDiffConstraints {
      * @param writer writer the output should be written to
      * @param oldSchema original schema
      * @param newSchema new schema
-     * @param primaryKey determines whether primery keys should be processed or
+     * @param primaryKey determines whether primary keys should be processed or
      *        any other constraints should be processed
+     * @param searchPathHelper search path helper
      */
     public static void createConstraints(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final boolean primaryKey) {
+            final boolean primaryKey, final SearchPathHelper searchPathHelper) {
         for (final PgTable newTable : newSchema.getTables()) {
             final PgTable oldTable;
 
@@ -51,6 +52,7 @@ public class PgDiffConstraints {
             // Add new constraints
             for (final PgConstraint constraint :
                     getNewConstraints(oldTable, newTable, primaryKey)) {
+                searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(constraint.getCreationSQL());
             }
@@ -65,10 +67,11 @@ public class PgDiffConstraints {
      * @param newSchema new schema
      * @param primaryKey determines whether primary keys should be processed or
      *        any other constraints should be processed
+     * @param searchPathHelper search path helper
      */
     public static void dropConstraints(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final boolean primaryKey) {
+            final boolean primaryKey, final SearchPathHelper searchPathHelper) {
         for (final PgTable newTable : newSchema.getTables()) {
             final PgTable oldTable;
 
@@ -81,6 +84,7 @@ public class PgDiffConstraints {
             // Drop constraints that no more exist or are modified
             for (final PgConstraint constraint :
                     getDropConstraints(oldTable, newTable, primaryKey)) {
+                searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(constraint.getDropSQL());
             }
@@ -92,7 +96,7 @@ public class PgDiffConstraints {
      *
      * @param oldTable original table or null
      * @param newTable new table or null
-     * @param primaryKey determines whether primery keys should be processed or
+     * @param primaryKey determines whether primary keys should be processed or
      *        any other constraints should be processed
      *
      * @return list of constraints that should be dropped
@@ -124,7 +128,7 @@ public class PgDiffConstraints {
      *
      * @param oldTable original table
      * @param newTable new table
-     * @param primaryKey determines whether primery keys should be processed or
+     * @param primaryKey determines whether primary keys should be processed or
      *        any other constraints should be processed
      *
      * @return list of constraints that should be added
@@ -165,9 +169,11 @@ public class PgDiffConstraints {
      * @param writer writer
      * @param oldSchema old schema
      * @param newSchema new schema
+     * @param searchPathHelper search path helper
      */
     public static void alterComments(final PrintWriter writer,
-            final PgSchema oldSchema, final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema,
+            final SearchPathHelper searchPathHelper) {
         if (oldSchema == null) {
             return;
         }
@@ -193,6 +199,7 @@ public class PgDiffConstraints {
                         && newConstraint.getComment() != null
                         && !oldConstraint.getComment().equals(
                         newConstraint.getComment())) {
+                    searchPathHelper.outputSearchPath(writer);
                     writer.println();
                     writer.print("COMMENT ON ");
 
@@ -214,6 +221,7 @@ public class PgDiffConstraints {
                     writer.println(';');
                 } else if (oldConstraint.getComment() != null
                         && newConstraint.getComment() == null) {
+                    searchPathHelper.outputSearchPath(writer);
                     writer.println();
                     writer.print("COMMENT ON ");
 

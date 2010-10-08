@@ -32,14 +32,17 @@ public class PgDiffViews {
      * @param writer writer the output should be written to
      * @param oldSchema original schema
      * @param newSchema new schema
+     * @param searchPathHelper search path helper
      */
     public static void createViews(final PrintWriter writer,
-            final PgSchema oldSchema, final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema,
+            final SearchPathHelper searchPathHelper) {
         for (final PgView newView : newSchema.getViews()) {
             if (oldSchema == null
                     || !oldSchema.containsView(newView.getName())
                     || isViewModified(
                     oldSchema.getView(newView.getName()), newView)) {
+                searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(newView.getCreationSQL());
             }
@@ -52,9 +55,11 @@ public class PgDiffViews {
      * @param writer writer the output should be written to
      * @param oldSchema original schema
      * @param newSchema new schema
+     * @param searchPathHelper search path helper
      */
     public static void dropViews(final PrintWriter writer,
-            final PgSchema oldSchema, final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema,
+            final SearchPathHelper searchPathHelper) {
         if (oldSchema == null) {
             return;
         }
@@ -63,6 +68,7 @@ public class PgDiffViews {
             final PgView newView = newSchema.getView(oldView.getName());
 
             if (newView == null || isViewModified(oldView, newView)) {
+                searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(oldView.getDropSQL());
             }
@@ -113,9 +119,11 @@ public class PgDiffViews {
      * @param writer writer
      * @param oldSchema old schema
      * @param newSchema new schema
+     * @param searchPathHelper search path helper
      */
     public static void alterViews(final PrintWriter writer,
-            final PgSchema oldSchema, final PgSchema newSchema) {
+            final PgSchema oldSchema, final PgSchema newSchema,
+            final SearchPathHelper searchPathHelper) {
         if (oldSchema == null) {
             return;
         }
@@ -127,7 +135,7 @@ public class PgDiffViews {
                 continue;
             }
 
-            diffDefaultValues(writer, oldView, newView);
+            diffDefaultValues(writer, oldView, newView, searchPathHelper);
 
             if (oldView.getComment() == null
                     && newView.getComment() != null
@@ -135,6 +143,7 @@ public class PgDiffViews {
                     && newView.getComment() != null
                     && !oldView.getComment().equals(
                     newView.getComment())) {
+                searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.print("COMMENT ON VIEW ");
                 writer.print(
@@ -144,6 +153,7 @@ public class PgDiffViews {
                 writer.println(';');
             } else if (oldView.getComment() != null
                     && newView.getComment() == null) {
+                searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.print("COMMENT ON VIEW ");
                 writer.print(PgDiffUtils.getQuotedName(newView.getName()));
@@ -189,6 +199,7 @@ public class PgDiffViews {
                         || oldColumnComment != null && newColumnComment != null
                         && !oldColumnComment.getComment().equals(
                         newColumnComment.getComment())) {
+                    searchPathHelper.outputSearchPath(writer);
                     writer.println();
                     writer.print("COMMENT ON COLUMN ");
                     writer.print(PgDiffUtils.getQuotedName(newView.getName()));
@@ -200,6 +211,7 @@ public class PgDiffViews {
                     writer.println(';');
                 } else if (oldColumnComment != null
                         && newColumnComment == null) {
+                    searchPathHelper.outputSearchPath(writer);
                     writer.println();
                     writer.print("COMMENT ON COLUMN ");
                     writer.print(PgDiffUtils.getQuotedName(newView.getName()));
@@ -218,9 +230,11 @@ public class PgDiffViews {
      * @param writer writer
      * @param oldView old view
      * @param newView new view
+     * @param searchPathHelper search path helper
      */
     private static void diffDefaultValues(final PrintWriter writer,
-            final PgView oldView, final PgView newView) {
+            final PgView oldView, final PgView newView,
+            final SearchPathHelper searchPathHelper) {
         final List<PgView.DefaultValue> oldValues =
                 oldView.getDefaultValues();
         final List<PgView.DefaultValue> newValues =
@@ -236,8 +250,9 @@ public class PgDiffViews {
 
                     if (!oldValue.getDefaultValue().equals(
                             newValue.getDefaultValue())) {
+                        searchPathHelper.outputSearchPath(writer);
                         writer.println();
-                        writer.print("ALTER VIEW ");
+                        writer.print("ALTER TABLE ");
                         writer.print(
                                 PgDiffUtils.getQuotedName(newView.getName()));
                         writer.print(" ALTER COLUMN ");
@@ -253,8 +268,9 @@ public class PgDiffViews {
             }
 
             if (!found) {
+                searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.print("ALTER VIEW ");
+                writer.print("ALTER TABLE ");
                 writer.print(PgDiffUtils.getQuotedName(newView.getName()));
                 writer.print(" ALTER COLUMN ");
                 writer.print(PgDiffUtils.getQuotedName(
@@ -278,8 +294,9 @@ public class PgDiffViews {
                 continue;
             }
 
+            searchPathHelper.outputSearchPath(writer);
             writer.println();
-            writer.print("ALTER VIEW ");
+            writer.print("ALTER TABLE ");
             writer.print(PgDiffUtils.getQuotedName(newView.getName()));
             writer.print(" ALTER COLUMN ");
             writer.print(PgDiffUtils.getQuotedName(newValue.getColumnName()));

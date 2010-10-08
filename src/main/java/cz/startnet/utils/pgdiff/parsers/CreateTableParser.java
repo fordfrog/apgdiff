@@ -5,11 +5,13 @@
  */
 package cz.startnet.utils.pgdiff.parsers;
 
+import cz.startnet.utils.pgdiff.Resources;
 import cz.startnet.utils.pgdiff.schema.PgColumn;
 import cz.startnet.utils.pgdiff.schema.PgConstraint;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
+import java.text.MessageFormat;
 
 /**
  * Parses CREATE TABLE statements.
@@ -42,10 +44,9 @@ public class CreateTableParser {
         final PgSchema schema = database.getSchema(schemaName);
 
         if (schema == null) {
-            throw new RuntimeException(
-                    "Cannot get schema '" + schemaName
-                    + "'. Need to issue 'CREATE SCHEMA " + schemaName
-                    + ";' before 'CREATE TABLE " + tableName + "...;'?");
+            throw new RuntimeException(MessageFormat.format(
+                    Resources.getString("CannotFindSchemaCreateTable"),
+                    schemaName, tableName));
         }
 
         schema.addTable(table);
