@@ -2,9 +2,9 @@
  Changelog of Another PostgreSQL Diff Tool
 ------------------------------------------
 
---------------------------------
-Version 2.2.2 (not released yet)
---------------------------------
+-------------
+Version 2.2.2
+-------------
 
 Fixes
 * Added missing new line after ALTER VIEW ... ALTER COLUMN ... SET/DROP DEFAULT.
