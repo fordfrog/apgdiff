@@ -51,13 +51,15 @@ public class PgDiffSequences {
      */
     public static void dropSequences(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema) {
+        if (oldSchema == null) {
+            return;
+        }
+
         // Drop sequences that do not exist in new schema
-        if (oldSchema != null) {
-            for (final PgSequence sequence : oldSchema.getSequences()) {
-                if (!newSchema.containsSequence(sequence.getName())) {
-                    writer.println();
-                    writer.println(sequence.getDropSQL());
-                }
+        for (final PgSequence sequence : oldSchema.getSequences()) {
+            if (!newSchema.containsSequence(sequence.getName())) {
+                writer.println();
+                writer.println(sequence.getDropSQL());
             }
         }
     }
@@ -73,80 +75,106 @@ public class PgDiffSequences {
     public static void alterSequences(final PrintWriter writer,
             final PgDiffArguments arguments, final PgSchema oldSchema,
             final PgSchema newSchema) {
+        if (oldSchema == null) {
+            return;
+        }
+
         final StringBuilder sbSQL = new StringBuilder(100);
 
         for (final PgSequence newSequence : newSchema.getSequences()) {
-            if (oldSchema != null
-                    && oldSchema.containsSequence(newSequence.getName())) {
-                final PgSequence oldSequence =
-                        oldSchema.getSequence(newSequence.getName());
-                sbSQL.setLength(0);
+            final PgSequence oldSequence =
+                    oldSchema.getSequence(newSequence.getName());
 
-                final String oldIncrement = oldSequence.getIncrement();
-                final String newIncrement = newSequence.getIncrement();
+            if (oldSequence == null) {
+                continue;
+            }
 
-                if (newIncrement != null
-                        && !newIncrement.equals(oldIncrement)) {
-                    sbSQL.append("\n\tINCREMENT BY ");
-                    sbSQL.append(newIncrement);
+            sbSQL.setLength(0);
+
+            final String oldIncrement = oldSequence.getIncrement();
+            final String newIncrement = newSequence.getIncrement();
+
+            if (newIncrement != null
+                    && !newIncrement.equals(oldIncrement)) {
+                sbSQL.append("\n\tINCREMENT BY ");
+                sbSQL.append(newIncrement);
+            }
+
+            final String oldMinValue = oldSequence.getMinValue();
+            final String newMinValue = newSequence.getMinValue();
+
+            if (newMinValue == null && oldMinValue != null) {
+                sbSQL.append("\n\tNO MINVALUE");
+            } else if (newMinValue != null
+                    && !newMinValue.equals(oldMinValue)) {
+                sbSQL.append("\n\tMINVALUE ");
+                sbSQL.append(newMinValue);
+            }
+
+            final String oldMaxValue = oldSequence.getMaxValue();
+            final String newMaxValue = newSequence.getMaxValue();
+
+            if (newMaxValue == null && oldMaxValue != null) {
+                sbSQL.append("\n\tNO MAXVALUE");
+            } else if (newMaxValue != null
+                    && !newMaxValue.equals(oldMaxValue)) {
+                sbSQL.append("\n\tMAXVALUE ");
+                sbSQL.append(newMaxValue);
+            }
+
+            if (!arguments.isIgnoreStartWith()) {
+                final String oldStart = oldSequence.getStartWith();
+                final String newStart = newSequence.getStartWith();
+
+                if (newStart != null && !newStart.equals(oldStart)) {
+                    sbSQL.append("\n\tRESTART WITH ");
+                    sbSQL.append(newStart);
                 }
+            }
 
-                final String oldMinValue = oldSequence.getMinValue();
-                final String newMinValue = newSequence.getMinValue();
+            final String oldCache = oldSequence.getCache();
+            final String newCache = newSequence.getCache();
 
-                if (newMinValue == null && oldMinValue != null) {
-                    sbSQL.append("\n\tNO MINVALUE");
-                } else if (newMinValue != null
-                        && !newMinValue.equals(oldMinValue)) {
-                    sbSQL.append("\n\tMINVALUE ");
-                    sbSQL.append(newMinValue);
-                }
+            if (newCache != null && !newCache.equals(oldCache)) {
+                sbSQL.append("\n\tCACHE ");
+                sbSQL.append(newCache);
+            }
 
-                final String oldMaxValue = oldSequence.getMaxValue();
-                final String newMaxValue = newSequence.getMaxValue();
+            final boolean oldCycle = oldSequence.isCycle();
+            final boolean newCycle = newSequence.isCycle();
 
-                if (newMaxValue == null && oldMaxValue != null) {
-                    sbSQL.append("\n\tNO MAXVALUE");
-                } else if (newMaxValue != null
-                        && !newMaxValue.equals(oldMaxValue)) {
-                    sbSQL.append("\n\tMAXVALUE ");
-                    sbSQL.append(newMaxValue);
-                }
+            if (oldCycle && !newCycle) {
+                sbSQL.append("\n\tNO CYCLE");
+            } else if (!oldCycle && newCycle) {
+                sbSQL.append("\n\tCYCLE");
+            }
 
-                if (!arguments.isIgnoreStartWith()) {
-                    final String oldStart = oldSequence.getStartWith();
-                    final String newStart = newSequence.getStartWith();
+            if (sbSQL.length() > 0) {
+                writer.println();
+                writer.print("ALTER SEQUENCE "
+                        + PgDiffUtils.getQuotedName(newSequence.getName()));
+                writer.print(sbSQL.toString());
+                writer.println(';');
+            }
 
-                    if (newStart != null && !newStart.equals(oldStart)) {
-                        sbSQL.append("\n\tRESTART WITH ");
-                        sbSQL.append(newStart);
-                    }
-                }
-
-                final String oldCache = oldSequence.getCache();
-                final String newCache = newSequence.getCache();
-
-                if (newCache != null && !newCache.equals(oldCache)) {
-                    sbSQL.append("\n\tCACHE ");
-                    sbSQL.append(newCache);
-                }
-
-                final boolean oldCycle = oldSequence.isCycle();
-                final boolean newCycle = newSequence.isCycle();
-
-                if (oldCycle && !newCycle) {
-                    sbSQL.append("\n\tNO CYCLE");
-                } else if (!oldCycle && newCycle) {
-                    sbSQL.append("\n\tCYCLE");
-                }
-
-                if (sbSQL.length() > 0) {
-                    writer.println();
-                    writer.print("ALTER SEQUENCE "
-                            + PgDiffUtils.getQuotedName(newSequence.getName()));
-                    writer.print(sbSQL.toString());
-                    writer.println(';');
-                }
+            if (oldSequence.getComment() == null
+                    && newSequence.getComment() != null
+                    || oldSequence.getComment() != null
+                    && newSequence.getComment() != null
+                    && !oldSequence.getComment().equals(
+                    newSequence.getComment())) {
+                writer.println();
+                writer.print("COMMENT ON SEQUENCE ");
+                writer.print(PgDiffUtils.getQuotedName(newSequence.getName()));
+                writer.print(" IS ");
+                writer.print(newSequence.getComment());
+                writer.println(';');
+            } else if (oldSequence.getComment() != null
+                    && newSequence.getComment() == null) {
+                writer.println();
+                writer.print("COMMENT ON SEQUENCE ");
+                writer.print(newSequence.getName());
+                writer.println(" IS NULL;");
             }
         }
     }

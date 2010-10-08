@@ -15,6 +15,8 @@ SET escape_string_warning = off;
 
 COMMENT ON DATABASE comments IS 'comments database';
 
+COMMENT ON SCHEMA public IS 'public schema';
+
 
 --
 -- Name: plpgsql; Type: PROCEDURAL LANGUAGE; Schema: -; Owner: postgres
@@ -75,6 +77,8 @@ CREATE TABLE test (
 
 
 ALTER TABLE public.test OWNER TO fordfrog;
+
+COMMENT ON TABLE test IS 'test table';
 
 --
 -- Name: COLUMN test.id; Type: COMMENT; Schema: public; Owner: fordfrog
@@ -176,6 +180,8 @@ COMMENT ON INDEX test_pkey IS 'primary key';
 --
 
 CREATE TRIGGER test_trigger BEFORE UPDATE ON test FOR EACH STATEMENT EXECUTE PROCEDURE trigger_fnc();
+
+COMMENT ON TRIGGER test_trigger ON test IS 'test trigger';
 
 
 --

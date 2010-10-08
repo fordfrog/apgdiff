@@ -80,6 +80,28 @@ public class PgFunction {
         sbSQL.append(") ");
         sbSQL.append(body);
 
+        if (comment != null && !comment.isEmpty()) {
+            sbSQL.append("\n\nCOMMENT ON FUNCTION ");
+            sbSQL.append(PgDiffUtils.getQuotedName(name));
+            sbSQL.append('(');
+
+            addComma = false;
+
+            for (final Argument argument : arguments) {
+                if (addComma) {
+                    sbSQL.append(", ");
+                }
+
+                sbSQL.append(argument.getDeclaration(false));
+
+                addComma = true;
+            }
+
+            sbSQL.append(") IS ");
+            sbSQL.append(comment);
+            sbSQL.append(';');
+        }
+
         return sbSQL.toString();
     }
 

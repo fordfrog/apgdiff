@@ -133,4 +133,63 @@ public class PgDiffTriggers {
 
         return list;
     }
+
+    /**
+     * Outputs statements for trigger comments that have changed.
+     *
+     * @param writer writer
+     * @param oldSchema old schema
+     * @param newSchema new schema
+     */
+    public static void alterComments(final PrintWriter writer,
+            final PgSchema oldSchema, final PgSchema newSchema) {
+        if (oldSchema == null) {
+            return;
+        }
+
+        for (PgTable oldTable : oldSchema.getTables()) {
+            final PgTable newTable = newSchema.getTable(oldTable.getName());
+
+            if (newTable == null) {
+                continue;
+            }
+
+            for (final PgTrigger oldTrigger : oldTable.getTriggers()) {
+                final PgTrigger newTrigger =
+                        newTable.getTrigger(oldTrigger.getName());
+
+                if (newTrigger == null) {
+                    continue;
+                }
+
+                if (oldTrigger.getComment() == null
+                        && newTrigger.getComment() != null
+                        || oldTrigger.getComment() != null
+                        && newTrigger.getComment() != null
+                        && !oldTrigger.getComment().equals(
+                        newTrigger.getComment())) {
+                    writer.println();
+                    writer.print("COMMENT ON TRIGGER ");
+                    writer.print(
+                            PgDiffUtils.getQuotedName(newTrigger.getName()));
+                    writer.print(" ON ");
+                    writer.print(PgDiffUtils.getQuotedName(
+                            newTrigger.getTableName()));
+                    writer.print(" IS ");
+                    writer.print(newTrigger.getComment());
+                    writer.println(';');
+                } else if (oldTrigger.getComment() != null
+                        && newTrigger.getComment() == null) {
+                    writer.println();
+                    writer.print("COMMENT ON TRIGGER ");
+                    writer.print(
+                            PgDiffUtils.getQuotedName(newTrigger.getName()));
+                    writer.print(" ON ");
+                    writer.print(PgDiffUtils.getQuotedName(
+                            newTrigger.getTableName()));
+                    writer.println(" IS NULL;");
+                }
+            }
+        }
+    }
 }

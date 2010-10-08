@@ -228,6 +228,12 @@ public class PgDiffTest {
                     {"alter_view_drop_default", false, true, false, false},
                     // Tests adding view default value
                     {"alter_view_add_default", false, true, false, false},
+                    // Tests adding of comments
+                    {"add_comments", false, true, false, false},
+                    // Tests dropping of comments
+                    {"drop_comments", false, true, false, false},
+                    // Tests altering of comments
+                    {"alter_comments", false, true, false, false},
                     // Tests changing view default value
                     {"alter_view_change_default", false, true, false, false},
                     // Tests creation of sequence with bug in MINVALUE value
@@ -241,7 +247,7 @@ public class PgDiffTest {
      * Runs single test using class member variables.
      *
      * @throws FileNotFoundException Thrown if expected diff file was not found.
-     * @throws IOException Thrown if problem occured while reading expected
+     * @throws IOException Thrown if problem occurred while reading expected
      * diff.
      */
     @Test(timeout = 1000)

@@ -340,7 +340,7 @@ public class CommentParser {
                 schema.getFunction(tmpFunction.getSignature());
 
         parser.expect("IS");
-        schema.setComment(getComment(parser));
+        function.setComment(getComment(parser));
         parser.expect(";");
     }
 

@@ -146,6 +146,14 @@ public class PgSchema {
 
         sbSQL.append(';');
 
+        if (comment != null && !comment.isEmpty()) {
+            sbSQL.append("\n\nCOMMENT ON SCHEMA ");
+            sbSQL.append(PgDiffUtils.getQuotedName(name));
+            sbSQL.append(" IS ");
+            sbSQL.append(comment);
+            sbSQL.append(';');
+        }
+
         return sbSQL.toString();
     }
 

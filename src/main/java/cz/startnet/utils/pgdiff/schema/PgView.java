@@ -128,6 +128,26 @@ public class PgView {
             sbSQL.append(';');
         }
 
+        if (comment != null && !comment.isEmpty()) {
+            sbSQL.append("\n\nCOMMENT ON VIEW ");
+            sbSQL.append(PgDiffUtils.getQuotedName(name));
+            sbSQL.append(" IS ");
+            sbSQL.append(comment);
+            sbSQL.append(';');
+        }
+
+        for (final ColumnComment columnComment : columnComments) {
+            if (columnComment.getComment() != null
+                    && !columnComment.getComment().isEmpty()) {
+                sbSQL.append("\n\nCOMMENT ON COLUMN ");
+                sbSQL.append(PgDiffUtils.getQuotedName(
+                        columnComment.getColumnName()));
+                sbSQL.append(" IS ");
+                sbSQL.append(columnComment.getComment());
+                sbSQL.append(';');
+            }
+        }
+
         return sbSQL.toString();
     }
 

@@ -237,6 +237,26 @@ public class PgTable {
             sbSQL.append(';');
         }
 
+        if (comment != null && !comment.isEmpty()) {
+            sbSQL.append("\n\nCOMMENT ON TABLE ");
+            sbSQL.append(PgDiffUtils.getQuotedName(name));
+            sbSQL.append(" IS ");
+            sbSQL.append(comment);
+            sbSQL.append(';');
+        }
+
+        for (final PgColumn column : columns) {
+            if (column.getComment() != null && !column.getComment().isEmpty()) {
+                sbSQL.append("\n\nCOMMENT ON COLUMN ");
+                sbSQL.append(PgDiffUtils.getQuotedName(name));
+                sbSQL.append('.');
+                sbSQL.append(PgDiffUtils.getQuotedName(column.getName()));
+                sbSQL.append(" IS ");
+                sbSQL.append(column.getComment());
+                sbSQL.append(';');
+            }
+        }
+
         return sbSQL.toString();
     }
 

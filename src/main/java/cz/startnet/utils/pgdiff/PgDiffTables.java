@@ -133,6 +133,7 @@ public class PgDiffTables {
             checkTablespace(writer, oldTable, newTable);
             addAlterStatistics(writer, oldTable, newTable);
             addAlterStorage(writer, oldTable, newTable);
+            alterComments(writer, oldTable, newTable);
         }
     }
 
@@ -451,12 +452,14 @@ public class PgDiffTables {
      */
     public static void dropTables(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema) {
-        if (oldSchema != null) {
-            for (final PgTable table : oldSchema.getTables()) {
-                if (!newSchema.containsTable(table.getName())) {
-                    writer.println();
-                    writer.println(table.getDropSQL());
-                }
+        if (oldSchema == null) {
+            return;
+        }
+
+        for (final PgTable table : oldSchema.getTables()) {
+            if (!newSchema.containsTable(table.getName())) {
+                writer.println();
+                writer.println(table.getDropSQL());
             }
         }
     }
@@ -506,6 +509,67 @@ public class PgDiffTables {
                     writer.println(
                             (i + 1) < dropDefaultsColumns.size() ? "," : ";");
                 }
+            }
+        }
+    }
+
+    /**
+     * Outputs statements for tables and columns for which comments have
+     * changed.
+     *
+     * @param writer writer
+     * @param oldTable old table
+     * @param newTable new table
+     */
+    private static void alterComments(final PrintWriter writer,
+            final PgTable oldTable, final PgTable newTable) {
+        if (oldTable.getComment() == null
+                && newTable.getComment() != null
+                || oldTable.getComment() != null
+                && newTable.getComment() != null
+                && !oldTable.getComment().equals(newTable.getComment())) {
+            writer.println();
+            writer.print("COMMENT ON TABLE ");
+            writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
+            writer.print(" IS ");
+            writer.print(newTable.getComment());
+            writer.println(';');
+        } else if (oldTable.getComment() != null
+                && newTable.getComment() == null) {
+            writer.println();
+            writer.print("COMMENT ON TABLE ");
+            writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
+            writer.println(" IS NULL;");
+        }
+
+        for (final PgColumn oldColumn : oldTable.getColumns()) {
+            final PgColumn newColumn = newTable.getColumn(oldColumn.getName());
+
+            if (newColumn == null) {
+                continue;
+            }
+
+            if (oldColumn.getComment() == null
+                    && newColumn.getComment() != null
+                    || oldColumn.getComment() != null
+                    && newColumn.getComment() != null
+                    && !oldColumn.getComment().equals(newColumn.getComment())) {
+                writer.println();
+                writer.print("COMMENT ON COLUMN ");
+                writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
+                writer.print('.');
+                writer.print(PgDiffUtils.getQuotedName(newColumn.getName()));
+                writer.print(" IS ");
+                writer.print(newColumn.getComment());
+                writer.println(';');
+            } else if (oldColumn.getComment() != null
+                    && newColumn.getComment() == null) {
+                writer.println();
+                writer.print("COMMENT ON COLUMN ");
+                writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
+                writer.print('.');
+                writer.print(PgDiffUtils.getQuotedName(newColumn.getName()));
+                writer.println(" IS NULL;");
             }
         }
     }

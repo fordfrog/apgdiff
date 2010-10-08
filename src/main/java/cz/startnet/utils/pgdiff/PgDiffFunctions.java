@@ -63,13 +63,88 @@ public class PgDiffFunctions {
     public static void dropFunctions(final PrintWriter writer,
             final PgDiffArguments arguments, final PgSchema oldSchema,
             final PgSchema newSchema) {
+        if (oldSchema == null) {
+            return;
+        }
+
         // Drop functions that exist no more
-        if (oldSchema != null) {
-            for (final PgFunction oldFunction : oldSchema.getFunctions()) {
-                if (!newSchema.containsFunction(oldFunction.getSignature())) {
-                    writer.println();
-                    writer.println(oldFunction.getDropSQL());
+        for (final PgFunction oldFunction : oldSchema.getFunctions()) {
+            if (!newSchema.containsFunction(oldFunction.getSignature())) {
+                writer.println();
+                writer.println(oldFunction.getDropSQL());
+            }
+        }
+    }
+
+    /**
+     * Outputs statements for function comments that have changed.
+     *
+     * @param writer writer
+     * @param oldSchema old schema
+     * @param newSchema new schema
+     */
+    public static void alterComments(final PrintWriter writer,
+            final PgSchema oldSchema, final PgSchema newSchema) {
+        if (oldSchema == null) {
+            return;
+        }
+
+        for (final PgFunction oldfunction : oldSchema.getFunctions()) {
+            final PgFunction newFunction =
+                    newSchema.getFunction(oldfunction.getSignature());
+
+            if (newFunction == null) {
+                continue;
+            }
+
+            if (oldfunction.getComment() == null
+                    && newFunction.getComment() != null
+                    || oldfunction.getComment() != null
+                    && newFunction.getComment() != null
+                    && !oldfunction.getComment().equals(
+                    newFunction.getComment())) {
+                writer.println();
+                writer.print("COMMENT ON FUNCTION ");
+                writer.print(PgDiffUtils.getQuotedName(newFunction.getName()));
+                writer.print('(');
+
+                boolean addComma = false;
+
+                for (final PgFunction.Argument argument :
+                        newFunction.getArguments()) {
+                    if (addComma) {
+                        writer.print(", ");
+                    } else {
+                        addComma = true;
+                    }
+
+                    writer.print(argument.getDeclaration(false));
                 }
+
+                writer.print(") IS ");
+                writer.print(newFunction.getComment());
+                writer.println(';');
+            } else if (oldfunction.getComment() != null
+                    && newFunction.getComment() == null) {
+                writer.println();
+                writer.print("COMMENT ON FUNCTION ");
+                writer.print(PgDiffUtils.getQuotedName(newFunction.getName()));
+                writer.print('(');
+
+                boolean addComma = false;
+
+                for (final PgFunction.Argument argument :
+                        newFunction.getArguments()) {
+                    if (addComma) {
+                        writer.print(", ");
+                    } else {
+                        addComma = true;
+                    }
+
+                    writer.print(argument.getDeclaration(false));
+                }
+
+                writer.println(") IS NULL;");
             }
         }
     }

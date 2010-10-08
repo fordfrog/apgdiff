@@ -158,4 +158,81 @@ public class PgDiffConstraints {
 
         return list;
     }
+
+    /**
+     * Outputs statements for constraint comments that have changed.
+     *
+     * @param writer writer
+     * @param oldSchema old schema
+     * @param newSchema new schema
+     */
+    public static void alterComments(final PrintWriter writer,
+            final PgSchema oldSchema, final PgSchema newSchema) {
+        if (oldSchema == null) {
+            return;
+        }
+
+        for (PgTable oldTable : oldSchema.getTables()) {
+            final PgTable newTable = newSchema.getTable(oldTable.getName());
+
+            if (newTable == null) {
+                continue;
+            }
+
+            for (final PgConstraint oldConstraint : oldTable.getConstraints()) {
+                final PgConstraint newConstraint =
+                        newTable.getConstraint(oldConstraint.getName());
+
+                if (newConstraint == null) {
+                    continue;
+                }
+
+                if (oldConstraint.getComment() == null
+                        && newConstraint.getComment() != null
+                        || oldConstraint.getComment() != null
+                        && newConstraint.getComment() != null
+                        && !oldConstraint.getComment().equals(
+                        newConstraint.getComment())) {
+                    writer.println();
+                    writer.print("COMMENT ON ");
+
+                    if (newConstraint.isPrimaryKeyConstraint()) {
+                        writer.print("INDEX ");
+                        writer.print(PgDiffUtils.getQuotedName(
+                                newConstraint.getName()));
+                    } else {
+                        writer.print("CONSTRAINT ");
+                        writer.print(PgDiffUtils.getQuotedName(
+                                newConstraint.getName()));
+                        writer.print(" ON ");
+                        writer.print(PgDiffUtils.getQuotedName(
+                                newConstraint.getTableName()));
+                    }
+
+                    writer.print(" IS ");
+                    writer.print(newConstraint.getComment());
+                    writer.println(';');
+                } else if (oldConstraint.getComment() != null
+                        && newConstraint.getComment() == null) {
+                    writer.println();
+                    writer.print("COMMENT ON ");
+
+                    if (newConstraint.isPrimaryKeyConstraint()) {
+                        writer.print("INDEX ");
+                        writer.print(PgDiffUtils.getQuotedName(
+                                newConstraint.getName()));
+                    } else {
+                        writer.print("CONSTRAINT ");
+                        writer.print(PgDiffUtils.getQuotedName(
+                                newConstraint.getName()));
+                        writer.print(" ON ");
+                        writer.print(PgDiffUtils.getQuotedName(
+                                newConstraint.getTableName()));
+                    }
+
+                    writer.println(" IS NULL;");
+                }
+            }
+        }
+    }
 }

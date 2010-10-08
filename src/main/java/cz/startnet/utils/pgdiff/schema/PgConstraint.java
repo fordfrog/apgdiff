@@ -63,6 +63,16 @@ public class PgConstraint {
         sbSQL.append(getDefinition());
         sbSQL.append(';');
 
+        if (comment != null && !comment.isEmpty()) {
+            sbSQL.append("\n\nCOMMENT ON CONSTRAINT ");
+            sbSQL.append(PgDiffUtils.getQuotedName(name));
+            sbSQL.append(" ON ");
+            sbSQL.append(PgDiffUtils.getQuotedName(tableName));
+            sbSQL.append(" IS ");
+            sbSQL.append(comment);
+            sbSQL.append(';');
+        }
+
         return sbSQL.toString();
     }
 
