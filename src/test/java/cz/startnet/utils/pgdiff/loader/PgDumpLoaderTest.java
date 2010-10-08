@@ -56,7 +56,8 @@ public class PgDumpLoaderTest {
                     {8},
                     {9},
                     {10},
-                    {11}
+                    {11},
+                    {12}
                 });
     }
 

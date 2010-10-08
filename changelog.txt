@@ -17,6 +17,7 @@ Fixes
   words, if two dumps are completely same, no output is produced.
 * Replaced 'ALTER VIEW name ALTER COLUMN ...' with 'ALTER TABLE view_name ALTER
   COLUMN ...' to make it compatible with PostgreSQL releases prior to 8.4.
+* Fixed parsing of '' escapes.
 Other
 * Added support for localization of apgdiff.
 * Added Czech localization.
