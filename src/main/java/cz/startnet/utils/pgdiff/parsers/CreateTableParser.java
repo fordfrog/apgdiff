@@ -115,7 +115,7 @@ public class CreateTableParser {
      * Parses CONSTRAINT definition.
      *
      * @param parser parser
-     * @param table pg table
+     * @param table table
      */
     private static void parseConstraint(final Parser parser,
             final PgTable table) {
@@ -130,7 +130,7 @@ public class CreateTableParser {
      * Parses column definition.
      *
      * @param parser parser
-     * @param table pg table
+     * @param table table
      */
     private static void parseColumn(final Parser parser, final PgTable table) {
         final PgColumn column = new PgColumn(

@@ -56,6 +56,10 @@ public class PgColumn {
      * Contains information about column storage type.
      */
     private String storage;
+    /**
+     * Comment.
+     */
+    private String comment;
 
     /**
      * Creates a new PgColumn object.
@@ -64,6 +68,24 @@ public class PgColumn {
      */
     public PgColumn(final String name) {
         this.name = name;
+    }
+
+    /**
+     * Getter for {@link #comment}.
+     *
+     * @return {@link #comment}
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Setter for {@link #comment}.
+     *
+     * @param comment {@link #comment}
+     */
+    public void setComment(final String comment) {
+        this.comment = comment;
     }
 
     /**

@@ -34,6 +34,10 @@ public class PgConstraint {
      * Name of the table the constraint is defined on.
      */
     private String tableName;
+    /**
+     * Comment.
+     */
+    private String comment;
 
     /**
      * Creates a new PgConstraint object.
@@ -59,7 +63,35 @@ public class PgConstraint {
         sbSQL.append(getDefinition());
         sbSQL.append(';');
 
+        if (comment != null && !comment.isEmpty()) {
+            sbSQL.append("\n\nCOMMENT ON CONSTRAINT ");
+            sbSQL.append(PgDiffUtils.getQuotedName(name));
+            sbSQL.append(" ON ");
+            sbSQL.append(PgDiffUtils.getQuotedName(tableName));
+            sbSQL.append(" IS ");
+            sbSQL.append(comment);
+            sbSQL.append(';');
+        }
+
         return sbSQL.toString();
+    }
+
+    /**
+     * Getter for {@link #comment}.
+     *
+     * @return {@link #comment}
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Setter for {@link #comment}.
+     *
+     * @param comment {@link #comment}
+     */
+    public void setComment(final String comment) {
+        this.comment = comment;
     }
 
     /**

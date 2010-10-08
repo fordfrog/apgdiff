@@ -8,6 +8,7 @@ package cz.startnet.utils.pgdiff.loader;
 import cz.startnet.utils.pgdiff.Resources;
 import cz.startnet.utils.pgdiff.parsers.AlterTableParser;
 import cz.startnet.utils.pgdiff.parsers.AlterViewParser;
+import cz.startnet.utils.pgdiff.parsers.CommentParser;
 import cz.startnet.utils.pgdiff.parsers.CreateFunctionParser;
 import cz.startnet.utils.pgdiff.parsers.CreateIndexParser;
 import cz.startnet.utils.pgdiff.parsers.CreateSchemaParser;
@@ -115,6 +116,11 @@ public class PgDumpLoader { //NOPMD
      */
     private static final Pattern PATTERN_ALTER_VIEW = Pattern.compile(
             "^ALTER[\\s]+VIEW[\\s]+.*$", Pattern.CASE_INSENSITIVE);
+    /**
+     * Pattern for testing whether it is COMMENT statement.
+     */
+    private static final Pattern PATTERN_COMMENT = Pattern.compile(
+            "^COMMENT[\\s]+ON[\\s]+.*$", Pattern.CASE_INSENSITIVE);
 
     /**
      * Creates a new instance of PgDumpLoader.
@@ -192,6 +198,9 @@ public class PgDumpLoader { //NOPMD
                 } else if (PATTERN_CREATE_FUNCTION.matcher(line).matches()) {
                     CreateFunctionParser.parse(
                             database, getWholeFunction(reader, line));
+                } else if (PATTERN_COMMENT.matcher(line).matches()) {
+                    CommentParser.parse(
+                            database, line, outputIgnoredStatements);
                 } else if (PATTERN_SELECT.matcher(line).matches()
                         || PATTERN_INSERT_INTO.matcher(line).matches()
                         || PATTERN_UPDATE.matcher(line).matches()

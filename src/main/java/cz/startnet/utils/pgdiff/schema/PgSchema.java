@@ -39,6 +39,17 @@ public class PgSchema {
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final List<PgView> views = new ArrayList<PgView>();
     /**
+     * List of indexes defined in the schema.
+     */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    private final List<PgIndex> indexes = new ArrayList<PgIndex>();
+    /**
+     * List of primary keys defined in the schema.
+     */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    private final List<PgConstraint> primaryKeys =
+            new ArrayList<PgConstraint>();
+    /**
      * Name of the schema.
      */
     private final String name;
@@ -50,6 +61,10 @@ public class PgSchema {
      * Optional definition of schema elements.
      */
     private String definition;
+    /**
+     * Comment.
+     */
+    private String comment;
 
     /**
      * Creates a new PgSchema object.
@@ -76,6 +91,24 @@ public class PgSchema {
      */
     public String getAuthorization() {
         return authorization;
+    }
+
+    /**
+     * Getter for {@link #comment}.
+     *
+     * @return {@link #comment}
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Setter for {@link #comment}.
+     *
+     * @param comment {@link #comment}
+     */
+    public void setComment(final String comment) {
+        this.comment = comment;
     }
 
     /**
@@ -112,6 +145,14 @@ public class PgSchema {
         }
 
         sbSQL.append(';');
+
+        if (comment != null && !comment.isEmpty()) {
+            sbSQL.append("\n\nCOMMENT ON SCHEMA ");
+            sbSQL.append(PgDiffUtils.getQuotedName(name));
+            sbSQL.append(" IS ");
+            sbSQL.append(comment);
+            sbSQL.append(';');
+        }
 
         return sbSQL.toString();
     }
@@ -152,25 +193,72 @@ public class PgSchema {
     }
 
     /**
-     * Finds sequence according to specified sequence
-     * <code>name</code>.
+     * Finds index according to specified index <code>name</code>.
+     *
+     * @param name name of the index to be searched
+     *
+     * @return found index or null if no such index has been found
+     */
+    public PgIndex getIndex(final String name) {
+        for (PgIndex index : indexes) {
+            if (index.getName().equals(name)) {
+                return index;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Finds primary key according to specified primary key <code>name</code>.
+     *
+     * @param name name of the primary key to be searched
+     *
+     * @return found primary key or null if no such primary key has been found
+     */
+    public PgConstraint getPrimaryKey(final String name) {
+        for (PgConstraint constraint : primaryKeys) {
+            if (constraint.getName().equals(name)) {
+                return constraint;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Finds sequence according to specified sequence <code>name</code>.
      *
      * @param name name of the sequence to be searched
      *
      * @return found sequence or null if no such sequence has been found
      */
     public PgSequence getSequence(final String name) {
-        PgSequence sequence = null;
-
-        for (PgSequence curSequence : sequences) {
-            if (curSequence.getName().equals(name)) {
-                sequence = curSequence;
-
-                break;
+        for (PgSequence sequence : sequences) {
+            if (sequence.getName().equals(name)) {
+                return sequence;
             }
         }
 
-        return sequence;
+        return null;
+    }
+
+    /**
+     * Getter for {@link #indexes}. The list cannot be modified.
+     *
+     * @return {@link #indexes}
+     */
+    public List<PgIndex> getIndexes() {
+        return Collections.unmodifiableList(indexes);
+    }
+
+    /**
+     * Getter for {@link #primaryKeys}. The list cannot be modified.
+     *
+     * @return {@link #primaryKeys}
+     */
+    public List<PgConstraint> getPrimaryKeys() {
+        return Collections.unmodifiableList(primaryKeys);
     }
 
     /**
@@ -190,17 +278,13 @@ public class PgSchema {
      * @return found table or null if no such table has been found
      */
     public PgTable getTable(final String name) {
-        PgTable table = null;
-
-        for (PgTable curTable : tables) {
-            if (curTable.getName().equals(name)) {
-                table = curTable;
-
-                break;
+        for (PgTable table : tables) {
+            if (table.getName().equals(name)) {
+                return table;
             }
         }
 
-        return table;
+        return null;
     }
 
     /**
@@ -220,17 +304,13 @@ public class PgSchema {
      * @return found view or null if no such view has been found
      */
     public PgView getView(final String name) {
-        PgView view = null;
-
-        for (PgView curView : views) {
-            if (curView.getName().equals(name)) {
-                view = curView;
-
-                break;
+        for (PgView view : views) {
+            if (view.getName().equals(name)) {
+                return view;
             }
         }
 
-        return view;
+        return null;
     }
 
     /**
@@ -240,6 +320,24 @@ public class PgSchema {
      */
     public List<PgView> getViews() {
         return Collections.unmodifiableList(views);
+    }
+
+    /**
+     * Adds <code>index</code> to the list of indexes.
+     *
+     * @param index index
+     */
+    public void addIndex(final PgIndex index) {
+        indexes.add(index);
+    }
+
+    /**
+     * Adds <code>primary key</code> to the list of primary keys.
+     *
+     * @param primaryKey index
+     */
+    public void addPrimaryKey(final PgConstraint primaryKey) {
+        primaryKeys.add(primaryKey);
     }
 
     /**
@@ -307,17 +405,13 @@ public class PgSchema {
      *         otherwise false
      */
     public boolean containsSequence(final String name) {
-        boolean found = false;
-
         for (PgSequence sequence : sequences) {
             if (sequence.getName().equals(name)) {
-                found = true;
-
-                break;
+                return true;
             }
         }
 
-        return found;
+        return false;
     }
 
     /**
@@ -330,17 +424,13 @@ public class PgSchema {
      *         otherwise false.
      */
     public boolean containsTable(final String name) {
-        boolean found = false;
-
         for (PgTable table : tables) {
             if (table.getName().equals(name)) {
-                found = true;
-
-                break;
+                return true;
             }
         }
 
-        return found;
+        return false;
     }
 
     /**
@@ -353,16 +443,12 @@ public class PgSchema {
      *         otherwise false.
      */
     public boolean containsView(final String name) {
-        boolean found = false;
-
         for (PgView view : views) {
             if (view.getName().equals(name)) {
-                found = true;
-
-                break;
+                return true;
             }
         }
 
-        return found;
+        return false;
     }
 }

@@ -88,7 +88,7 @@ public class AlterTableParser {
                 if (parser.expectOptional("FOREIGN", "KEY")) {
                     parseAddForeignKey(parser, table);
                 } else if (parser.expectOptional("CONSTRAINT")) {
-                    parseAddConstraint(parser, table);
+                    parseAddConstraint(parser, table, schema);
                 } else {
                     parser.throwUnsupportedCommand();
                 }
@@ -199,16 +199,23 @@ public class AlterTableParser {
      * Parses ADD CONSTRAINT action.
      *
      * @param parser parser
-     * @param table pg table
+     * @param table table
+     * @param schema schema
      */
     private static void parseAddConstraint(final Parser parser,
-            final PgTable table) {
+            final PgTable table, final PgSchema schema) {
         final String constraintName =
                 ParserUtils.getObjectName(parser.parseIdentifier());
         final PgConstraint constraint = new PgConstraint(constraintName);
-        table.addConstraint(constraint);
-        constraint.setDefinition(parser.getExpression());
         constraint.setTableName(table.getName());
+        table.addConstraint(constraint);
+
+        if (parser.expectOptional("PRIMARY", "KEY")) {
+            schema.addPrimaryKey(constraint);
+            constraint.setDefinition("PRIMARY KEY " + parser.getExpression());
+        } else {
+            constraint.setDefinition(parser.getExpression());
+        }
     }
 
     /**

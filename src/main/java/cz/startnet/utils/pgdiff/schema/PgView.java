@@ -34,6 +34,15 @@ public class PgView {
      */
     private final List<DefaultValue> defaultValues =
             new ArrayList<DefaultValue>(0);
+    /**
+     * List of optional column comments.
+     */
+    private final List<ColumnComment> columnComments =
+            new ArrayList<ColumnComment>(0);
+    /**
+     * Comment.
+     */
+    private String comment;
 
     /**
      * Creates a new PgView object.
@@ -61,6 +70,24 @@ public class PgView {
      */
     public List<String> getColumnNames() {
         return Collections.unmodifiableList(columnNames);
+    }
+
+    /**
+     * Getter for {@link #comment}.
+     *
+     * @return {@link #comment}
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Setter for {@link #comment}.
+     *
+     * @param comment {@link #comment}
+     */
+    public void setComment(final String comment) {
+        this.comment = comment;
     }
 
     /**
@@ -99,6 +126,26 @@ public class PgView {
             sbSQL.append(" SET DEFAULT ");
             sbSQL.append(defaultValue.getDefaultValue());
             sbSQL.append(';');
+        }
+
+        if (comment != null && !comment.isEmpty()) {
+            sbSQL.append("\n\nCOMMENT ON VIEW ");
+            sbSQL.append(PgDiffUtils.getQuotedName(name));
+            sbSQL.append(" IS ");
+            sbSQL.append(comment);
+            sbSQL.append(';');
+        }
+
+        for (final ColumnComment columnComment : columnComments) {
+            if (columnComment.getComment() != null
+                    && !columnComment.getComment().isEmpty()) {
+                sbSQL.append("\n\nCOMMENT ON COLUMN ");
+                sbSQL.append(PgDiffUtils.getQuotedName(
+                        columnComment.getColumnName()));
+                sbSQL.append(" IS ");
+                sbSQL.append(columnComment.getComment());
+                sbSQL.append(';');
+            }
         }
 
         return sbSQL.toString();
@@ -176,6 +223,41 @@ public class PgView {
     }
 
     /**
+     * Adds/replaces column comment.
+     *
+     * @param columnName column name
+     * @param comment comment
+     */
+    public void addColumnComment(final String columnName,
+            final String comment) {
+        removeColumnDefaultValue(columnName);
+        columnComments.add(new ColumnComment(columnName, comment));
+    }
+
+    /**
+     * Removes column comment if present.
+     *
+     * @param columnName column name
+     */
+    public void removeColumnComment(final String columnName) {
+        for (final ColumnComment item : columnComments) {
+            if (item.getColumnName().equals(columnName)) {
+                columnComments.remove(item);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Getter for {@link #columnComments}.
+     *
+     * @return {@link #columnComments}
+     */
+    public List<ColumnComment> getColumnComments() {
+        return Collections.unmodifiableList(columnComments);
+    }
+
+    /**
      * Contains information about default value of column.
      */
     @SuppressWarnings("PublicInnerClass")
@@ -217,6 +299,51 @@ public class PgView {
          */
         public String getDefaultValue() {
             return defaultValue;
+        }
+    }
+
+    /**
+     * Contains information about column comment.
+     */
+    @SuppressWarnings("PublicInnerClass")
+    public class ColumnComment {
+
+        /**
+         * Column name.
+         */
+        private final String columnName;
+        /**
+         * Comment.
+         */
+        private final String comment;
+
+        /**
+         * Creates new instance of ColumnComment.
+         *
+         * @param columnName {@link #columnName}
+         * @param comment {@link #comment}
+         */
+        ColumnComment(final String columnName, final String comment) {
+            this.columnName = columnName;
+            this.comment = comment;
+        }
+
+        /**
+         * Getter for {@link #columnName}.
+         *
+         * @return {@link #columnName}
+         */
+        public String getColumnName() {
+            return columnName;
+        }
+
+        /**
+         * Getter for {@link #comment}.
+         *
+         * @return {@link #comment}
+         */
+        public String getComment() {
+            return comment;
         }
     }
 }

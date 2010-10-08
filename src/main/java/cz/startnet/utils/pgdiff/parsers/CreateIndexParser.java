@@ -7,6 +7,7 @@ package cz.startnet.utils.pgdiff.parsers;
 
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgIndex;
+import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
 
 /**
@@ -47,12 +48,13 @@ public class CreateIndexParser {
         final String definition = parser.getRest();
         final String schemaName =
                 ParserUtils.getSchemaName(tableName, database);
+        final PgSchema schema = database.getSchema(schemaName);
         final String objectName = ParserUtils.getObjectName(tableName);
 
-        final PgTable table =
-                database.getSchema(schemaName).getTable(objectName);
+        final PgTable table = schema.getTable(objectName);
         final PgIndex index = new PgIndex(indexName);
         table.addIndex(index);
+        schema.addIndex(index);
         index.setDefinition(definition.trim());
         index.setTableName(table.getName());
         index.setUnique(unique);

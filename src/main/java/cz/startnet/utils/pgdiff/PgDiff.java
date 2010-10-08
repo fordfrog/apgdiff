@@ -96,6 +96,21 @@ public class PgDiff {
             writer.println("START TRANSACTION;");
         }
 
+        if (oldDatabase.getComment() == null
+                && newDatabase.getComment() != null
+                || oldDatabase.getComment() != null
+                && newDatabase.getComment() != null
+                && !oldDatabase.getComment().equals(newDatabase.getComment())) {
+            writer.println();
+            writer.print("COMMENT ON DATABASE current_database() IS ");
+            writer.print(newDatabase.getComment());
+            writer.println(';');
+        } else if (oldDatabase.getComment() != null
+                && newDatabase.getComment() == null) {
+            writer.println();
+            writer.println("COMMENT ON DATABASE current_database() IS NULL;");
+        }
+
         dropOldSchemas(writer, oldDatabase, newDatabase);
         createNewSchemas(writer, oldDatabase, newDatabase);
         updateSchemas(writer, arguments, oldDatabase, newDatabase);
@@ -185,6 +200,30 @@ public class PgDiff {
             final PgSchema oldSchema =
                     oldDatabase.getSchema(newSchema.getName());
 
+            if (oldSchema != null && newSchema != null) {
+                if (oldSchema.getComment() == null
+                        && newSchema.getComment() != null
+                        || oldSchema.getComment() != null
+                        && newSchema.getComment() != null
+                        && !oldSchema.getComment().equals(
+                        newSchema.getComment())) {
+                    writer.println();
+                    writer.print("COMMENT ON SCHEMA ");
+                    writer.print(
+                            PgDiffUtils.getQuotedName(newSchema.getName()));
+                    writer.print(" IS ");
+                    writer.print(newSchema.getComment());
+                    writer.println(';');
+                } else if (oldSchema.getComment() != null
+                        && newSchema.getComment() == null) {
+                    writer.println();
+                    writer.print("COMMENT ON SCHEMA ");
+                    writer.print(
+                            PgDiffUtils.getQuotedName(newSchema.getName()));
+                    writer.println(" IS NULL;");
+                }
+            }
+
             PgDiffTriggers.dropTriggers(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffFunctions.dropFunctions(
@@ -227,6 +266,15 @@ public class PgDiff {
             PgDiffViews.createViews(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffViews.alterViews(
+                    writer, oldSchema, newSchema, searchPathHelper);
+
+            PgDiffFunctions.alterComments(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffConstraints.alterComments(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffIndexes.alterComments(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffTriggers.alterComments(
                     writer, oldSchema, newSchema, searchPathHelper);
         }
     }

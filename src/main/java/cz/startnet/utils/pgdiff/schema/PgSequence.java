@@ -46,6 +46,10 @@ public class PgSequence {
      * Column the sequence is owned by.
      */
     private String ownedBy;
+    /**
+     * Comment.
+     */
+    private String comment;
 
     /**
      * Creates a new PgSequence object.
@@ -72,6 +76,24 @@ public class PgSequence {
      */
     public String getCache() {
         return cache;
+    }
+
+    /**
+     * Getter for {@link #comment}.
+     *
+     * @return {@link #comment}
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Setter for {@link #comment}.
+     *
+     * @param comment {@link #comment}
+     */
+    public void setComment(final String comment) {
+        this.comment = comment;
     }
 
     /**
@@ -127,6 +149,14 @@ public class PgSequence {
         }
 
         sbSQL.append(';');
+
+        if (comment != null && !comment.isEmpty()) {
+            sbSQL.append("\n\nCOMMENT ON SEQUENCE ");
+            sbSQL.append(PgDiffUtils.getQuotedName(name));
+            sbSQL.append(" IS ");
+            sbSQL.append(comment);
+            sbSQL.append(';');
+        }
 
         return sbSQL.toString();
     }
