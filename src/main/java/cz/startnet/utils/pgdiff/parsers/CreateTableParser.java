@@ -45,8 +45,8 @@ public class CreateTableParser {
 
         if (schema == null) {
             throw new RuntimeException(MessageFormat.format(
-                    Resources.getString("CannotFindSchemaCreateTable"),
-                    schemaName, tableName));
+                    Resources.getString("CannotFindSchema"), schemaName,
+                    statement));
         }
 
         schema.addTable(table);

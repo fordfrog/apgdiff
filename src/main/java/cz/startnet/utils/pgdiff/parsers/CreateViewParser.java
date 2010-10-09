@@ -5,9 +5,11 @@
  */
 package cz.startnet.utils.pgdiff.parsers;
 
+import cz.startnet.utils.pgdiff.Resources;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgView;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,8 +60,15 @@ public class CreateViewParser {
         view.setColumnNames(columnNames);
         view.setQuery(query);
 
-        final PgSchema schema = database.getSchema(
-                ParserUtils.getSchemaName(viewName, database));
+        final String schemaName = ParserUtils.getSchemaName(viewName, database);
+        final PgSchema schema = database.getSchema(schemaName);
+
+        if (schema == null) {
+            throw new RuntimeException(MessageFormat.format(
+                    Resources.getString("CannotFindSchema"), schemaName,
+                    statement));
+        }
+
         schema.addView(view);
     }
 }

@@ -5,8 +5,11 @@
  */
 package cz.startnet.utils.pgdiff.parsers;
 
+import cz.startnet.utils.pgdiff.Resources;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgFunction;
+import cz.startnet.utils.pgdiff.schema.PgSchema;
+import java.text.MessageFormat;
 
 /**
  * Parses CREATE FUNCTION and CREATE OR REPLACE FUNCTION statements.
@@ -37,9 +40,17 @@ public class CreateFunctionParser {
         final String functionName = parser.parseIdentifier();
         final String schemaName =
                 ParserUtils.getSchemaName(functionName, database);
+        final PgSchema schema = database.getSchema(schemaName);
+
+        if (schema == null) {
+            throw new RuntimeException(MessageFormat.format(
+                    Resources.getString("CannotFindSchema"), schemaName,
+                    statement));
+        }
+
         final PgFunction function = new PgFunction();
         function.setName(ParserUtils.getObjectName(functionName));
-        database.getSchema(schemaName).addFunction(function);
+        schema.addFunction(function);
 
         parser.expect("(");
 

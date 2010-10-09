@@ -5,8 +5,11 @@
  */
 package cz.startnet.utils.pgdiff.parsers;
 
+import cz.startnet.utils.pgdiff.Resources;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
+import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgView;
+import java.text.MessageFormat;
 
 /**
  * Parses ALTER VIEW statements.
@@ -36,9 +39,16 @@ public class AlterViewParser {
 
         final String viewName = parser.parseIdentifier();
         final String schemaName = ParserUtils.getSchemaName(viewName, database);
-        final String objectName = ParserUtils.getObjectName(viewName);
+        final PgSchema schema = database.getSchema(schemaName);
 
-        final PgView view = database.getSchema(schemaName).getView(objectName);
+        if (schema == null) {
+            throw new RuntimeException(MessageFormat.format(
+                    Resources.getString("CannotFindSchema"), schemaName,
+                    statement));
+        }
+
+        final String objectName = ParserUtils.getObjectName(viewName);
+        final PgView view = schema.getView(objectName);
 
         while (!parser.expectOptional(";")) {
             if (parser.expectOptional("ALTER")) {

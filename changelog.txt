@@ -2,6 +2,14 @@
  Changelog of Another PostgreSQL Diff Tool
 ------------------------------------------
 
+--------------------------------
+Version 2.2.3 (not released yet)
+--------------------------------
+
+Fixes
+* Added user error message instead of NullPointerException for cases when
+  referenced schema was not created in the dump yet.
+
 -------------
 Version 2.2.2
 -------------

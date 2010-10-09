@@ -48,8 +48,14 @@ public class AlterTableParser {
         final String schemaName =
                 ParserUtils.getSchemaName(tableName, database);
         final PgSchema schema = database.getSchema(schemaName);
-        final String objectName = ParserUtils.getObjectName(tableName);
 
+        if (schema == null) {
+            throw new RuntimeException(MessageFormat.format(
+                    Resources.getString("CannotFindSchema"), schemaName,
+                    statement));
+        }
+
+        final String objectName = ParserUtils.getObjectName(tableName);
         final PgTable table = schema.getTable(objectName);
 
         if (table == null) {

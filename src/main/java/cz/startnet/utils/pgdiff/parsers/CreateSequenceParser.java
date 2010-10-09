@@ -5,8 +5,11 @@
  */
 package cz.startnet.utils.pgdiff.parsers;
 
+import cz.startnet.utils.pgdiff.Resources;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
+import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgSequence;
+import java.text.MessageFormat;
 
 /**
  * Parses CREATE SEQUENCE statements.
@@ -37,7 +40,15 @@ public class CreateSequenceParser {
                 new PgSequence(ParserUtils.getObjectName(sequenceName));
         final String schemaName =
                 ParserUtils.getSchemaName(sequenceName, database);
-        database.getSchema(schemaName).addSequence(sequence);
+        final PgSchema schema = database.getSchema(schemaName);
+
+        if (schema == null) {
+            throw new RuntimeException(MessageFormat.format(
+                    Resources.getString("CannotFindSchema"), schemaName,
+                    statement));
+        }
+
+        schema.addSequence(sequence);
 
         while (!parser.expectOptional(";")) {
             if (parser.expectOptional("INCREMENT")) {
