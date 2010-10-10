@@ -74,6 +74,10 @@ public class AlterTableParser {
                         tableName, database);
                 return;
             }
+
+            throw new RuntimeException(MessageFormat.format(
+                    Resources.getString("CannotFindObject"), tableName,
+                    statement));
         }
 
         while (!parser.expectOptional(";")) {
@@ -233,12 +237,27 @@ public class AlterTableParser {
         if (parser.expectOptional("SET")) {
             if (parser.expectOptional("STATISTICS")) {
                 final PgColumn column = table.getColumn(columnName);
+
+                if (column == null) {
+                    throw new RuntimeException(MessageFormat.format(
+                            Resources.getString("CannotFindTableColumn"),
+                            columnName, table.getName(), parser.getString()));
+                }
+
                 column.setStatistics(parser.parseInteger());
             } else if (parser.expectOptional("DEFAULT")) {
                 final String defaultValue = parser.getExpression();
 
                 if (table.containsColumn(columnName)) {
                     final PgColumn column = table.getColumn(columnName);
+
+                    if (column == null) {
+                        throw new RuntimeException(MessageFormat.format(
+                                Resources.getString("CannotFindTableColumn"),
+                                columnName, table.getName(),
+                                parser.getString()));
+                    }
+
                     column.setDefaultValue(defaultValue);
                 } else {
                     throw new ParserException(MessageFormat.format(
@@ -247,6 +266,12 @@ public class AlterTableParser {
                 }
             } else if (parser.expectOptional("STORAGE")) {
                 final PgColumn column = table.getColumn(columnName);
+
+                if (column == null) {
+                    throw new RuntimeException(MessageFormat.format(
+                            Resources.getString("CannotFindTableColumn"),
+                            columnName, table.getName(), parser.getString()));
+                }
 
                 if (parser.expectOptional("PLAIN")) {
                     column.setStorage("PLAIN");

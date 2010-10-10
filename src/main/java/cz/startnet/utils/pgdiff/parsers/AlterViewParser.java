@@ -50,6 +50,12 @@ public class AlterViewParser {
         final String objectName = ParserUtils.getObjectName(viewName);
         final PgView view = schema.getView(objectName);
 
+        if (view == null) {
+            throw new RuntimeException(MessageFormat.format(
+                    Resources.getString("CannotFindView"), viewName,
+                    statement));
+        }
+
         while (!parser.expectOptional(";")) {
             if (parser.expectOptional("ALTER")) {
                 parser.expectOptional("COLUMN");

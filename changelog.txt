@@ -7,8 +7,8 @@ Version 2.2.3 (not released yet)
 --------------------------------
 
 Fixes
-* Added user error message instead of NullPointerException for cases when
-  referenced schema was not created in the dump yet.
+* Added user error messages instead of NullPointerException for cases when
+  referenced database object was not found in the dump.
 
 -------------
 Version 2.2.2

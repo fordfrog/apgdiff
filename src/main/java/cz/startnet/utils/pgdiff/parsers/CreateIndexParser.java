@@ -61,6 +61,12 @@ public class CreateIndexParser {
         final String objectName = ParserUtils.getObjectName(tableName);
         final PgTable table = schema.getTable(objectName);
 
+        if (table == null) {
+            throw new RuntimeException(MessageFormat.format(
+                    Resources.getString("CannotFindTable"), tableName,
+                    statement));
+        }
+
         final PgIndex index = new PgIndex(indexName);
         table.addIndex(index);
         index.setDefinition(definition.trim());
