@@ -1,15 +1,9 @@
-CREATE SCHEMA juzz_system;
-
-CREATE OR REPLACE FUNCTION "juzz_system"."f_obj_execute_node_select" (
-"in_id_model" bigint,
-"in_arr_val" text,
-"in_mode" bigint
-)
-RETURNS bigint AS
-$body$
+CREATE FUNCTION f_obj_execute_node_select(in_id_model bigint, in_id_object text, in_arr_val text, in_mode bigint) RETURNS bigint
+    LANGUAGE plpgsql SECURITY DEFINER
+    AS $$
 DECLARE
-v_ret bigint;
+        v_ret   bigint;
 BEGIN
-return v_ret;
-END;$body$
-LANGUAGE plpgsql;
+    RETURN v_ret + 1;
+END;
+$$;

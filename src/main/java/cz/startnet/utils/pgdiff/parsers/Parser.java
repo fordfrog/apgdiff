@@ -65,7 +65,10 @@ public final class Parser {
         if (wordEnd <= string.length()
                 && string.substring(position, wordEnd).equalsIgnoreCase(word)
                 && (wordEnd == string.length()
-                || !Character.isLetter(string.charAt(wordEnd))
+                || Character.isWhitespace(string.charAt(wordEnd))
+                || string.charAt(wordEnd) == ';'
+                || string.charAt(wordEnd) == ')'
+                || string.charAt(wordEnd) == ','
                 || "(".equals(word) || ",".equals(word))) {
             position = wordEnd;
             skipWhitespace();

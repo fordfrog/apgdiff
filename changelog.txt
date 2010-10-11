@@ -11,6 +11,8 @@ Fixes
   referenced database object was not found in the dump.
 * Fixed bug with parsing quoted object name when both first and second part of
   the name was quoted.
+* Fixed bug in parser that caused in some cases invalid match against expected
+  "word".
 
 -------------
 Version 2.2.2

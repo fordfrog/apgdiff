@@ -1,12 +1,9 @@
-SET search_path = juzz_system, pg_catalog;
-
-DROP FUNCTION f_obj_execute_node_select(in_id_model bigint, in_id_object text, in_arr_val text, in_mode bigint);
-
-CREATE OR REPLACE FUNCTION f_obj_execute_node_select(in_id_model bigint, in_arr_val text, in_mode bigint) RETURNS bigint AS
-$body$
+CREATE OR REPLACE FUNCTION f_obj_execute_node_select(in_id_model bigint, in_id_object text, in_arr_val text, in_mode bigint) RETURNS bigint
+    LANGUAGE plpgsql SECURITY DEFINER
+    AS $$
 DECLARE
-v_ret bigint;
+        v_ret   bigint;
 BEGIN
-return v_ret;
-END;$body$
-LANGUAGE plpgsql;
+    RETURN v_ret + 1;
+END;
+$$;
