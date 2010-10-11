@@ -69,7 +69,9 @@ public final class Parser {
                 || string.charAt(wordEnd) == ';'
                 || string.charAt(wordEnd) == ')'
                 || string.charAt(wordEnd) == ','
-                || "(".equals(word) || ",".equals(word))) {
+                || string.charAt(wordEnd) == '['
+                || "(".equals(word) || ",".equals(word) || "[".equals(word)
+                || "]".equals(word))) {
             position = wordEnd;
             skipWhitespace();
 
