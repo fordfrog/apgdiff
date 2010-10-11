@@ -49,7 +49,7 @@ public class ParserUtils {
         if (names.length < 2) {
             return database.getDefaultSchema().getName();
         } else {
-            return names[names.length - 2];
+            return names[0];
         }
     }
 
@@ -119,9 +119,11 @@ public class ParserUtils {
 
                     if (endPos + 1 == string.length()) {
                         break;
+                    } else if (string.charAt(endPos + 1) == '.') {
+                        startPos = endPos + 2;
+                    } else {
+                        startPos = endPos + 1;
                     }
-
-                    startPos = endPos + 1;
                 } else {
                     final int endPos = string.indexOf('.', startPos);
 

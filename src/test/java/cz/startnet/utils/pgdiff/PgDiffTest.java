@@ -235,7 +235,9 @@ public class PgDiffTest {
                     // Tests creation of sequence with bug in MINVALUE value
                     {"add_sequence_bug2100013", false, true, false, false},
                     // Tests view with default value
-                    {"view_bug3080388", false, true, false, false}
+                    {"view_bug3080388", false, true, false, false},
+                    // Tests function arguments beginning with in_
+                    {"function_bug3084274", false, true, false, false}
                 });
     }
 
