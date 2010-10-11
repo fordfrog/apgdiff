@@ -20,6 +20,8 @@ Fixes
   the name was quoted.
 * Fixed bug in parser that caused in some cases invalid match against expected
   "word".
+* Fixed bug in parser that caused array data types not detected correctly (was
+  caused by fix of invalid match of "word" above).
 
 -------------
 Version 2.2.2
