@@ -6,6 +6,8 @@
 package cz.startnet.utils.pgdiff;
 
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.util.SortedMap;
 
 /**
  * Contains parsed command line arguments.
@@ -55,6 +57,10 @@ public class PgDiffArguments {
      * Whether to output information about ignored statements.
      */
     private boolean outputIgnoredStatements;
+    /**
+     * Whether to list supported charsets.
+     */
+    private boolean listCharsets;
 
     /**
      * Setter for {@link #addDefaults}.
@@ -233,6 +239,8 @@ public class PgDiffArguments {
             } else if ("--in-charset-name".equals(args[i])) {
                 setInCharsetName(args[i + 1]);
                 i++;
+            } else if ("--list-charsets".equals(args[i])) {
+                setListCharsets(true);
             } else if ("--out-charset-name".equals(args[i])) {
                 setOutCharsetName(args[i + 1]);
                 i++;
@@ -250,8 +258,11 @@ public class PgDiffArguments {
             }
         }
 
-        if ((args.length == 1) && isVersion()) {
+        if (args.length == 1 && isVersion()) {
             printVersion(writer);
+            success = false;
+        } else if (args.length == 1 && isListCharsets()) {
+            listCharsets(writer);
             success = false;
         } else if (args.length < 2) {
             printUsage(writer);
@@ -319,5 +330,36 @@ public class PgDiffArguments {
      */
     public void setOutCharsetName(final String outCharsetName) {
         this.outCharsetName = outCharsetName;
+    }
+
+    /**
+     * Getter for {@link #listCharsets}.
+     *
+     * @return {@link #listCharsets}
+     */
+    public boolean isListCharsets() {
+        return listCharsets;
+    }
+
+    /**
+     * Setter for {@link #listCharsets}.
+     *
+     * @param listCharsets {@link #listCharsets}
+     */
+    public void setListCharsets(final boolean listCharsets) {
+        this.listCharsets = listCharsets;
+    }
+
+    /**
+     * Lists supported charsets.
+     *
+     * @param writer writer
+     */
+    private void listCharsets(final PrintWriter writer) {
+        final SortedMap<String, Charset> charsets = Charset.availableCharsets();
+
+        for (final String name : charsets.keySet()) {
+            writer.println(name);
+        }
     }
 }

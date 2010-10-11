@@ -6,6 +6,8 @@
 Version 2.2.3 (not released yet)
 --------------------------------
 
+New Features
+* Added switch --list-charsets to output list of supported charsets.
 Fixes
 * Added user error messages instead of NullPointerException for cases when
   referenced database object was not found in the dump.
