@@ -31,7 +31,36 @@ public class ParserUtils {
      */
     public static String getObjectName(final String name) {
         final String[] names = splitNames(name);
+
         return names[names.length - 1];
+    }
+
+    /**
+     * Returns second (from right) object name from optionally schema qualified
+     * name.
+     *
+     * @param name optionally schema qualified name
+     *
+     * @return name of the object
+     */
+    public static String getSecondObjectName(final String name) {
+        final String[] names = splitNames(name);
+
+        return names[names.length - 2];
+    }
+
+    /**
+     * Returns third (from right) object name from optionally schema qualified
+     * name.
+     *
+     * @param name optionally schema qualified name
+     *
+     * @return name of the object or null if there is no third object name
+     */
+    public static String getThirdObjectName(final String name) {
+        final String[] names = splitNames(name);
+
+        return names.length >= 3 ? names[names.length - 3] : null;
     }
 
     /**

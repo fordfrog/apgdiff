@@ -31,6 +31,28 @@ public class PgFunction {
      * Whole definition of the function from RETURNS keyword.
      */
     private String body;
+    /**
+     * Comment.
+     */
+    private String comment;
+
+    /**
+     * Getter for {@link #comment}.
+     *
+     * @return {@link #comment}
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Setter for {@link #comment}.
+     *
+     * @param comment {@link #comment}
+     */
+    public void setComment(final String comment) {
+        this.comment = comment;
+    }
 
     /**
      * Returns creation SQL of the function.
@@ -57,6 +79,28 @@ public class PgFunction {
 
         sbSQL.append(") ");
         sbSQL.append(body);
+
+        if (comment != null && !comment.isEmpty()) {
+            sbSQL.append("\n\nCOMMENT ON FUNCTION ");
+            sbSQL.append(PgDiffUtils.getQuotedName(name));
+            sbSQL.append('(');
+
+            addComma = false;
+
+            for (final Argument argument : arguments) {
+                if (addComma) {
+                    sbSQL.append(", ");
+                }
+
+                sbSQL.append(argument.getDeclaration(false));
+
+                addComma = true;
+            }
+
+            sbSQL.append(") IS ");
+            sbSQL.append(comment);
+            sbSQL.append(';');
+        }
 
         return sbSQL.toString();
     }

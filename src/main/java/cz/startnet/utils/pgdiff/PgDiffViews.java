@@ -9,6 +9,7 @@ import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgView;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -59,15 +60,17 @@ public class PgDiffViews {
     public static void dropViews(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
             final SearchPathHelper searchPathHelper) {
-        if (oldSchema != null) {
-            for (final PgView oldView : oldSchema.getViews()) {
-                final PgView newView = newSchema.getView(oldView.getName());
+        if (oldSchema == null) {
+            return;
+        }
 
-                if (newView == null || isViewModified(oldView, newView)) {
-                    searchPathHelper.outputSearchPath(writer);
-                    writer.println();
-                    writer.println(oldView.getDropSQL());
-                }
+        for (final PgView oldView : oldSchema.getViews()) {
+            final PgView newView = newSchema.getView(oldView.getName());
+
+            if (newView == null || isViewModified(oldView, newView)) {
+                searchPathHelper.outputSearchPath(writer);
+                writer.println();
+                writer.println(oldView.getDropSQL());
             }
         }
     }
@@ -121,13 +124,101 @@ public class PgDiffViews {
     public static void alterViews(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
             final SearchPathHelper searchPathHelper) {
-        if (oldSchema != null) {
-            for (final PgView oldView : oldSchema.getViews()) {
-                final PgView newView = newSchema.getView(oldView.getName());
+        if (oldSchema == null) {
+            return;
+        }
 
-                if (oldView != null && newView != null) {
-                    diffDefaultValues(
-                            writer, oldView, newView, searchPathHelper);
+        for (final PgView oldView : oldSchema.getViews()) {
+            final PgView newView = newSchema.getView(oldView.getName());
+
+            if (newView == null) {
+                continue;
+            }
+
+            diffDefaultValues(writer, oldView, newView, searchPathHelper);
+
+            if (oldView.getComment() == null
+                    && newView.getComment() != null
+                    || oldView.getComment() != null
+                    && newView.getComment() != null
+                    && !oldView.getComment().equals(
+                    newView.getComment())) {
+                searchPathHelper.outputSearchPath(writer);
+                writer.println();
+                writer.print("COMMENT ON VIEW ");
+                writer.print(
+                        PgDiffUtils.getQuotedName(newView.getName()));
+                writer.print(" IS ");
+                writer.print(newView.getComment());
+                writer.println(';');
+            } else if (oldView.getComment() != null
+                    && newView.getComment() == null) {
+                searchPathHelper.outputSearchPath(writer);
+                writer.println();
+                writer.print("COMMENT ON VIEW ");
+                writer.print(PgDiffUtils.getQuotedName(newView.getName()));
+                writer.println(" IS NULL;");
+            }
+
+            final List<String> columnNames =
+                    new ArrayList<String>(newView.getColumnComments().size());
+
+            for (final PgView.ColumnComment columnComment :
+                    newView.getColumnComments()) {
+                columnNames.add(columnComment.getColumnName());
+            }
+
+            for (final PgView.ColumnComment columnComment :
+                    oldView.getColumnComments()) {
+                if (!columnNames.contains(columnComment.getColumnName())) {
+                    columnNames.add(columnComment.getColumnName());
+                }
+            }
+
+            for (final String columnName : columnNames) {
+                PgView.ColumnComment oldColumnComment = null;
+                PgView.ColumnComment newColumnComment = null;
+
+                for (final PgView.ColumnComment columnComment :
+                        oldView.getColumnComments()) {
+                    if (columnName.equals(columnComment.getColumnName())) {
+                        oldColumnComment = columnComment;
+                        break;
+                    }
+                }
+
+                for (final PgView.ColumnComment columnComment :
+                        newView.getColumnComments()) {
+                    if (columnName.equals(columnComment.getColumnName())) {
+                        newColumnComment = columnComment;
+                        break;
+                    }
+                }
+
+                if (oldColumnComment == null && newColumnComment != null
+                        || oldColumnComment != null && newColumnComment != null
+                        && !oldColumnComment.getComment().equals(
+                        newColumnComment.getComment())) {
+                    searchPathHelper.outputSearchPath(writer);
+                    writer.println();
+                    writer.print("COMMENT ON COLUMN ");
+                    writer.print(PgDiffUtils.getQuotedName(newView.getName()));
+                    writer.print('.');
+                    writer.print(PgDiffUtils.getQuotedName(
+                            newColumnComment.getColumnName()));
+                    writer.print(" IS ");
+                    writer.print(newColumnComment.getComment());
+                    writer.println(';');
+                } else if (oldColumnComment != null
+                        && newColumnComment == null) {
+                    searchPathHelper.outputSearchPath(writer);
+                    writer.println();
+                    writer.print("COMMENT ON COLUMN ");
+                    writer.print(PgDiffUtils.getQuotedName(newView.getName()));
+                    writer.print('.');
+                    writer.print(PgDiffUtils.getQuotedName(
+                            oldColumnComment.getColumnName()));
+                    writer.println(" IS NULL;");
                 }
             }
         }

@@ -69,6 +69,7 @@ public class CreateIndexParser {
 
         final PgIndex index = new PgIndex(indexName);
         table.addIndex(index);
+        schema.addIndex(index);
         index.setDefinition(definition.trim());
         index.setTableName(table.getName());
         index.setUnique(unique);

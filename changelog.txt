@@ -2,6 +2,13 @@
  Changelog of Another PostgreSQL Diff Tool
 ------------------------------------------
 
+------------------------------
+Version 2.3 (not released yet)
+------------------------------
+
+New Features
+* Added support for diffing of COMMENT ON statements.
+
 --------------------------------
 Version 2.2.3 (not released yet)
 --------------------------------

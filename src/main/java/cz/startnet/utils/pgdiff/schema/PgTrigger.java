@@ -56,6 +56,10 @@ public class PgTrigger {
      * WHEN condition.
      */
     private String when;
+    /**
+     * Comment.
+     */
+    private String comment;
 
     /**
      * Setter for {@link #before}.
@@ -73,6 +77,24 @@ public class PgTrigger {
      */
     public boolean isBefore() {
         return before;
+    }
+
+    /**
+     * Getter for {@link #comment}.
+     *
+     * @return {@link #comment}
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Setter for {@link #comment}.
+     *
+     * @param comment {@link #comment}
+     */
+    public void setComment(final String comment) {
+        this.comment = comment;
     }
 
     /**
@@ -134,6 +156,16 @@ public class PgTrigger {
         sbSQL.append("\n\tEXECUTE PROCEDURE ");
         sbSQL.append(getFunction());
         sbSQL.append(';');
+
+        if (comment != null && !comment.isEmpty()) {
+            sbSQL.append("\n\nCOMMENT ON TRIGGER ");
+            sbSQL.append(PgDiffUtils.getQuotedName(name));
+            sbSQL.append(" ON ");
+            sbSQL.append(PgDiffUtils.getQuotedName(tableName));
+            sbSQL.append(" IS ");
+            sbSQL.append(comment);
+            sbSQL.append(';');
+        }
 
         return sbSQL.toString();
     }

@@ -148,4 +148,52 @@ public class PgDiffIndexes {
 
         return list;
     }
+
+    /**
+     * Outputs statements for index comments that have changed.
+     *
+     * @param writer writer
+     * @param oldSchema old schema
+     * @param newSchema new schema
+     * @param searchPathHelper search path helper
+     */
+    public static void alterComments(final PrintWriter writer,
+            final PgSchema oldSchema, final PgSchema newSchema,
+            final SearchPathHelper searchPathHelper) {
+        if (oldSchema == null) {
+            return;
+        }
+
+        for (final PgIndex oldIndex : oldSchema.getIndexes()) {
+            final PgIndex newIndex = newSchema.getIndex(oldIndex.getName());
+
+            if (newIndex == null) {
+                continue;
+            }
+
+            if (oldIndex.getComment() == null
+                    && newIndex.getComment() != null
+                    || oldIndex.getComment() != null
+                    && newIndex.getComment() != null
+                    && !oldIndex.getComment().equals(
+                    newIndex.getComment())) {
+                searchPathHelper.outputSearchPath(writer);
+                writer.println();
+                writer.print("COMMENT ON INDEX ");
+                writer.print(
+                        PgDiffUtils.getQuotedName(newIndex.getName()));
+                writer.print(" IS ");
+                writer.print(newIndex.getComment());
+                writer.println(';');
+            } else if (oldIndex.getComment() != null
+                    && newIndex.getComment() == null) {
+                searchPathHelper.outputSearchPath(writer);
+                writer.println();
+                writer.print("COMMENT ON INDEX ");
+                writer.print(
+                        PgDiffUtils.getQuotedName(newIndex.getName()));
+                writer.println(" IS NULL;");
+            }
+        }
+    }
 }
