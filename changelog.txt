@@ -17,6 +17,9 @@ Fixes
   "word".
 * Fixed bug in parser that caused array data types not detected correctly (was
   caused by fix of invalid match of "word" above).
+* Functions are now created after tables are create and updated, because of
+  functions depending on tables and columns. Later will be implemented solution
+  for cases where functions have to be created before table columns.
 
 -------------
 Version 2.2.2
