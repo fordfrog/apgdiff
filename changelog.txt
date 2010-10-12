@@ -13,6 +13,8 @@ New Features
 Version 2.2.3 (not released yet)
 --------------------------------
 
+New Features
+* Added switch --list-charsets to output list of supported charsets.
 Fixes
 * Added user error messages instead of NullPointerException for cases when
   referenced database object was not found in the dump.
@@ -22,6 +24,9 @@ Fixes
   "word".
 * Fixed bug in parser that caused array data types not detected correctly (was
   caused by fix of invalid match of "word" above).
+* Functions are now created after tables are create and updated, because of
+  functions depending on tables and columns. Later will be implemented solution
+  for cases where functions have to be created before table columns.
 
 -------------
 Version 2.2.2

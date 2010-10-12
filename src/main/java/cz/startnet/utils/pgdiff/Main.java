@@ -42,7 +42,7 @@ public class Main {
             final PrintWriter encodedWriter = new PrintWriter(
                     new OutputStreamWriter(
                     System.out, arguments.getOutCharsetName()));
-            PgDiff.createDiff(encodedWriter, arguments);
+                PgDiff.createDiff(encodedWriter, arguments);
             encodedWriter.close();
         }
 
