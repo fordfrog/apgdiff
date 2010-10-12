@@ -199,8 +199,9 @@ public class PgDumpLoader { //NOPMD
                     CreateFunctionParser.parse(
                             database, getWholeFunction(reader, line));
                 } else if (PATTERN_COMMENT.matcher(line).matches()) {
-                    CommentParser.parse(
-                            database, line, outputIgnoredStatements);
+                    CommentParser.parse(database,
+                            getWholeStatement(reader, line),
+                            outputIgnoredStatements);
                 } else if (PATTERN_SELECT.matcher(line).matches()
                         || PATTERN_INSERT_INTO.matcher(line).matches()
                         || PATTERN_UPDATE.matcher(line).matches()
