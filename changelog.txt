@@ -8,12 +8,6 @@ Version 2.3 (not released yet)
 
 New Features
 * Added support for diffing of COMMENT ON statements.
-
---------------------------------
-Version 2.2.3 (not released yet)
---------------------------------
-
-New Features
 * Added switch --list-charsets to output list of supported charsets.
 Fixes
 * Added user error messages instead of NullPointerException for cases when
