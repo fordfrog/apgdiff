@@ -2,9 +2,9 @@
  Changelog of Another PostgreSQL Diff Tool
 ------------------------------------------
 
-------------------------------
-Version 2.3 (not released yet)
-------------------------------
+-----------------------
+2010-10-22: Version 2.3
+-----------------------
 
 New Features
 * Added support for diffing of COMMENT ON statements.
@@ -22,9 +22,9 @@ Fixes
   functions depending on tables and columns. Later will be implemented solution
   for cases where functions have to be created before table columns.
 
--------------
-Version 2.2.2
--------------
+-------------------------
+2010-10-09: Version 2.2.2
+-------------------------
 
 Fixes
 * Added missing new line after ALTER VIEW ... ALTER COLUMN ... SET/DROP DEFAULT.
