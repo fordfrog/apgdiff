@@ -3,6 +3,7 @@
  */
 package cz.startnet.utils.pgdiff.parsers;
 
+import cz.startnet.utils.pgdiff.Resources;
 import cz.startnet.utils.pgdiff.schema.PgColumn;
 import cz.startnet.utils.pgdiff.schema.PgConstraint;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
@@ -13,10 +14,11 @@ import cz.startnet.utils.pgdiff.schema.PgSequence;
 import cz.startnet.utils.pgdiff.schema.PgTable;
 import cz.startnet.utils.pgdiff.schema.PgTrigger;
 import cz.startnet.utils.pgdiff.schema.PgView;
+import java.text.MessageFormat;
 
 /**
  * COMMENT parser.
- * 
+ *
  * @author fordfrog
  */
 public class CommentParser {
@@ -268,6 +270,13 @@ public class CommentParser {
             parser.expect(";");
         } else {
             final PgColumn column = table.getColumn(objectName);
+
+            if (column == null) {
+                throw new ParserException(MessageFormat.format(
+                        Resources.getString("CannotFindColumnInTable"),
+                        columnName, table.getName()));
+            }
+
             parser.expect("IS");
             column.setComment(getComment(parser));
             parser.expect(";");
