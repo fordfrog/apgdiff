@@ -243,7 +243,9 @@ public class PgDiffTest {
                     // Tests view with default value
                     {"view_bug3080388", false, true, false, false},
                     // Tests function arguments beginning with in_
-                    {"function_bug3084274", false, true, false, false}
+                    {"function_bug3084274", false, true, false, false},
+                    // Tests addition of comment when new column has been added
+                    {"add_comment_new_column", false, true, false, false}
                 });
     }
 

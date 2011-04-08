@@ -2,6 +2,13 @@
  Changelog of Another PostgreSQL Diff Tool
 ------------------------------------------
 
+--------------------------------
+Version 2.3.1 (not released yet)
+--------------------------------
+
+Fixes
+* Fixed issue with comments not being added on newly created columns.
+
 -----------------------
 2010-10-22: Version 2.3
 -----------------------

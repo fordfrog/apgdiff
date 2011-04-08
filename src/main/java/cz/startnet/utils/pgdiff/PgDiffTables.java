@@ -576,18 +576,14 @@ public class PgDiffTables {
             writer.println(" IS NULL;");
         }
 
-        for (final PgColumn oldColumn : oldTable.getColumns()) {
-            final PgColumn newColumn = newTable.getColumn(oldColumn.getName());
+        for (final PgColumn newColumn : newTable.getColumns()) {
+            final PgColumn oldColumn = oldTable.getColumn(newColumn.getName());
+            final String oldComment =
+                    oldColumn == null ? null : oldColumn.getComment();
+            final String newComment = newColumn.getComment();
 
-            if (newColumn == null) {
-                continue;
-            }
-
-            if (oldColumn.getComment() == null
-                    && newColumn.getComment() != null
-                    || oldColumn.getComment() != null
-                    && newColumn.getComment() != null
-                    && !oldColumn.getComment().equals(newColumn.getComment())) {
+            if (newComment != null && (oldComment == null ? newComment != null
+                    : !oldComment.equals(newComment))) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.print("COMMENT ON COLUMN ");
@@ -597,8 +593,7 @@ public class PgDiffTables {
                 writer.print(" IS ");
                 writer.print(newColumn.getComment());
                 writer.println(';');
-            } else if (oldColumn.getComment() != null
-                    && newColumn.getComment() == null) {
+            } else if (oldComment != null && newComment == null) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.print("COMMENT ON COLUMN ");
