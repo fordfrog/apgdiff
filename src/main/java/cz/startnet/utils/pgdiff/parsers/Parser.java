@@ -264,7 +264,15 @@ public final class Parser {
                 }
             }
 
-            final String result = string.substring(position, endPos + 1);
+            final String result;
+
+            try {
+                result = string.substring(position, endPos + 1);
+            } catch (final Throwable ex) {
+                throw new RuntimeException("Failed to get substring: " + string
+                        + " start pos: " + position + " end pos: "
+                        + (endPos + 1), ex);
+            }
 
             position = endPos + 1;
             skipWhitespace();
