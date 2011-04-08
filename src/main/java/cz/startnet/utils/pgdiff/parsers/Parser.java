@@ -11,7 +11,7 @@ import java.util.Locale;
 
 /**
  * Class for parsing strings.
- * 
+ *
  * @author fordfrog
  */
 public final class Parser {
@@ -38,7 +38,7 @@ public final class Parser {
     /**
      * Checks whether the string contains given word on current position. If not
      * then throws an exception.
-     * 
+     *
      * @param words list of words to check
      */
     public void expect(final String... words) {
@@ -125,7 +125,7 @@ public final class Parser {
      * returned quoted. If the identifier is not quoted, it is converted to
      * lowercase. If identifier does not start with letter then exception is
      * thrown. Position is placed at next first non-whitespace character.
-     * 
+     *
      * @return parsed identifier
      */
     public String parseIdentifier() {
@@ -496,7 +496,7 @@ public final class Parser {
 
     /**
      * Checks whether the whole string has been consumed.
-     * 
+     *
      * @return true if there is nothing left to parse, otherwise false
      */
     public boolean isConsumed() {
