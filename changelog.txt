@@ -9,6 +9,7 @@ Version 2.3.1 (not released yet)
 Fixes
 * Fixed issue with comments not being added on newly created columns.
 * Improved logging errors when parsing strings.
+* Added support for IF NOT EXISTS (patch by Felipe Sateler).
 
 -----------------------
 2010-10-22: Version 2.3

@@ -37,6 +37,9 @@ public class CreateTableParser {
         final Parser parser = new Parser(statement);
         parser.expect("CREATE", "TABLE");
 
+	// Optional IF NOT EXISTS, irrelevant for our purposes
+	parser.expectOptional("IF", "NOT", "EXISTS");
+
         final String tableName = parser.parseIdentifier();
         final PgTable table = new PgTable(ParserUtils.getObjectName(tableName));
         final String schemaName =
