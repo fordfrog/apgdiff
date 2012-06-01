@@ -245,7 +245,9 @@ public class PgDiffTest {
                     // Tests function arguments beginning with in_
                     {"function_bug3084274", false, true, false, false},
                     // Tests addition of comment when new column has been added
-                    {"add_comment_new_column", false, true, false, false}
+                    {"add_comment_new_column", false, true, false, false},
+                    // Tests handling of quoted schemas in search_path
+                    {"quoted_schema", false, true, false, false}
                 });
     }
 
