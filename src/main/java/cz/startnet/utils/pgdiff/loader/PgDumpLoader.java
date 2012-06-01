@@ -47,7 +47,7 @@ public class PgDumpLoader { //NOPMD
      */
     private static final Pattern PATTERN_DEFAULT_SCHEMA =
             Pattern.compile(
-            "^SET[\\s]+search_path[\\s]*=[\\s]*([^,\\s]+)(?:,[\\s]+.*)?;$",
+            "^SET[\\s]+search_path[\\s]*=[\\s]*\"?([^,\\s\"]+)\"?(?:,[\\s]+.*)?;$",
             Pattern.CASE_INSENSITIVE);
     /**
      * Pattern for testing whether it is CREATE TABLE statement.

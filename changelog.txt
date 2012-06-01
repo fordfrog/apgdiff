@@ -10,6 +10,7 @@ Fixes
 * Fixed issue with comments not being added on newly created columns.
 * Improved logging errors when parsing strings.
 * Added support for IF NOT EXISTS (patch by Felipe Sateler).
+* Fixed NPE when search_path contains quoted schema (patch by Steven Elliott).
 
 -----------------------
 2010-10-22: Version 2.3
