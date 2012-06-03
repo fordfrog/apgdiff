@@ -11,6 +11,8 @@ Fixes
 * Improved logging errors when parsing strings.
 * Added support for IF NOT EXISTS (patch by Felipe Sateler).
 * Fixed NPE when search_path contains quoted schema (patch by Steven Elliott).
+* Fixed dropping of default values when --add-defaults is specified (patch by
+  Jim Mlodgenski).
 
 -----------------------
 2010-10-22: Version 2.3
