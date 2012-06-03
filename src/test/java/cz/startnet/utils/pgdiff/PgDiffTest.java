@@ -245,7 +245,9 @@ public class PgDiffTest {
                     // Tests handling of quoted schemas in search_path
                     {"quoted_schema", false, true, false, false},
                     // Tests adding new column with add defaults turned on
-                    {"add_column_add_defaults", true, true, false, false}
+                    {"add_column_add_defaults", true, true, false, false},
+                    // Tests adding new sequence that is owned by table
+                    {"add_owned_sequence", false, true, false, false}
                 });
     }
 

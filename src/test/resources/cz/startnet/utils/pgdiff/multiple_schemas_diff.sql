@@ -20,6 +20,9 @@ CREATE TABLE testtable3 (
 	id bigint DEFAULT nextval('testtable3_id_seq'::regclass) NOT NULL
 );
 
+ALTER SEQUENCE testtable3_id_seq
+	OWNED BY testtable3.id;
+
 SET search_path = testschema2, pg_catalog;
 
 CREATE SEQUENCE testtable1_id_seq
@@ -32,3 +35,6 @@ CREATE SEQUENCE testtable1_id_seq
 CREATE TABLE testtable1 (
 	id integer DEFAULT nextval('testtable1_id_seq'::regclass) NOT NULL
 );
+
+ALTER SEQUENCE testtable1_id_seq
+	OWNED BY testtable1.id;
