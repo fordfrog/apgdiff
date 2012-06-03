@@ -247,7 +247,9 @@ public class PgDiffTest {
                     // Tests addition of comment when new column has been added
                     {"add_comment_new_column", false, true, false, false},
                     // Tests handling of quoted schemas in search_path
-                    {"quoted_schema", false, true, false, false}
+                    {"quoted_schema", false, true, false, false},
+                    // Tests adding new column with add defaults turned on
+                    {"add_column_add_defaults", true, true, false, false}
                 });
     }
 
