@@ -46,6 +46,30 @@ public class PgDiffSequences {
     }
 
     /**
+     * Outputs statements for altering of new sequences.
+     *
+     * @param writer writer the output should be written to
+     * @param oldSchema original schema
+     * @param newSchema new schema
+     * @param searchPathHelper search path helper
+     */
+    public static void alterCreatedSequences(final PrintWriter writer,
+            final PgSchema oldSchema, final PgSchema newSchema,
+            final SearchPathHelper searchPathHelper) {
+        // Alter created sequences
+        for (final PgSequence sequence : newSchema.getSequences()) {
+            if ((oldSchema == null
+                    || !oldSchema.containsSequence(sequence.getName()))
+                    && sequence.getOwnedBy() != null &&
+                    !sequence.getOwnedBy().isEmpty()) {
+                searchPathHelper.outputSearchPath(writer);
+                writer.println();
+                writer.println(sequence.getOwnedBySQL());
+            }
+        }
+    }
+
+    /**
      * Outputs statements for dropping of sequences that do not exist anymore.
      *
      * @param writer writer the output should be written to
@@ -154,6 +178,14 @@ public class PgDiffSequences {
                 sbSQL.append("\n\tNO CYCLE");
             } else if (!oldCycle && newCycle) {
                 sbSQL.append("\n\tCYCLE");
+            }
+
+            final String oldOwnedBy = oldSequence.getOwnedBy();
+            final String newOwnedBy = newSequence.getOwnedBy();
+
+            if (newOwnedBy != null && !newOwnedBy.equals(oldOwnedBy)) {
+                 sbSQL.append("\n\tOWNED BY ");
+                 sbSQL.append(newOwnedBy);
             }
 
             if (sbSQL.length() > 0) {

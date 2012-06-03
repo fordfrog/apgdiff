@@ -3,9 +3,11 @@
 ------------------------------------------
 
 --------------------------------
-Version 2.3.1 (not released yet)
+Version 2.4 (not released yet)
 --------------------------------
 
+New Features
+* Added support for ALTER SEQUENCE OWNED BY (patch by Mikhail Petrov).
 Fixes
 * Fixed issue with comments not being added on newly created columns.
 * Improved logging errors when parsing strings.

@@ -143,11 +143,6 @@ public class PgSequence {
             sbSQL.append("\n\tCYCLE");
         }
 
-        if (ownedBy != null && !ownedBy.isEmpty()) {
-            sbSQL.append("\n\tOWNED BY ");
-            sbSQL.append(PgDiffUtils.getQuotedName(ownedBy));
-        }
-
         sbSQL.append(';');
 
         if (comment != null && !comment.isEmpty()) {
@@ -157,6 +152,28 @@ public class PgSequence {
             sbSQL.append(comment);
             sbSQL.append(';');
         }
+
+        return sbSQL.toString();
+    }
+
+    /**
+     * Creates and returns SQL statement for modification "OWNED BY" parameter.
+     *
+     * @return created SQL statement
+     */
+
+    public String getOwnedBySQL() {
+        final StringBuilder sbSQL = new StringBuilder(100);
+
+        sbSQL.append("ALTER SEQUENCE ");
+        sbSQL.append(PgDiffUtils.getQuotedName(name));
+
+        if (ownedBy != null && !ownedBy.isEmpty()) {
+            sbSQL.append("\n\tOWNED BY ");
+            sbSQL.append(ownedBy);
+        }
+
+        sbSQL.append(';');
 
         return sbSQL.toString();
     }

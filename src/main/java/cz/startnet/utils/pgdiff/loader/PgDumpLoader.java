@@ -8,6 +8,7 @@ package cz.startnet.utils.pgdiff.loader;
 import cz.startnet.utils.pgdiff.Resources;
 import cz.startnet.utils.pgdiff.parsers.AlterTableParser;
 import cz.startnet.utils.pgdiff.parsers.AlterViewParser;
+import cz.startnet.utils.pgdiff.parsers.AlterSequenceParser;
 import cz.startnet.utils.pgdiff.parsers.CommentParser;
 import cz.startnet.utils.pgdiff.parsers.CreateFunctionParser;
 import cz.startnet.utils.pgdiff.parsers.CreateIndexParser;
@@ -69,6 +70,12 @@ public class PgDumpLoader { //NOPMD
      */
     private static final Pattern PATTERN_CREATE_SEQUENCE = Pattern.compile(
             "^CREATE[\\s]+SEQUENCE[\\s]+.*$", Pattern.CASE_INSENSITIVE);
+    /**
+     * Pattern for testing whether it is ALTER SEQUENCE statement.
+     */
+    private static final Pattern PATTERN_ALTER_SEQUENCE =
+            Pattern.compile("^ALTER[\\s]+SEQUENCE[\\s]+.*$",
+            Pattern.CASE_INSENSITIVE);
     /**
      * Pattern for testing whether it is CREATE INDEX statement.
      */
@@ -180,6 +187,10 @@ public class PgDumpLoader { //NOPMD
                 } else if (PATTERN_CREATE_SEQUENCE.matcher(line).matches()) {
                     CreateSequenceParser.parse(
                             database, getWholeStatement(reader, line));
+                } else if (PATTERN_ALTER_SEQUENCE.matcher(line).matches()) {
+                    AlterSequenceParser.parse(database,
+                            getWholeStatement(reader, line),
+                            outputIgnoredStatements);
                 } else if (PATTERN_CREATE_INDEX.matcher(line).matches()) {
                     CreateIndexParser.parse(
                             database, getWholeStatement(reader, line));

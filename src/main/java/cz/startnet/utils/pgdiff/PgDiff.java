@@ -251,6 +251,8 @@ public class PgDiff {
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffTables.alterTables(
                     writer, arguments, oldSchema, newSchema, searchPathHelper);
+            PgDiffSequences.alterCreatedSequences(
+                    writer, oldSchema, newSchema, searchPathHelper);
             PgDiffFunctions.createFunctions(
                     writer, arguments, oldSchema, newSchema, searchPathHelper);
             PgDiffConstraints.createConstraints(
