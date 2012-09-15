@@ -15,6 +15,8 @@ Fixes
 * Fixed NPE when search_path contains quoted schema (patch by Steven Elliott).
 * Fixed dropping of default values when --add-defaults is specified (patch by
   Jim Mlodgenski).
+* Fixed all bugs related to incorrect parsing of end of statement, most often
+  resulting in StringIndexOutOfBoundException.
 
 -----------------------
 2010-10-22: Version 2.3

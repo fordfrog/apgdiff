@@ -79,6 +79,7 @@ public class PgFunction {
 
         sbSQL.append(") ");
         sbSQL.append(body);
+        sbSQL.append(';');
 
         if (comment != null && !comment.isEmpty()) {
             sbSQL.append("\n\nCOMMENT ON FUNCTION ");
@@ -194,7 +195,7 @@ public class PgFunction {
     /**
      * Returns function signature. It consists of unquoted name and argument
      * data types.
-     * 
+     *
      * @return function signature
      */
     public String getSignature() {
