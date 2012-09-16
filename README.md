@@ -1,14 +1,16 @@
-------------------------------------------
- Changelog of Another PostgreSQL Diff Tool
-------------------------------------------
+# Another PostgreSQL Diff Tool (aka apgdiff)
 
---------------------------------
-Version 2.4 (not released yet)
---------------------------------
+Ahother PostgreSQL Diff Tool is free PostgreSQL diff tool that is useful for
+comparison/diffing of database schemas. You can find more information at its
+website at http://apgdiff.startnet.biz/
 
-New Features
+## Changelog
+
+### Version 2.4 (not released yet)
+
+#### New Features
 * Added support for ALTER SEQUENCE OWNED BY (patch by Mikhail Petrov).
-Fixes
+#### Fixes
 * Fixed issue with comments not being added on newly created columns.
 * Improved logging errors when parsing strings.
 * Added support for IF NOT EXISTS (patch by Felipe Sateler).
@@ -18,14 +20,12 @@ Fixes
 * Fixed all bugs related to incorrect parsing of end of statement, most often
   resulting in StringIndexOutOfBoundException.
 
------------------------
-2010-10-22: Version 2.3
------------------------
+### 2010-10-22: Version 2.3
 
-New Features
+#### New Features
 * Added support for diffing of COMMENT ON statements.
 * Added switch --list-charsets to output list of supported charsets.
-Fixes
+#### Fixes
 * Added user error messages instead of NullPointerException for cases when
   referenced database object was not found in the dump.
 * Fixed bug with parsing quoted object name when both first and second part of
@@ -38,11 +38,9 @@ Fixes
   functions depending on tables and columns. Later will be implemented solution
   for cases where functions have to be created before table columns.
 
--------------------------
-2010-10-09: Version 2.2.2
--------------------------
+### 2010-10-09: Version 2.2.2
 
-Fixes
+#### Fixes
 * Added missing new line after ALTER VIEW ... ALTER COLUMN ... SET/DROP DEFAULT.
 * Fixed parsing of quoted string values.
 * Fixed detection of function body separator (did not work when there was
@@ -54,27 +52,23 @@ Fixes
 * Replaced 'ALTER VIEW name ALTER COLUMN ...' with 'ALTER TABLE view_name ALTER
   COLUMN ...' to make it compatible with PostgreSQL releases prior to 8.4.
 * Fixed parsing of '' escapes.
-Other
+#### Other
 * Added support for localization of apgdiff.
 * Added Czech localization.
 
--------------------------
-2010-10-03: Version 2.2.1
--------------------------
+### 2010-10-03: Version 2.2.1
 
-New Features
+#### New Features
 * Commands like OWNER TO and ENABLE/DISABLE TRIGGER/RULE are now added to the
   diff output even for commands that are otherwise being parsed, like ALTER
   TABLE.
-Fixes
+#### Fixes
 * Fixed bug where default values were dropped from VIEW columns even if they
   were not modified.
 
------------------------
-2010-10-02: Version 2.2
------------------------
+### 2010-10-02: Version 2.2
 
-New Features
+#### New Features
 * Statements that are not supported by apgdiff yet are now all ignored(till this
   release apgdiff had to be instructed to know what commands to ignore which was
   not good solution). This is the same behavior as in 1.* releases.
@@ -83,40 +77,30 @@ New Features
   feature makes more clear what statements were ignored and developer has to
   handle them manually eventually.
 
------------------------
-2010-09-30: Version 2.1
------------------------
+### 2010-09-30: Version 2.1
 
-New Features
+#### New Features
 * Added support for ALTER VIEW.
 * Added support for ALTER TABLE view_name/sequence_name.
-
-Fixes
-
+#### Fixes
 * Fixed issue with comparison of VIEWs when columns are not specified but query
   has changed.
 * Fixed parsing of quoted names at many places.
 * CREATE RULE is now silently skipped.
 
--------------------------
-2010-09-16: Version 2.0.2
--------------------------
+### 2010-09-16: Version 2.0.2
 
-Fixes
+#### Fixes
 * CREATE DOMAIN is now silently skipped.
 
--------------------------
-2010-09-16: Version 2.0.1
--------------------------
+### 2010-09-16: Version 2.0.1
 
-Fixes
+#### Fixes
 * CREATE OPERATOR and ALTER LANGUAGE are now silently skipped.
 
------------------------------------------------
-2010-09-13: Version 2.0 Including Beta Releases
------------------------------------------------
+### 2010-09-13: Version 2.0 Including Beta Releases
 
-New Features
+#### New Features
 * SQL parser has been completely rewritten to allow safer and more flexible
   parsing of SQL statements.
 * Statements not supported by apgdiff are now not silenty ignored if apgdiff is
@@ -131,8 +115,7 @@ New Features
 * Added support for default values on function arguments.
 * Added support for parsing ALTER TABLE ... ENABLE/DISABLE TRIGGER/PARSER, but
   they are not diffed for now.
-
-Fixes
+#### Fixes
 * ALTER SEQUENCE and CREATE AGGREGATE are now silently skipped.
 * Fixed parsing of end of function.
 * Improved handling of dotted quoted names.
@@ -141,8 +124,6 @@ Fixes
 * Triggers are now dropped before functions are dropped (bug #2991245).
 * Improved diffing of CREATE TABLE ... INHERITS.
 
----------------------
-Versions Prior to 2.0
----------------------
+### Versions Prior to 2.0
 
 These versions are not covered in changelog.
