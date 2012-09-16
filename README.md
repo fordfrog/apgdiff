@@ -10,6 +10,7 @@ website at http://apgdiff.startnet.biz/
 
 #### New Features
 * Added support for ALTER SEQUENCE OWNED BY (patch by Mikhail Petrov).
+
 #### Fixes
 * Fixed issue with comments not being added on newly created columns.
 * Improved logging errors when parsing strings.
@@ -25,6 +26,7 @@ website at http://apgdiff.startnet.biz/
 #### New Features
 * Added support for diffing of COMMENT ON statements.
 * Added switch --list-charsets to output list of supported charsets.
+
 #### Fixes
 * Added user error messages instead of NullPointerException for cases when
   referenced database object was not found in the dump.
@@ -52,6 +54,7 @@ website at http://apgdiff.startnet.biz/
 * Replaced 'ALTER VIEW name ALTER COLUMN ...' with 'ALTER TABLE view_name ALTER
   COLUMN ...' to make it compatible with PostgreSQL releases prior to 8.4.
 * Fixed parsing of '' escapes.
+
 #### Other
 * Added support for localization of apgdiff.
 * Added Czech localization.
@@ -62,6 +65,7 @@ website at http://apgdiff.startnet.biz/
 * Commands like OWNER TO and ENABLE/DISABLE TRIGGER/RULE are now added to the
   diff output even for commands that are otherwise being parsed, like ALTER
   TABLE.
+
 #### Fixes
 * Fixed bug where default values were dropped from VIEW columns even if they
   were not modified.
@@ -82,6 +86,7 @@ website at http://apgdiff.startnet.biz/
 #### New Features
 * Added support for ALTER VIEW.
 * Added support for ALTER TABLE view_name/sequence_name.
+
 #### Fixes
 * Fixed issue with comparison of VIEWs when columns are not specified but query
   has changed.
@@ -115,6 +120,7 @@ website at http://apgdiff.startnet.biz/
 * Added support for default values on function arguments.
 * Added support for parsing ALTER TABLE ... ENABLE/DISABLE TRIGGER/PARSER, but
   they are not diffed for now.
+
 #### Fixes
 * ALTER SEQUENCE and CREATE AGGREGATE are now silently skipped.
 * Fixed parsing of end of function.
