@@ -52,8 +52,7 @@ public class CreateTriggerParser {
         while (true) {
             if (!first && !parser.expectOptional("OR")) {
                 break;
-            }
-            if (parser.expectOptional("INSERT")) {
+            } else if (parser.expectOptional("INSERT")) {
                 trigger.setOnInsert(true);
             } else if (parser.expectOptional("UPDATE")) {
                 trigger.setOnUpdate(true);

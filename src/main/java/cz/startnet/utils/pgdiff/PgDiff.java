@@ -200,7 +200,7 @@ public class PgDiff {
             final PgSchema oldSchema =
                     oldDatabase.getSchema(newSchema.getName());
 
-            if (oldSchema != null && newSchema != null) {
+            if (oldSchema != null) {
                 if (oldSchema.getComment() == null
                         && newSchema.getComment() != null
                         || oldSchema.getComment() != null
