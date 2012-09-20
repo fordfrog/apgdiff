@@ -10,6 +10,7 @@ website at http://apgdiff.startnet.biz/
 
 #### New Features
 * Added support for ALTER SEQUENCE OWNED BY (patch by Mikhail Petrov).
+* Added support for CREATE TRIGGER ... UPDATE OF column.
 
 #### Fixes
 * Fixed issue with comments not being added on newly created columns.

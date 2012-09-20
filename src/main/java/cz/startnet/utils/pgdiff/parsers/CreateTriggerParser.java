@@ -57,6 +57,12 @@ public class CreateTriggerParser {
                 trigger.setOnInsert(true);
             } else if (parser.expectOptional("UPDATE")) {
                 trigger.setOnUpdate(true);
+
+                if (parser.expectOptional("OF")) {
+                    do {
+                        trigger.addUpdateColumn(parser.parseIdentifier());
+                    } while (parser.expectOptional(","));
+                }
             } else if (parser.expectOptional("DELETE")) {
                 trigger.setOnDelete(true);
             } else if (parser.expectOptional("TRUNCATE")) {

@@ -57,7 +57,7 @@ ALTER TABLE public.test_table OWNER TO fordfrog;
 --
 
 CREATE TRIGGER test_table_trigger
-    BEFORE INSERT OR UPDATE ON test_table
+    BEFORE INSERT OR UPDATE OF id ON test_table
     FOR EACH ROW
     EXECUTE PROCEDURE test_table_trigger();
 

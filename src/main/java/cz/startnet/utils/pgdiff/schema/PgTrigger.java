@@ -6,6 +6,9 @@
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Stores trigger information.
@@ -52,6 +55,11 @@ public class PgTrigger {
      * Whether the trigger should be fired on TRUNCATE.
      */
     private boolean onTruncate;
+    /**
+     * Optional list of columns for UPDATE event.
+     */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    private final List<String> updateColumns = new ArrayList<String>();
     /**
      * WHEN condition.
      */
@@ -124,6 +132,23 @@ public class PgTrigger {
             }
 
             sbSQL.append(" UPDATE");
+
+            if (!updateColumns.isEmpty()) {
+                sbSQL.append(" OF");
+
+                boolean first = true;
+
+                for (final String columnName : updateColumns) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        sbSQL.append(',');
+                    }
+
+                    sbSQL.append(' ');
+                    sbSQL.append(columnName);
+                }
+            }
         }
 
         if (isOnDelete()) {
@@ -325,6 +350,24 @@ public class PgTrigger {
     }
 
     /**
+     * Getter for {@link #updateColumns}.
+     *
+     * @return {@link #updateColumns}
+     */
+    public List<String> getUpdateColumns() {
+        return Collections.unmodifiableList(updateColumns);
+    }
+
+    /**
+     * Adds column name to the list of update columns.
+     *
+     * @param columnName column name
+     */
+    public void addUpdateColumn(final String columnName) {
+        updateColumns.add(columnName);
+    }
+
+    /**
      * Getter for {@link #when}.
      *
      * @return {@link #when}
@@ -359,6 +402,17 @@ public class PgTrigger {
                     && (onUpdate == trigger.isOnUpdate())
                     && (onTruncate == trigger.isOnTruncate())
                     && tableName.equals(trigger.getTableName());
+
+            if (equals) {
+                final List<String> sorted1 =
+                        new ArrayList<String>(updateColumns);
+                final List<String> sorted2 =
+                        new ArrayList<String>(trigger.getUpdateColumns());
+                Collections.sort(sorted1);
+                Collections.sort(sorted2);
+
+                equals = sorted1.equals(sorted2);
+            }
         }
 
         return equals;
