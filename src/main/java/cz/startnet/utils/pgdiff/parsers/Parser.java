@@ -14,6 +14,7 @@ import java.util.Locale;
  *
  * @author fordfrog
  */
+@SuppressWarnings("FinalClass")
 public final class Parser {
 
     /**
@@ -54,7 +55,7 @@ public final class Parser {
      * description is thrown. If word is found, position is moved at first
      * non-whitespace character following the word.
      *
-     * @param word word to expect
+     * @param word     word to expect
      * @param optional true if word is optional, otherwise false
      *
      * @return true if word was found, otherwise false
@@ -183,7 +184,7 @@ public final class Parser {
      * string, null is returned.
      *
      * @return rest of the string, without trailing ';' if present, or null if
-     * there is nothing more in the string
+     *         there is nothing more in the string
      */
     public String getRest() {
         final String result;
@@ -329,11 +330,10 @@ public final class Parser {
     }
 
     /**
-     * Returns position of last character of single command within
-     * statement (like CREATE TABLE). Last character is either ',' or
-     * ')'. If no such character is found and method reaches the end of the
-     * command then position after the last character in the command is
-     * returned.
+     * Returns position of last character of single command within statement
+     * (like CREATE TABLE). Last character is either ',' or ')'. If no such
+     * character is found and method reaches the end of the command then
+     * position after the last character in the command is returned.
      *
      * @return end position of the command
      */
@@ -417,7 +417,7 @@ public final class Parser {
      * Returns substring from the string.
      *
      * @param startPos start position
-     * @param endPos end position exclusive
+     * @param endPos   end position exclusive
      *
      * @return substring
      */

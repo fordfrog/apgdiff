@@ -7,7 +7,6 @@ package cz.startnet.utils.pgdiff;
 
 import cz.startnet.utils.pgdiff.schema.PgFunction;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
-
 import java.io.PrintWriter;
 
 /**
@@ -18,18 +17,12 @@ import java.io.PrintWriter;
 public class PgDiffFunctions {
 
     /**
-     * Creates a new instance of PgDiffFunctions.
-     */
-    private PgDiffFunctions() {
-    }
-
-    /**
      * Outputs statements for new or modified functions.
      *
-     * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
-     * @param oldSchema original schema
-     * @param newSchema new schema
+     * @param writer           writer the output should be written to
+     * @param arguments        object containing arguments settings
+     * @param oldSchema        original schema
+     * @param newSchema        new schema
      * @param searchPathHelper search path helper
      */
     public static void createFunctions(final PrintWriter writer,
@@ -57,10 +50,10 @@ public class PgDiffFunctions {
     /**
      * Outputs statements for dropping of functions that exist no more.
      *
-     * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
-     * @param oldSchema original schema
-     * @param newSchema new schema
+     * @param writer           writer the output should be written to
+     * @param arguments        object containing arguments settings
+     * @param oldSchema        original schema
+     * @param newSchema        new schema
      * @param searchPathHelper search path helper
      */
     public static void dropFunctions(final PrintWriter writer,
@@ -83,9 +76,9 @@ public class PgDiffFunctions {
     /**
      * Outputs statements for function comments that have changed.
      *
-     * @param writer writer
-     * @param oldSchema old schema
-     * @param newSchema new schema
+     * @param writer           writer
+     * @param oldSchema        old schema
+     * @param newSchema        new schema
      * @param searchPathHelper search path helper
      */
     public static void alterComments(final PrintWriter writer,
@@ -155,5 +148,11 @@ public class PgDiffFunctions {
                 writer.println(") IS NULL;");
             }
         }
+    }
+
+    /**
+     * Creates a new instance of PgDiffFunctions.
+     */
+    private PgDiffFunctions() {
     }
 }

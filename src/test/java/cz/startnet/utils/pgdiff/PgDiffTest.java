@@ -29,51 +29,6 @@ import org.junit.runners.Parameterized.Parameters;
 public class PgDiffTest {
 
     /**
-     * Template name for file names that should be used for the test.
-     * Testing method adds _original.sql, _new.sql and _diff.sql to the file
-     * name template.
-     */
-    private final String fileNameTemplate;
-    /**
-     * Value for the same named command line argument.
-     */
-    private final boolean addDefaults;
-    /**
-     * Value for the same named command line argument.
-     */
-    private final boolean addTransaction;
-    /**
-     * Value for the same named command line argument.
-     */
-    private final boolean ignoreFunctionWhitespace;
-    /**
-     * Value for the same named command line argument.
-     */
-    private final boolean ignoreStartWith;
-
-    /**
-     * Creates a new PgDiffTest object.
-     *
-     * @param fileNameTemplate {@link #fileNameTemplate}
-     * @param addDefaults {@link #addDefaults}
-     * @param addTransaction {@link #addTransaction}
-     * @param ignoreFunctionWhitespace {@link #ignoreFunctionWhitespace}
-     * @param ignoreStartWith {@link #ignoreStartWith}
-     */
-    public PgDiffTest(final String fileNameTemplate,
-            final boolean addDefaults, final boolean addTransaction,
-            final boolean ignoreFunctionWhitespace,
-            final boolean ignoreStartWith) {
-        super();
-        this.fileNameTemplate = fileNameTemplate;
-        this.addDefaults = addDefaults;
-        this.addTransaction = addTransaction;
-        this.ignoreFunctionWhitespace = ignoreFunctionWhitespace;
-        this.ignoreStartWith = ignoreStartWith;
-        Locale.setDefault(Locale.ENGLISH);
-    }
-
-    /**
      * Provides parameters for running the tests.
      *
      * @return parameters for the tests
@@ -250,13 +205,57 @@ public class PgDiffTest {
                     {"add_owned_sequence", false, true, false, false}
                 });
     }
+    /**
+     * Template name for file names that should be used for the test. Testing
+     * method adds _original.sql, _new.sql and _diff.sql to the file name
+     * template.
+     */
+    private final String fileNameTemplate;
+    /**
+     * Value for the same named command line argument.
+     */
+    private final boolean addDefaults;
+    /**
+     * Value for the same named command line argument.
+     */
+    private final boolean addTransaction;
+    /**
+     * Value for the same named command line argument.
+     */
+    private final boolean ignoreFunctionWhitespace;
+    /**
+     * Value for the same named command line argument.
+     */
+    private final boolean ignoreStartWith;
+
+    /**
+     * Creates a new PgDiffTest object.
+     *
+     * @param fileNameTemplate         {@link #fileNameTemplate}
+     * @param addDefaults              {@link #addDefaults}
+     * @param addTransaction           {@link #addTransaction}
+     * @param ignoreFunctionWhitespace {@link #ignoreFunctionWhitespace}
+     * @param ignoreStartWith          {@link #ignoreStartWith}
+     */
+    public PgDiffTest(final String fileNameTemplate,
+            final boolean addDefaults, final boolean addTransaction,
+            final boolean ignoreFunctionWhitespace,
+            final boolean ignoreStartWith) {
+        super();
+        this.fileNameTemplate = fileNameTemplate;
+        this.addDefaults = addDefaults;
+        this.addTransaction = addTransaction;
+        this.ignoreFunctionWhitespace = ignoreFunctionWhitespace;
+        this.ignoreStartWith = ignoreStartWith;
+        Locale.setDefault(Locale.ENGLISH);
+    }
 
     /**
      * Runs single test on original schema.
      *
      * @throws FileNotFoundException Thrown if expected diff file was not found.
-     * @throws IOException Thrown if problem occurred while reading expected
-     * diff.
+     * @throws IOException           Thrown if problem occurred while reading
+     *                               expected diff.
      */
     @Test(timeout = 1000)
     public void runDiffSameOriginal() throws FileNotFoundException, IOException {
@@ -278,8 +277,8 @@ public class PgDiffTest {
      * Runs single test on new schema.
      *
      * @throws FileNotFoundException Thrown if expected diff file was not found.
-     * @throws IOException Thrown if problem occurred while reading expected
-     * diff.
+     * @throws IOException           Thrown if problem occurred while reading
+     *                               expected diff.
      */
     @Test(timeout = 1000)
     public void runDiffSameNew() throws FileNotFoundException, IOException {
@@ -301,8 +300,8 @@ public class PgDiffTest {
      * Runs single test using class member variables.
      *
      * @throws FileNotFoundException Thrown if expected diff file was not found.
-     * @throws IOException Thrown if problem occurred while reading expected
-     * diff.
+     * @throws IOException           Thrown if problem occurred while reading
+     *                               expected diff.
      */
     @Test(timeout = 1000)
     public void runDiff() throws FileNotFoundException, IOException {

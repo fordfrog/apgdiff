@@ -18,15 +18,14 @@ public class FileException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Creates a new instance of <code>FileException</code> without
-     * detail message.
+     * Creates a new instance of {@code FileException} without detail message.
      */
     public FileException() {
     }
 
     /**
-     * Constructs an instance of <code>FileException</code> with the
-     * specified detail message.
+     * Constructs an instance of {@code FileException} with the specified detail
+     * message.
      *
      * @param msg the detail message
      */
@@ -35,10 +34,10 @@ public class FileException extends RuntimeException {
     }
 
     /**
-     * Constructs an instance of <code>FileException</code> with the
-     * specified detail message.
+     * Constructs an instance of {@code FileException} with the specified detail
+     * message.
      *
-     * @param msg the detail message
+     * @param msg   the detail message
      * @param cause cause of the exception
      */
     public FileException(final String msg, final Throwable cause) {

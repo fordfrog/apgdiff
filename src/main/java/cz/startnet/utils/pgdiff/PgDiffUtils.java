@@ -477,19 +477,13 @@ public class PgDiffUtils {
         "ZONE"};
 
     /**
-     * Creates a new PgDiffUtils object.
-     */
-    private PgDiffUtils() {
-    }
-
-    /**
      * If name contains only lower case characters and digits and is not
      * keyword, it is returned not quoted, otherwise the string is returned
      * quoted.
      *
-     * @param name name
+     * @param name            name
      * @param excludeKeywords whether check against keywords should be skipped
-     * 
+     *
      * @return quoted string if needed, otherwise not quoted string
      */
     public static String getQuotedName(final String name,
@@ -532,5 +526,11 @@ public class PgDiffUtils {
      */
     public static String getQuotedName(final String name) {
         return getQuotedName(name, false);
+    }
+
+    /**
+     * Creates a new PgDiffUtils object.
+     */
+    private PgDiffUtils() {
     }
 }

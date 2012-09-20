@@ -13,24 +13,18 @@ import java.text.MessageFormat;
 
 /**
  * Parses ALTER VIEW statements.
- * 
+ *
  * @author fordfrog
  */
 public class AlterViewParser {
 
     /**
-     * Creates new instance of AlterViewParser.
-     */
-    private AlterViewParser() {
-    }
-
-    /**
      * Parses ALTER VIEW statement.
-     * 
-     * @param database database
-     * @param statement ALTER VIEW statement
+     *
+     * @param database                database
+     * @param statement               ALTER VIEW statement
      * @param outputIgnoredStatements whether ignored statements should be
-     * output in the diff
+     *                                output in the diff
      */
     public static void parse(final PgDatabase database,
             final String statement, final boolean outputIgnoredStatements) {
@@ -83,5 +77,11 @@ public class AlterViewParser {
                 parser.throwUnsupportedCommand();
             }
         }
+    }
+
+    /**
+     * Creates new instance of AlterViewParser.
+     */
+    private AlterViewParser() {
     }
 }

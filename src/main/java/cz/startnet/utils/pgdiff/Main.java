@@ -10,18 +10,12 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
 /**
- * Compares two PostgreSQL dumps and outputs information about differences
- * in the database schemas.
+ * Compares two PostgreSQL dumps and outputs information about differences in
+ * the database schemas.
  *
  * @author fordfrog
  */
 public class Main {
-
-    /**
-     * Creates a new Main object.
-     */
-    private Main() {
-    }
 
     /**
      * APgDiff main method.
@@ -29,7 +23,7 @@ public class Main {
      * @param args the command line arguments
      *
      * @throws UnsupportedEncodingException Thrown if unsupported output
-     * encoding has been encountered.
+     *                                      encoding has been encountered.
      */
     public static void main(final String[] args)
             throws UnsupportedEncodingException {
@@ -42,10 +36,16 @@ public class Main {
             final PrintWriter encodedWriter = new PrintWriter(
                     new OutputStreamWriter(
                     System.out, arguments.getOutCharsetName()));
-                PgDiff.createDiff(encodedWriter, arguments);
+            PgDiff.createDiff(encodedWriter, arguments);
             encodedWriter.close();
         }
 
         writer.close();
+    }
+
+    /**
+     * Creates a new Main object.
+     */
+    private Main() {
     }
 }

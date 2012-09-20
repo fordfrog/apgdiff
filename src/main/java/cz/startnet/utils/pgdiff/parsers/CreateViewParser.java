@@ -21,15 +21,9 @@ import java.util.List;
 public class CreateViewParser {
 
     /**
-     * Creates a new instance of CreateViewParser.
-     */
-    private CreateViewParser() {
-    }
-
-    /**
      * Parses CREATE VIEW statement.
      *
-     * @param database database
+     * @param database  database
      * @param statement CREATE VIEW statement
      */
     public static void parse(final PgDatabase database,
@@ -70,5 +64,11 @@ public class CreateViewParser {
         }
 
         schema.addView(view);
+    }
+
+    /**
+     * Creates a new instance of CreateViewParser.
+     */
+    private CreateViewParser() {
     }
 }

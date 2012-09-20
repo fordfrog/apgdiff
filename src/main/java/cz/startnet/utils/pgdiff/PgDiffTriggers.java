@@ -8,9 +8,7 @@ package cz.startnet.utils.pgdiff;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
 import cz.startnet.utils.pgdiff.schema.PgTrigger;
-
 import java.io.PrintWriter;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,17 +20,11 @@ import java.util.List;
 public class PgDiffTriggers {
 
     /**
-     * Creates a new instance of PgDiffTriggers.
-     */
-    private PgDiffTriggers() {
-    }
-
-    /**
      * Outputs statements for creation of new triggers.
      *
-     * @param writer writer the output should be written to
-     * @param oldSchema original schema
-     * @param newSchema new schema
+     * @param writer           writer the output should be written to
+     * @param oldSchema        original schema
+     * @param newSchema        new schema
      * @param searchPathHelper search path helper
      */
     public static void createTriggers(final PrintWriter writer,
@@ -59,9 +51,9 @@ public class PgDiffTriggers {
     /**
      * Outputs statements for dropping triggers.
      *
-     * @param writer writer the output should be written to
-     * @param oldSchema original schema
-     * @param newSchema new schema
+     * @param writer           writer the output should be written to
+     * @param oldSchema        original schema
+     * @param newSchema        new schema
      * @param searchPathHelper search path helper
      */
     public static void dropTriggers(final PrintWriter writer,
@@ -143,9 +135,9 @@ public class PgDiffTriggers {
     /**
      * Outputs statements for trigger comments that have changed.
      *
-     * @param writer writer
-     * @param oldSchema old schema
-     * @param newSchema new schema
+     * @param writer           writer
+     * @param oldSchema        old schema
+     * @param newSchema        new schema
      * @param searchPathHelper search path helper
      */
     public static void alterComments(final PrintWriter writer,
@@ -201,5 +193,11 @@ public class PgDiffTriggers {
                 }
             }
         }
+    }
+
+    /**
+     * Creates a new instance of PgDiffTriggers.
+     */
+    private PgDiffTriggers() {
     }
 }

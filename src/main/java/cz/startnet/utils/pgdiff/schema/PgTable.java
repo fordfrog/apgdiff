@@ -6,7 +6,6 @@
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -94,7 +93,7 @@ public class PgTable {
     }
 
     /**
-     * Finds column according to specified column <code>name</code>.
+     * Finds column according to specified column {@code name}.
      *
      * @param name name of the column to be searched
      *
@@ -138,8 +137,7 @@ public class PgTable {
     }
 
     /**
-     * Finds constraint according to specified constraint
-     * <code>name</code>.
+     * Finds constraint according to specified constraint {@code name}.
      *
      * @param name name of the constraint to be searched
      *
@@ -270,7 +268,7 @@ public class PgTable {
     }
 
     /**
-     * Finds index according to specified index <code>name</code>.
+     * Finds index according to specified index {@code name}.
      *
      * @param name name of the index to be searched
      *
@@ -287,7 +285,7 @@ public class PgTable {
     }
 
     /**
-     * Finds trigger according to specified trigger <code>name</code>.
+     * Finds trigger according to specified trigger {@code name}.
      *
      * @param name name of the trigger to be searched
      *
@@ -394,7 +392,7 @@ public class PgTable {
     }
 
     /**
-     * Adds <code>column</code> to the list of columns.
+     * Adds {@code column} to the list of columns.
      *
      * @param column column
      */
@@ -403,7 +401,7 @@ public class PgTable {
     }
 
     /**
-     * Adds <code>constraint</code> to the list of constraints.
+     * Adds {@code constraint} to the list of constraints.
      *
      * @param constraint constraint
      */
@@ -412,7 +410,7 @@ public class PgTable {
     }
 
     /**
-     * Adds <code>index</code> to the list of indexes.
+     * Adds {@code index} to the list of indexes.
      *
      * @param index index
      */
@@ -421,7 +419,7 @@ public class PgTable {
     }
 
     /**
-     * Adds <code>trigger</code> to the list of triggers.
+     * Adds {@code trigger} to the list of triggers.
      *
      * @param trigger trigger
      */
@@ -430,13 +428,12 @@ public class PgTable {
     }
 
     /**
-     * Returns true if table contains given column <code>name</code>,
-     * otherwise false.
+     * Returns true if table contains given column {@code name}, otherwise
+     * false.
      *
      * @param name name of the column
      *
-     * @return true if table contains given column <code>name</code>, otherwise
-     *         false
+     * @return true if table contains given column {@code name}, otherwise false
      */
     public boolean containsColumn(final String name) {
         for (PgColumn column : columns) {
@@ -449,13 +446,13 @@ public class PgTable {
     }
 
     /**
-     * Returns true if table contains given constraint
-     * <code>name</code>, otherwise false.
+     * Returns true if table contains given constraint {@code name}, otherwise
+     * false.
      *
      * @param name name of the constraint
      *
-     * @return true if table contains given constraint <code>name</code>,
-     *         otherwise false
+     * @return true if table contains given constraint {@code name}, otherwise
+     *         false
      */
     public boolean containsConstraint(final String name) {
         for (PgConstraint constraint : constraints) {
@@ -468,13 +465,11 @@ public class PgTable {
     }
 
     /**
-     * Returns true if table contains given index <code>name</code>,
-     * otherwise false.
+     * Returns true if table contains given index {@code name}, otherwise false.
      *
      * @param name name of the index
      *
-     * @return true if table contains given index <code>name</code>, otherwise
-     *         false
+     * @return true if table contains given index {@code name}, otherwise false
      */
     public boolean containsIndex(final String name) {
         for (PgIndex index : indexes) {

@@ -16,15 +16,9 @@ import cz.startnet.utils.pgdiff.schema.PgSchema;
 public class CreateSchemaParser {
 
     /**
-     * Creates a new CreateSchemaParser object.
-     */
-    private CreateSchemaParser() {
-    }
-
-    /**
      * Parses CREATE SCHEMA statement.
      *
-     * @param database database
+     * @param database  database
      * @param statement CREATE SCHEMA statement
      */
     public static void parse(final PgDatabase database,
@@ -59,5 +53,11 @@ public class CreateSchemaParser {
                 schema.setDefinition(definition);
             }
         }
+    }
+
+    /**
+     * Creates a new CreateSchemaParser object.
+     */
+    private CreateSchemaParser() {
     }
 }

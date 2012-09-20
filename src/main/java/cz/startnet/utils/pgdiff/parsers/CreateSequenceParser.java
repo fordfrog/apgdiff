@@ -19,15 +19,9 @@ import java.text.MessageFormat;
 public class CreateSequenceParser {
 
     /**
-     * Creates a new instance of CreateSequenceParser.
-     */
-    private CreateSequenceParser() {
-    }
-
-    /**
      * Parses CREATE SEQUENCE statement.
      *
-     * @param database database
+     * @param database  database
      * @param statement CREATE SEQUENCE statement
      */
     public static void parse(final PgDatabase database,
@@ -86,5 +80,11 @@ public class CreateSequenceParser {
                 parser.throwUnsupportedCommand();
             }
         }
+    }
+
+    /**
+     * Creates a new instance of CreateSequenceParser.
+     */
+    private CreateSequenceParser() {
     }
 }

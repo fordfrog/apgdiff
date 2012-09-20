@@ -6,7 +6,6 @@
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -158,7 +157,7 @@ public class PgSchema {
     }
 
     /**
-     * Finds function according to specified function <code>signature</code>.
+     * Finds function according to specified function {@code signature}.
      *
      * @param signature signature of the function to be searched
      *
@@ -193,7 +192,7 @@ public class PgSchema {
     }
 
     /**
-     * Finds index according to specified index <code>name</code>.
+     * Finds index according to specified index {@code name}.
      *
      * @param name name of the index to be searched
      *
@@ -210,7 +209,7 @@ public class PgSchema {
     }
 
     /**
-     * Finds primary key according to specified primary key <code>name</code>.
+     * Finds primary key according to specified primary key {@code name}.
      *
      * @param name name of the primary key to be searched
      *
@@ -227,7 +226,7 @@ public class PgSchema {
     }
 
     /**
-     * Finds sequence according to specified sequence <code>name</code>.
+     * Finds sequence according to specified sequence {@code name}.
      *
      * @param name name of the sequence to be searched
      *
@@ -271,7 +270,7 @@ public class PgSchema {
     }
 
     /**
-     * Finds table according to specified table <code>name</code>.
+     * Finds table according to specified table {@code name}.
      *
      * @param name name of the table to be searched
      *
@@ -297,7 +296,7 @@ public class PgSchema {
     }
 
     /**
-     * Finds view according to specified view <code>name</code>.
+     * Finds view according to specified view {@code name}.
      *
      * @param name name of the view to be searched
      *
@@ -323,7 +322,7 @@ public class PgSchema {
     }
 
     /**
-     * Adds <code>index</code> to the list of indexes.
+     * Adds {@code index} to the list of indexes.
      *
      * @param index index
      */
@@ -332,7 +331,7 @@ public class PgSchema {
     }
 
     /**
-     * Adds <code>primary key</code> to the list of primary keys.
+     * Adds {@code primary key} to the list of primary keys.
      *
      * @param primaryKey index
      */
@@ -341,7 +340,7 @@ public class PgSchema {
     }
 
     /**
-     * Adds <code>function</code> to the list of functions.
+     * Adds {@code function} to the list of functions.
      *
      * @param function function
      */
@@ -350,7 +349,7 @@ public class PgSchema {
     }
 
     /**
-     * Adds <code>sequence</code> to the list of sequences.
+     * Adds {@code sequence} to the list of sequences.
      *
      * @param sequence sequence
      */
@@ -359,7 +358,7 @@ public class PgSchema {
     }
 
     /**
-     * Adds <code>table</code> to the list of tables.
+     * Adds {@code table} to the list of tables.
      *
      * @param table table
      */
@@ -368,7 +367,7 @@ public class PgSchema {
     }
 
     /**
-     * Adds <code>view</code> to the list of views.
+     * Adds {@code view} to the list of views.
      *
      * @param view view
      */
@@ -377,13 +376,13 @@ public class PgSchema {
     }
 
     /**
-     * Returns true if schema contains function with given
-     * <code>signature</code>, otherwise false.
+     * Returns true if schema contains function with given {@code signature},
+     * otherwise false.
      *
      * @param signature signature of the function
      *
-     * @return true if schema contains function with given
-     *         <code>signature</code>, otherwise false
+     * @return true if schema contains function with given {@code signature},
+     *         otherwise false
      */
     public boolean containsFunction(final String signature) {
         for (PgFunction function : functions) {
@@ -396,12 +395,12 @@ public class PgSchema {
     }
 
     /**
-     * Returns true if schema contains sequence with given
-     * <code>name</code>, otherwise false.
+     * Returns true if schema contains sequence with given {@code name},
+     * otherwise false.
      *
      * @param name name of the sequence
      *
-     * @return true if schema contains sequence with given <code>name</code>,
+     * @return true if schema contains sequence with given {@code name},
      *         otherwise false
      */
     public boolean containsSequence(final String name) {
@@ -415,13 +414,13 @@ public class PgSchema {
     }
 
     /**
-     * Returns true if schema contains table with given
-     * <code>name</code>, otherwise false.
+     * Returns true if schema contains table with given {@code name}, otherwise
+     * false.
      *
      * @param name name of the table
      *
-     * @return true if schema contains table with given <code>name</code>,
-     *         otherwise false.
+     * @return true if schema contains table with given {@code name}, otherwise
+     *         false.
      */
     public boolean containsTable(final String name) {
         for (PgTable table : tables) {
@@ -434,13 +433,13 @@ public class PgSchema {
     }
 
     /**
-     * Returns true if schema contains view with given
-     * <code>name</code>, otherwise false.
+     * Returns true if schema contains view with given {@code name}, otherwise
+     * false.
      *
      * @param name name of the view
      *
-     * @return true if schema contains view with given <code>name</code>,
-     *         otherwise false.
+     * @return true if schema contains view with given {@code name}, otherwise
+     *         false.
      */
     public boolean containsView(final String name) {
         for (PgView view : views) {

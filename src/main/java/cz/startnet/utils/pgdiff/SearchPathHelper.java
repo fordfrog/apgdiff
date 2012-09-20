@@ -7,7 +7,7 @@ import java.io.PrintWriter;
 
 /**
  * Helps to output search path only if it was not output yet.
- * 
+ *
  * @author fordfrog
  */
 public class SearchPathHelper {

@@ -6,7 +6,6 @@
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -109,8 +108,8 @@ public class PgColumn {
     /**
      * Returns full definition of the column.
      *
-     * @param addDefaults whether default value should be added in case NOT
-     *        NULL constraint is specified but no default value is set
+     * @param addDefaults whether default value should be added in case NOT NULL
+     *                    constraint is specified but no default value is set
      *
      * @return full definition of the column
      */

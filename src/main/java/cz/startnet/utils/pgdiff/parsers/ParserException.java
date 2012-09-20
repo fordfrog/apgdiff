@@ -18,15 +18,14 @@ public class ParserException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Creates a new instance of <code>ParserException</code> without
-     * detail message.
+     * Creates a new instance of {@code ParserException} without detail message.
      */
     public ParserException() {
     }
 
     /**
-     * Constructs an instance of <code>ParserException</code> with the
-     * specified detail message.
+     * Constructs an instance of {@code ParserException} with the specified
+     * detail message.
      *
      * @param msg the detail message
      */
@@ -35,10 +34,10 @@ public class ParserException extends RuntimeException {
     }
 
     /**
-     * Constructs an instance of <code>ParserException</code> with the
-     * specified detail message.
+     * Constructs an instance of {@code ParserException} with the specified
+     * detail message.
      *
-     * @param msg the detail message
+     * @param msg   the detail message
      * @param cause cause of the exception
      */
     public ParserException(final String msg, final Throwable cause) {

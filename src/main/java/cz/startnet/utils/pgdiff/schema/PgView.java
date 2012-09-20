@@ -190,7 +190,7 @@ public class PgView {
     /**
      * Adds/replaces column default value specification.
      *
-     * @param columnName column name
+     * @param columnName   column name
      * @param defaultValue default value
      */
     public void addColumnDefaultValue(final String columnName,
@@ -226,7 +226,7 @@ public class PgView {
      * Adds/replaces column comment.
      *
      * @param columnName column name
-     * @param comment comment
+     * @param comment    comment
      */
     public void addColumnComment(final String columnName,
             final String comment) {
@@ -275,7 +275,7 @@ public class PgView {
         /**
          * Creates new instance of DefaultValue.
          *
-         * @param columnName {@link #columnName}
+         * @param columnName   {@link #columnName}
          * @param defaultValue {@link #defaultValue}
          */
         DefaultValue(final String columnName, final String defaultValue) {
@@ -321,7 +321,7 @@ public class PgView {
          * Creates new instance of ColumnComment.
          *
          * @param columnName {@link #columnName}
-         * @param comment {@link #comment}
+         * @param comment    {@link #comment}
          */
         ColumnComment(final String columnName, final String comment) {
             this.columnName = columnName;

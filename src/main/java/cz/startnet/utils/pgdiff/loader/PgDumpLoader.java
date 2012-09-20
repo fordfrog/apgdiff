@@ -137,12 +137,6 @@ public class PgDumpLoader { //NOPMD
     private static String lineBuffer;
 
     /**
-     * Creates a new instance of PgDumpLoader.
-     */
-    private PgDumpLoader() {
-    }
-
-    /**
      * Loads database schema from dump file.
      *
      * @param inputStream             input stream that should be read
@@ -375,5 +369,11 @@ public class PgDumpLoader { //NOPMD
         }
 
         return isQuoted;
+    }
+
+    /**
+     * Creates a new instance of PgDumpLoader.
+     */
+    private PgDumpLoader() {
     }
 }

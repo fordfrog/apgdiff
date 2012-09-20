@@ -6,7 +6,6 @@
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
-
 import java.util.regex.Pattern;
 
 /**
@@ -17,8 +16,7 @@ import java.util.regex.Pattern;
 public class PgConstraint {
 
     /**
-     * Pattern for checking whether the constraint is PRIMARY KEY
-     * constraint.
+     * Pattern for checking whether the constraint is PRIMARY KEY constraint.
      */
     private static final Pattern PATTERN_PRIMARY_KEY =
             Pattern.compile(".*PRIMARY[\\s]+KEY.*", Pattern.CASE_INSENSITIVE);
@@ -147,8 +145,7 @@ public class PgConstraint {
     }
 
     /**
-     * Returns true if this is a PRIMARY KEY constraint, otherwise
-     * false.
+     * Returns true if this is a PRIMARY KEY constraint, otherwise false.
      *
      * @return true if this is a PRIMARY KEY constraint, otherwise false
      */

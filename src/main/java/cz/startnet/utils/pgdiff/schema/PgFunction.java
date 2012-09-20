@@ -237,15 +237,16 @@ public class PgFunction {
 
     /**
      * Compares two objects whether they are equal. If both objects are of the
-     * same class but they equal just in whitespace in {@link #body},
-     * they are considered being equal.
+     * same class but they equal just in whitespace in {@link #body}, they are
+     * considered being equal.
      *
-     * @param object object to be compared
+     * @param object                   object to be compared
      * @param ignoreFunctionWhitespace whether multiple whitespaces in function
-     * {@link #body} should be ignored
+     *                                 {@link #body} should be ignored
      *
-     * @return true if <code>object</code> is pg function and the function code
-     * is the same when compared ignoring whitespace, otherwise returns false
+     * @return true if {@code object} is pg function and the function code is
+     *         the same when compared ignoring whitespace, otherwise returns
+     *         false
      */
     public boolean equals(final Object object,
             final boolean ignoreFunctionWhitespace) {

@@ -24,17 +24,11 @@ import java.util.Map;
 public class PgDiffTables {
 
     /**
-     * Creates a new instance of PgDiffTables.
-     */
-    private PgDiffTables() {
-    }
-
-    /**
      * Outputs statements for creation of clusters.
      *
-     * @param writer writer the output should be written to
-     * @param oldSchema original schema
-     * @param newSchema new schema
+     * @param writer           writer the output should be written to
+     * @param oldSchema        original schema
+     * @param newSchema        new schema
      * @param searchPathHelper search path helper
      */
     public static void dropClusters(final PrintWriter writer,
@@ -73,9 +67,9 @@ public class PgDiffTables {
     /**
      * Outputs statements for dropping of clusters.
      *
-     * @param writer writer the output should be written to
-     * @param oldSchema original schema
-     * @param newSchema new schema
+     * @param writer           writer the output should be written to
+     * @param oldSchema        original schema
+     * @param newSchema        new schema
      * @param searchPathHelper search path helper
      */
     public static void createClusters(final PrintWriter writer,
@@ -117,10 +111,10 @@ public class PgDiffTables {
     /**
      * Outputs statements for altering tables.
      *
-     * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
-     * @param oldSchema original schema
-     * @param newSchema new schema
+     * @param writer           writer the output should be written to
+     * @param arguments        object containing arguments settings
+     * @param oldSchema        original schema
+     * @param newSchema        new schema
      * @param searchPathHelper search path helper
      */
     public static void alterTables(final PrintWriter writer,
@@ -147,9 +141,9 @@ public class PgDiffTables {
     /**
      * Generate the needed alter table xxx set statistics when needed.
      *
-     * @param writer writer the output should be written to
-     * @param oldTable original table
-     * @param newTable new table
+     * @param writer           writer the output should be written to
+     * @param oldTable         original table
+     * @param newTable         new table
      * @param searchPathHelper search path helper
      */
     private static void addAlterStatistics(final PrintWriter writer,
@@ -195,9 +189,9 @@ public class PgDiffTables {
     /**
      * Generate the needed alter table xxx set storage when needed.
      *
-     * @param writer writer the output should be written to
-     * @param oldTable original table
-     * @param newTable new table
+     * @param writer           writer the output should be written to
+     * @param oldTable         original table
+     * @param newTable         new table
      * @param searchPathHelper search path helper
      */
     private static void addAlterStorage(final PrintWriter writer,
@@ -242,12 +236,12 @@ public class PgDiffTables {
     /**
      * Adds statements for creation of new columns to the list of statements.
      *
-     * @param statements list of statements
-     * @param arguments object containing arguments settings
-     * @param oldTable original table
-     * @param newTable new table
+     * @param statements          list of statements
+     * @param arguments           object containing arguments settings
+     * @param oldTable            original table
+     * @param newTable            new table
      * @param dropDefaultsColumns list for storing columns for which default
-     *        value should be dropped
+     *                            value should be dropped
      */
     private static void addCreateTableColumns(final List<String> statements,
             final PgDiffArguments arguments, final PgTable oldTable,
@@ -270,8 +264,8 @@ public class PgDiffTables {
      * Adds statements for removal of columns to the list of statements.
      *
      * @param statements list of statements
-     * @param oldTable original table
-     * @param newTable new table
+     * @param oldTable   original table
+     * @param newTable   new table
      */
     private static void addDropTableColumns(final List<String> statements,
             final PgTable oldTable, final PgTable newTable) {
@@ -286,12 +280,12 @@ public class PgDiffTables {
     /**
      * Adds statements for modification of columns to the list of statements.
      *
-     * @param statements list of statements
-     * @param arguments object containing arguments settings
-     * @param oldTable original table
-     * @param newTable new table
+     * @param statements          list of statements
+     * @param arguments           object containing arguments settings
+     * @param oldTable            original table
+     * @param newTable            new table
      * @param dropDefaultsColumns list for storing columns for which default
-     *        value should be dropped
+     *                            value should be dropped
      */
     private static void addModifyTableColumns(final List<String> statements,
             final PgDiffArguments arguments, final PgTable oldTable,
@@ -354,12 +348,12 @@ public class PgDiffTables {
     }
 
     /**
-     * Checks whether there is a discrepancy in INHERITS for original
-     * and new table.
+     * Checks whether there is a discrepancy in INHERITS for original and new
+     * table.
      *
-     * @param writer writer the output should be written to
-     * @param oldTable original table
-     * @param newTable new table
+     * @param writer           writer the output should be written to
+     * @param oldTable         original table
+     * @param newTable         new table
      * @param searchPathHelper search path helper
      */
     private static void checkInherits(final PrintWriter writer,
@@ -389,13 +383,13 @@ public class PgDiffTables {
     }
 
     /**
-     * Checks whether OIDS are dropped from the new table. There is no
-     * way to add OIDS to existing table so we do not create SQL statement for
-     * addition of OIDS but we issue warning.
+     * Checks whether OIDS are dropped from the new table. There is no way to
+     * add OIDS to existing table so we do not create SQL statement for addition
+     * of OIDS but we issue warning.
      *
-     * @param writer writer the output should be written to
-     * @param oldTable original table
-     * @param newTable new table
+     * @param writer           writer the output should be written to
+     * @param oldTable         original table
+     * @param newTable         new table
      * @param searchPathHelper search path helper
      */
     private static void checkWithOIDS(final PrintWriter writer,
@@ -426,9 +420,9 @@ public class PgDiffTables {
     /**
      * Checks tablespace modification.
      *
-     * @param writer writer
-     * @param oldTable old table
-     * @param newTable new table
+     * @param writer           writer
+     * @param oldTable         old table
+     * @param newTable         new table
      * @param searchPathHelper search path helper
      */
     private static void checkTablespace(final PrintWriter writer,
@@ -450,9 +444,9 @@ public class PgDiffTables {
     /**
      * Outputs statements for creation of new tables.
      *
-     * @param writer writer the output should be written to
-     * @param oldSchema original schema
-     * @param newSchema new schema
+     * @param writer           writer the output should be written to
+     * @param oldSchema        original schema
+     * @param newSchema        new schema
      * @param searchPathHelper search path helper
      */
     public static void createTables(final PrintWriter writer,
@@ -471,9 +465,9 @@ public class PgDiffTables {
     /**
      * Outputs statements for dropping tables.
      *
-     * @param writer writer the output should be written to
-     * @param oldSchema original schema
-     * @param newSchema new schema
+     * @param writer           writer the output should be written to
+     * @param oldSchema        original schema
+     * @param newSchema        new schema
      * @param searchPathHelper search path helper
      */
     public static void dropTables(final PrintWriter writer,
@@ -493,13 +487,13 @@ public class PgDiffTables {
     }
 
     /**
-     * Outputs statements for addition, removal and modifications of
-     * table columns.
+     * Outputs statements for addition, removal and modifications of table
+     * columns.
      *
-     * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
-     * @param oldTable original table
-     * @param newTable new table
+     * @param writer           writer the output should be written to
+     * @param arguments        object containing arguments settings
+     * @param oldTable         original table
+     * @param newTable         new table
      * @param searchPathHelper search path helper
      */
     private static void updateTableColumns(final PrintWriter writer,
@@ -547,9 +541,9 @@ public class PgDiffTables {
      * Outputs statements for tables and columns for which comments have
      * changed.
      *
-     * @param writer writer
-     * @param oldTable old table
-     * @param newTable new table
+     * @param writer           writer
+     * @param oldTable         old table
+     * @param newTable         new table
      * @param searchPathHelper search path helper
      */
     private static void alterComments(final PrintWriter writer,
@@ -603,5 +597,11 @@ public class PgDiffTables {
                 writer.println(" IS NULL;");
             }
         }
+    }
+
+    /**
+     * Creates a new instance of PgDiffTables.
+     */
+    private PgDiffTables() {
     }
 }

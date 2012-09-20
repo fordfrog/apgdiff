@@ -8,9 +8,7 @@ package cz.startnet.utils.pgdiff;
 import cz.startnet.utils.pgdiff.schema.PgIndex;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
-
 import java.io.PrintWriter;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,17 +20,11 @@ import java.util.List;
 public class PgDiffIndexes {
 
     /**
-     * Creates a new instance of PgDiffIndexes.
-     */
-    private PgDiffIndexes() {
-    }
-
-    /**
      * Outputs statements for creation of new indexes.
      *
-     * @param writer writer the output should be written to
-     * @param oldSchema original schema
-     * @param newSchema new schema
+     * @param writer           writer the output should be written to
+     * @param oldSchema        original schema
+     * @param newSchema        new schema
      * @param searchPathHelper search path helper
      */
     public static void createIndexes(final PrintWriter writer,
@@ -62,9 +54,9 @@ public class PgDiffIndexes {
     /**
      * Outputs statements for dropping indexes that exist no more.
      *
-     * @param writer writer the output should be written to
-     * @param oldSchema original schema
-     * @param newSchema new schema
+     * @param writer           writer the output should be written to
+     * @param oldSchema        original schema
+     * @param newSchema        new schema
      * @param searchPathHelper search path helper
      */
     public static void dropIndexes(final PrintWriter writer,
@@ -98,7 +90,7 @@ public class PgDiffIndexes {
      * @return list of indexes that should be dropped
      *
      * @todo Indexes that are depending on a removed field should not be added
-     *       to drop because they are already removed.
+     * to drop because they are already removed.
      */
     private static List<PgIndex> getDropIndexes(final PgTable oldTable,
             final PgTable newTable) {
@@ -152,9 +144,9 @@ public class PgDiffIndexes {
     /**
      * Outputs statements for index comments that have changed.
      *
-     * @param writer writer
-     * @param oldSchema old schema
-     * @param newSchema new schema
+     * @param writer           writer
+     * @param oldSchema        old schema
+     * @param newSchema        new schema
      * @param searchPathHelper search path helper
      */
     public static void alterComments(final PrintWriter writer,
@@ -195,5 +187,11 @@ public class PgDiffIndexes {
                 writer.println(" IS NULL;");
             }
         }
+    }
+
+    /**
+     * Creates a new instance of PgDiffIndexes.
+     */
+    private PgDiffIndexes() {
     }
 }

@@ -7,7 +7,6 @@ package cz.startnet.utils.pgdiff;
 
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgSequence;
-
 import java.io.PrintWriter;
 
 /**
@@ -18,17 +17,11 @@ import java.io.PrintWriter;
 public class PgDiffSequences {
 
     /**
-     * Creates a new instance of PgDiffSequences.
-     */
-    private PgDiffSequences() {
-    }
-
-    /**
      * Outputs statements for creation of new sequences.
      *
-     * @param writer writer the output should be written to
-     * @param oldSchema original schema
-     * @param newSchema new schema
+     * @param writer           writer the output should be written to
+     * @param oldSchema        original schema
+     * @param newSchema        new schema
      * @param searchPathHelper search path helper
      */
     public static void createSequences(final PrintWriter writer,
@@ -48,9 +41,9 @@ public class PgDiffSequences {
     /**
      * Outputs statements for altering of new sequences.
      *
-     * @param writer writer the output should be written to
-     * @param oldSchema original schema
-     * @param newSchema new schema
+     * @param writer           writer the output should be written to
+     * @param oldSchema        original schema
+     * @param newSchema        new schema
      * @param searchPathHelper search path helper
      */
     public static void alterCreatedSequences(final PrintWriter writer,
@@ -60,8 +53,8 @@ public class PgDiffSequences {
         for (final PgSequence sequence : newSchema.getSequences()) {
             if ((oldSchema == null
                     || !oldSchema.containsSequence(sequence.getName()))
-                    && sequence.getOwnedBy() != null &&
-                    !sequence.getOwnedBy().isEmpty()) {
+                    && sequence.getOwnedBy() != null
+                    && !sequence.getOwnedBy().isEmpty()) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(sequence.getOwnedBySQL());
@@ -72,9 +65,9 @@ public class PgDiffSequences {
     /**
      * Outputs statements for dropping of sequences that do not exist anymore.
      *
-     * @param writer writer the output should be written to
-     * @param oldSchema original schema
-     * @param newSchema new schema
+     * @param writer           writer the output should be written to
+     * @param oldSchema        original schema
+     * @param newSchema        new schema
      * @param searchPathHelper search path helper
      */
     public static void dropSequences(final PrintWriter writer,
@@ -97,10 +90,10 @@ public class PgDiffSequences {
     /**
      * Outputs statement for modified sequences.
      *
-     * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
-     * @param oldSchema original schema
-     * @param newSchema new schema
+     * @param writer           writer the output should be written to
+     * @param arguments        object containing arguments settings
+     * @param oldSchema        original schema
+     * @param newSchema        new schema
      * @param searchPathHelper search path helper
      */
     public static void alterSequences(final PrintWriter writer,
@@ -184,8 +177,8 @@ public class PgDiffSequences {
             final String newOwnedBy = newSequence.getOwnedBy();
 
             if (newOwnedBy != null && !newOwnedBy.equals(oldOwnedBy)) {
-                 sbSQL.append("\n\tOWNED BY ");
-                 sbSQL.append(newOwnedBy);
+                sbSQL.append("\n\tOWNED BY ");
+                sbSQL.append(newOwnedBy);
             }
 
             if (sbSQL.length() > 0) {
@@ -219,5 +212,11 @@ public class PgDiffSequences {
                 writer.println(" IS NULL;");
             }
         }
+    }
+
+    /**
+     * Creates a new instance of PgDiffSequences.
+     */
+    private PgDiffSequences() {
     }
 }

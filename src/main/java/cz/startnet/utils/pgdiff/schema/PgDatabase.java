@@ -61,8 +61,7 @@ public class PgDatabase {
     }
 
     /**
-     * Sets default schema according to the <code>name</code> of the
-     * schema.
+     * Sets default schema according to the {@code name} of the schema.
      *
      * @param name name of the schema
      */
@@ -129,7 +128,7 @@ public class PgDatabase {
     }
 
     /**
-     * Adds <code>schema</code> to the lists of schemas.
+     * Adds {@code schema} to the lists of schemas.
      *
      * @param schema schema
      */

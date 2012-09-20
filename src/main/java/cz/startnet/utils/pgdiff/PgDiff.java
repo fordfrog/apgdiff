@@ -8,7 +8,6 @@ package cz.startnet.utils.pgdiff;
 import cz.startnet.utils.pgdiff.loader.PgDumpLoader;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
-
 import java.io.InputStream;
 import java.io.PrintWriter;
 
@@ -20,15 +19,9 @@ import java.io.PrintWriter;
 public class PgDiff {
 
     /**
-     * Creates a new instance of PgDiff.
-     */
-    private PgDiff() {
-    }
-
-    /**
      * Creates diff on the two database schemas.
      *
-     * @param writer writer the output should be written to
+     * @param writer    writer the output should be written to
      * @param arguments object containing arguments settings
      */
     public static void createDiff(final PrintWriter writer,
@@ -45,12 +38,12 @@ public class PgDiff {
     /**
      * Creates diff on the two database schemas.
      *
-     * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
+     * @param writer         writer the output should be written to
+     * @param arguments      object containing arguments settings
      * @param oldInputStream input stream of file containing dump of the
-     *        original schema
+     *                       original schema
      * @param newInputStream input stream of file containing dump of the new
-     *        schema
+     *                       schema
      */
     public static void createDiff(final PrintWriter writer,
             final PgDiffArguments arguments, final InputStream oldInputStream,
@@ -67,7 +60,7 @@ public class PgDiff {
     /**
      * Creates new schemas (not the objects inside the schemas).
      *
-     * @param writer writer the output should be written to
+     * @param writer      writer the output should be written to
      * @param oldDatabase original database schema
      * @param newDatabase new database schema
      */
@@ -84,8 +77,8 @@ public class PgDiff {
     /**
      * Creates diff from comparison of two database schemas.
      *
-     * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
+     * @param writer      writer the output should be written to
+     * @param arguments   object containing arguments settings
      * @param oldDatabase original database schema
      * @param newDatabase new database schema
      */
@@ -156,7 +149,7 @@ public class PgDiff {
     /**
      * Drops old schemas that do not exist anymore.
      *
-     * @param writer writer the output should be written to
+     * @param writer      writer the output should be written to
      * @param oldDatabase original database schema
      * @param newDatabase new database schema
      */
@@ -175,8 +168,8 @@ public class PgDiff {
     /**
      * Updates objects in schemas.
      *
-     * @param writer writer the output should be written to
-     * @param arguments object containing arguments settings
+     * @param writer      writer the output should be written to
+     * @param arguments   object containing arguments settings
      * @param oldDatabase original database schema
      * @param newDatabase new database schema
      */
@@ -279,5 +272,11 @@ public class PgDiff {
             PgDiffTriggers.alterComments(
                     writer, oldSchema, newSchema, searchPathHelper);
         }
+    }
+
+    /**
+     * Creates a new instance of PgDiff.
+     */
+    private PgDiff() {
     }
 }

@@ -5,15 +5,12 @@
  */
 package cz.startnet.utils.pgdiff.loader;
 
-import org.junit.Test;
-
-import org.junit.runner.RunWith;
-
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-
 import java.util.Arrays;
 import java.util.Collection;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Tests for PgDiffLoader class.
@@ -22,20 +19,6 @@ import java.util.Collection;
  */
 @RunWith(value = Parameterized.class)
 public class PgDumpLoaderTest {
-
-    /**
-     * Index of the file that should be tested.
-     */
-    private final int fileIndex;
-
-    /**
-     * Creates a new instance of PgDumpLoaderTest.
-     *
-     * @param fileIndex {@link #fileIndex}
-     */
-    public PgDumpLoaderTest(final int fileIndex) {
-        this.fileIndex = fileIndex;
-    }
 
     /**
      * Provides parameters for running the tests.
@@ -62,6 +45,19 @@ public class PgDumpLoaderTest {
                     {14},
                     {15}
                 });
+    }
+    /**
+     * Index of the file that should be tested.
+     */
+    private final int fileIndex;
+
+    /**
+     * Creates a new instance of PgDumpLoaderTest.
+     *
+     * @param fileIndex {@link #fileIndex}
+     */
+    public PgDumpLoaderTest(final int fileIndex) {
+        this.fileIndex = fileIndex;
     }
 
     /**

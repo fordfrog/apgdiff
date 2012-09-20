@@ -25,18 +25,12 @@ import java.util.List;
 public class AlterTableParser {
 
     /**
-     * Creates a new instance of AlterTableParser.
-     */
-    private AlterTableParser() {
-    }
-
-    /**
      * Parses ALTER TABLE statement.
      *
-     * @param database database
-     * @param statement ALTER TABLE statement
+     * @param database                database
+     * @param statement               ALTER TABLE statement
      * @param outputIgnoredStatements whether ignored statements should be
-     * output in the diff
+     *                                output in the diff
      */
     public static void parse(final PgDatabase database,
             final String statement, final boolean outputIgnoredStatements) {
@@ -123,11 +117,12 @@ public class AlterTableParser {
     /**
      * Parses ENABLE statements.
      *
-     * @param parser parser
+     * @param parser                  parser
      * @param outputIgnoredStatements whether ignored statements should be
-     * output in the diff
-     * @param tableName table name as it was specified in the statement
-     * @param database database information
+     *                                output in the diff
+     * @param tableName               table name as it was specified in the
+     *                                statement
+     * @param database                database information
      */
     private static void parseEnable(final Parser parser,
             final boolean outputIgnoredStatements, final String tableName,
@@ -177,11 +172,12 @@ public class AlterTableParser {
     /**
      * Parses DISABLE statements.
      *
-     * @param parser parser
+     * @param parser                  parser
      * @param outputIgnoredStatements whether ignored statements should be
-     * output in the diff
-     * @param tableName table name as it was specified in the statement
-     * @param database database information
+     *                                output in the diff
+     * @param tableName               table name as it was specified in the
+     *                                statement
+     * @param database                database information
      */
     private static void parseDisable(final Parser parser,
             final boolean outputIgnoredStatements, final String tableName,
@@ -209,7 +205,7 @@ public class AlterTableParser {
      * Parses ADD CONSTRAINT action.
      *
      * @param parser parser
-     * @param table table
+     * @param table  table
      * @param schema schema
      */
     private static void parseAddConstraint(final Parser parser,
@@ -232,7 +228,7 @@ public class AlterTableParser {
      * Parses ALTER COLUMN action.
      *
      * @param parser parser
-     * @param table pg table
+     * @param table  pg table
      */
     private static void parseAlterColumn(final Parser parser,
             final PgTable table) {
@@ -303,7 +299,7 @@ public class AlterTableParser {
      * Parses ADD FOREIGN KEY action.
      *
      * @param parser parser
-     * @param table pg table
+     * @param table  pg table
      */
     private static void parseAddForeignKey(final Parser parser,
             final PgTable table) {
@@ -332,13 +328,14 @@ public class AlterTableParser {
 
     /**
      * Parses ALTER TABLE view.
-     * 
-     * @param parser parser
-     * @param view view
+     *
+     * @param parser                  parser
+     * @param view                    view
      * @param outputIgnoredStatements whether ignored statements should be
-     * output in the diff
-     * @param viewName view name as it was specified in the statement
-     * @param database database information
+     *                                output in the diff
+     * @param viewName                view name as it was specified in the
+     *                                statement
+     * @param database                database information
      */
     private static void parseView(final Parser parser, final PgView view,
             final boolean outputIgnoredStatements, final String viewName,
@@ -375,12 +372,13 @@ public class AlterTableParser {
     /**
      * Parses ALTER TABLE sequence.
      *
-     * @param parser parser
-     * @param sequence sequence
+     * @param parser                  parser
+     * @param sequence                sequence
      * @param outputIgnoredStatements whether ignored statements should be
-     * output in the diff
-     * @param sequenceName sequence name as it was specified in the statement
-     * @param database database information
+     *                                output in the diff
+     * @param sequenceName            sequence name as it was specified in the
+     *                                statement
+     * @param database                database information
      */
     private static void parseSequence(final Parser parser,
             final PgSequence sequence, final boolean outputIgnoredStatements,
@@ -398,5 +396,11 @@ public class AlterTableParser {
                 parser.throwUnsupportedCommand();
             }
         }
+    }
+
+    /**
+     * Creates a new instance of AlterTableParser.
+     */
+    private AlterTableParser() {
     }
 }

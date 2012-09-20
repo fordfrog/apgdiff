@@ -19,15 +19,9 @@ import java.text.MessageFormat;
 public class CreateFunctionParser {
 
     /**
-     * Creates a new instance of CreateFunctionParser.
-     */
-    private CreateFunctionParser() {
-    }
-
-    /**
      * Parses CREATE FUNCTION and CREATE OR REPLACE FUNCTION statement.
      *
-     * @param database database
+     * @param database  database
      * @param statement CREATE FUNCTION statement
      */
     public static void parse(final PgDatabase database,
@@ -110,5 +104,11 @@ public class CreateFunctionParser {
         }
 
         function.setBody(parser.getRest());
+    }
+
+    /**
+     * Creates a new instance of CreateFunctionParser.
+     */
+    private CreateFunctionParser() {
     }
 }

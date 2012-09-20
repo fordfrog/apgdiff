@@ -33,8 +33,8 @@ public class PgDiffArguments {
      */
     private String outCharsetName = "UTF-8";
     /**
-     * Whether DEFAULT ... should be added in case new column has NOT
-     * NULL constraint. The default value is dropped later.
+     * Whether DEFAULT ... should be added in case new column has NOT NULL
+     * constraint. The default value is dropped later.
      */
     private boolean addDefaults;
     /**
@@ -212,11 +212,12 @@ public class PgDiffArguments {
      * Parses command line arguments or outputs instructions.
      *
      * @param writer writer to be used for info output
-     * @param args array of arguments
+     * @param args   array of arguments
      *
      * @return true if arguments were parsed and execution can continue,
      *         otherwise false
      */
+    @SuppressWarnings("AssignmentToForLoopParameter")
     public boolean parse(final PrintWriter writer, final String[] args) {
         boolean success = true;
         final int argsLength;

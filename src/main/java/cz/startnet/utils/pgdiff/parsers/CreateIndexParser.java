@@ -20,15 +20,9 @@ import java.text.MessageFormat;
 public class CreateIndexParser {
 
     /**
-     * Creates a new instance of CreateIndexParser.
-     */
-    private CreateIndexParser() {
-    }
-
-    /**
      * Parses CREATE INDEX statement.
      *
-     * @param database database
+     * @param database  database
      * @param statement CREATE INDEX statement
      */
     public static void parse(final PgDatabase database,
@@ -73,5 +67,11 @@ public class CreateIndexParser {
         index.setDefinition(definition.trim());
         index.setTableName(table.getName());
         index.setUnique(unique);
+    }
+
+    /**
+     * Creates a new instance of CreateIndexParser.
+     */
+    private CreateIndexParser() {
     }
 }

@@ -15,14 +15,8 @@ import java.util.Locale;
 public class PgColumnUtils {
 
     /**
-     * Creates a new PgColumnUtils object.
-     */
-    private PgColumnUtils() {
-    }
-
-    /**
-     * Returns default value for given column type. If no default value
-     * is specified then null is returned.
+     * Returns default value for given column type. If no default value is
+     * specified then null is returned.
      *
      * @param type column type
      *
@@ -59,5 +53,11 @@ public class PgColumnUtils {
         }
 
         return defaultValue;
+    }
+
+    /**
+     * Creates a new PgColumnUtils object.
+     */
+    private PgColumnUtils() {
     }
 }

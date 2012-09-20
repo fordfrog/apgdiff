@@ -161,7 +161,6 @@ public class PgSequence {
      *
      * @return created SQL statement
      */
-
     public String getOwnedBySQL() {
         final StringBuilder sbSQL = new StringBuilder(100);
 

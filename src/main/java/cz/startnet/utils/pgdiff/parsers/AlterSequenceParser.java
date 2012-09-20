@@ -13,24 +13,18 @@ import java.text.MessageFormat;
 
 /**
  * Parses ALTER SEQUENCE statements.
- * 
+ *
  * @author mix86
  */
 public class AlterSequenceParser {
 
     /**
-     * Creates new instance of AlterSequenceParser.
-     */
-    private AlterSequenceParser() {
-    }
-
-    /**
      * Parses ALTER SEQUENCE statement.
-     * 
-     * @param database database
-     * @param statement ALTER SEQUENCE statement
+     *
+     * @param database                database
+     * @param statement               ALTER SEQUENCE statement
      * @param outputIgnoredStatements whether ignored statements should be
-     * output in the diff
+     *                                output in the diff
      */
     public static void parse(final PgDatabase database,
             final String statement, final boolean outputIgnoredStatements) {
@@ -39,7 +33,8 @@ public class AlterSequenceParser {
         parser.expect("ALTER", "SEQUENCE");
 
         final String sequenceName = parser.parseIdentifier();
-        final String schemaName = ParserUtils.getSchemaName(sequenceName, database);
+        final String schemaName =
+                ParserUtils.getSchemaName(sequenceName, database);
         final PgSchema schema = database.getSchema(schemaName);
 
         if (schema == null) {
@@ -69,5 +64,11 @@ public class AlterSequenceParser {
                 parser.throwUnsupportedCommand();
             }
         }
+    }
+
+    /**
+     * Creates new instance of AlterSequenceParser.
+     */
+    private AlterSequenceParser() {
     }
 }

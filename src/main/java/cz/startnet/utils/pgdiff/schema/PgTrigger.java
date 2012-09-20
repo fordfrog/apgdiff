@@ -30,13 +30,13 @@ public class PgTrigger {
      */
     private String tableName;
     /**
-     * Whether the trigger should be fired BEFORE or AFTER action.
-     * Default is before.
+     * Whether the trigger should be fired BEFORE or AFTER action. Default is
+     * before.
      */
     private boolean before = true;
     /**
-     * Whether the trigger should be fired FOR EACH ROW or FOR EACH
-     * STATEMENT. Default is FOR EACH STATEMENT.
+     * Whether the trigger should be fired FOR EACH ROW or FOR EACH STATEMENT.
+     * Default is FOR EACH STATEMENT.
      */
     private boolean forEachRow;
     /**

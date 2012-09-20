@@ -7,7 +7,7 @@ import java.util.ResourceBundle;
 
 /**
  * Utility class for accessing localized resources.
- * 
+ *
  * @author fordfrog
  */
 public class Resources {
@@ -19,12 +19,6 @@ public class Resources {
             ResourceBundle.getBundle("cz/startnet/utils/pgdiff/Resources");
 
     /**
-     * Creates new instance of Resources.
-     */
-    private Resources() {
-    }
-
-    /**
      * Returns string from resource bundle based on the key.
      *
      * @param key key
@@ -33,5 +27,11 @@ public class Resources {
      */
     public static String getString(final String key) {
         return RESOURCE_BUNDLE.getString(key);
+    }
+
+    /**
+     * Creates new instance of Resources.
+     */
+    private Resources() {
     }
 }

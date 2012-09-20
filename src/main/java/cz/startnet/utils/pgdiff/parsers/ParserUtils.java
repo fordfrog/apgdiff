@@ -17,12 +17,6 @@ import java.util.List;
 public class ParserUtils {
 
     /**
-     * Creates a new instance of ParserUtils.
-     */
-    private ParserUtils() {
-    }
-
-    /**
      * Returns object name from optionally schema qualified name.
      *
      * @param name optionally schema qualified name
@@ -66,7 +60,7 @@ public class ParserUtils {
     /**
      * Returns schema name from optionally schema qualified name.
      *
-     * @param name optionally schema qualified name
+     * @param name     optionally schema qualified name
      * @param database database
      *
      * @return name of the schema
@@ -85,8 +79,8 @@ public class ParserUtils {
     /**
      * Generates unique name from the prefix, list of names, and postfix.
      *
-     * @param prefix prefix
-     * @param names list of names
+     * @param prefix  prefix
+     * @param names   list of names
      * @param postfix postfix
      *
      * @return generated name
@@ -168,5 +162,11 @@ public class ParserUtils {
 
             return strings.toArray(new String[strings.size()]);
         }
+    }
+
+    /**
+     * Creates a new instance of ParserUtils.
+     */
+    private ParserUtils() {
     }
 }

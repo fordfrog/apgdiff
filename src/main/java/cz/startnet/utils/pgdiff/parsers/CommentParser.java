@@ -24,18 +24,12 @@ import java.text.MessageFormat;
 public class CommentParser {
 
     /**
-     * Creates new instance of CommentParser.
-     */
-    private CommentParser() {
-    }
-
-    /**
      * Parses COMMENT statements.
      *
-     * @param database database
-     * @param statement COMMENT statement
+     * @param database                database
+     * @param statement               COMMENT statement
      * @param outputIgnoredStatements whether ignored statements should be
-     * output into the diff
+     *                                output into the diff
      */
     public static void parse(final PgDatabase database,
             final String statement, final boolean outputIgnoredStatements) {
@@ -70,7 +64,7 @@ public class CommentParser {
     /**
      * Parses COMMENT ON TABLE.
      *
-     * @param parser parser
+     * @param parser   parser
      * @param database database
      */
     private static void parseTable(final Parser parser,
@@ -91,7 +85,7 @@ public class CommentParser {
     /**
      * Parses COMMENT ON CONSTRAINT.
      *
-     * @param parser parser
+     * @param parser   parser
      * @param database database
      */
     private static void parseConstraint(final Parser parser,
@@ -117,7 +111,7 @@ public class CommentParser {
     /**
      * Parses COMMENT ON DATABASE.
      *
-     * @param parser parser
+     * @param parser   parser
      * @param database database
      */
     private static void parseDatabase(final Parser parser,
@@ -131,7 +125,7 @@ public class CommentParser {
     /**
      * Parses COMMENT ON INDEX.
      *
-     * @param parser parser
+     * @param parser   parser
      * @param database database
      */
     private static void parseIndex(final Parser parser,
@@ -159,7 +153,7 @@ public class CommentParser {
     /**
      * Parses COMMENT ON SCHEMA.
      *
-     * @param parser parser
+     * @param parser   parser
      * @param database database
      */
     private static void parseSchema(final Parser parser,
@@ -176,7 +170,7 @@ public class CommentParser {
     /**
      * Parses COMMENT ON SEQUENCE.
      *
-     * @param parser parser
+     * @param parser   parser
      * @param database database
      */
     private static void parseSequence(final Parser parser,
@@ -197,7 +191,7 @@ public class CommentParser {
     /**
      * Parses COMMENT ON TRIGGER.
      *
-     * @param parser parser
+     * @param parser   parser
      * @param database database
      */
     private static void parseTrigger(final Parser parser,
@@ -223,7 +217,7 @@ public class CommentParser {
     /**
      * Parses COMMENT ON VIEW.
      *
-     * @param parser parser
+     * @param parser   parser
      * @param database database
      */
     private static void parseView(final Parser parser,
@@ -243,7 +237,7 @@ public class CommentParser {
     /**
      * Parses COMMENT ON COLUMN.
      *
-     * @param parser parser
+     * @param parser   parser
      * @param database database
      */
     private static void parseColumn(final Parser parser,
@@ -286,7 +280,7 @@ public class CommentParser {
     /**
      * Parses COMMENT ON FUNCTION.
      *
-     * @param parser parser
+     * @param parser   parser
      * @param database database
      */
     private static void parseFunction(final Parser parser,
@@ -369,5 +363,11 @@ public class CommentParser {
         }
 
         return comment;
+    }
+
+    /**
+     * Creates new instance of CommentParser.
+     */
+    private CommentParser() {
     }
 }

@@ -17,15 +17,9 @@ import cz.startnet.utils.pgdiff.schema.PgTrigger;
 public class CreateTriggerParser {
 
     /**
-     * Creates a new CreateTableParser object.
-     */
-    private CreateTriggerParser() {
-    }
-
-    /**
      * Parses CREATE TRIGGER statement.
      *
-     * @param database database
+     * @param database  database
      * @param statement CREATE TRIGGER statement
      */
     public static void parse(final PgDatabase database,
@@ -105,5 +99,11 @@ public class CreateTriggerParser {
         final PgSchema tableSchema = database.getSchema(
                 ParserUtils.getSchemaName(tableName, database));
         tableSchema.getTable(trigger.getTableName()).addTrigger(trigger);
+    }
+
+    /**
+     * Creates a new CreateTableParser object.
+     */
+    private CreateTriggerParser() {
     }
 }

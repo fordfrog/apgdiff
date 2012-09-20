@@ -21,15 +21,9 @@ import java.text.MessageFormat;
 public class CreateTableParser {
 
     /**
-     * Creates a new instance of CreateTableParser.
-     */
-    private CreateTableParser() {
-    }
-
-    /**
      * Parses CREATE TABLE statement.
      *
-     * @param database database
+     * @param database  database
      * @param statement CREATE TABLE statement
      */
     public static void parse(final PgDatabase database,
@@ -37,8 +31,8 @@ public class CreateTableParser {
         final Parser parser = new Parser(statement);
         parser.expect("CREATE", "TABLE");
 
-	// Optional IF NOT EXISTS, irrelevant for our purposes
-	parser.expectOptional("IF", "NOT", "EXISTS");
+        // Optional IF NOT EXISTS, irrelevant for our purposes
+        parser.expectOptional("IF", "NOT", "EXISTS");
 
         final String tableName = parser.parseIdentifier();
         final PgTable table = new PgTable(ParserUtils.getObjectName(tableName));
@@ -96,7 +90,7 @@ public class CreateTableParser {
      * Parses INHERITS.
      *
      * @param parser parser
-     * @param table pg table
+     * @param table  pg table
      */
     private static void parseInherits(final Parser parser,
             final PgTable table) {
@@ -118,7 +112,7 @@ public class CreateTableParser {
      * Parses CONSTRAINT definition.
      *
      * @param parser parser
-     * @param table table
+     * @param table  table
      */
     private static void parseConstraint(final Parser parser,
             final PgTable table) {
@@ -133,12 +127,18 @@ public class CreateTableParser {
      * Parses column definition.
      *
      * @param parser parser
-     * @param table table
+     * @param table  table
      */
     private static void parseColumn(final Parser parser, final PgTable table) {
         final PgColumn column = new PgColumn(
                 ParserUtils.getObjectName(parser.parseIdentifier()));
         table.addColumn(column);
         column.parseDefinition(parser.getExpression());
+    }
+
+    /**
+     * Creates a new instance of CreateTableParser.
+     */
+    private CreateTableParser() {
     }
 }
