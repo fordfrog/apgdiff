@@ -6,7 +6,7 @@ website at http://apgdiff.startnet.biz/
 
 ## Changelog
 
-### Version 2.4
+### 2012-09-21: Version 2.4
 
 #### New Features
 * Added support for ALTER SEQUENCE OWNED BY (patch by Mikhail Petrov).
