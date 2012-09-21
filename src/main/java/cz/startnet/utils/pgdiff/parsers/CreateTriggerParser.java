@@ -19,11 +19,12 @@ public class CreateTriggerParser {
     /**
      * Parses CREATE TRIGGER statement.
      *
-     * @param database  database
-     * @param statement CREATE TRIGGER statement
+     * @param database            database
+     * @param statement           CREATE TRIGGER statement
+     * @param ignoreSlonyTriggers whether Slony triggers should be ignored
      */
     public static void parse(final PgDatabase database,
-            final String statement) {
+            final String statement, final boolean ignoreSlonyTriggers) {
         final Parser parser = new Parser(statement);
         parser.expect("CREATE", "TRIGGER");
 
@@ -94,9 +95,15 @@ public class CreateTriggerParser {
         parser.expect("EXECUTE", "PROCEDURE");
         trigger.setFunction(parser.getRest());
 
-        final PgSchema tableSchema = database.getSchema(
-                ParserUtils.getSchemaName(tableName, database));
-        tableSchema.getTable(trigger.getTableName()).addTrigger(trigger);
+        final boolean ignoreSlonyTrigger = ignoreSlonyTriggers
+                && ("_slony_logtrigger".equals(trigger.getName())
+                || "_slony_denyaccess".equals(trigger.getName()));
+
+        if (!ignoreSlonyTrigger) {
+            final PgSchema tableSchema = database.getSchema(
+                    ParserUtils.getSchemaName(tableName, database));
+            tableSchema.getTable(trigger.getTableName()).addTrigger(trigger);
+        }
     }
 
     /**

@@ -144,11 +144,13 @@ public class PgDumpLoader { //NOPMD
      *                                file
      * @param outputIgnoredStatements whether ignored statements should be
      *                                included in the output
+     * @param ignoreSlonyTriggers     whether Slony triggers should be ignored
      *
      * @return database schema from dump file
      */
     public static PgDatabase loadDatabaseSchema(final InputStream inputStream,
-            final String charsetName, final boolean outputIgnoredStatements) {
+            final String charsetName, final boolean outputIgnoredStatements,
+            final boolean ignoreSlonyTriggers) {
 
         final PgDatabase database = new PgDatabase();
         BufferedReader reader = null;
@@ -190,7 +192,8 @@ public class PgDumpLoader { //NOPMD
                 AlterViewParser.parse(
                         database, statement, outputIgnoredStatements);
             } else if (PATTERN_CREATE_TRIGGER.matcher(statement).matches()) {
-                CreateTriggerParser.parse(database, statement);
+                CreateTriggerParser.parse(
+                        database, statement, ignoreSlonyTriggers);
             } else if (PATTERN_CREATE_FUNCTION.matcher(statement).matches()) {
                 CreateFunctionParser.parse(database, statement);
             } else if (PATTERN_COMMENT.matcher(statement).matches()) {
@@ -222,14 +225,16 @@ public class PgDumpLoader { //NOPMD
      *                                file
      * @param outputIgnoredStatements whether ignored statements should be
      *                                included in the output
+     * @param ignoreSlonyTriggers     whether Slony triggers should be ignored
      *
      * @return database schema from dump file
      */
     public static PgDatabase loadDatabaseSchema(final String file,
-            final String charsetName, final boolean outputIgnoredStatements) {
+            final String charsetName, final boolean outputIgnoredStatements,
+            final boolean ignoreSlonyTriggers) {
         try {
             return loadDatabaseSchema(new FileInputStream(file), charsetName,
-                    outputIgnoredStatements);
+                    outputIgnoredStatements, ignoreSlonyTriggers);
         } catch (final FileNotFoundException ex) {
             throw new FileException(MessageFormat.format(
                     Resources.getString("FileNotFound"), file), ex);

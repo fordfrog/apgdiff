@@ -11,6 +11,9 @@ website at http://apgdiff.startnet.biz/
 #### New Features
 * Added support for ALTER SEQUENCE OWNED BY (patch by Mikhail Petrov).
 * Added support for CREATE TRIGGER ... UPDATE OF column.
+* Added switch --ignore-slony-triggers which causes that Slony triggers
+  _slony_logtrigger and _slony_denyaccess are completely ignored during parsing
+  and diffing.
 
 #### Fixes
 * Fixed issue with comments not being added on newly created columns.

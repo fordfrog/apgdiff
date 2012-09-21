@@ -61,6 +61,10 @@ public class PgDiffArguments {
      * Whether to list supported charsets.
      */
     private boolean listCharsets;
+    /**
+     * Whether Slony triggers should be ignored.
+     */
+    private boolean ignoreSlonyTriggers;
 
     /**
      * Setter for {@link #addDefaults}.
@@ -235,6 +239,8 @@ public class PgDiffArguments {
                 setAddTransaction(true);
             } else if ("--ignore-function-whitespace".equals(args[i])) {
                 setIgnoreFunctionWhitespace(true);
+            } else if ("--ignore-slony-triggers".equals(args[i])) {
+                setIgnoreSlonyTriggers(true);
             } else if ("--ignore-start-with".equals(args[i])) {
                 setIgnoreStartWith(true);
             } else if ("--in-charset-name".equals(args[i])) {
@@ -362,5 +368,23 @@ public class PgDiffArguments {
         for (final String name : charsets.keySet()) {
             writer.println(name);
         }
+    }
+
+    /**
+     * Getter for {@link #ignoreSlonyTriggers}.
+     *
+     * @return {@link #ignoreSlonyTriggers}
+     */
+    public boolean isIgnoreSlonyTriggers() {
+        return ignoreSlonyTriggers;
+    }
+
+    /**
+     * Setter for {@link #ignoreSlonyTriggers}.
+     *
+     * @param ignoreSlonyTriggers {@link #ignoreSlonyTriggers}
+     */
+    public void setIgnoreSlonyTriggers(final boolean ignoreSlonyTriggers) {
+        this.ignoreSlonyTriggers = ignoreSlonyTriggers;
     }
 }
