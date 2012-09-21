@@ -26,13 +26,16 @@ public class PgDiff {
      */
     public static void createDiff(final PrintWriter writer,
             final PgDiffArguments arguments) {
-        diffDatabaseSchemas(writer, arguments,
-                PgDumpLoader.loadDatabaseSchema(arguments.getOldDumpFile(),
-                arguments.getInCharsetName(),
-                arguments.isOutputIgnoredStatements()),
-                PgDumpLoader.loadDatabaseSchema(arguments.getNewDumpFile(),
-                arguments.getInCharsetName(),
-                arguments.isOutputIgnoredStatements()));
+        final PgDatabase oldDatabase = PgDumpLoader.loadDatabaseSchema(
+                arguments.getOldDumpFile(), arguments.getInCharsetName(),
+                arguments.isOutputIgnoredStatements(),
+                arguments.isIgnoreSlonyTriggers());
+        final PgDatabase newDatabase = PgDumpLoader.loadDatabaseSchema(
+                arguments.getNewDumpFile(), arguments.getInCharsetName(),
+                arguments.isOutputIgnoredStatements(),
+                arguments.isIgnoreSlonyTriggers());
+
+        diffDatabaseSchemas(writer, arguments, oldDatabase, newDatabase);
     }
 
     /**
@@ -48,13 +51,16 @@ public class PgDiff {
     public static void createDiff(final PrintWriter writer,
             final PgDiffArguments arguments, final InputStream oldInputStream,
             final InputStream newInputStream) {
-        diffDatabaseSchemas(writer, arguments,
-                PgDumpLoader.loadDatabaseSchema(oldInputStream,
-                arguments.getInCharsetName(),
-                arguments.isOutputIgnoredStatements()),
-                PgDumpLoader.loadDatabaseSchema(newInputStream,
-                arguments.getInCharsetName(),
-                arguments.isOutputIgnoredStatements()));
+        final PgDatabase oldDatabase = PgDumpLoader.loadDatabaseSchema(
+                oldInputStream, arguments.getInCharsetName(),
+                arguments.isOutputIgnoredStatements(),
+                arguments.isIgnoreSlonyTriggers());
+        final PgDatabase newDatabase = PgDumpLoader.loadDatabaseSchema(
+                newInputStream, arguments.getInCharsetName(),
+                arguments.isOutputIgnoredStatements(),
+                arguments.isIgnoreSlonyTriggers());
+
+        diffDatabaseSchemas(writer, arguments, oldDatabase, newDatabase);
     }
 
     /**
