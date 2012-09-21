@@ -14,7 +14,7 @@
             <outputDirectory></outputDirectory>
         </file>
         <file>
-            <source>${basedir}/changelog.txt</source>
+            <source>${basedir}/README.md</source>
             <outputDirectory></outputDirectory>
         </file>
     </files>
