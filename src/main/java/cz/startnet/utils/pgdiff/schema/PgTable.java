@@ -173,19 +173,29 @@ public class PgTable {
         sbSQL.append(PgDiffUtils.getQuotedName(name));
         sbSQL.append(" (\n");
 
-        for (PgColumn column : columns) {
-            sbSQL.append("\t");
-            sbSQL.append(column.getFullDefinition(false));
-            sbSQL.append(",\n");
-        }
+        boolean first = true;
 
-        sbSQL.setLength(sbSQL.length() - 2);
-        sbSQL.append("\n)");
+        if (columns.isEmpty()) {
+            sbSQL.append(')');
+        } else {
+            for (PgColumn column : columns) {
+                if (first) {
+                    first = false;
+                } else {
+                    sbSQL.append(",\n");
+                }
+
+                sbSQL.append("\t");
+                sbSQL.append(column.getFullDefinition(false));
+            }
+
+            sbSQL.append("\n)");
+        }
 
         if (inherits != null && !inherits.isEmpty()) {
             sbSQL.append("\nINHERITS (");
 
-            boolean first = true;
+            first = true;
 
             for (final String tableName : inherits) {
                 if (first) {

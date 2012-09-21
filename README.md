@@ -21,6 +21,7 @@ website at http://apgdiff.startnet.biz/
   Jim Mlodgenski).
 * Fixed all bugs related to incorrect parsing of end of statement, most often
   resulting in StringIndexOutOfBoundException.
+* Fixed CREATE TABLE statement output when table contains no column.
 
 ### 2010-10-22: Version 2.3
 
