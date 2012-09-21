@@ -28,8 +28,6 @@ public class CreateTriggerParser {
         parser.expect("CREATE", "TRIGGER");
 
         final String triggerName = parser.parseIdentifier();
-        final String schemaName =
-                ParserUtils.getSchemaName(triggerName, database);
         final String objectName = ParserUtils.getObjectName(triggerName);
 
         final PgTrigger trigger = new PgTrigger();
