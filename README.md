@@ -12,6 +12,10 @@ website at http://apgdiff.startnet.biz/
 * Added hint to use "CREATE TABLE ... CONSTRAINT name PRIMARY KEY/UNIQUE ..."
   instead of "CREATE TABLE ... PRIMARY KEY/UNIQUE ..." because apgdiff cannot
   easily support unnamed constraints.
+* Fixed issue with incorrect end of expression detection because of ignored [
+  and ] brackets. This caused issues for example in statements like
+  "... DEFAULT ARRAY[1, 2, 3], ..." where end of expression was detected at
+  first comma (and not the third one) which then resulted in parser exception.
 
 ### 2012-09-21: Version 2.4
 

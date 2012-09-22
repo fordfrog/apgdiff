@@ -336,6 +336,8 @@ public final class Parser {
      * position after the last character in the command is returned.
      *
      * @return end position of the command
+     *
+     * @todo Support for dollar quoted strings is missing here.
      */
     private int getExpressionEnd() {
         int bracesCount = 0;
@@ -345,9 +347,9 @@ public final class Parser {
         for (; charPos < string.length(); charPos++) {
             final char chr = string.charAt(charPos);
 
-            if (chr == '(') {
+            if (chr == '(' || chr == '[') {
                 bracesCount++;
-            } else if (chr == ')') {
+            } else if (chr == ')' || chr == ']') {
                 if (bracesCount == 0) {
                     break;
                 } else {
@@ -355,6 +357,11 @@ public final class Parser {
                 }
             } else if (chr == '\'') {
                 singleQuoteOn = !singleQuoteOn;
+
+                // escaped single quote is like two single quotes
+                if (charPos > 0 && string.charAt(charPos - 1) == '\\') {
+                    singleQuoteOn = !singleQuoteOn;
+                }
             } else if ((chr == ',') && !singleQuoteOn && (bracesCount == 0)) {
                 break;
             } else if (chr == ';' && bracesCount == 0 && !singleQuoteOn) {
