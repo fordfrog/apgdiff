@@ -6,6 +6,13 @@ website at http://apgdiff.startnet.biz/
 
 ## Changelog
 
+### Version 2.4.1 (not released yet)
+
+#### Fixes
+* Added hint to use "CREATE TABLE ... CONSTRAINT name PRIMARY KEY/UNIQUE ..."
+  instead of "CREATE TABLE ... PRIMARY KEY/UNIQUE ..." because apgdiff cannot
+  easily support unnamed constraints.
+
 ### 2012-09-21: Version 2.4
 
 #### New Features
