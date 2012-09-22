@@ -53,6 +53,12 @@ public class CreateTableParser {
         while (!parser.expectOptional(")")) {
             if (parser.expectOptional("CONSTRAINT")) {
                 parseConstraint(parser, table);
+            } else if (parser.expectOptional("PRIMARY", "KEY")) {
+                throw new ParserException(Resources.getString(
+                        "CreateTablePrimaryKeyNotSupported"));
+            } else if (parser.expectOptional("UNIQUE")) {
+                throw new ParserException(
+                        Resources.getString("CreateTableUniqueNotSupported"));
             } else {
                 parseColumn(parser, table);
             }
