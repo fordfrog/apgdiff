@@ -65,6 +65,10 @@ public class PgDiffArguments {
      * Whether Slony triggers should be ignored.
      */
     private boolean ignoreSlonyTriggers;
+    /**
+     * Force DROP FUNCTION statement before any CREATE FUNCTION one for existing function.
+     */
+    private boolean forceDropFunction;
 
     /**
      * Setter for {@link #addDefaults}.
@@ -255,6 +259,8 @@ public class PgDiffArguments {
                 setOutputIgnoredStatements(true);
             } else if ("--version".equals(args[i])) {
                 setVersion(true);
+            } else if ("--force-drop-function".equals(args[i])) {
+                setForceDropFunction(true);
             } else {
                 writer.print(Resources.getString("ErrorUnknownOption"));
                 writer.print(": ");
@@ -386,5 +392,23 @@ public class PgDiffArguments {
      */
     public void setIgnoreSlonyTriggers(final boolean ignoreSlonyTriggers) {
         this.ignoreSlonyTriggers = ignoreSlonyTriggers;
+    }
+    
+    /**
+     * Getter for {@link #forceDropFunction}.
+     * 
+     * @return {@link #forceDropFunction}
+     */
+    public boolean isForceDropFunction() {
+        return forceDropFunction;
+    }
+    
+    /**
+     * Setter for {@link #forceDropFunction}.
+     * 
+     * @param forceDropFunction {@link #forceDropFunction}
+     */
+    public void setForceDropFunction(final boolean forceDropFunction) {
+        this.forceDropFunction = forceDropFunction;
     }
 }

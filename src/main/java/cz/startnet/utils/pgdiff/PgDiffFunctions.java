@@ -42,6 +42,9 @@ public class PgDiffFunctions {
                     oldFunction, arguments.isIgnoreFunctionWhitespace())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
+                if (arguments.isForceDropFunction() && oldFunction != null) {
+                    writer.println(oldFunction.getDropSQL());
+                }
                 writer.println(newFunction.getCreationSQL());
             }
         }
