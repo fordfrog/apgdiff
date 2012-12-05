@@ -69,6 +69,10 @@ public class PgDiffArguments {
      * Force DROP FUNCTION statement before any CREATE FUNCTION one for existing function.
      */
     private boolean forceDropFunction;
+    /**
+     * Do not generate DROP SEQUENCE statement for DROPPED tables.
+     */
+    private boolean tableDropsSequence;
 
     /**
      * Setter for {@link #addDefaults}.
@@ -261,6 +265,8 @@ public class PgDiffArguments {
                 setVersion(true);
             } else if ("--force-drop-function".equals(args[i])) {
                 setForceDropFunction(true);
+            } else if ("--table-drops-sequence".equals(args[i])) {
+                setTableDropsSequence(true);
             } else {
                 writer.print(Resources.getString("ErrorUnknownOption"));
                 writer.print(": ");
@@ -410,5 +416,23 @@ public class PgDiffArguments {
      */
     public void setForceDropFunction(final boolean forceDropFunction) {
         this.forceDropFunction = forceDropFunction;
+    }
+
+    /**
+     * Getter for {@link #tableDropsSequence}.
+     * 
+     * @return {@link #tableDropsSequence}
+     */
+    public boolean isTableDropsSequence() {
+        return tableDropsSequence;
+    }
+
+    /**
+     * Setter for {@link #tableDropsSequence}.
+     * 
+     * @param tableDropsSequence {@link #tableDropsSequence}
+     */
+    public void setTableDropsSequence(boolean tableDropsSequence) {
+        this.tableDropsSequence = tableDropsSequence;
     }
 }

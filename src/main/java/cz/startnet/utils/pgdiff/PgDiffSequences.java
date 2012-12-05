@@ -7,7 +7,10 @@ package cz.startnet.utils.pgdiff;
 
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgSequence;
+import cz.startnet.utils.pgdiff.schema.PgTable;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Diffs sequences.
@@ -71,18 +74,29 @@ public class PgDiffSequences {
      * @param searchPathHelper search path helper
      */
     public static void dropSequences(final PrintWriter writer,
-            final PgSchema oldSchema, final PgSchema newSchema,
-            final SearchPathHelper searchPathHelper) {
+            final PgDiffArguments arguments, final PgSchema oldSchema,
+            final PgSchema newSchema, final SearchPathHelper searchPathHelper) {
         if (oldSchema == null) {
             return;
+        }
+        
+        List<PgTable> droppedTables = PgDiffTables.getDropTableCandidates(oldSchema, newSchema);
+        List<String> droppedTableNames = new ArrayList<String>();
+        for (PgTable table : droppedTables) {
+            droppedTableNames.add(table.getName());
         }
 
         // Drop sequences that do not exist in new schema
         for (final PgSequence sequence : oldSchema.getSequences()) {
             if (!newSchema.containsSequence(sequence.getName())) {
-                searchPathHelper.outputSearchPath(writer);
-                writer.println();
-                writer.println(sequence.getDropSQL());
+                if (arguments.isTableDropsSequence() && -1 != droppedTableNames.indexOf(sequence.getOwnedByTable())) {
+                    // Don't drop sequences for dropped tables on new Postgresql servers,
+                    // it will do it authomatically.
+                } else {
+                    searchPathHelper.outputSearchPath(writer);
+                    writer.println();
+                    writer.println(sequence.getDropSQL());
+                }
             }
         }
     }
