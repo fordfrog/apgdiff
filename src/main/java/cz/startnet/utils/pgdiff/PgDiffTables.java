@@ -300,8 +300,19 @@ public class PgDiffTables {
                     PgDiffUtils.getQuotedName(newColumn.getName());
 
             if (!oldColumn.getType().equals(newColumn.getType())) {
+            	String usingStatement = "";
+            	if(oldColumn.getType().contains("varying") && newColumn.getType().contains("numeric")){
+                	/*
+                	 * In the case of varying to numeric there is not implicit conversion,
+                	 * so must be set using USING
+                	 * http://www.postgresql.org/docs/current/static/sql-altertable.html
+                	 * http://postgres.cz/wiki/PostgreSQL_SQL_Tricks#ALTER_TABLE_ALTER_COLUMN_USING
+                	 */
+            		usingStatement = " USING  " + newColumnName + "::numeric";            		
+                }
+            	
                 statements.add("\tALTER COLUMN " + newColumnName + " TYPE "
-                        + newColumn.getType() + " /* "
+                        + newColumn.getType() + usingStatement + " /* "
                         + MessageFormat.format(
                         Resources.getString("TypeParameterChange"),
                         newTable.getName(), oldColumn.getType(),

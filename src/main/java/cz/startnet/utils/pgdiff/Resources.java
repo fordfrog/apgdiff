@@ -4,6 +4,7 @@
 package cz.startnet.utils.pgdiff;
 
 import java.util.ResourceBundle;
+import java.util.Locale; 
 
 /**
  * Utility class for accessing localized resources.
@@ -14,9 +15,12 @@ public class Resources {
 
     /**
      * Resource bundle.
+     * 
+     * 
      */
+	
     private static final ResourceBundle RESOURCE_BUNDLE =
-            ResourceBundle.getBundle("cz/startnet/utils/pgdiff/Resources");
+            ResourceBundle.getBundle("cz.startnet.utils.pgdiff.Resources");
 
     /**
      * Returns string from resource bundle based on the key.
