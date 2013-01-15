@@ -20,6 +20,7 @@ import java.util.Map;
  * Diffs tables.
  *
  * @author fordfrog
+ * 
  */
 public class PgDiffTables {
 
@@ -300,15 +301,16 @@ public class PgDiffTables {
                     PgDiffUtils.getQuotedName(newColumn.getName());
 
             if (!oldColumn.getType().equals(newColumn.getType())) {
+            	/*
+            	 * In the case of character varying to numeric there is not implicit conversion,
+            	 * so must be set using USING
+            	 * http://www.postgresql.org/docs/current/static/sql-altertable.html
+            	 * http://postgres.cz/wiki/PostgreSQL_SQL_Tricks#ALTER_TABLE_ALTER_COLUMN_USING
+            	 * @author neoecos
+            	 */        	
             	String usingStatement = "";
-            	if(oldColumn.getType().contains("varying") && newColumn.getType().contains("numeric")){
-                	/*
-                	 * In the case of varying to numeric there is not implicit conversion,
-                	 * so must be set using USING
-                	 * http://www.postgresql.org/docs/current/static/sql-altertable.html
-                	 * http://postgres.cz/wiki/PostgreSQL_SQL_Tricks#ALTER_TABLE_ALTER_COLUMN_USING
-                	 */
-            		usingStatement = " USING  " + newColumnName + "::numeric";            		
+            	if(oldColumn.getType().contains("character") && newColumn.getType().contains("numeric")){
+                	usingStatement = " USING  " + newColumnName + "::numeric";            		
                 }
             	
                 statements.add("\tALTER COLUMN " + newColumnName + " TYPE "
