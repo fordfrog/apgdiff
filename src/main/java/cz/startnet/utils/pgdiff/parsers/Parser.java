@@ -397,9 +397,8 @@ public final class Parser {
         throw new ParserException(MessageFormat.format(
                 Resources.getString("CannotParseStringUnsupportedCommand"),
                 string, position + 1,
-                string.substring(
-                    position,
-                    (string.length() > position + 20 ? position + 20 : string.length()))));
+                string.substring(position, string.length() > position + 20
+                ? position + 20 : string.length())));
     }
 
     /**
