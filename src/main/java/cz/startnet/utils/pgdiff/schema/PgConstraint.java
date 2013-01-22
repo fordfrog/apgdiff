@@ -121,7 +121,11 @@ public class PgConstraint {
         sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
         sbSQL.append("\n\tDROP CONSTRAINT ");
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
-        sbSQL.append(';');
+        /*
+         * Added CASCADE statement
+         * @author neoecos
+         */
+        sbSQL.append(" CASCADE ;");
 
         return sbSQL.toString();
     }
