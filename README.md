@@ -18,6 +18,7 @@ website at http://apgdiff.startnet.biz/
   first comma (and not the third one) which then resulted in parser exception.
 * Fixed issue when outputting unsupported command information and the
   unsupported command string is shorter than 20 characters. (Linas Valiukas)
+* Added Spanish translation. (Sebastian Ortiz)
 
 ### 2012-09-21: Version 2.4
 
