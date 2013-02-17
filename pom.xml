@@ -8,11 +8,11 @@
     <version>2.4.1-SNAPSHOT</version>
     <description>Simple PostgreSQL diff tool that is useful for schema upgrades. The tool compares two schema dump files and creates output file that is (after some hand-made modifications) suitable for upgrade of old schema.</description>
 
-    <url>http://apgdiff.startnet.biz/</url>
+    <url>http://www.apgdiff.com/</url>
 
     <issueManagement>
-        <system>SouceForge Tracker</system>
-        <url>http://sourceforge.net/tracker/?group_id=163508</url>
+        <system>GitHub Issue Tracker</system>
+        <url>https://github.com/fordfrog/apgdiff/issues?sort=created&state=open</url>
     </issueManagement>
 
     <inceptionYear>2006</inceptionYear>
@@ -68,9 +68,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:hg:http://apgdiff.hg.sourceforge.net:8000/hgroot/apgdiff/apgdiff</connection>
-        <developerConnection>scm:hg:ssh://apgdiff.hg.sourceforge.net/hgroot/apgdiff/apgdiff</developerConnection>
-        <url>http://apgdiff.hg.sourceforge.net/hgweb/apgdiff/</url>
+        <connection>scm:git:git://github.com/fordfrog/apgdiff.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:fordfrog/apgdiff.git</developerConnection>
+        <url>https://github.com/fordfrog/apgdiff.git</url>
     </scm>
 
     <organization>
