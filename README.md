@@ -2,7 +2,10 @@
 
 Another PostgreSQL Diff Tool is free PostgreSQL diff tool that is useful for
 comparison/diffing of database schemas. You can find more information at its
-website at http://www.apgdiff.com/
+website at http://www.apgdiff.com/. If you found an issue in apgdiff, please
+file it at https://github.com/fordfrog/apgdiff/issues. If you for some reason
+need to contact author of this application, you can email him at
+fordfrog@fordfrog.com.
 
 ## Changelog
 
