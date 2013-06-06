@@ -329,6 +329,12 @@ public class PgDumpLoader { //NOPMD
 
             pos = sbStatement.indexOf("--", pos + 1);
         }
+        
+        int endPos = sbStatement.indexOf("*/");
+        if(endPos>=0){
+        	int startPos = sbStatement.indexOf("/*");
+        	sbStatement.replace(startPos, endPos+2, "");
+        }
     }
 
     /**
