@@ -2,4 +2,4 @@
 CREATE TABLE testtable (
 	field1 polygon
 )
-INHERITS (parenttable);
+INHERITS (public.parenttable);

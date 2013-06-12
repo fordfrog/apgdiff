@@ -5,7 +5,7 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
-import cz.startnet.utils.pgdiff.parsers.Pair;
+import cz.startnet.utils.pgdiff.Pair;
 import cz.startnet.utils.pgdiff.PgDiffUtils;
 import java.util.ArrayList;
 import java.util.Collections;
