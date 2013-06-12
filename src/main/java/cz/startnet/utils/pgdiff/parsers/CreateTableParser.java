@@ -35,7 +35,6 @@ public class CreateTableParser {
         parser.expectOptional("IF", "NOT", "EXISTS");
 
         final String tableName = parser.parseIdentifier();
-        final PgTable table = new PgTable(ParserUtils.getObjectName(tableName));
         final String schemaName =
                 ParserUtils.getSchemaName(tableName, database);
         final PgSchema schema = database.getSchema(schemaName);
@@ -45,6 +44,8 @@ public class CreateTableParser {
                     Resources.getString("CannotFindSchema"), schemaName,
                     statement));
         }
+
+        final PgTable table = new PgTable(ParserUtils.getObjectName(tableName), database, schema);
 
         schema.addTable(table);
 
@@ -66,7 +67,7 @@ public class CreateTableParser {
 
         while (!parser.expectOptional(";")) {
             if (parser.expectOptional("INHERITS")) {
-                parseInherits(parser, table);
+                parseInherits(database, parser, table);
             } else if (parser.expectOptional("WITHOUT")) {
                 table.setWith("OIDS=false");
             } else if (parser.expectOptional("WITH")) {
@@ -89,17 +90,21 @@ public class CreateTableParser {
     /**
      * Parses INHERITS.
      *
+     * @param database database
      * @param parser parser
      * @param table  pg table
      */
-    private static void parseInherits(final Parser parser,
+    private static void parseInherits(final PgDatabase database,final Parser parser,
             final PgTable table) {
         parser.expect("(");
 
         while (!parser.expectOptional(")")) {
-            table.addInherits(
-                    ParserUtils.getObjectName(parser.parseIdentifier()));
-
+         final String parsedString = parser.parseIdentifier();
+         final String tableName = ParserUtils.getObjectName(parsedString);
+         final String schemaName = parsedString.contains(".") ? 
+             ParserUtils.getSecondObjectName(parsedString) :
+             database.getDefaultSchema().getName();
+            table.addInherits(schemaName, tableName);
             if (parser.expectOptional(")")) {
                 break;
             } else {

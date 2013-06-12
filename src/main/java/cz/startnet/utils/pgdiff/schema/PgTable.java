@@ -5,6 +5,7 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
+import cz.startnet.utils.pgdiff.parsers.Pair;
 import cz.startnet.utils.pgdiff.PgDiffUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,7 +47,7 @@ public class PgTable {
      * List of names of inherited tables.
      */
     @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private final List<String> inherits = new ArrayList<String>();
+    private final List<Pair<String,String>> inherits = new ArrayList<Pair<String,String>>();
     /**
      * Name of the table.
      */
@@ -66,12 +67,24 @@ public class PgTable {
     private String comment;
 
     /**
+     * PgDatabase
+     */
+    private final PgDatabase database;
+    
+    /**
+     * PgSchema
+     */
+    private final PgSchema schema;
+
+    /**
      * Creates a new PgTable object.
      *
      * @param name {@link #name}
      */
-    public PgTable(final String name) {
+    public PgTable(final String name, final PgDatabase database, final PgSchema schema) {
         this.name = name;
+        this.database = database;
+        this.schema = schema;
     }
 
     /**
@@ -105,7 +118,15 @@ public class PgTable {
                 return column;
             }
         }
-
+        if (inherits != null && !inherits.isEmpty()) {
+            for (final Pair<String, String> inheritPair : inherits) {
+                if (database.getSchema(inheritPair.getL()).containsTable(inheritPair.getR())) {
+                  if(database.getSchema(inheritPair.getL()).getTable(inheritPair.getR()).containsColumn(name)) {
+                    return database.getSchema(inheritPair.getL()).getTable(inheritPair.getR()).getColumn(name); 
+                  }
+                }
+            }
+        }
         return null;
     }
 
@@ -197,14 +218,13 @@ public class PgTable {
 
             first = true;
 
-            for (final String tableName : inherits) {
+            for (final Pair<String,String> inheritPair : inherits) {
                 if (first) {
                     first = false;
                 } else {
                     sbSQL.append(", ");
                 }
-
-                sbSQL.append(tableName);
+                sbSQL.append(String.format("%s.%s", inheritPair.getL(), inheritPair.getR()));
             }
 
             sbSQL.append(")");
@@ -325,8 +345,8 @@ public class PgTable {
      *
      * @param tableName name of inherited table
      */
-    public void addInherits(final String tableName) {
-        inherits.add(tableName);
+    public void addInherits(final String schemaName, final String tableName) {
+        inherits.add(new Pair<String, String>(schemaName, tableName));
     }
 
     /**
@@ -334,7 +354,7 @@ public class PgTable {
      *
      * @return {@link #inherits}
      */
-    public List<String> getInherits() {
+    public List<Pair<String,String>> getInherits() {
         return Collections.unmodifiableList(inherits);
     }
 
@@ -451,7 +471,14 @@ public class PgTable {
                 return true;
             }
         }
-
+        if (inherits != null && !inherits.isEmpty()) {
+            for (final Pair<String,String> inheritPair : inherits) {
+                if (database.getSchema(inheritPair.getL()).containsTable(inheritPair.getR())) {
+                  return database.getSchema(inheritPair.getL()).getTable(inheritPair.getR()).containsColumn(name);
+                }
+            }
+        }
+        
         return false;
     }
 
