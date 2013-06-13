@@ -40,7 +40,7 @@ INHERITS (public.parenttable);
 -- Name: parenttable_id; Type: DEFAULT; Schema: schema1; Owner: admin
 --
 
-ALTER TABLE ONLY schema1.childtable ALTER COLUMN parenttable_id SET DEFAULT 0;
+ALTER TABLE ONLY childtable ALTER COLUMN parenttable_id SET DEFAULT 0;
 
 --
 -- PostgreSQL database dump complete

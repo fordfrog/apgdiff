@@ -303,7 +303,7 @@ public class PgTable {
         for (PgColumn column : getColumnsWithStatistics()) {
             sbSQL.append("\nALTER TABLE ONLY ");
             sbSQL.append(PgDiffUtils.getQuotedName(name));
-            sbSQL.append("ALTER COLUMN ");
+            sbSQL.append(" ALTER COLUMN ");
             sbSQL.append(
                     PgDiffUtils.getQuotedName(column.getName()));
             sbSQL.append(" SET STATISTICS ");
