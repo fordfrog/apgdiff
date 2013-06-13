@@ -9,6 +9,7 @@ import cz.startnet.utils.pgdiff.Resources;
 import cz.startnet.utils.pgdiff.schema.PgColumn;
 import cz.startnet.utils.pgdiff.schema.PgConstraint;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
+import cz.startnet.utils.pgdiff.schema.PgInheritedColumn;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgSequence;
 import cz.startnet.utils.pgdiff.schema.PgTable;
@@ -261,6 +262,17 @@ public class AlterTableParser {
                                 parser.getString()));
                     }
 
+                    column.setDefaultValue(defaultValue);
+                } else if (table.containsInheritedColumn(columnName)) {
+                    final PgInheritedColumn column = table.getInheritedColumn(columnName);
+                    
+                    if (column == null) {
+                        throw new RuntimeException(MessageFormat.format(
+                                Resources.getString("CannotFindTableColumn"),
+                                columnName, table.getName(),
+                                parser.getString()));
+                    }
+                    
                     column.setDefaultValue(defaultValue);
                 } else {
                     throw new ParserException(MessageFormat.format(

@@ -8,6 +8,7 @@ package cz.startnet.utils.pgdiff;
 import cz.startnet.utils.pgdiff.Pair;
 import cz.startnet.utils.pgdiff.schema.PgColumn;
 import cz.startnet.utils.pgdiff.schema.PgColumnUtils;
+import cz.startnet.utils.pgdiff.schema.PgInheritedColumn;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
 import java.io.PrintWriter;
@@ -132,6 +133,7 @@ public class PgDiffTables {
                     writer, arguments, oldTable, newTable, searchPathHelper);
             checkWithOIDS(writer, oldTable, newTable, searchPathHelper);
             checkInherits(writer, oldTable, newTable, newSchema, searchPathHelper);
+            addInheritedColumnDefaults(writer, arguments, oldTable, newTable, searchPathHelper);
             checkTablespace(writer, oldTable, newTable, searchPathHelper);
             addAlterStatistics(writer, oldTable, newTable, searchPathHelper);
             addAlterStorage(writer, oldTable, newTable, searchPathHelper);
@@ -414,6 +416,50 @@ public class PgDiffTables {
             }
         }
     }
+    
+    /**
+     * Outputs statements for defaults of tables who's column belongs to
+     * an inherited table.
+     *
+     * @param writer           writer the output should be written to
+     * @param arguments        object containing arguments settings
+     * @param oldTable         original table
+     * @param newTable         new table
+     * @param searchPathHelper search path helper
+     */
+    private static void addInheritedColumnDefaults(final PrintWriter writer,
+            final PgDiffArguments arguments, final PgTable oldTable,
+            final PgTable newTable, final SearchPathHelper searchPathHelper) {
+        for (final PgInheritedColumn newColumn : newTable.getInheritedColumns()) {
+            if (!oldTable.containsInheritedColumn(newColumn.getInheritedColumn().getName())) {
+                continue;
+            }
+            final PgInheritedColumn oldColumn = oldTable.getInheritedColumn(newColumn.getInheritedColumn().getName());
+            final String newColumnName =
+                    PgDiffUtils.getQuotedName(newColumn.getInheritedColumn().getName());
+            
+            final String oldDefault = (oldColumn.getDefaultValue() == null) ? ""
+                    : oldColumn.getDefaultValue();
+            final String newDefault = (newColumn.getDefaultValue() == null) ? ""
+                    : newColumn.getDefaultValue();
+            if (!oldDefault.equals(newDefault)) {
+                if (newDefault.length() == 0) {
+                    writer.println(String.format(
+                        "\nALTER TABLE ONLY %s\n\tALTER COLUMN %s DROP DEFAULT;",
+                        PgDiffUtils.getQuotedName(newTable.getName()),
+                        PgDiffUtils.getQuotedName(newColumn.getInheritedColumn().getName())
+                    ));
+                } else {
+                    writer.println(String.format(
+                        "\nALTER TABLE ONLY %s\n\tALTER COLUMN %s SET DEFAULT %s;",
+                        PgDiffUtils.getQuotedName(newTable.getName()),
+                        PgDiffUtils.getQuotedName(newColumn.getInheritedColumn().getName()),
+                        newDefault
+                    ));
+                }
+            }
+        }
+    }
 
     /**
      * Checks whether OIDS are dropped from the new table. There is no way to
@@ -490,7 +536,7 @@ public class PgDiffTables {
                     || !oldSchema.containsTable(table.getName())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(table.getCreationSQL());
+                writer.println(table.getCreationSQL(newSchema));
             }
         }
     }
