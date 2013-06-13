@@ -5,6 +5,7 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
+import cz.startnet.utils.pgdiff.Pair;
 import cz.startnet.utils.pgdiff.PgDiffUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +23,11 @@ public class PgTable {
      */
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final List<PgColumn> columns = new ArrayList<PgColumn>();
+    /**
+     * List of inheritedColumns defined on the table.
+     */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    private final List<PgInheritedColumn> inheritedColumns = new ArrayList<PgInheritedColumn>();
     /**
      * List of constraints defined on the table.
      */
@@ -46,7 +52,7 @@ public class PgTable {
      * List of names of inherited tables.
      */
     @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private final List<String> inherits = new ArrayList<String>();
+    private final List<Pair<String,String>> inherits = new ArrayList<Pair<String,String>>();
     /**
      * Name of the table.
      */
@@ -66,12 +72,24 @@ public class PgTable {
     private String comment;
 
     /**
+     * PgDatabase
+     */
+    private final PgDatabase database;
+    
+    /**
+     * PgSchema
+     */
+    private final PgSchema schema;
+
+    /**
      * Creates a new PgTable object.
      *
      * @param name {@link #name}
      */
-    public PgTable(final String name) {
+    public PgTable(final String name, final PgDatabase database, final PgSchema schema) {
         this.name = name;
+        this.database = database;
+        this.schema = schema;
     }
 
     /**
@@ -105,7 +123,25 @@ public class PgTable {
                 return column;
             }
         }
-
+        return null;
+    }
+    
+    /**
+     * Finds inheritedColumn according to specified name {@code name}.
+     *
+     * @param name name of the inheritedColumn to be searched
+     *
+     * @return found inheritedColumn or null if no such inheritedColumn
+     * has been found
+     */
+    public PgInheritedColumn getInheritedColumn(final String name) {
+        if (inherits != null && !inherits.isEmpty()) {
+            for (PgInheritedColumn inheritedColumn : inheritedColumns) {
+                if (inheritedColumn.getInheritedColumn().getName().equals(name)) {
+                    return inheritedColumn;
+                }
+            }
+        }
         return null;
     }
 
@@ -116,6 +152,15 @@ public class PgTable {
      */
     public List<PgColumn> getColumns() {
         return Collections.unmodifiableList(columns);
+    }
+    
+    /**
+     * Getter for {@link #inheritedColumns}. The list cannot be modified.
+     *
+     * @return {@link #inheritedColumns}
+     */
+    public List<PgInheritedColumn> getInheritedColumns() {
+        return Collections.unmodifiableList(inheritedColumns);
     }
 
     /**
@@ -164,10 +209,12 @@ public class PgTable {
 
     /**
      * Creates and returns SQL for creation of the table.
+     * 
+     * @param schema schema of current statement
      *
      * @return created SQL statement
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(final PgSchema schema) {
         final StringBuilder sbSQL = new StringBuilder(1000);
         sbSQL.append("CREATE TABLE ");
         sbSQL.append(PgDiffUtils.getQuotedName(name));
@@ -197,14 +244,19 @@ public class PgTable {
 
             first = true;
 
-            for (final String tableName : inherits) {
+            for (final Pair<String,String> inheritPair : inherits) {
                 if (first) {
                     first = false;
                 } else {
                     sbSQL.append(", ");
                 }
-
-                sbSQL.append(tableName);
+                String inheritTableName = null;
+                if(schema.getName().equals(inheritPair.getL())){
+                    inheritTableName = inheritPair.getR();
+                } else {
+                    inheritTableName = String.format("%s.%s", inheritPair.getL(), inheritPair.getR());
+                }
+                sbSQL.append(inheritTableName);
             }
 
             sbSQL.append(")");
@@ -233,6 +285,20 @@ public class PgTable {
         }
 
         sbSQL.append(';');
+        
+        //Inherited column default override
+        for (PgInheritedColumn column : getInheritedColumns()) {
+            if(column.getDefaultValue() != null){
+                sbSQL.append("\n\nALTER TABLE ONLY ");
+                sbSQL.append(PgDiffUtils.getQuotedName(name));
+                sbSQL.append("\n\tALTER COLUMN ");
+                sbSQL.append(
+                    PgDiffUtils.getQuotedName(column.getInheritedColumn().getName()));
+                sbSQL.append(" SET DEFAULT ");
+                sbSQL.append(column.getDefaultValue());
+                sbSQL.append(';');
+            }
+        }
 
         for (PgColumn column : getColumnsWithStatistics()) {
             sbSQL.append("\nALTER TABLE ONLY ");
@@ -325,8 +391,13 @@ public class PgTable {
      *
      * @param tableName name of inherited table
      */
-    public void addInherits(final String tableName) {
-        inherits.add(tableName);
+    public void addInherits(final String schemaName, final String tableName) {
+        inherits.add(new Pair<String, String>(schemaName, tableName));
+        final PgTable inheritedTable = database.getSchema(schemaName).getTable(tableName);
+        for( PgColumn column : inheritedTable.getColumns() ) {
+          PgInheritedColumn inheritedColumn = new PgInheritedColumn(column);
+          inheritedColumns.add(inheritedColumn);
+        }
     }
 
     /**
@@ -334,7 +405,7 @@ public class PgTable {
      *
      * @return {@link #inherits}
      */
-    public List<String> getInherits() {
+    public List<Pair<String,String>> getInherits() {
         return Collections.unmodifiableList(inherits);
     }
 
@@ -409,6 +480,15 @@ public class PgTable {
     public void addColumn(final PgColumn column) {
         columns.add(column);
     }
+    
+    /**
+     * Adds {@code inheritedColumn} to the list of inheritedColumns.
+     *
+     * @param inheritedColumn inheritedColumn
+     */
+    public void addInheritedColumn(final PgInheritedColumn inheritedColumn) {
+        inheritedColumns.add(inheritedColumn);
+    }
 
     /**
      * Adds {@code constraint} to the list of constraints.
@@ -451,7 +531,26 @@ public class PgTable {
                 return true;
             }
         }
-
+        return false;
+    }
+    
+    /**
+     * Returns true if table contains given inheritedColumn {@code name},
+     * otherwise false.
+     *
+     * @param name name of the inheritedColumn
+     *
+     * @return true if table contains given inheritedColumn {@code name},
+     * otherwise false
+     */
+    public boolean containsInheritedColumn(final String name) {
+       if (inherits != null && !inherits.isEmpty()) {
+            for (PgInheritedColumn inheritedColumn : inheritedColumns) {
+                if (inheritedColumn.getInheritedColumn().getName().equals(name)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
