@@ -4,8 +4,9 @@ CREATE TABLE parenttable2 (
 );
 
 ALTER TABLE parenttable
-	DROP COLUMN id,
-	ADD COLUMN field3 information_schema.cardinal_number;
+	RENAME COLUMN id TO field3 /* RENAME column - table: parenttable original: id new: field3 */,
+	ALTER COLUMN field3 TYPE information_schema.cardinal_number /* TYPE change - table: parenttable original: bigserial new: information_schema.cardinal_number */,
+	ALTER COLUMN field3 DROP NOT NULL;
 
 ALTER TABLE testtable
 	NO INHERIT parenttable;
