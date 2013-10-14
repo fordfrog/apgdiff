@@ -2,7 +2,7 @@
 
 Ahother PostgreSQL Diff Tool is free PostgreSQL diff tool that is useful for
 comparison/diffing of database schemas. You can find more information at its
-website at http://apgdiff.startnet.biz/
+website at http://apgdiff.com/
 
 ## Changelog
 
