@@ -5,24 +5,30 @@
  */
 package cz.startnet.utils.pgdiff;
 
+import java.io.PrintWriter;
+
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgSequence;
-import java.io.PrintWriter;
+import cz.startnet.utils.pgdiff.schema.PgSequencePrivilege;
 
 /**
  * Diffs sequences.
- *
+ * 
  * @author fordfrog
  */
 public class PgDiffSequences {
 
     /**
      * Outputs statements for creation of new sequences.
-     *
-     * @param writer           writer the output should be written to
-     * @param oldSchema        original schema
-     * @param newSchema        new schema
-     * @param searchPathHelper search path helper
+     * 
+     * @param writer
+     *            writer the output should be written to
+     * @param oldSchema
+     *            original schema
+     * @param newSchema
+     *            new schema
+     * @param searchPathHelper
+     *            search path helper
      */
     public static void createSequences(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
@@ -34,25 +40,53 @@ public class PgDiffSequences {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(sequence.getCreationSQL());
+
+                for (PgSequencePrivilege sequencePrivilege : sequence
+                        .getPrivileges()) {
+                    writer.println("REVOKE ALL ON TABLE "
+                            + PgDiffUtils.getQuotedName(sequence.getName())
+                            + " FROM " + sequencePrivilege.getRoleName() + ";");
+                    if (!"".equals(sequencePrivilege.getPrivilegesSQL(true))) {
+                        writer.println("GRANT "
+                                + sequencePrivilege.getPrivilegesSQL(true)
+                                + " ON TABLE "
+                                + PgDiffUtils.getQuotedName(sequence.getName())
+                                + " TO " + sequencePrivilege.getRoleName()
+                                + " WITH GRANT OPTION;");
+                    }
+                    if (!"".equals(sequencePrivilege.getPrivilegesSQL(false))) {
+                        writer.println("GRANT "
+                                + sequencePrivilege.getPrivilegesSQL(false)
+                                + " ON TABLE "
+                                + PgDiffUtils.getQuotedName(sequence.getName())
+                                + " TO " + sequencePrivilege.getRoleName()
+                                + ";");
+                    }
+                }
+
             }
         }
     }
 
     /**
      * Outputs statements for altering of new sequences.
-     *
-     * @param writer           writer the output should be written to
-     * @param oldSchema        original schema
-     * @param newSchema        new schema
-     * @param searchPathHelper search path helper
+     * 
+     * @param writer
+     *            writer the output should be written to
+     * @param oldSchema
+     *            original schema
+     * @param newSchema
+     *            new schema
+     * @param searchPathHelper
+     *            search path helper
      */
     public static void alterCreatedSequences(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
             final SearchPathHelper searchPathHelper) {
         // Alter created sequences
         for (final PgSequence sequence : newSchema.getSequences()) {
-            if ((oldSchema == null
-                    || !oldSchema.containsSequence(sequence.getName()))
+            if ((oldSchema == null || !oldSchema.containsSequence(sequence
+                    .getName()))
                     && sequence.getOwnedBy() != null
                     && !sequence.getOwnedBy().isEmpty()) {
                 searchPathHelper.outputSearchPath(writer);
@@ -64,11 +98,15 @@ public class PgDiffSequences {
 
     /**
      * Outputs statements for dropping of sequences that do not exist anymore.
-     *
-     * @param writer           writer the output should be written to
-     * @param oldSchema        original schema
-     * @param newSchema        new schema
-     * @param searchPathHelper search path helper
+     * 
+     * @param writer
+     *            writer the output should be written to
+     * @param oldSchema
+     *            original schema
+     * @param newSchema
+     *            new schema
+     * @param searchPathHelper
+     *            search path helper
      */
     public static void dropSequences(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
@@ -89,12 +127,17 @@ public class PgDiffSequences {
 
     /**
      * Outputs statement for modified sequences.
-     *
-     * @param writer           writer the output should be written to
-     * @param arguments        object containing arguments settings
-     * @param oldSchema        original schema
-     * @param newSchema        new schema
-     * @param searchPathHelper search path helper
+     * 
+     * @param writer
+     *            writer the output should be written to
+     * @param arguments
+     *            object containing arguments settings
+     * @param oldSchema
+     *            original schema
+     * @param newSchema
+     *            new schema
+     * @param searchPathHelper
+     *            search path helper
      */
     public static void alterSequences(final PrintWriter writer,
             final PgDiffArguments arguments, final PgSchema oldSchema,
@@ -106,8 +149,8 @@ public class PgDiffSequences {
         final StringBuilder sbSQL = new StringBuilder(100);
 
         for (final PgSequence newSequence : newSchema.getSequences()) {
-            final PgSequence oldSequence =
-                    oldSchema.getSequence(newSequence.getName());
+            final PgSequence oldSequence = oldSchema.getSequence(newSequence
+                    .getName());
 
             if (oldSequence == null) {
                 continue;
@@ -118,8 +161,7 @@ public class PgDiffSequences {
             final String oldIncrement = oldSequence.getIncrement();
             final String newIncrement = newSequence.getIncrement();
 
-            if (newIncrement != null
-                    && !newIncrement.equals(oldIncrement)) {
+            if (newIncrement != null && !newIncrement.equals(oldIncrement)) {
                 sbSQL.append("\n\tINCREMENT BY ");
                 sbSQL.append(newIncrement);
             }
@@ -129,8 +171,7 @@ public class PgDiffSequences {
 
             if (newMinValue == null && oldMinValue != null) {
                 sbSQL.append("\n\tNO MINVALUE");
-            } else if (newMinValue != null
-                    && !newMinValue.equals(oldMinValue)) {
+            } else if (newMinValue != null && !newMinValue.equals(oldMinValue)) {
                 sbSQL.append("\n\tMINVALUE ");
                 sbSQL.append(newMinValue);
             }
@@ -140,8 +181,7 @@ public class PgDiffSequences {
 
             if (newMaxValue == null && oldMaxValue != null) {
                 sbSQL.append("\n\tNO MAXVALUE");
-            } else if (newMaxValue != null
-                    && !newMaxValue.equals(oldMaxValue)) {
+            } else if (newMaxValue != null && !newMaxValue.equals(oldMaxValue)) {
                 sbSQL.append("\n\tMAXVALUE ");
                 sbSQL.append(newMaxValue);
             }
@@ -195,7 +235,7 @@ public class PgDiffSequences {
                     || oldSequence.getComment() != null
                     && newSequence.getComment() != null
                     && !oldSequence.getComment().equals(
-                    newSequence.getComment())) {
+                            newSequence.getComment())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.print("COMMENT ON SEQUENCE ");
@@ -210,6 +250,77 @@ public class PgDiffSequences {
                 writer.print("COMMENT ON SEQUENCE ");
                 writer.print(newSequence.getName());
                 writer.println(" IS NULL;");
+            }
+
+            alterPrivileges(writer, oldSequence, newSequence, searchPathHelper);
+        }
+    }
+
+    private static void alterPrivileges(final PrintWriter writer,
+            final PgSequence oldSequence, final PgSequence newSequence,
+            final SearchPathHelper searchPathHelper) {
+        boolean emptyLinePrinted = false;
+        for (PgSequencePrivilege oldSequencePrivilege : oldSequence
+                .getPrivileges()) {
+            PgSequencePrivilege newSequencePrivilege = newSequence
+                    .getPrivilege(oldSequencePrivilege.getRoleName());
+            if (newSequencePrivilege == null) {
+                if (!emptyLinePrinted) {
+                    writer.println();
+                }
+                writer.println("REVOKE ALL ON SEQUENCE "
+                        + PgDiffUtils.getQuotedName(oldSequence.getName())
+                        + " FROM " + oldSequencePrivilege.getRoleName() + ";");
+            } else if (!oldSequencePrivilege.isSimilar(newSequencePrivilege)) {
+                if (!emptyLinePrinted) {
+                    writer.println();
+                }
+                writer.println("REVOKE ALL ON SEQUENCE "
+                        + PgDiffUtils.getQuotedName(newSequence.getName())
+                        + " FROM " + newSequencePrivilege.getRoleName() + ";");
+                if (!"".equals(newSequencePrivilege.getPrivilegesSQL(true))) {
+                    writer.println("GRANT "
+                            + newSequencePrivilege.getPrivilegesSQL(true)
+                            + " ON SEQUENCE "
+                            + PgDiffUtils.getQuotedName(newSequence.getName())
+                            + " TO " + newSequencePrivilege.getRoleName()
+                            + " WITH GRANT OPTION;");
+                }
+                if (!"".equals(newSequencePrivilege.getPrivilegesSQL(false))) {
+                    writer.println("GRANT "
+                            + newSequencePrivilege.getPrivilegesSQL(false)
+                            + " ON SEQUENCE "
+                            + PgDiffUtils.getQuotedName(newSequence.getName())
+                            + " TO " + newSequencePrivilege.getRoleName() + ";");
+                }
+            } // else similar privilege will not be updated
+        }
+        for (PgSequencePrivilege newSequencePrivilege : newSequence
+                .getPrivileges()) {
+            PgSequencePrivilege oldSequencePrivilege = oldSequence
+                    .getPrivilege(newSequencePrivilege.getRoleName());
+            if (oldSequencePrivilege == null) {
+                if (!emptyLinePrinted) {
+                    writer.println();
+                }
+                writer.println("REVOKE ALL ON SEQUENCE "
+                        + PgDiffUtils.getQuotedName(newSequence.getName())
+                        + " FROM " + newSequencePrivilege.getRoleName() + ";");
+                if (!"".equals(newSequencePrivilege.getPrivilegesSQL(true))) {
+                    writer.println("GRANT "
+                            + newSequencePrivilege.getPrivilegesSQL(true)
+                            + " ON SEQUENCE "
+                            + PgDiffUtils.getQuotedName(newSequence.getName())
+                            + " TO " + newSequencePrivilege.getRoleName()
+                            + " WITH GRANT OPTION;");
+                }
+                if (!"".equals(newSequencePrivilege.getPrivilegesSQL(false))) {
+                    writer.println("GRANT "
+                            + newSequencePrivilege.getPrivilegesSQL(false)
+                            + " ON SEQUENCE "
+                            + PgDiffUtils.getQuotedName(newSequence.getName())
+                            + " TO " + newSequencePrivilege.getRoleName() + ";");
+                }
             }
         }
     }

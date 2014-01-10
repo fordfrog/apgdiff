@@ -5,6 +5,10 @@
  */
 package cz.startnet.utils.pgdiff.parsers;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+
 import cz.startnet.utils.pgdiff.Resources;
 import cz.startnet.utils.pgdiff.schema.PgColumn;
 import cz.startnet.utils.pgdiff.schema.PgConstraint;
@@ -13,34 +17,33 @@ import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgSequence;
 import cz.startnet.utils.pgdiff.schema.PgTable;
 import cz.startnet.utils.pgdiff.schema.PgView;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Parses ALTER TABLE statements.
- *
+ * 
  * @author fordfrog
  */
 public class AlterTableParser {
 
     /**
      * Parses ALTER TABLE statement.
-     *
-     * @param database                database
-     * @param statement               ALTER TABLE statement
-     * @param outputIgnoredStatements whether ignored statements should be
-     *                                output in the diff
+     * 
+     * @param database
+     *            database
+     * @param statement
+     *            ALTER TABLE statement
+     * @param outputIgnoredStatements
+     *            whether ignored statements should be output in the diff
      */
-    public static void parse(final PgDatabase database,
-            final String statement, final boolean outputIgnoredStatements) {
+    public static void parse(final PgDatabase database, final String statement,
+            final boolean outputIgnoredStatements) {
         final Parser parser = new Parser(statement);
         parser.expect("ALTER", "TABLE");
         parser.expectOptional("ONLY");
 
         final String tableName = parser.parseIdentifier();
-        final String schemaName =
-                ParserUtils.getSchemaName(tableName, database);
+        final String schemaName = ParserUtils
+                .getSchemaName(tableName, database);
         final PgSchema schema = database.getSchema(schemaName);
 
         if (schema == null) {
@@ -78,16 +81,17 @@ public class AlterTableParser {
             if (parser.expectOptional("ALTER")) {
                 parseAlterColumn(parser, table);
             } else if (parser.expectOptional("CLUSTER", "ON")) {
-                table.setClusterIndexName(
-                        ParserUtils.getObjectName(parser.parseIdentifier()));
+                table.setClusterIndexName(ParserUtils.getObjectName(parser
+                        .parseIdentifier()));
             } else if (parser.expectOptional("OWNER", "TO")) {
                 // we do not parse this one so we just consume the identifier
-                if (outputIgnoredStatements) {
-                    database.addIgnoredStatement("ALTER TABLE " + tableName
-                            + " OWNER TO " + parser.parseIdentifier() + ';');
-                } else {
-                    parser.parseIdentifier();
-                }
+                // if (outputIgnoredStatements) {
+                // database.addIgnoredStatement("ALTER TABLE " + tableName
+                // + " OWNER TO " + parser.parseIdentifier() + ';');
+                // } else {
+                // parser.parseIdentifier();
+                // }
+                table.setOwnerTo(parser.parseIdentifier());
             } else if (parser.expectOptional("ADD")) {
                 if (parser.expectOptional("FOREIGN", "KEY")) {
                     parseAddForeignKey(parser, table);
@@ -97,11 +101,11 @@ public class AlterTableParser {
                     parser.throwUnsupportedCommand();
                 }
             } else if (parser.expectOptional("ENABLE")) {
-                parseEnable(
-                        parser, outputIgnoredStatements, tableName, database);
+                parseEnable(parser, outputIgnoredStatements, tableName,
+                        database);
             } else if (parser.expectOptional("DISABLE")) {
-                parseDisable(
-                        parser, outputIgnoredStatements, tableName, database);
+                parseDisable(parser, outputIgnoredStatements, tableName,
+                        database);
             } else {
                 parser.throwUnsupportedCommand();
             }
@@ -116,13 +120,15 @@ public class AlterTableParser {
 
     /**
      * Parses ENABLE statements.
-     *
-     * @param parser                  parser
-     * @param outputIgnoredStatements whether ignored statements should be
-     *                                output in the diff
-     * @param tableName               table name as it was specified in the
-     *                                statement
-     * @param database                database information
+     * 
+     * @param parser
+     *            parser
+     * @param outputIgnoredStatements
+     *            whether ignored statements should be output in the diff
+     * @param tableName
+     *            table name as it was specified in the statement
+     * @param database
+     *            database information
      */
     private static void parseEnable(final Parser parser,
             final boolean outputIgnoredStatements, final String tableName,
@@ -171,13 +177,15 @@ public class AlterTableParser {
 
     /**
      * Parses DISABLE statements.
-     *
-     * @param parser                  parser
-     * @param outputIgnoredStatements whether ignored statements should be
-     *                                output in the diff
-     * @param tableName               table name as it was specified in the
-     *                                statement
-     * @param database                database information
+     * 
+     * @param parser
+     *            parser
+     * @param outputIgnoredStatements
+     *            whether ignored statements should be output in the diff
+     * @param tableName
+     *            table name as it was specified in the statement
+     * @param database
+     *            database information
      */
     private static void parseDisable(final Parser parser,
             final boolean outputIgnoredStatements, final String tableName,
@@ -203,15 +211,18 @@ public class AlterTableParser {
 
     /**
      * Parses ADD CONSTRAINT action.
-     *
-     * @param parser parser
-     * @param table  table
-     * @param schema schema
+     * 
+     * @param parser
+     *            parser
+     * @param table
+     *            table
+     * @param schema
+     *            schema
      */
     private static void parseAddConstraint(final Parser parser,
             final PgTable table, final PgSchema schema) {
-        final String constraintName =
-                ParserUtils.getObjectName(parser.parseIdentifier());
+        final String constraintName = ParserUtils.getObjectName(parser
+                .parseIdentifier());
         final PgConstraint constraint = new PgConstraint(constraintName);
         constraint.setTableName(table.getName());
         table.addConstraint(constraint);
@@ -226,16 +237,18 @@ public class AlterTableParser {
 
     /**
      * Parses ALTER COLUMN action.
-     *
-     * @param parser parser
-     * @param table  pg table
+     * 
+     * @param parser
+     *            parser
+     * @param table
+     *            pg table
      */
     private static void parseAlterColumn(final Parser parser,
             final PgTable table) {
         parser.expectOptional("COLUMN");
 
-        final String columnName =
-                ParserUtils.getObjectName(parser.parseIdentifier());
+        final String columnName = ParserUtils.getObjectName(parser
+                .parseIdentifier());
 
         if (parser.expectOptional("SET")) {
             if (parser.expectOptional("STATISTICS")) {
@@ -255,10 +268,11 @@ public class AlterTableParser {
                     final PgColumn column = table.getColumn(columnName);
 
                     if (column == null) {
-                        throw new RuntimeException(MessageFormat.format(
-                                Resources.getString("CannotFindTableColumn"),
-                                columnName, table.getName(),
-                                parser.getString()));
+                        throw new RuntimeException(
+                                MessageFormat.format(Resources
+                                        .getString("CannotFindTableColumn"),
+                                        columnName, table.getName(), parser
+                                                .getString()));
                     }
 
                     column.setDefaultValue(defaultValue);
@@ -297,9 +311,11 @@ public class AlterTableParser {
 
     /**
      * Parses ADD FOREIGN KEY action.
-     *
-     * @param parser parser
-     * @param table  pg table
+     * 
+     * @param parser
+     *            parser
+     * @param table
+     *            pg table
      */
     private static void parseAddForeignKey(final Parser parser,
             final PgTable table) {
@@ -307,8 +323,8 @@ public class AlterTableParser {
         parser.expect("(");
 
         while (!parser.expectOptional(")")) {
-            columnNames.add(
-                    ParserUtils.getObjectName(parser.parseIdentifier()));
+            columnNames
+                    .add(ParserUtils.getObjectName(parser.parseIdentifier()));
 
             if (parser.expectOptional(")")) {
                 break;
@@ -317,10 +333,9 @@ public class AlterTableParser {
             }
         }
 
-        final String constraintName = ParserUtils.generateName(
-                table.getName() + "_", columnNames, "_fkey");
-        final PgConstraint constraint =
-                new PgConstraint(constraintName);
+        final String constraintName = ParserUtils.generateName(table.getName()
+                + "_", columnNames, "_fkey");
+        final PgConstraint constraint = new PgConstraint(constraintName);
         table.addConstraint(constraint);
         constraint.setDefinition(parser.getExpression());
         constraint.setTableName(table.getName());
@@ -328,14 +343,17 @@ public class AlterTableParser {
 
     /**
      * Parses ALTER TABLE view.
-     *
-     * @param parser                  parser
-     * @param view                    view
-     * @param outputIgnoredStatements whether ignored statements should be
-     *                                output in the diff
-     * @param viewName                view name as it was specified in the
-     *                                statement
-     * @param database                database information
+     * 
+     * @param parser
+     *            parser
+     * @param view
+     *            view
+     * @param outputIgnoredStatements
+     *            whether ignored statements should be output in the diff
+     * @param viewName
+     *            view name as it was specified in the statement
+     * @param database
+     *            database information
      */
     private static void parseView(final Parser parser, final PgView view,
             final boolean outputIgnoredStatements, final String viewName,
@@ -344,8 +362,8 @@ public class AlterTableParser {
             if (parser.expectOptional("ALTER")) {
                 parser.expectOptional("COLUMN");
 
-                final String columnName =
-                        ParserUtils.getObjectName(parser.parseIdentifier());
+                final String columnName = ParserUtils.getObjectName(parser
+                        .parseIdentifier());
 
                 if (parser.expectOptional("SET", "DEFAULT")) {
                     final String expression = parser.getExpression();
@@ -371,14 +389,17 @@ public class AlterTableParser {
 
     /**
      * Parses ALTER TABLE sequence.
-     *
-     * @param parser                  parser
-     * @param sequence                sequence
-     * @param outputIgnoredStatements whether ignored statements should be
-     *                                output in the diff
-     * @param sequenceName            sequence name as it was specified in the
-     *                                statement
-     * @param database                database information
+     * 
+     * @param parser
+     *            parser
+     * @param sequence
+     *            sequence
+     * @param outputIgnoredStatements
+     *            whether ignored statements should be output in the diff
+     * @param sequenceName
+     *            sequence name as it was specified in the statement
+     * @param database
+     *            database information
      */
     private static void parseSequence(final Parser parser,
             final PgSequence sequence, final boolean outputIgnoredStatements,

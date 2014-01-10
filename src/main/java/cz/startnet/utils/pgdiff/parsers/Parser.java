@@ -5,13 +5,14 @@
  */
 package cz.startnet.utils.pgdiff.parsers;
 
-import cz.startnet.utils.pgdiff.Resources;
 import java.text.MessageFormat;
 import java.util.Locale;
 
+import cz.startnet.utils.pgdiff.Resources;
+
 /**
  * Class for parsing strings.
- *
+ * 
  * @author fordfrog
  */
 @SuppressWarnings("FinalClass")
@@ -20,7 +21,7 @@ public final class Parser {
     /**
      * String to be parsed.
      */
-    private String string;
+    private final String string;
     /**
      * Current position.
      */
@@ -28,8 +29,9 @@ public final class Parser {
 
     /**
      * Creates new instance of Parser.
-     *
-     * @param string {@link #string}
+     * 
+     * @param string
+     *            {@link #string}
      */
     public Parser(final String string) {
         this.string = string;
@@ -39,8 +41,9 @@ public final class Parser {
     /**
      * Checks whether the string contains given word on current position. If not
      * then throws an exception.
-     *
-     * @param words list of words to check
+     * 
+     * @param words
+     *            list of words to check
      */
     public void expect(final String... words) {
         for (final String word : words) {
@@ -54,10 +57,12 @@ public final class Parser {
      * returns true. If expectation is not optional, exception with error
      * description is thrown. If word is found, position is moved at first
      * non-whitespace character following the word.
-     *
-     * @param word     word to expect
-     * @param optional true if word is optional, otherwise false
-     *
+     * 
+     * @param word
+     *            word to expect
+     * @param optional
+     *            true if word is optional, otherwise false
+     * 
      * @return true if word was found, otherwise false
      */
     public boolean expect(final String word, final boolean optional) {
@@ -66,19 +71,17 @@ public final class Parser {
         if (wordEnd <= string.length()
                 && string.substring(position, wordEnd).equalsIgnoreCase(word)
                 && (wordEnd == string.length()
-                || Character.isWhitespace(string.charAt(wordEnd))
-                || string.charAt(wordEnd) == ';'
-                || string.charAt(wordEnd) == ')'
-                || string.charAt(wordEnd) == ','
-                || string.charAt(wordEnd) == '['
-                || "(".equals(word) || ",".equals(word) || "[".equals(word)
-                || "]".equals(word))) {
+                        || Character.isWhitespace(string.charAt(wordEnd))
+                        || string.charAt(wordEnd) == ';'
+                        || string.charAt(wordEnd) == ')'
+                        || string.charAt(wordEnd) == ','
+                        || string.charAt(wordEnd) == '[' || "(".equals(word)
+                        || ",".equals(word) || "[".equals(word) || "]"
+                            .equals(word))) {
             position = wordEnd;
             skipWhitespace();
-
             return true;
         }
-
         if (optional) {
             return false;
         }
@@ -90,9 +93,10 @@ public final class Parser {
 
     /**
      * Checks whether string contains at current position sequence of the words.
-     *
-     * @param words array of words
-     *
+     * 
+     * @param words
+     *            array of words
+     * 
      * @return true if whole sequence was found, otherwise false
      */
     public boolean expectOptional(final String... words) {
@@ -126,7 +130,7 @@ public final class Parser {
      * returned quoted. If the identifier is not quoted, it is converted to
      * lowercase. If identifier does not start with letter then exception is
      * thrown. Position is placed at next first non-whitespace character.
-     *
+     * 
      * @return parsed identifier
      */
     public String parseIdentifier() {
@@ -144,7 +148,7 @@ public final class Parser {
 
     /**
      * Parses single part of the identifier.
-     *
+     * 
      * @return parsed identifier
      */
     private String parseIdentifierInternal() {
@@ -168,9 +172,8 @@ public final class Parser {
                 }
             }
 
-            final String result =
-                    string.substring(position, endPos).toLowerCase(
-                    Locale.ENGLISH);
+            final String result = string.substring(position, endPos)
+                    .toLowerCase(Locale.ENGLISH);
 
             position = endPos;
 
@@ -182,7 +185,7 @@ public final class Parser {
      * Returns rest of the string. If the string ends with ';' then it is
      * removed from the string before returned. If there is nothing more in the
      * string, null is returned.
-     *
+     * 
      * @return rest of the string, without trailing ';' if present, or null if
      *         there is nothing more in the string
      */
@@ -207,7 +210,7 @@ public final class Parser {
     /**
      * Parses integer from the string. If next word is not integer then
      * exception is thrown.
-     *
+     * 
      * @return parsed integer value
      */
     public int parseInteger() {
@@ -220,8 +223,8 @@ public final class Parser {
         }
 
         try {
-            final int result =
-                    Integer.parseInt(string.substring(position, endPos));
+            final int result = Integer.parseInt(string.substring(position,
+                    endPos));
 
             position = endPos;
             skipWhitespace();
@@ -240,7 +243,7 @@ public final class Parser {
      * Quoted string is parsed till next unescaped quote. Unquoted string is
      * parsed till whitespace, ',' ')' or ';' is found. If string should be
      * empty, exception is thrown.
-     *
+     * 
      * @return parsed string, if quoted then including quotes
      */
     public String parseString() {
@@ -309,7 +312,7 @@ public final class Parser {
     /**
      * Returns expression that is ended either with ',', ')' or with end of the
      * string. If expression is empty then exception is thrown.
-     *
+     * 
      * @return expression string
      */
     public String getExpression() {
@@ -334,7 +337,7 @@ public final class Parser {
      * (like CREATE TABLE). Last character is either ',' or ')'. If no such
      * character is found and method reaches the end of the command then
      * position after the last character in the command is returned.
-     *
+     * 
      * @return end position of the command
      */
     private int getExpressionEnd() {
@@ -367,7 +370,7 @@ public final class Parser {
 
     /**
      * Returns current position in the string.
-     *
+     * 
      * @return current position in the string
      */
     public int getPosition() {
@@ -376,7 +379,7 @@ public final class Parser {
 
     /**
      * Returns parsed string.
-     *
+     * 
      * @return parsed string
      */
     public String getString() {
@@ -387,20 +390,22 @@ public final class Parser {
      * Throws exception about unsupported command in statement.
      */
     public void throwUnsupportedCommand() {
-        throw new ParserException(MessageFormat.format(
-                Resources.getString("CannotParseStringUnsupportedCommand"),
-                string, position + 1,
-                string.substring(position, position + 20)));
+        throw new ParserException(
+                MessageFormat.format(Resources
+                        .getString("CannotParseStringUnsupportedCommand"),
+                        string, position + 1, string.substring(position,
+                                position + 20)));
     }
 
     /**
      * Checks whether one of the words is present at current position. If the
      * word is present then the word is returned and position is updated.
-     *
-     * @param words words to check
-     *
+     * 
+     * @param words
+     *            words to check
+     * 
      * @return found word or null if non of the words has been found
-     *
+     * 
      * @see #expectOptional(java.lang.String[])
      */
     public String expectOptionalOneOf(final String... words) {
@@ -415,10 +420,12 @@ public final class Parser {
 
     /**
      * Returns substring from the string.
-     *
-     * @param startPos start position
-     * @param endPos   end position exclusive
-     *
+     * 
+     * @param startPos
+     *            start position
+     * @param endPos
+     *            end position exclusive
+     * 
      * @return substring
      */
     public String getSubString(final int startPos, final int endPos) {
@@ -427,8 +434,9 @@ public final class Parser {
 
     /**
      * Changes current position in the string.
-     *
-     * @param position new position
+     * 
+     * @param position
+     *            new position
      */
     public void setPosition(final int position) {
         this.position = position;
@@ -437,7 +445,7 @@ public final class Parser {
     /**
      * Parses data type from the string. Position is updated. If data type
      * definition is not found then exception is thrown.
-     *
+     * 
      * @return data type string
      */
     public String parseDataType() {
@@ -445,8 +453,7 @@ public final class Parser {
 
         while (endPos < string.length()
                 && !Character.isWhitespace(string.charAt(endPos))
-                && string.charAt(endPos) != '('
-                && string.charAt(endPos) != ')'
+                && string.charAt(endPos) != '(' && string.charAt(endPos) != ')'
                 && string.charAt(endPos) != ',') {
             endPos++;
         }
@@ -463,8 +470,7 @@ public final class Parser {
         position = endPos;
         skipWhitespace();
 
-        if ("character".equalsIgnoreCase(dataType)
-                && expectOptional("varying")) {
+        if ("character".equalsIgnoreCase(dataType) && expectOptional("varying")) {
             dataType = "character varying";
         } else if ("double".equalsIgnoreCase(dataType)
                 && expectOptional("precision")) {
@@ -496,12 +502,11 @@ public final class Parser {
 
     /**
      * Checks whether the whole string has been consumed.
-     *
+     * 
      * @return true if there is nothing left to parse, otherwise false
      */
     public boolean isConsumed() {
-        return position == string.length()
-                || position + 1 == string.length()
+        return position == string.length() || position + 1 == string.length()
                 && string.charAt(position) == ';';
     }
 }
