@@ -20,6 +20,8 @@ CREATE TABLE testtable3 (
 	id bigint DEFAULT nextval('testtable3_id_seq'::regclass) NOT NULL
 );
 
+ALTER TABLE testtable3 OWNER TO fordfrog;
+
 ALTER SEQUENCE testtable3_id_seq
 	OWNED BY testtable3.id;
 
@@ -35,6 +37,8 @@ CREATE SEQUENCE testtable1_id_seq
 CREATE TABLE testtable1 (
 	id integer DEFAULT nextval('testtable1_id_seq'::regclass) NOT NULL
 );
+
+ALTER TABLE testtable1 OWNER TO fordfrog;
 
 ALTER SEQUENCE testtable1_id_seq
 	OWNED BY testtable1.id;

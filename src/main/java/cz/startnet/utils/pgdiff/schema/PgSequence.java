@@ -5,11 +5,15 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import cz.startnet.utils.pgdiff.PgDiffUtils;
 
 /**
  * Stores sequence information.
- *
+ * 
  * @author fordfrog
  */
 public class PgSequence {
@@ -50,11 +54,17 @@ public class PgSequence {
      * Comment.
      */
     private String comment;
+    /**
+     * List of privileges defined on the sequence.
+     */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    private final List<PgSequencePrivilege> privileges = new ArrayList<PgSequencePrivilege>();
 
     /**
      * Creates a new PgSequence object.
-     *
-     * @param name name of the sequence
+     * 
+     * @param name
+     *            name of the sequence
      */
     public PgSequence(final String name) {
         this.name = name;
@@ -62,8 +72,9 @@ public class PgSequence {
 
     /**
      * Setter for {@link #cache}.
-     *
-     * @param cache {@link #cache}
+     * 
+     * @param cache
+     *            {@link #cache}
      */
     public void setCache(final String cache) {
         this.cache = cache;
@@ -71,7 +82,7 @@ public class PgSequence {
 
     /**
      * Getter for {@link #cache}.
-     *
+     * 
      * @return {@link #cache}
      */
     public String getCache() {
@@ -80,7 +91,7 @@ public class PgSequence {
 
     /**
      * Getter for {@link #comment}.
-     *
+     * 
      * @return {@link #comment}
      */
     public String getComment() {
@@ -89,8 +100,9 @@ public class PgSequence {
 
     /**
      * Setter for {@link #comment}.
-     *
-     * @param comment {@link #comment}
+     * 
+     * @param comment
+     *            {@link #comment}
      */
     public void setComment(final String comment) {
         this.comment = comment;
@@ -98,7 +110,7 @@ public class PgSequence {
 
     /**
      * Creates and returns SQL statement for creation of the sequence.
-     *
+     * 
      * @return created SQL statement
      */
     public String getCreationSQL() {
@@ -158,7 +170,7 @@ public class PgSequence {
 
     /**
      * Creates and returns SQL statement for modification "OWNED BY" parameter.
-     *
+     * 
      * @return created SQL statement
      */
     public String getOwnedBySQL() {
@@ -179,8 +191,9 @@ public class PgSequence {
 
     /**
      * Setter for {@link #cycle}.
-     *
-     * @param cycle {@link #cycle}
+     * 
+     * @param cycle
+     *            {@link #cycle}
      */
     public void setCycle(final boolean cycle) {
         this.cycle = cycle;
@@ -188,7 +201,7 @@ public class PgSequence {
 
     /**
      * Getter for {@link #cycle}.
-     *
+     * 
      * @return {@link #cycle}
      */
     public boolean isCycle() {
@@ -197,7 +210,7 @@ public class PgSequence {
 
     /**
      * Creates and returns SQL statement for dropping the sequence.
-     *
+     * 
      * @return created SQL
      */
     public String getDropSQL() {
@@ -206,8 +219,9 @@ public class PgSequence {
 
     /**
      * Setter for {@link #increment}.
-     *
-     * @param increment {@link #increment}
+     * 
+     * @param increment
+     *            {@link #increment}
      */
     public void setIncrement(final String increment) {
         this.increment = increment;
@@ -215,7 +229,7 @@ public class PgSequence {
 
     /**
      * Getter for {@link #increment}.
-     *
+     * 
      * @return {@link #increment}
      */
     public String getIncrement() {
@@ -224,8 +238,9 @@ public class PgSequence {
 
     /**
      * Setter for {@link #maxValue}.
-     *
-     * @param maxValue {@link #maxValue}
+     * 
+     * @param maxValue
+     *            {@link #maxValue}
      */
     public void setMaxValue(final String maxValue) {
         this.maxValue = maxValue;
@@ -233,7 +248,7 @@ public class PgSequence {
 
     /**
      * Getter for {@link #maxValue}.
-     *
+     * 
      * @return {@link #maxValue}
      */
     public String getMaxValue() {
@@ -242,8 +257,9 @@ public class PgSequence {
 
     /**
      * Setter for {@link #minValue}.
-     *
-     * @param minValue {@link #minValue}
+     * 
+     * @param minValue
+     *            {@link #minValue}
      */
     public void setMinValue(final String minValue) {
         this.minValue = minValue;
@@ -251,7 +267,7 @@ public class PgSequence {
 
     /**
      * Getter for {@link #minValue}.
-     *
+     * 
      * @return {@link #minValue}
      */
     public String getMinValue() {
@@ -260,8 +276,9 @@ public class PgSequence {
 
     /**
      * Setter for {@link #name}.
-     *
-     * @param name {@link #name}
+     * 
+     * @param name
+     *            {@link #name}
      */
     public void setName(final String name) {
         this.name = name;
@@ -269,7 +286,7 @@ public class PgSequence {
 
     /**
      * Getter for {@link #name}.
-     *
+     * 
      * @return {@link #name}
      */
     public String getName() {
@@ -278,8 +295,9 @@ public class PgSequence {
 
     /**
      * Setter for {@link #startWith}.
-     *
-     * @param startWith {@link #startWith}
+     * 
+     * @param startWith
+     *            {@link #startWith}
      */
     public void setStartWith(final String startWith) {
         this.startWith = startWith;
@@ -287,7 +305,7 @@ public class PgSequence {
 
     /**
      * Getter for {@link #startWith}.
-     *
+     * 
      * @return {@link #startWith}
      */
     public String getStartWith() {
@@ -296,7 +314,7 @@ public class PgSequence {
 
     /**
      * Getter for {@link #ownedBy}.
-     *
+     * 
      * @return {@link #ownedBy}
      */
     public String getOwnedBy() {
@@ -305,10 +323,28 @@ public class PgSequence {
 
     /**
      * Setter for {@link #ownedBy}.
-     *
-     * @param ownedBy {@link #ownedBy}
+     * 
+     * @param ownedBy
+     *            {@link #ownedBy}
      */
     public void setOwnedBy(final String ownedBy) {
         this.ownedBy = ownedBy;
+    }
+
+    public List<PgSequencePrivilege> getPrivileges() {
+        return Collections.unmodifiableList(privileges);
+    }
+
+    public PgSequencePrivilege getPrivilege(final String roleName) {
+        for (PgSequencePrivilege privilege : privileges) {
+            if (privilege.getRoleName().equals(roleName)) {
+                return privilege;
+            }
+        }
+        return null;
+    }
+
+    public void addPrivilege(final PgSequencePrivilege privilege) {
+        privileges.add(privilege);
     }
 }

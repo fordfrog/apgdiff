@@ -5,14 +5,15 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
-import cz.startnet.utils.pgdiff.PgDiffUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import cz.startnet.utils.pgdiff.PgDiffUtils;
+
 /**
  * Stores view information.
- *
+ * 
  * @author fordfrog
  */
 public class PgView {
@@ -32,22 +33,28 @@ public class PgView {
     /**
      * List of optional column default values.
      */
-    private final List<DefaultValue> defaultValues =
-            new ArrayList<DefaultValue>(0);
+    private final List<DefaultValue> defaultValues = new ArrayList<DefaultValue>(
+            0);
     /**
      * List of optional column comments.
      */
-    private final List<ColumnComment> columnComments =
-            new ArrayList<ColumnComment>(0);
+    private final List<ColumnComment> columnComments = new ArrayList<ColumnComment>(
+            0);
     /**
      * Comment.
      */
     private String comment;
+    /**
+     * List of privileges defined on the view.
+     */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    private final List<PgViewPrivilege> privileges = new ArrayList<PgViewPrivilege>();
 
     /**
      * Creates a new PgView object.
-     *
-     * @param name {@link #name}
+     * 
+     * @param name
+     *            {@link #name}
      */
     public PgView(final String name) {
         this.name = name;
@@ -55,8 +62,9 @@ public class PgView {
 
     /**
      * Setter for {@link #columnNames}.
-     *
-     * @param columnNames {@link #columnNames}
+     * 
+     * @param columnNames
+     *            {@link #columnNames}
      */
     @SuppressWarnings("AssignmentToCollectionOrArrayFieldFromParameter")
     public void setColumnNames(final List<String> columnNames) {
@@ -65,16 +73,33 @@ public class PgView {
 
     /**
      * Getter for {@link #columnNames}. The list cannot be modified.
-     *
+     * 
      * @return {@link #columnNames}
      */
     public List<String> getColumnNames() {
         return Collections.unmodifiableList(columnNames);
     }
 
+    public List<PgViewPrivilege> getPrivileges() {
+        return Collections.unmodifiableList(privileges);
+    }
+
+    public PgViewPrivilege getPrivilege(final String roleName) {
+        for (PgViewPrivilege privilege : privileges) {
+            if (privilege.getRoleName().equals(roleName)) {
+                return privilege;
+            }
+        }
+        return null;
+    }
+
+    public void addPrivilege(final PgViewPrivilege privilege) {
+        privileges.add(privilege);
+    }
+
     /**
      * Getter for {@link #comment}.
-     *
+     * 
      * @return {@link #comment}
      */
     public String getComment() {
@@ -83,8 +108,9 @@ public class PgView {
 
     /**
      * Setter for {@link #comment}.
-     *
-     * @param comment {@link #comment}
+     * 
+     * @param comment
+     *            {@link #comment}
      */
     public void setComment(final String comment) {
         this.comment = comment;
@@ -92,7 +118,7 @@ public class PgView {
 
     /**
      * Creates and returns SQL for creation of the view.
-     *
+     * 
      * @return created SQL statement
      */
     public String getCreationSQL() {
@@ -121,8 +147,7 @@ public class PgView {
             sbSQL.append("\n\nALTER VIEW ");
             sbSQL.append(PgDiffUtils.getQuotedName(name));
             sbSQL.append(" ALTER COLUMN ");
-            sbSQL.append(
-                    PgDiffUtils.getQuotedName(defaultValue.getColumnName()));
+            sbSQL.append(PgDiffUtils.getQuotedName(defaultValue.getColumnName()));
             sbSQL.append(" SET DEFAULT ");
             sbSQL.append(defaultValue.getDefaultValue());
             sbSQL.append(';');
@@ -140,8 +165,8 @@ public class PgView {
             if (columnComment.getComment() != null
                     && !columnComment.getComment().isEmpty()) {
                 sbSQL.append("\n\nCOMMENT ON COLUMN ");
-                sbSQL.append(PgDiffUtils.getQuotedName(
-                        columnComment.getColumnName()));
+                sbSQL.append(PgDiffUtils.getQuotedName(columnComment
+                        .getColumnName()));
                 sbSQL.append(" IS ");
                 sbSQL.append(columnComment.getComment());
                 sbSQL.append(';');
@@ -153,7 +178,7 @@ public class PgView {
 
     /**
      * Creates and returns SQL statement for dropping the view.
-     *
+     * 
      * @return created SQL statement
      */
     public String getDropSQL() {
@@ -162,7 +187,7 @@ public class PgView {
 
     /**
      * Getter for {@link #name}.
-     *
+     * 
      * @return {@link #name}
      */
     public String getName() {
@@ -171,8 +196,9 @@ public class PgView {
 
     /**
      * Setter for {@link #query}.
-     *
-     * @param query {@link #query}
+     * 
+     * @param query
+     *            {@link #query}
      */
     public void setQuery(final String query) {
         this.query = query;
@@ -180,7 +206,7 @@ public class PgView {
 
     /**
      * Getter for {@link #query}.
-     *
+     * 
      * @return {@link #query}
      */
     public String getQuery() {
@@ -189,9 +215,11 @@ public class PgView {
 
     /**
      * Adds/replaces column default value specification.
-     *
-     * @param columnName   column name
-     * @param defaultValue default value
+     * 
+     * @param columnName
+     *            column name
+     * @param defaultValue
+     *            default value
      */
     public void addColumnDefaultValue(final String columnName,
             final String defaultValue) {
@@ -201,8 +229,9 @@ public class PgView {
 
     /**
      * Removes column default value if present.
-     *
-     * @param columnName column name
+     * 
+     * @param columnName
+     *            column name
      */
     public void removeColumnDefaultValue(final String columnName) {
         for (final DefaultValue item : defaultValues) {
@@ -215,7 +244,7 @@ public class PgView {
 
     /**
      * Getter for {@link #defaultValues}.
-     *
+     * 
      * @return {@link #defaultValues}
      */
     public List<DefaultValue> getDefaultValues() {
@@ -224,20 +253,22 @@ public class PgView {
 
     /**
      * Adds/replaces column comment.
-     *
-     * @param columnName column name
-     * @param comment    comment
+     * 
+     * @param columnName
+     *            column name
+     * @param comment
+     *            comment
      */
-    public void addColumnComment(final String columnName,
-            final String comment) {
+    public void addColumnComment(final String columnName, final String comment) {
         removeColumnDefaultValue(columnName);
         columnComments.add(new ColumnComment(columnName, comment));
     }
 
     /**
      * Removes column comment if present.
-     *
-     * @param columnName column name
+     * 
+     * @param columnName
+     *            column name
      */
     public void removeColumnComment(final String columnName) {
         for (final ColumnComment item : columnComments) {
@@ -250,7 +281,7 @@ public class PgView {
 
     /**
      * Getter for {@link #columnComments}.
-     *
+     * 
      * @return {@link #columnComments}
      */
     public List<ColumnComment> getColumnComments() {
@@ -274,9 +305,11 @@ public class PgView {
 
         /**
          * Creates new instance of DefaultValue.
-         *
-         * @param columnName   {@link #columnName}
-         * @param defaultValue {@link #defaultValue}
+         * 
+         * @param columnName
+         *            {@link #columnName}
+         * @param defaultValue
+         *            {@link #defaultValue}
          */
         DefaultValue(final String columnName, final String defaultValue) {
             this.columnName = columnName;
@@ -285,7 +318,7 @@ public class PgView {
 
         /**
          * Getter for {@link #columnName}.
-         *
+         * 
          * @return {@link #columnName}
          */
         public String getColumnName() {
@@ -294,7 +327,7 @@ public class PgView {
 
         /**
          * Getter for {@link #defaultValue}.
-         *
+         * 
          * @return {@link #defaultValue}
          */
         public String getDefaultValue() {
@@ -319,9 +352,11 @@ public class PgView {
 
         /**
          * Creates new instance of ColumnComment.
-         *
-         * @param columnName {@link #columnName}
-         * @param comment    {@link #comment}
+         * 
+         * @param columnName
+         *            {@link #columnName}
+         * @param comment
+         *            {@link #comment}
          */
         ColumnComment(final String columnName, final String comment) {
             this.columnName = columnName;
@@ -330,7 +365,7 @@ public class PgView {
 
         /**
          * Getter for {@link #columnName}.
-         *
+         * 
          * @return {@link #columnName}
          */
         public String getColumnName() {
@@ -339,7 +374,7 @@ public class PgView {
 
         /**
          * Getter for {@link #comment}.
-         *
+         * 
          * @return {@link #comment}
          */
         public String getComment() {

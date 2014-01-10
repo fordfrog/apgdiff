@@ -5,27 +5,33 @@
  */
 package cz.startnet.utils.pgdiff;
 
-import cz.startnet.utils.pgdiff.schema.PgSchema;
-import cz.startnet.utils.pgdiff.schema.PgView;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import cz.startnet.utils.pgdiff.schema.PgSchema;
+import cz.startnet.utils.pgdiff.schema.PgView;
+import cz.startnet.utils.pgdiff.schema.PgViewPrivilege;
+
 /**
  * Diffs views.
- *
+ * 
  * @author fordfrog
  */
 public class PgDiffViews {
 
     /**
      * Outputs statements for creation of views.
-     *
-     * @param writer           writer the output should be written to
-     * @param oldSchema        original schema
-     * @param newSchema        new schema
-     * @param searchPathHelper search path helper
+     * 
+     * @param writer
+     *            writer the output should be written to
+     * @param oldSchema
+     *            original schema
+     * @param newSchema
+     *            new schema
+     * @param searchPathHelper
+     *            search path helper
      */
     public static void createViews(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
@@ -33,22 +39,48 @@ public class PgDiffViews {
         for (final PgView newView : newSchema.getViews()) {
             if (oldSchema == null
                     || !oldSchema.containsView(newView.getName())
-                    || isViewModified(
-                    oldSchema.getView(newView.getName()), newView)) {
+                    || isViewModified(oldSchema.getView(newView.getName()),
+                            newView)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(newView.getCreationSQL());
+
+                for (PgViewPrivilege viewPrivilege : newView.getPrivileges()) {
+                    writer.println("REVOKE ALL ON TABLE "
+                            + PgDiffUtils.getQuotedName(newView.getName())
+                            + " FROM " + viewPrivilege.getRoleName() + ";");
+                    if (!"".equals(viewPrivilege.getPrivilegesSQL(true))) {
+                        writer.println("GRANT "
+                                + viewPrivilege.getPrivilegesSQL(true)
+                                + " ON TABLE "
+                                + PgDiffUtils.getQuotedName(newView.getName())
+                                + " TO " + viewPrivilege.getRoleName()
+                                + " WITH GRANT OPTION;");
+                    }
+                    if (!"".equals(viewPrivilege.getPrivilegesSQL(false))) {
+                        writer.println("GRANT "
+                                + viewPrivilege.getPrivilegesSQL(false)
+                                + " ON TABLE "
+                                + PgDiffUtils.getQuotedName(newView.getName())
+                                + " TO " + viewPrivilege.getRoleName() + ";");
+                    }
+                }
+
             }
         }
     }
 
     /**
      * Outputs statements for dropping views.
-     *
-     * @param writer           writer the output should be written to
-     * @param oldSchema        original schema
-     * @param newSchema        new schema
-     * @param searchPathHelper search path helper
+     * 
+     * @param writer
+     *            writer the output should be written to
+     * @param oldSchema
+     *            original schema
+     * @param newSchema
+     *            new schema
+     * @param searchPathHelper
+     *            search path helper
      */
     public static void dropViews(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
@@ -71,10 +103,12 @@ public class PgDiffViews {
     /**
      * Returns true if either column names or query of the view has been
      * modified.
-     *
-     * @param oldView old view
-     * @param newView new view
-     *
+     * 
+     * @param oldView
+     *            old view
+     * @param newView
+     *            new view
+     * 
      * @return true if view has been modified, otherwise false
      */
     private static boolean isViewModified(final PgView oldView,
@@ -108,11 +142,15 @@ public class PgDiffViews {
 
     /**
      * Outputs statements for altering view default values.
-     *
-     * @param writer           writer
-     * @param oldSchema        old schema
-     * @param newSchema        new schema
-     * @param searchPathHelper search path helper
+     * 
+     * @param writer
+     *            writer
+     * @param oldSchema
+     *            old schema
+     * @param newSchema
+     *            new schema
+     * @param searchPathHelper
+     *            search path helper
      */
     public static void alterViews(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
@@ -130,17 +168,14 @@ public class PgDiffViews {
 
             diffDefaultValues(writer, oldView, newView, searchPathHelper);
 
-            if (oldView.getComment() == null
-                    && newView.getComment() != null
+            if (oldView.getComment() == null && newView.getComment() != null
                     || oldView.getComment() != null
                     && newView.getComment() != null
-                    && !oldView.getComment().equals(
-                    newView.getComment())) {
+                    && !oldView.getComment().equals(newView.getComment())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.print("COMMENT ON VIEW ");
-                writer.print(
-                        PgDiffUtils.getQuotedName(newView.getName()));
+                writer.print(PgDiffUtils.getQuotedName(newView.getName()));
                 writer.print(" IS ");
                 writer.print(newView.getComment());
                 writer.println(';');
@@ -153,16 +188,16 @@ public class PgDiffViews {
                 writer.println(" IS NULL;");
             }
 
-            final List<String> columnNames =
-                    new ArrayList<String>(newView.getColumnComments().size());
+            final List<String> columnNames = new ArrayList<String>(newView
+                    .getColumnComments().size());
 
-            for (final PgView.ColumnComment columnComment :
-                    newView.getColumnComments()) {
+            for (final PgView.ColumnComment columnComment : newView
+                    .getColumnComments()) {
                 columnNames.add(columnComment.getColumnName());
             }
 
-            for (final PgView.ColumnComment columnComment :
-                    oldView.getColumnComments()) {
+            for (final PgView.ColumnComment columnComment : oldView
+                    .getColumnComments()) {
                 if (!columnNames.contains(columnComment.getColumnName())) {
                     columnNames.add(columnComment.getColumnName());
                 }
@@ -172,66 +207,71 @@ public class PgDiffViews {
                 PgView.ColumnComment oldColumnComment = null;
                 PgView.ColumnComment newColumnComment = null;
 
-                for (final PgView.ColumnComment columnComment :
-                        oldView.getColumnComments()) {
+                for (final PgView.ColumnComment columnComment : oldView
+                        .getColumnComments()) {
                     if (columnName.equals(columnComment.getColumnName())) {
                         oldColumnComment = columnComment;
                         break;
                     }
                 }
 
-                for (final PgView.ColumnComment columnComment :
-                        newView.getColumnComments()) {
+                for (final PgView.ColumnComment columnComment : newView
+                        .getColumnComments()) {
                     if (columnName.equals(columnComment.getColumnName())) {
                         newColumnComment = columnComment;
                         break;
                     }
                 }
 
-                if (oldColumnComment == null && newColumnComment != null
-                        || oldColumnComment != null && newColumnComment != null
+                if (oldColumnComment == null
+                        && newColumnComment != null
+                        || oldColumnComment != null
+                        && newColumnComment != null
                         && !oldColumnComment.getComment().equals(
-                        newColumnComment.getComment())) {
+                                newColumnComment.getComment())) {
                     searchPathHelper.outputSearchPath(writer);
                     writer.println();
                     writer.print("COMMENT ON COLUMN ");
                     writer.print(PgDiffUtils.getQuotedName(newView.getName()));
                     writer.print('.');
-                    writer.print(PgDiffUtils.getQuotedName(
-                            newColumnComment.getColumnName()));
+                    writer.print(PgDiffUtils.getQuotedName(newColumnComment
+                            .getColumnName()));
                     writer.print(" IS ");
                     writer.print(newColumnComment.getComment());
                     writer.println(';');
-                } else if (oldColumnComment != null
-                        && newColumnComment == null) {
+                } else if (oldColumnComment != null && newColumnComment == null) {
                     searchPathHelper.outputSearchPath(writer);
                     writer.println();
                     writer.print("COMMENT ON COLUMN ");
                     writer.print(PgDiffUtils.getQuotedName(newView.getName()));
                     writer.print('.');
-                    writer.print(PgDiffUtils.getQuotedName(
-                            oldColumnComment.getColumnName()));
+                    writer.print(PgDiffUtils.getQuotedName(oldColumnComment
+                            .getColumnName()));
                     writer.println(" IS NULL;");
                 }
             }
+
+            alterPrivileges(writer, oldView, newView, searchPathHelper);
         }
     }
 
     /**
      * Diffs default values in views.
-     *
-     * @param writer           writer
-     * @param oldView          old view
-     * @param newView          new view
-     * @param searchPathHelper search path helper
+     * 
+     * @param writer
+     *            writer
+     * @param oldView
+     *            old view
+     * @param newView
+     *            new view
+     * @param searchPathHelper
+     *            search path helper
      */
     private static void diffDefaultValues(final PrintWriter writer,
             final PgView oldView, final PgView newView,
             final SearchPathHelper searchPathHelper) {
-        final List<PgView.DefaultValue> oldValues =
-                oldView.getDefaultValues();
-        final List<PgView.DefaultValue> newValues =
-                newView.getDefaultValues();
+        final List<PgView.DefaultValue> oldValues = oldView.getDefaultValues();
+        final List<PgView.DefaultValue> newValues = newView.getDefaultValues();
 
         // modify defaults that are in old view
         for (final PgView.DefaultValue oldValue : oldValues) {
@@ -246,11 +286,11 @@ public class PgDiffViews {
                         searchPathHelper.outputSearchPath(writer);
                         writer.println();
                         writer.print("ALTER TABLE ");
-                        writer.print(
-                                PgDiffUtils.getQuotedName(newView.getName()));
+                        writer.print(PgDiffUtils.getQuotedName(newView
+                                .getName()));
                         writer.print(" ALTER COLUMN ");
-                        writer.print(PgDiffUtils.getQuotedName(
-                                newValue.getColumnName()));
+                        writer.print(PgDiffUtils.getQuotedName(newValue
+                                .getColumnName()));
                         writer.print(" SET DEFAULT ");
                         writer.print(newValue.getDefaultValue());
                         writer.println(';');
@@ -266,8 +306,7 @@ public class PgDiffViews {
                 writer.print("ALTER TABLE ");
                 writer.print(PgDiffUtils.getQuotedName(newView.getName()));
                 writer.print(" ALTER COLUMN ");
-                writer.print(PgDiffUtils.getQuotedName(
-                        oldValue.getColumnName()));
+                writer.print(PgDiffUtils.getQuotedName(oldValue.getColumnName()));
                 writer.println(" DROP DEFAULT;");
             }
         }
@@ -296,6 +335,73 @@ public class PgDiffViews {
             writer.print(" SET DEFAULT ");
             writer.print(newValue.getDefaultValue());
             writer.println(';');
+        }
+    }
+
+    private static void alterPrivileges(final PrintWriter writer,
+            final PgView oldView, final PgView newView,
+            final SearchPathHelper searchPathHelper) {
+        boolean emptyLinePrinted = false;
+        for (PgViewPrivilege oldViewPrivilege : oldView.getPrivileges()) {
+            PgViewPrivilege newViewPrivilege = newView
+                    .getPrivilege(oldViewPrivilege.getRoleName());
+            if (newViewPrivilege == null) {
+                if (!emptyLinePrinted) {
+                    writer.println();
+                }
+                writer.println("REVOKE ALL ON TABLE "
+                        + PgDiffUtils.getQuotedName(oldView.getName())
+                        + " FROM " + oldViewPrivilege.getRoleName() + ";");
+            } else if (!oldViewPrivilege.isSimilar(newViewPrivilege)) {
+                if (!emptyLinePrinted) {
+                    writer.println();
+                }
+                writer.println("REVOKE ALL ON TABLE "
+                        + PgDiffUtils.getQuotedName(newView.getName())
+                        + " FROM " + newViewPrivilege.getRoleName() + ";");
+                if (!"".equals(newViewPrivilege.getPrivilegesSQL(true))) {
+                    writer.println("GRANT "
+                            + newViewPrivilege.getPrivilegesSQL(true)
+                            + " ON TABLE "
+                            + PgDiffUtils.getQuotedName(newView.getName())
+                            + " TO " + newViewPrivilege.getRoleName()
+                            + " WITH GRANT OPTION;");
+                }
+                if (!"".equals(newViewPrivilege.getPrivilegesSQL(false))) {
+                    writer.println("GRANT "
+                            + newViewPrivilege.getPrivilegesSQL(false)
+                            + " ON TABLE "
+                            + PgDiffUtils.getQuotedName(newView.getName())
+                            + " TO " + newViewPrivilege.getRoleName() + ";");
+                }
+            } // else similar privilege will not be updated
+        }
+        for (PgViewPrivilege newViewPrivilege : newView.getPrivileges()) {
+            PgViewPrivilege oldViewPrivilege = oldView
+                    .getPrivilege(newViewPrivilege.getRoleName());
+            if (oldViewPrivilege == null) {
+                if (!emptyLinePrinted) {
+                    writer.println();
+                }
+                writer.println("REVOKE ALL ON TABLE "
+                        + PgDiffUtils.getQuotedName(newView.getName())
+                        + " FROM " + newViewPrivilege.getRoleName() + ";");
+                if (!"".equals(newViewPrivilege.getPrivilegesSQL(true))) {
+                    writer.println("GRANT "
+                            + newViewPrivilege.getPrivilegesSQL(true)
+                            + " ON TABLE "
+                            + PgDiffUtils.getQuotedName(newView.getName())
+                            + " TO " + newViewPrivilege.getRoleName()
+                            + " WITH GRANT OPTION;");
+                }
+                if (!"".equals(newViewPrivilege.getPrivilegesSQL(false))) {
+                    writer.println("GRANT "
+                            + newViewPrivilege.getPrivilegesSQL(false)
+                            + " ON TABLE "
+                            + PgDiffUtils.getQuotedName(newView.getName())
+                            + " TO " + newViewPrivilege.getRoleName() + ";");
+                }
+            }
         }
     }
 
