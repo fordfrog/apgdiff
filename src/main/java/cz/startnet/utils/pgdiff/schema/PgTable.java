@@ -5,14 +5,15 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
-import cz.startnet.utils.pgdiff.PgDiffUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import cz.startnet.utils.pgdiff.PgDiffUtils;
+
 /**
  * Stores table information.
- *
+ * 
  * @author fordfrog
  */
 public class PgTable {
@@ -26,8 +27,7 @@ public class PgTable {
      * List of constraints defined on the table.
      */
     @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private final List<PgConstraint> constraints =
-            new ArrayList<PgConstraint>();
+    private final List<PgConstraint> constraints = new ArrayList<PgConstraint>();
     /**
      * List of indexes defined on the table.
      */
@@ -64,11 +64,21 @@ public class PgTable {
      * Comment.
      */
     private String comment;
+    /**
+     * List of privileges defined on the table.
+     */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    private final List<PgTablePrivilege> privileges = new ArrayList<PgTablePrivilege>();
+    /**
+     * Column the table is owner to.
+     */
+    private String ownerTo;
 
     /**
      * Creates a new PgTable object.
-     *
-     * @param name {@link #name}
+     * 
+     * @param name
+     *            {@link #name}
      */
     public PgTable(final String name) {
         this.name = name;
@@ -76,8 +86,9 @@ public class PgTable {
 
     /**
      * Setter for {@link #clusterIndexName}.
-     *
-     * @param name {@link #clusterIndexName}
+     * 
+     * @param name
+     *            {@link #clusterIndexName}
      */
     public void setClusterIndexName(final String name) {
         clusterIndexName = name;
@@ -85,7 +96,7 @@ public class PgTable {
 
     /**
      * Getter for {@link #clusterIndexName}.
-     *
+     * 
      * @return {@link #clusterIndexName}
      */
     public String getClusterIndexName() {
@@ -94,9 +105,10 @@ public class PgTable {
 
     /**
      * Finds column according to specified column {@code name}.
-     *
-     * @param name name of the column to be searched
-     *
+     * 
+     * @param name
+     *            name of the column to be searched
+     * 
      * @return found column or null if no such column has been found
      */
     public PgColumn getColumn(final String name) {
@@ -111,16 +123,20 @@ public class PgTable {
 
     /**
      * Getter for {@link #columns}. The list cannot be modified.
-     *
+     * 
      * @return {@link #columns}
      */
     public List<PgColumn> getColumns() {
         return Collections.unmodifiableList(columns);
     }
 
+    public List<PgTablePrivilege> getPrivileges() {
+        return Collections.unmodifiableList(privileges);
+    }
+
     /**
      * Getter for {@link #comment}.
-     *
+     * 
      * @return {@link #comment}
      */
     public String getComment() {
@@ -129,8 +145,9 @@ public class PgTable {
 
     /**
      * Setter for {@link #comment}.
-     *
-     * @param comment {@link #comment}
+     * 
+     * @param comment
+     *            {@link #comment}
      */
     public void setComment(final String comment) {
         this.comment = comment;
@@ -138,9 +155,10 @@ public class PgTable {
 
     /**
      * Finds constraint according to specified constraint {@code name}.
-     *
-     * @param name name of the constraint to be searched
-     *
+     * 
+     * @param name
+     *            name of the constraint to be searched
+     * 
      * @return found constraint or null if no such constraint has been found
      */
     public PgConstraint getConstraint(final String name) {
@@ -155,7 +173,7 @@ public class PgTable {
 
     /**
      * Getter for {@link #constraints}. The list cannot be modified.
-     *
+     * 
      * @return {@link #constraints}
      */
     public List<PgConstraint> getConstraints() {
@@ -164,7 +182,7 @@ public class PgTable {
 
     /**
      * Creates and returns SQL for creation of the table.
-     *
+     * 
      * @return created SQL statement
      */
     public String getCreationSQL() {
@@ -238,8 +256,7 @@ public class PgTable {
             sbSQL.append("\nALTER TABLE ONLY ");
             sbSQL.append(PgDiffUtils.getQuotedName(name));
             sbSQL.append(" ALTER COLUMN ");
-            sbSQL.append(
-                    PgDiffUtils.getQuotedName(column.getName()));
+            sbSQL.append(PgDiffUtils.getQuotedName(column.getName()));
             sbSQL.append(" SET STATISTICS ");
             sbSQL.append(column.getStatistics());
             sbSQL.append(';');
@@ -270,7 +287,7 @@ public class PgTable {
 
     /**
      * Creates and returns SQL statement for dropping the table.
-     *
+     * 
      * @return created SQL statement
      */
     public String getDropSQL() {
@@ -279,9 +296,10 @@ public class PgTable {
 
     /**
      * Finds index according to specified index {@code name}.
-     *
-     * @param name name of the index to be searched
-     *
+     * 
+     * @param name
+     *            name of the index to be searched
+     * 
      * @return found index or null if no such index has been found
      */
     public PgIndex getIndex(final String name) {
@@ -296,9 +314,10 @@ public class PgTable {
 
     /**
      * Finds trigger according to specified trigger {@code name}.
-     *
-     * @param name name of the trigger to be searched
-     *
+     * 
+     * @param name
+     *            name of the trigger to be searched
+     * 
      * @return found trigger or null if no such trigger has been found
      */
     public PgTrigger getTrigger(final String name) {
@@ -311,9 +330,18 @@ public class PgTable {
         return null;
     }
 
+    public PgTablePrivilege getPrivilege(final String roleName) {
+        for (PgTablePrivilege privilege : privileges) {
+            if (privilege.getRoleName().equals(roleName)) {
+                return privilege;
+            }
+        }
+        return null;
+    }
+
     /**
      * Getter for {@link #indexes}. The list cannot be modified.
-     *
+     * 
      * @return {@link #indexes}
      */
     public List<PgIndex> getIndexes() {
@@ -322,8 +350,9 @@ public class PgTable {
 
     /**
      * Setter for {@link #inherits}.
-     *
-     * @param tableName name of inherited table
+     * 
+     * @param tableName
+     *            name of inherited table
      */
     public void addInherits(final String tableName) {
         inherits.add(tableName);
@@ -331,7 +360,7 @@ public class PgTable {
 
     /**
      * Getter for {@link #inherits}.
-     *
+     * 
      * @return {@link #inherits}
      */
     public List<String> getInherits() {
@@ -340,8 +369,9 @@ public class PgTable {
 
     /**
      * Setter for {@link #name}.
-     *
-     * @param name {@link #name}
+     * 
+     * @param name
+     *            {@link #name}
      */
     public void setName(final String name) {
         this.name = name;
@@ -349,7 +379,7 @@ public class PgTable {
 
     /**
      * Getter for {@link #name}.
-     *
+     * 
      * @return {@link #name}
      */
     public String getName() {
@@ -358,7 +388,7 @@ public class PgTable {
 
     /**
      * Getter for {@link #triggers}. The list cannot be modified.
-     *
+     * 
      * @return {@link #triggers}
      */
     public List<PgTrigger> getTriggers() {
@@ -367,8 +397,9 @@ public class PgTable {
 
     /**
      * Setter for {@link #with}.
-     *
-     * @param with {@link #with}
+     * 
+     * @param with
+     *            {@link #with}
      */
     public void setWith(final String with) {
         this.with = with;
@@ -376,7 +407,7 @@ public class PgTable {
 
     /**
      * Getter for {@link #with}
-     *
+     * 
      * @return {@link #with}
      */
     public String getWith() {
@@ -385,7 +416,7 @@ public class PgTable {
 
     /**
      * Getter for {@link #tablespace}.
-     *
+     * 
      * @return {@link #tablespace}
      */
     public String getTablespace() {
@@ -394,17 +425,38 @@ public class PgTable {
 
     /**
      * Setter for {@link #tablespace}.
-     *
-     * @param tablespace {@link #tablespace}
+     * 
+     * @param tablespace
+     *            {@link #tablespace}
      */
     public void setTablespace(final String tablespace) {
         this.tablespace = tablespace;
     }
 
     /**
+     * Getter for {@link #ownerTo}.
+     * 
+     * @return {@link #ownerTo}
+     */
+    public String getOwnerTo() {
+        return ownerTo;
+    }
+
+    /**
+     * Setter for {@link #ownerTo}.
+     * 
+     * @param ownerTo
+     *            {@link #ownerTo}
+     */
+    public void setOwnerTo(final String ownerTo) {
+        this.ownerTo = ownerTo;
+    }
+
+    /**
      * Adds {@code column} to the list of columns.
-     *
-     * @param column column
+     * 
+     * @param column
+     *            column
      */
     public void addColumn(final PgColumn column) {
         columns.add(column);
@@ -412,8 +464,9 @@ public class PgTable {
 
     /**
      * Adds {@code constraint} to the list of constraints.
-     *
-     * @param constraint constraint
+     * 
+     * @param constraint
+     *            constraint
      */
     public void addConstraint(final PgConstraint constraint) {
         constraints.add(constraint);
@@ -421,8 +474,9 @@ public class PgTable {
 
     /**
      * Adds {@code index} to the list of indexes.
-     *
-     * @param index index
+     * 
+     * @param index
+     *            index
      */
     public void addIndex(final PgIndex index) {
         indexes.add(index);
@@ -430,19 +484,25 @@ public class PgTable {
 
     /**
      * Adds {@code trigger} to the list of triggers.
-     *
-     * @param trigger trigger
+     * 
+     * @param trigger
+     *            trigger
      */
     public void addTrigger(final PgTrigger trigger) {
         triggers.add(trigger);
     }
 
+    public void addPrivilege(final PgTablePrivilege privilege) {
+        privileges.add(privilege);
+    }
+
     /**
      * Returns true if table contains given column {@code name}, otherwise
      * false.
-     *
-     * @param name name of the column
-     *
+     * 
+     * @param name
+     *            name of the column
+     * 
      * @return true if table contains given column {@code name}, otherwise false
      */
     public boolean containsColumn(final String name) {
@@ -458,9 +518,10 @@ public class PgTable {
     /**
      * Returns true if table contains given constraint {@code name}, otherwise
      * false.
-     *
-     * @param name name of the constraint
-     *
+     * 
+     * @param name
+     *            name of the constraint
+     * 
      * @return true if table contains given constraint {@code name}, otherwise
      *         false
      */
@@ -476,9 +537,10 @@ public class PgTable {
 
     /**
      * Returns true if table contains given index {@code name}, otherwise false.
-     *
-     * @param name name of the index
-     *
+     * 
+     * @param name
+     *            name of the index
+     * 
      * @return true if table contains given index {@code name}, otherwise false
      */
     public boolean containsIndex(final String name) {
@@ -493,7 +555,7 @@ public class PgTable {
 
     /**
      * Returns list of columns that have statistics defined.
-     *
+     * 
      * @return list of columns that have statistics defined
      */
     private List<PgColumn> getColumnsWithStatistics() {
