@@ -12,7 +12,7 @@
 
     <issueManagement>
         <system>GitHub Issue Tracker</system>
-        <url>https://github.com/fordfrog/apgdiff/issues?sort=created&state=open</url>
+        <url>https://github.com/fordfrog/apgdiff/issues?sort=created&amp;state=open</url>
     </issueManagement>
 
     <inceptionYear>2006</inceptionYear>
