@@ -22,6 +22,7 @@ fordfrog@fordfrog.com.
 * Fixed issue when outputting unsupported command information and the
   unsupported command string is shorter than 20 characters. (Linas Valiukas)
 * Added Spanish translation. (Sebastian Ortiz)
+* Fitted English help to 80 characters in width. (Dave Jarvis)
 
 ### 2012-09-21: Version 2.4
 
