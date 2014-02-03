@@ -21,6 +21,10 @@ public class PgView extends PgRelation {
      */
     private boolean declareColumnNames = false;
     /**
+     * Is this a MATERIALIZED view?
+     */
+    private boolean materialized;
+    /**
      * SQL query of the view.
      */
     private String query;
@@ -80,7 +84,10 @@ public class PgView extends PgRelation {
      */
     public String getCreationSQL() {
         final StringBuilder sbSQL = new StringBuilder(query.length() * 2);
-        sbSQL.append("CREATE VIEW ");
+        sbSQL.append("CREATE ");
+        if (materialized)
+            sbSQL.append("MATERIALIZED ");
+        sbSQL.append("VIEW ");
         sbSQL.append(PgDiffUtils.getQuotedName(name));
 
         if (declareColumnNames) {
@@ -136,7 +143,26 @@ public class PgView extends PgRelation {
      * @return created SQL statement
      */
     public String getDropSQL() {
-        return "DROP VIEW " + PgDiffUtils.getQuotedName(getName()) + ";";
+        return "DROP " + (materialized ? "MATERIALIZED " : "") +
+                "VIEW " + PgDiffUtils.getQuotedName(getName()) + ";";
+    }
+
+    /**
+     * Setter for {@link #materialized}.
+     *
+     * @param materialized {@link #materialized}
+     */
+    public void setMaterialized(boolean materialized) {
+        this.materialized = materialized;
+    }
+
+    /**
+     * Getter for {@link #materialized}.
+     *
+     * @return {@link #materialized}
+     */
+    public boolean isMaterialized() {
+        return materialized;
     }
 
     /**

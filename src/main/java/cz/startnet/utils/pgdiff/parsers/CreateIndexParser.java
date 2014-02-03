@@ -6,10 +6,8 @@
 package cz.startnet.utils.pgdiff.parsers;
 
 import cz.startnet.utils.pgdiff.Resources;
-import cz.startnet.utils.pgdiff.schema.PgDatabase;
-import cz.startnet.utils.pgdiff.schema.PgIndex;
-import cz.startnet.utils.pgdiff.schema.PgSchema;
-import cz.startnet.utils.pgdiff.schema.PgTable;
+import cz.startnet.utils.pgdiff.schema.*;
+
 import java.text.MessageFormat;
 
 /**
@@ -54,18 +52,24 @@ public class CreateIndexParser {
 
         final String objectName = ParserUtils.getObjectName(tableName);
         final PgTable table = schema.getTable(objectName);
+        final PgView view = schema.getView(objectName);
+        final PgIndex index = new PgIndex(indexName);
 
-        if (table == null) {
+        if (table != null) {
+            table.addIndex(index);
+        }
+        else if (view != null) {
+            view.addIndex(index);
+        }
+        else {
             throw new RuntimeException(MessageFormat.format(
-                    Resources.getString("CannotFindTable"), tableName,
+                    Resources.getString("CannotFindObject"), tableName,
                     statement));
         }
 
-        final PgIndex index = new PgIndex(indexName);
-        table.addIndex(index);
         schema.addIndex(index);
         index.setDefinition(definition.trim());
-        index.setTableName(table.getName());
+        index.setTableName(objectName);
         index.setUnique(unique);
     }
 

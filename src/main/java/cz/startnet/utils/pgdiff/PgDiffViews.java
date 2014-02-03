@@ -82,6 +82,9 @@ public class PgDiffViews {
         if (!oldView.getQuery().trim().equals(newView.getQuery().trim()))
             return true;
 
+        if (oldView.isMaterialized() != newView.isMaterialized())
+            return true;
+
         final List<String> oldViewColumnNames =
                 oldView.getDeclaredColumnNames();
         final List<String> newViewColumnNames =

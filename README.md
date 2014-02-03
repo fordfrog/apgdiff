@@ -11,6 +11,9 @@ fordfrog@fordfrog.com.
 
 ### Version 2.4.1 (not released yet)
 
+#### New Features
+* MATERIALIZED VIEW support in PostgreSQL 9.3 (Marti Raudsepp)
+
 #### Fixes
 * Added hint to use "CREATE TABLE ... CONSTRAINT name PRIMARY KEY/UNIQUE ..."
   instead of "CREATE TABLE ... PRIMARY KEY/UNIQUE ..." because apgdiff cannot
