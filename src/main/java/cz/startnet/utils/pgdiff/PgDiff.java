@@ -222,6 +222,7 @@ public class PgDiff {
                     writer.println(" IS NULL;");
                 }
             }
+            PgDiffGrants.revokeGrants(writer, oldSchema, newSchema, searchPathHelper);
 
             PgDiffTriggers.dropTriggers(
                     writer, oldSchema, newSchema, searchPathHelper);
@@ -246,6 +247,9 @@ public class PgDiff {
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffSequences.alterSequences(
                     writer, arguments, oldSchema, newSchema, searchPathHelper);
+            PgDiffTypes.alterTypes(writer, arguments, oldSchema, newSchema, searchPathHelper);
+            PgDiffTypes.createTypes(writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffTypes.dropTypes(writer, oldSchema, newSchema, searchPathHelper);
             PgDiffTables.createTables(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffTables.alterTables(
@@ -277,6 +281,8 @@ public class PgDiff {
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffTriggers.alterComments(
                     writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffGrants.createGrants(writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffGrants.alterGrants(writer, arguments, oldSchema, newSchema, searchPathHelper);
         }
     }
 

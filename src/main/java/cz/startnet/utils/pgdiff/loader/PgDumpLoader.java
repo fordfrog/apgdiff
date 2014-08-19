@@ -11,6 +11,8 @@ import cz.startnet.utils.pgdiff.parsers.AlterTableParser;
 import cz.startnet.utils.pgdiff.parsers.AlterViewParser;
 import cz.startnet.utils.pgdiff.parsers.CommentParser;
 import cz.startnet.utils.pgdiff.parsers.CreateFunctionParser;
+import cz.startnet.utils.pgdiff.parsers.CreateTypeParser;
+import cz.startnet.utils.pgdiff.parsers.GrantParser;
 import cz.startnet.utils.pgdiff.parsers.CreateIndexParser;
 import cz.startnet.utils.pgdiff.parsers.CreateSchemaParser;
 import cz.startnet.utils.pgdiff.parsers.CreateSequenceParser;
@@ -132,6 +134,17 @@ public class PgDumpLoader { //NOPMD
             "^COMMENT[\\s]+ON[\\s]+.*$",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /**
+     * Pattern for testing whether it is CREATE TYPE statement.
+     */
+    private static final Pattern PATTERN_CREATE_TYPE = Pattern.compile(
+           "^CREATE[\\s]+TYPE[\\s]+.*$",
+            Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    /**
+     * Pattern for testing whether it is GRANT statement.
+     */
+    private static final Pattern PATTERN_GRANT = Pattern.compile(
+            "^GRANT[\\s].*$", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    /**
      * Storage of unprocessed line part.
      */
     private static String lineBuffer;
@@ -196,6 +209,10 @@ public class PgDumpLoader { //NOPMD
                         database, statement, ignoreSlonyTriggers);
             } else if (PATTERN_CREATE_FUNCTION.matcher(statement).matches()) {
                 CreateFunctionParser.parse(database, statement);
+            } else if (PATTERN_CREATE_TYPE.matcher(statement).matches()) {
+                CreateTypeParser.parse(database, statement);
+            } else if (PATTERN_GRANT.matcher(statement).matches()) {
+                GrantParser.parse(database, statement);
             } else if (PATTERN_COMMENT.matcher(statement).matches()) {
                 CommentParser.parse(
                         database, statement, outputIgnoredStatements);

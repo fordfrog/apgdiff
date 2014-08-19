@@ -33,6 +33,16 @@ public class PgSchema {
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final List<PgTable> tables = new ArrayList<PgTable>();
     /**
+     * List of types defined in the schema.
+     */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    private final List<PgType> types = new ArrayList<>();
+    /**
+     * List of types defined in the schema.
+     */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    private List<PgGrant> grants = new ArrayList<>();
+    /**
      * List of views defined in the schema.
      */
     @SuppressWarnings("CollectionWithoutInitialCapacity")
@@ -367,6 +377,61 @@ public class PgSchema {
     }
 
     /**
+     * Adds {@code type} to the list of types.
+     *
+     * @param type type
+     */
+    public void addType(final PgType type) {
+        types.add(type);
+    }
+
+    /**
+     * Returns a list of types
+     *
+     * @return types List<PgType>
+     */
+    public List<PgType> getTypes() {
+        return types;
+    }
+
+    /**
+     * Finds type according to specified name {@code name}.
+     *
+     * @param name name of the type to be searched
+     *
+     * @return found type or null if no such table has been found
+     */
+    public PgType getType(final String name) {
+        for (PgType type : types) {
+            if (type.getName().equals(name)) {
+                return type;
+            }
+        }
+
+        return null;
+    }
+    
+    /**
+     * Returns true if schema contains type with given {@code name}, otherwise
+     * false.
+     *
+     * @param name name of the table
+     *
+     * @return true if schema contains table with given {@code name}, otherwise
+     * false.
+     */
+    public boolean containsType(final String name) {
+        for (PgType type : types) {
+            if (type.getName().equals(name)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+
+    /**
      * Adds {@code view} to the list of views.
      *
      * @param view view
@@ -450,4 +515,47 @@ public class PgSchema {
 
         return false;
     }
+
+    /**
+     * @return the grants
+     */
+    public List<PgGrant> getGrants() {
+        return grants;
+    }
+
+    /**
+     * @param grants the grants to set
+     */
+    public void setGrants(List<PgGrant> grants) {
+        this.grants = grants;
+    }
+    
+    public void addGrant(PgGrant grant)
+    {
+        this.grants.add(grant);
+    }
+    
+    public PgGrant getGrant(String role, String object)
+    {
+        for(PgGrant grant : grants)
+        {
+            if(grant.getObject().equals(object) && grant.getRole().equals(role))
+            {
+                return grant;
+            }
+        }
+        return null;
+    }    
+    
+    public boolean containsGrant(String role, String object)
+    {
+        for(PgGrant grant : grants)
+        {
+            if(grant.getObject().equals(object) && grant.getRole().equals(role))
+            {
+                return true;
+            }
+        }
+        return false;
+    }    
 }
