@@ -301,7 +301,7 @@ public class PgDiffTables {
 
             if (!oldColumn.getType().equals(newColumn.getType())) {
                 statements.add("\tALTER COLUMN " + newColumnName + " TYPE "
-                        + newColumn.getType() + " /* "
+                        + newColumn.getType() + " USING " + newColumnName  + "::" + newColumn.getType() + " /* "
                         + MessageFormat.format(
                         Resources.getString("TypeParameterChange"),
                         newTable.getName(), oldColumn.getType(),
