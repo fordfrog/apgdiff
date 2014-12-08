@@ -15,16 +15,12 @@ import java.util.List;
  *
  * @author fordfrog
  */
-public class PgView {
+public class PgView extends PgRelation {
 
     /**
      * List of column names.
      */
     private List<String> columnNames;
-    /**
-     * Name of the view.
-     */
-    private final String name;
     /**
      * SQL query of the view.
      */
@@ -39,10 +35,6 @@ public class PgView {
      */
     private final List<ColumnComment> columnComments =
             new ArrayList<ColumnComment>(0);
-    /**
-     * Comment.
-     */
-    private String comment;
 
     /**
      * Creates a new PgView object.
@@ -50,7 +42,7 @@ public class PgView {
      * @param name {@link #name}
      */
     public PgView(final String name) {
-        this.name = name;
+        setName(name);
     }
 
     /**
@@ -70,24 +62,6 @@ public class PgView {
      */
     public List<String> getColumnNames() {
         return Collections.unmodifiableList(columnNames);
-    }
-
-    /**
-     * Getter for {@link #comment}.
-     *
-     * @return {@link #comment}
-     */
-    public String getComment() {
-        return comment;
-    }
-
-    /**
-     * Setter for {@link #comment}.
-     *
-     * @param comment {@link #comment}
-     */
-    public void setComment(final String comment) {
-        this.comment = comment;
     }
 
     /**
@@ -158,15 +132,6 @@ public class PgView {
      */
     public String getDropSQL() {
         return "DROP VIEW " + PgDiffUtils.getQuotedName(getName()) + ";";
-    }
-
-    /**
-     * Getter for {@link #name}.
-     *
-     * @return {@link #name}
-     */
-    public String getName() {
-        return name;
     }
 
     /**
