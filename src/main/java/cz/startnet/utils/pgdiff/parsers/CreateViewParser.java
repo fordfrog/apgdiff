@@ -63,7 +63,7 @@ public class CreateViewParser {
                     statement));
         }
 
-        schema.addView(view);
+        schema.addRelation(view);
     }
 
     /**

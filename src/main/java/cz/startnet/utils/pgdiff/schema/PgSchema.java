@@ -391,21 +391,12 @@ public class PgSchema {
     }
 
     /**
-     * Adds {@code table} to the list of rels.
+     * Adds {@code rel} table or view to the list of rels.
      *
-     * @param table table
+     * @param rel relation
      */
-    public void addTable(final PgTable table) {
-        rels.add(table);
-    }
-
-    /**
-     * Adds {@code view} to the list of views.
-     *
-     * @param view view
-     */
-    public void addView(final PgView view) {
-        rels.add(view);
+    public void addRelation(final PgRelation rel) {
+        rels.add(rel);
     }
 
     /**
