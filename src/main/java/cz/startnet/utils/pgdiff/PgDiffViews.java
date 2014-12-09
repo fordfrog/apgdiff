@@ -79,6 +79,9 @@ public class PgDiffViews {
      */
     private static boolean isViewModified(final PgView oldView,
             final PgView newView) {
+        if (!oldView.getQuery().trim().equals(newView.getQuery().trim()))
+            return true;
+
         final String[] oldViewColumnNames;
 
         if (oldView.getColumnNames() == null
@@ -99,11 +102,7 @@ public class PgDiffViews {
                     new String[newView.getColumnNames().size()]);
         }
 
-        if (oldViewColumnNames == null && newViewColumnNames == null) {
-            return !oldView.getQuery().trim().equals(newView.getQuery().trim());
-        } else {
-            return !Arrays.equals(oldViewColumnNames, newViewColumnNames);
-        }
+        return !Arrays.equals(oldViewColumnNames, newViewColumnNames);
     }
 
     /**

@@ -23,6 +23,8 @@ fordfrog@fordfrog.com.
   unsupported command string is shorter than 20 characters. (Linas Valiukas)
 * Added Spanish translation. (Sebastian Ortiz)
 * Fitted English help to 80 characters in width. (Dave Jarvis)
+* View query changes are now correctly detected even if it has declared
+  columns that didn't change. (Marti Raudsepp)
 
 ### 2012-09-21: Version 2.4
 
