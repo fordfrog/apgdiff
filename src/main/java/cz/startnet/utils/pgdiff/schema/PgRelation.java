@@ -5,6 +5,8 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
+import cz.startnet.utils.pgdiff.PgDiffUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -90,6 +92,29 @@ public class PgRelation {
      */
     public List<PgColumn> getColumns() {
         return Collections.unmodifiableList(columns);
+    }
+
+    /**
+     * Generates SQL code for declaring relation and column comments
+     *
+     * @return SQL code for declaring relation and column comments
+     */
+    protected String getColumnCommentDefinition() {
+        final StringBuilder sbSQL = new StringBuilder(100);
+
+        for (final PgColumn column : columns) {
+            if (column.getComment() != null && !column.getComment().isEmpty()) {
+                sbSQL.append("\n\nCOMMENT ON COLUMN ");
+                sbSQL.append(PgDiffUtils.getQuotedName(name));
+                sbSQL.append('.');
+                sbSQL.append(PgDiffUtils.getQuotedName(column.getName()));
+                sbSQL.append(" IS ");
+                sbSQL.append(column.getComment());
+                sbSQL.append(';');
+            }
+        }
+
+        return sbSQL.toString();
     }
 
     /**

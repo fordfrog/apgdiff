@@ -160,17 +160,7 @@ public class PgTable extends PgRelation {
             sbSQL.append(';');
         }
 
-        for (final PgColumn column : columns) {
-            if (column.getComment() != null && !column.getComment().isEmpty()) {
-                sbSQL.append("\n\nCOMMENT ON COLUMN ");
-                sbSQL.append(PgDiffUtils.getQuotedName(name));
-                sbSQL.append('.');
-                sbSQL.append(PgDiffUtils.getQuotedName(column.getName()));
-                sbSQL.append(" IS ");
-                sbSQL.append(column.getComment());
-                sbSQL.append(';');
-            }
-        }
+        sbSQL.append(getColumnCommentDefinition());
 
         return sbSQL.toString();
     }
