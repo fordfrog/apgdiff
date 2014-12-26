@@ -6,13 +6,8 @@
 package cz.startnet.utils.pgdiff.parsers;
 
 import cz.startnet.utils.pgdiff.Resources;
-import cz.startnet.utils.pgdiff.schema.PgColumn;
-import cz.startnet.utils.pgdiff.schema.PgConstraint;
-import cz.startnet.utils.pgdiff.schema.PgDatabase;
-import cz.startnet.utils.pgdiff.schema.PgSchema;
-import cz.startnet.utils.pgdiff.schema.PgSequence;
-import cz.startnet.utils.pgdiff.schema.PgTable;
-import cz.startnet.utils.pgdiff.schema.PgView;
+import cz.startnet.utils.pgdiff.schema.*;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +17,7 @@ import java.util.List;
  *
  * @author fordfrog
  */
-public class AlterTableParser {
+public class AlterRelationParser {
 
     /**
      * Parses ALTER TABLE statement.
@@ -35,12 +30,25 @@ public class AlterTableParser {
     public static void parse(final PgDatabase database,
             final String statement, final boolean outputIgnoredStatements) {
         final Parser parser = new Parser(statement);
-        parser.expect("ALTER", "TABLE");
-        parser.expectOptional("ONLY");
+        parser.expect("ALTER");
 
-        final String tableName = parser.parseIdentifier();
+        /*
+         * PostgreSQL allows using ALTER TABLE on views as well as other
+         * relation types, so we just ignore type here and derive its type from
+         * the original CREATE command.
+         */
+        if (parser.expectOptional("TABLE")) {
+            parser.expectOptional("ONLY");
+        } else if (parser.expectOptional("MATERIALIZED", "VIEW")
+                || parser.expectOptional("VIEW")) {
+            // OK, view
+        } else {
+            parser.throwUnsupportedCommand();
+        }
+
+        final String relName = parser.parseIdentifier();
         final String schemaName =
-                ParserUtils.getSchemaName(tableName, database);
+                ParserUtils.getSchemaName(relName, database);
         final PgSchema schema = database.getSchema(schemaName);
 
         if (schema == null) {
@@ -49,41 +57,43 @@ public class AlterTableParser {
                     statement));
         }
 
-        final String objectName = ParserUtils.getObjectName(tableName);
-        final PgTable table = schema.getTable(objectName);
+        final String objectName = ParserUtils.getObjectName(relName);
+        final PgRelation rel = schema.getRelation(objectName);
 
-        if (table == null) {
-            final PgView view = schema.getView(objectName);
-
-            if (view != null) {
-                parseView(parser, view, outputIgnoredStatements, tableName,
-                        database);
-                return;
-            }
-
+        if (rel == null) {
             final PgSequence sequence = schema.getSequence(objectName);
 
             if (sequence != null) {
                 parseSequence(parser, sequence, outputIgnoredStatements,
-                        tableName, database);
+                        relName, database);
                 return;
             }
 
             throw new RuntimeException(MessageFormat.format(
-                    Resources.getString("CannotFindObject"), tableName,
+                    Resources.getString("CannotFindObject"), relName,
                     statement));
         }
+
+        if (rel instanceof PgView) {
+            parseView(parser, (PgView) rel, outputIgnoredStatements, relName,
+                    database);
+            return;
+        }
+
+        // else
+        assert rel instanceof PgTable;
+        final PgTable table = (PgTable) rel;
 
         while (!parser.expectOptional(";")) {
             if (parser.expectOptional("ALTER")) {
                 parseAlterColumn(parser, table);
             } else if (parser.expectOptional("CLUSTER", "ON")) {
-                table.setClusterIndexName(
+                rel.setClusterIndexName(
                         ParserUtils.getObjectName(parser.parseIdentifier()));
             } else if (parser.expectOptional("OWNER", "TO")) {
                 // we do not parse this one so we just consume the identifier
                 if (outputIgnoredStatements) {
-                    database.addIgnoredStatement("ALTER TABLE " + tableName
+                    database.addIgnoredStatement("ALTER TABLE " + relName
                             + " OWNER TO " + parser.parseIdentifier() + ';');
                 } else {
                     parser.parseIdentifier();
@@ -98,10 +108,10 @@ public class AlterTableParser {
                 }
             } else if (parser.expectOptional("ENABLE")) {
                 parseEnable(
-                        parser, outputIgnoredStatements, tableName, database);
+                        parser, outputIgnoredStatements, relName, database);
             } else if (parser.expectOptional("DISABLE")) {
                 parseDisable(
-                        parser, outputIgnoredStatements, tableName, database);
+                        parser, outputIgnoredStatements, relName, database);
             } else {
                 parser.throwUnsupportedCommand();
             }
@@ -401,6 +411,6 @@ public class AlterTableParser {
     /**
      * Creates a new instance of AlterTableParser.
      */
-    private AlterTableParser() {
+    private AlterRelationParser() {
     }
 }

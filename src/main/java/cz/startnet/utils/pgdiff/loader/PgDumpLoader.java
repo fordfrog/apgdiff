@@ -7,8 +7,7 @@ package cz.startnet.utils.pgdiff.loader;
 
 import cz.startnet.utils.pgdiff.Resources;
 import cz.startnet.utils.pgdiff.parsers.AlterSequenceParser;
-import cz.startnet.utils.pgdiff.parsers.AlterTableParser;
-import cz.startnet.utils.pgdiff.parsers.AlterViewParser;
+import cz.startnet.utils.pgdiff.parsers.AlterRelationParser;
 import cz.startnet.utils.pgdiff.parsers.CommentParser;
 import cz.startnet.utils.pgdiff.parsers.CreateFunctionParser;
 import cz.startnet.utils.pgdiff.parsers.CreateIndexParser;
@@ -124,7 +123,7 @@ public class PgDumpLoader { //NOPMD
      * Pattern for testing whether it is ALTER VIEW statement.
      */
     private static final Pattern PATTERN_ALTER_VIEW = Pattern.compile(
-            "^ALTER[\\s]+VIEW[\\s]+.*$",
+            "^ALTER[\\s]+(?:MATERIALIZED[\\s]+)?VIEW[\\s]+.*$",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /**
      * Pattern for testing whether it is COMMENT statement.
@@ -177,8 +176,9 @@ public class PgDumpLoader { //NOPMD
                 database.setDefaultSchema(matcher.group(1));
             } else if (PATTERN_CREATE_TABLE.matcher(statement).matches()) {
                 CreateTableParser.parse(database, statement);
-            } else if (PATTERN_ALTER_TABLE.matcher(statement).matches()) {
-                AlterTableParser.parse(
+            } else if (PATTERN_ALTER_TABLE.matcher(statement).matches()
+                    || PATTERN_ALTER_VIEW.matcher(statement).matches()) {
+                AlterRelationParser.parse(
                         database, statement, outputIgnoredStatements);
             } else if (PATTERN_CREATE_SEQUENCE.matcher(statement).matches()) {
                 CreateSequenceParser.parse(database, statement);
@@ -189,9 +189,6 @@ public class PgDumpLoader { //NOPMD
                 CreateIndexParser.parse(database, statement);
             } else if (PATTERN_CREATE_VIEW.matcher(statement).matches()) {
                 CreateViewParser.parse(database, statement);
-            } else if (PATTERN_ALTER_VIEW.matcher(statement).matches()) {
-                AlterViewParser.parse(
-                        database, statement, outputIgnoredStatements);
             } else if (PATTERN_CREATE_TRIGGER.matcher(statement).matches()) {
                 CreateTriggerParser.parse(
                         database, statement, ignoreSlonyTriggers);
