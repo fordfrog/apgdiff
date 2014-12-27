@@ -184,30 +184,23 @@ public class PgView extends PgRelation {
     }
 
     /**
-     * Adds/replaces column default value specification.
+     * Finds column according to specified column {@code name}.
      *
-     * @param columnName   column name
-     * @param defaultValue default value
+     * @param name name of the column to be searched
+     *
+     * @return found column or null if no such column has been found
      */
-    public void addColumnDefaultValue(final String columnName,
-            final String defaultValue) {
-        PgColumn col = getColumn(columnName);
-        if (col == null) {
-            // If names were declared, we should already know it
-            assert !declareColumnNames;
-            col = new PgColumn(columnName);
+    public PgColumn getColumn(final String name) {
+        PgColumn col = super.getColumn(name);
+        if (col == null && !declareColumnNames) {
+            /*
+             * In views, we don't always know columns beforehand; create a new
+             * column if the view didn't declare col names.
+             */
+            col = new PgColumn(name);
             addColumn(col);
         }
-        col.setDefaultValue(defaultValue);
-    }
-
-    /**
-     * Removes column default value if present.
-     *
-     * @param columnName column name
-     */
-    public void removeColumnDefaultValue(final String columnName) {
-        addColumnDefaultValue(columnName, null);
+        return col;
     }
 
     /**
@@ -219,12 +212,6 @@ public class PgView extends PgRelation {
     public void addColumnComment(final String columnName,
             final String comment) {
         PgColumn col = getColumn(columnName);
-        if (col == null) {
-            // If names were declared, we should already know it
-            assert !declareColumnNames;
-            col = new PgColumn(columnName);
-            addColumn(col);
-        }
         col.setComment(comment);
     }
 
