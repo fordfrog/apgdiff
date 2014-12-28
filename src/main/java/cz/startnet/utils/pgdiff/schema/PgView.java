@@ -202,25 +202,4 @@ public class PgView extends PgRelation {
         }
         return col;
     }
-
-    /**
-     * Adds/replaces column comment.
-     *
-     * @param columnName column name
-     * @param comment    comment
-     */
-    public void addColumnComment(final String columnName,
-            final String comment) {
-        PgColumn col = getColumn(columnName);
-        col.setComment(comment);
-    }
-
-    /**
-     * Removes column comment if present.
-     *
-     * @param columnName column name
-     */
-    public void removeColumnComment(final String columnName) {
-        addColumnComment(columnName, null);
-    }
 }
