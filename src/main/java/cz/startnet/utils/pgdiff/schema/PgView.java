@@ -78,6 +78,18 @@ public class PgView extends PgRelation {
     }
 
     /**
+     * Returns relation kind for CREATE/ALTER/DROP commands.
+     *
+     * @return relation kind
+     */
+    public String getRelationKind() {
+        if (materialized)
+            return "MATERIALIZED VIEW";
+        else
+            return "VIEW";
+    }
+
+    /**
      * Creates and returns SQL for creation of the view.
      *
      * @return created SQL statement
@@ -85,9 +97,8 @@ public class PgView extends PgRelation {
     public String getCreationSQL() {
         final StringBuilder sbSQL = new StringBuilder(query.length() * 2);
         sbSQL.append("CREATE ");
-        if (materialized)
-            sbSQL.append("MATERIALIZED ");
-        sbSQL.append("VIEW ");
+        sbSQL.append(getRelationKind());
+        sbSQL.append(' ');
         sbSQL.append(PgDiffUtils.getQuotedName(name));
 
         if (declareColumnNames) {
@@ -114,7 +125,9 @@ public class PgView extends PgRelation {
             String defaultValue = col.getDefaultValue();
 
             if (defaultValue != null && !defaultValue.isEmpty()) {
-                sbSQL.append("\n\nALTER VIEW ");
+                sbSQL.append("\n\nALTER ");
+                sbSQL.append(getRelationKind());
+                sbSQL.append(' ');
                 sbSQL.append(PgDiffUtils.getQuotedName(name));
                 sbSQL.append(" ALTER COLUMN ");
                 sbSQL.append(PgDiffUtils.getQuotedName(col.getName()));
@@ -124,27 +137,9 @@ public class PgView extends PgRelation {
             }
         }
 
-        if (comment != null && !comment.isEmpty()) {
-            sbSQL.append("\n\nCOMMENT ON VIEW ");
-            sbSQL.append(PgDiffUtils.getQuotedName(name));
-            sbSQL.append(" IS ");
-            sbSQL.append(comment);
-            sbSQL.append(';');
-        }
-
-        sbSQL.append(getColumnCommentDefinition());
+        sbSQL.append(getCommentDefinitionSQL());
 
         return sbSQL.toString();
-    }
-
-    /**
-     * Creates and returns SQL statement for dropping the view.
-     *
-     * @return created SQL statement
-     */
-    public String getDropSQL() {
-        return "DROP " + (materialized ? "MATERIALIZED " : "") +
-                "VIEW " + PgDiffUtils.getQuotedName(getName()) + ";";
     }
 
     /**

@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author Marti Raudsepp
  */
-public class PgRelation {
+public abstract class PgRelation {
 
     /**
      * List of columns defined on the relation.
@@ -99,8 +99,18 @@ public class PgRelation {
      *
      * @return SQL code for declaring relation and column comments
      */
-    protected String getColumnCommentDefinition() {
+    protected String getCommentDefinitionSQL() {
         final StringBuilder sbSQL = new StringBuilder(100);
+
+        if (comment != null && !comment.isEmpty()) {
+            sbSQL.append("\n\nCOMMENT ON ");
+            sbSQL.append(getRelationKind());
+            sbSQL.append(' ');
+            sbSQL.append(PgDiffUtils.getQuotedName(name));
+            sbSQL.append(" IS ");
+            sbSQL.append(comment);
+            sbSQL.append(';');
+        }
 
         for (final PgColumn column : columns) {
             if (column.getComment() != null && !column.getComment().isEmpty()) {
@@ -248,6 +258,23 @@ public class PgRelation {
      */
     public void addTrigger(final PgTrigger trigger) {
         triggers.add(trigger);
+    }
+
+    /**
+     * Returns relation kind for CREATE/ALTER/DROP commands.
+     *
+     * @return relation kind
+     */
+    public abstract String getRelationKind();
+
+    /**
+     * Creates and returns SQL statement for dropping the relation.
+     *
+     * @return created SQL statement
+     */
+    public String getDropSQL() {
+        return "DROP " + getRelationKind() + " " +
+                PgDiffUtils.getQuotedName(getName()) + ";";
     }
 
     /**

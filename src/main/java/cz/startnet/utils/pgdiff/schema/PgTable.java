@@ -70,6 +70,15 @@ public class PgTable extends PgRelation {
     }
 
     /**
+     * Returns relation kind for CREATE/ALTER/DROP commands.
+     *
+     * @return relation kind
+     */
+    public String getRelationKind() {
+        return "TABLE";
+    }
+
+    /**
      * Creates and returns SQL for creation of the table.
      *
      * @return created SQL statement
@@ -152,26 +161,9 @@ public class PgTable extends PgRelation {
             sbSQL.append(';');
         }
 
-        if (comment != null && !comment.isEmpty()) {
-            sbSQL.append("\n\nCOMMENT ON TABLE ");
-            sbSQL.append(PgDiffUtils.getQuotedName(name));
-            sbSQL.append(" IS ");
-            sbSQL.append(comment);
-            sbSQL.append(';');
-        }
-
-        sbSQL.append(getColumnCommentDefinition());
+        sbSQL.append(getCommentDefinitionSQL());
 
         return sbSQL.toString();
-    }
-
-    /**
-     * Creates and returns SQL statement for dropping the table.
-     *
-     * @return created SQL statement
-     */
-    public String getDropSQL() {
-        return "DROP TABLE " + PgDiffUtils.getQuotedName(getName()) + ";";
     }
 
     /**
