@@ -232,12 +232,20 @@ public class PgDumpLoader { //NOPMD
     public static PgDatabase loadDatabaseSchema(final String file,
             final String charsetName, final boolean outputIgnoredStatements,
             final boolean ignoreSlonyTriggers) {
+        FileInputStream fis = null;
         try {
-            return loadDatabaseSchema(new FileInputStream(file), charsetName,
+            fis = new FileInputStream(file);
+            return loadDatabaseSchema(fis, charsetName,
                     outputIgnoredStatements, ignoreSlonyTriggers);
         } catch (final FileNotFoundException ex) {
             throw new FileException(MessageFormat.format(
                     Resources.getString("FileNotFound"), file), ex);
+        }finally {
+            if(fis!=null){
+                try {
+                    fis.close();
+                }catch (Exception e){}
+            }
         }
     }
 
