@@ -300,12 +300,12 @@ public class PgDiffTables {
                     PgDiffUtils.getQuotedName(newColumn.getName());
 
             if (!oldColumn.getType().equals(newColumn.getType())) {
-                statements.add("\tALTER COLUMN " + newColumnName + " TYPE "
-                        + newColumn.getType() + " /* "
-                        + MessageFormat.format(
-                        Resources.getString("TypeParameterChange"),
-                        newTable.getName(), oldColumn.getType(),
-                        newColumn.getType()) + " */");
+                statements.add(
+                    "\tALTER COLUMN "
+                            + newColumnName
+                            + " TYPE "
+                            + newColumn.getType() + " "
+                );
             }
 
             final String oldDefault = (oldColumn.getDefaultValue() == null) ? ""
