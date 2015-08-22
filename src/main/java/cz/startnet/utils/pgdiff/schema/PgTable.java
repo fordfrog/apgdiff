@@ -154,6 +154,23 @@ public class PgTable {
     }
 
     /**
+     * Finds constraint according to specified constraint {@code definition}.
+     * 
+     * @param definition definition of constraint to be searched
+     *
+     * @return found constraint or null if no such constraint has been found
+     */
+    public PgConstraint findConstraint(final String definition) {
+        for (PgConstraint constraint : constraints) {
+            if (constraint.getDefinition().equals(definition)) {
+                return constraint;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Getter for {@link #constraints}. The list cannot be modified.
      *
      * @return {@link #constraints}
