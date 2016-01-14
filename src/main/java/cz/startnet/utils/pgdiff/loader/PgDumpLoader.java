@@ -55,10 +55,11 @@ public class PgDumpLoader { //NOPMD
             "^CREATE[\\s]+TABLE[\\s]+.*$",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /**
-     * Pattern for testing whether it is CREATE VIEW statement.
+     * Pattern for testing whether it is CREATE VIEW or CREATE MATERIALIZED
+     * VIEW statement.
      */
     private static final Pattern PATTERN_CREATE_VIEW = Pattern.compile(
-            "^CREATE[\\s]+(?:OR[\\s]+REPLACE[\\s]+)?VIEW[\\s]+.*$",
+            "^CREATE[\\s]+(?:OR[\\s]+REPLACE[\\s]+)?(?:MATERIALIZED[\\s]+)?VIEW[\\s]+.*$",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /**
      * Pattern for testing whether it is ALTER TABLE statement.
