@@ -28,15 +28,10 @@ public class PgSchema {
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final List<PgSequence> sequences = new ArrayList<PgSequence>();
     /**
-     * List of tables defined in the schema.
+     * List of rels defined in the schema.
      */
     @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private final List<PgTable> tables = new ArrayList<PgTable>();
-    /**
-     * List of views defined in the schema.
-     */
-    @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private final List<PgView> views = new ArrayList<PgView>();
+    private final List<PgRelation> rels = new ArrayList<PgRelation>();
     /**
      * List of indexes defined in the schema.
      */
@@ -270,16 +265,16 @@ public class PgSchema {
     }
 
     /**
-     * Finds table according to specified table {@code name}.
+     * Finds table/view according to specified {@code name}.
      *
-     * @param name name of the table to be searched
+     * @param name name of the table/view to be searched
      *
      * @return found table or null if no such table has been found
      */
-    public PgTable getTable(final String name) {
-        for (PgTable table : tables) {
-            if (table.getName().equals(name)) {
-                return table;
+    public PgRelation getRelation(final String name) {
+        for (PgRelation rel : rels) {
+            if (rel.getName().equals(name)) {
+                return rel;
             }
         }
 
@@ -287,12 +282,44 @@ public class PgSchema {
     }
 
     /**
-     * Getter for {@link #tables}. The list cannot be modified.
+     * Finds table according to specified table {@code name}.
      *
-     * @return {@link #tables}
+     * @param name name of the table to be searched
+     *
+     * @return found table or null if no such table has been found
+     */
+    public PgTable getTable(final String name) {
+        PgRelation rel = this.getRelation(name);
+        if (rel == null || !(rel instanceof PgTable))
+            return null;
+        return (PgTable) rel;
+    }
+
+    /**
+     * Get a list of tables from {@link #rels}.
+     *
+     * @return list of tables
      */
     public List<PgTable> getTables() {
-        return Collections.unmodifiableList(tables);
+        @SuppressWarnings("CollectionWithoutInitialCapacity")
+        final List<PgTable> list = new ArrayList<PgTable>();
+
+        for (PgRelation rel : rels) {
+            if (rel instanceof PgTable) {
+                list.add((PgTable) rel);
+            }
+        }
+
+        return list;
+    }
+
+    /**
+     * Getter for {@link #rels}. The list cannot be modified.
+     *
+     * @return {@link #rels}
+     */
+    public List<PgRelation> getRels() {
+        return Collections.unmodifiableList(rels);
     }
 
     /**
@@ -303,22 +330,28 @@ public class PgSchema {
      * @return found view or null if no such view has been found
      */
     public PgView getView(final String name) {
-        for (PgView view : views) {
-            if (view.getName().equals(name)) {
-                return view;
-            }
-        }
-
-        return null;
+        PgRelation rel = this.getRelation(name);
+        if (rel == null || !(rel instanceof PgView))
+            return null;
+        return (PgView) rel;
     }
 
     /**
-     * Getter for {@link #views}. The list cannot be modified.
+     * Get a list of views from {@link #rels}.
      *
-     * @return {@link #views}
+     * @return list of views
      */
     public List<PgView> getViews() {
-        return Collections.unmodifiableList(views);
+        @SuppressWarnings("CollectionWithoutInitialCapacity")
+        final List<PgView> list = new ArrayList<PgView>();
+
+        for (PgRelation rel : rels) {
+            if (rel instanceof PgView) {
+                list.add((PgView) rel);
+            }
+        }
+
+        return list;
     }
 
     /**
@@ -358,21 +391,12 @@ public class PgSchema {
     }
 
     /**
-     * Adds {@code table} to the list of tables.
+     * Adds {@code rel} table or view to the list of rels.
      *
-     * @param table table
+     * @param rel relation
      */
-    public void addTable(final PgTable table) {
-        tables.add(table);
-    }
-
-    /**
-     * Adds {@code view} to the list of views.
-     *
-     * @param view view
-     */
-    public void addView(final PgView view) {
-        views.add(view);
+    public void addRelation(final PgRelation rel) {
+        rels.add(rel);
     }
 
     /**
@@ -423,13 +447,7 @@ public class PgSchema {
      *         false.
      */
     public boolean containsTable(final String name) {
-        for (PgTable table : tables) {
-            if (table.getName().equals(name)) {
-                return true;
-            }
-        }
-
-        return false;
+        return getTable(name) != null;
     }
 
     /**
@@ -442,12 +460,6 @@ public class PgSchema {
      *         false.
      */
     public boolean containsView(final String name) {
-        for (PgView view : views) {
-            if (view.getName().equals(name)) {
-                return true;
-            }
-        }
-
-        return false;
+        return getView(name) != null;
     }
 }

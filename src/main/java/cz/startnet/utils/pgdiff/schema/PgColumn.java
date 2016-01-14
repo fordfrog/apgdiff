@@ -44,7 +44,7 @@ public class PgColumn {
      */
     private String name;
     /**
-     * Type of the column.
+     * Type of the column. Always null for view columns.
      */
     private String type;
     /**

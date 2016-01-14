@@ -46,7 +46,7 @@ public class CreateTableParser {
                     statement));
         }
 
-        schema.addTable(table);
+        schema.addRelation(table);
 
         parser.expect("(");
 

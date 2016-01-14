@@ -6,13 +6,8 @@
 package cz.startnet.utils.pgdiff.parsers;
 
 import cz.startnet.utils.pgdiff.Resources;
-import cz.startnet.utils.pgdiff.schema.PgColumn;
-import cz.startnet.utils.pgdiff.schema.PgConstraint;
-import cz.startnet.utils.pgdiff.schema.PgDatabase;
-import cz.startnet.utils.pgdiff.schema.PgSchema;
-import cz.startnet.utils.pgdiff.schema.PgSequence;
-import cz.startnet.utils.pgdiff.schema.PgTable;
-import cz.startnet.utils.pgdiff.schema.PgView;
+import cz.startnet.utils.pgdiff.schema.*;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +17,7 @@ import java.util.List;
  *
  * @author fordfrog
  */
-public class AlterTableParser {
+public class AlterRelationParser {
 
     /**
      * Parses ALTER TABLE statement.
@@ -35,12 +30,25 @@ public class AlterTableParser {
     public static void parse(final PgDatabase database,
             final String statement, final boolean outputIgnoredStatements) {
         final Parser parser = new Parser(statement);
-        parser.expect("ALTER", "TABLE");
-        parser.expectOptional("ONLY");
+        parser.expect("ALTER");
 
-        final String tableName = parser.parseIdentifier();
+        /*
+         * PostgreSQL allows using ALTER TABLE on views as well as other
+         * relation types, so we just ignore type here and derive its type from
+         * the original CREATE command.
+         */
+        if (parser.expectOptional("TABLE")) {
+            parser.expectOptional("ONLY");
+        } else if (parser.expectOptional("MATERIALIZED", "VIEW")
+                || parser.expectOptional("VIEW")) {
+            // OK, view
+        } else {
+            parser.throwUnsupportedCommand();
+        }
+
+        final String relName = parser.parseIdentifier();
         final String schemaName =
-                ParserUtils.getSchemaName(tableName, database);
+                ParserUtils.getSchemaName(relName, database);
         final PgSchema schema = database.getSchema(schemaName);
 
         if (schema == null) {
@@ -49,46 +57,43 @@ public class AlterTableParser {
                     statement));
         }
 
-        final String objectName = ParserUtils.getObjectName(tableName);
-        final PgTable table = schema.getTable(objectName);
+        final String objectName = ParserUtils.getObjectName(relName);
+        final PgRelation rel = schema.getRelation(objectName);
 
-        if (table == null) {
-            final PgView view = schema.getView(objectName);
-
-            if (view != null) {
-                parseView(parser, view, outputIgnoredStatements, tableName,
-                        database);
-                return;
-            }
-
+        if (rel == null) {
             final PgSequence sequence = schema.getSequence(objectName);
 
             if (sequence != null) {
                 parseSequence(parser, sequence, outputIgnoredStatements,
-                        tableName, database);
+                        relName, database);
                 return;
             }
 
             throw new RuntimeException(MessageFormat.format(
-                    Resources.getString("CannotFindObject"), tableName,
+                    Resources.getString("CannotFindObject"), relName,
                     statement));
+        }
+
+        PgTable table = null;
+        if (rel instanceof PgTable) {
+            table = (PgTable) rel;
         }
 
         while (!parser.expectOptional(";")) {
             if (parser.expectOptional("ALTER")) {
-                parseAlterColumn(parser, table);
+                parseAlterColumn(parser, rel);
             } else if (parser.expectOptional("CLUSTER", "ON")) {
-                table.setClusterIndexName(
+                rel.setClusterIndexName(
                         ParserUtils.getObjectName(parser.parseIdentifier()));
             } else if (parser.expectOptional("OWNER", "TO")) {
                 // we do not parse this one so we just consume the identifier
                 if (outputIgnoredStatements) {
-                    database.addIgnoredStatement("ALTER TABLE " + tableName
+                    database.addIgnoredStatement("ALTER TABLE " + relName
                             + " OWNER TO " + parser.parseIdentifier() + ';');
                 } else {
                     parser.parseIdentifier();
                 }
-            } else if (parser.expectOptional("ADD")) {
+            } else if (table != null && parser.expectOptional("ADD")) {
                 if (parser.expectOptional("FOREIGN", "KEY")) {
                     parseAddForeignKey(parser, table);
                 } else if (parser.expectOptional("CONSTRAINT")) {
@@ -96,12 +101,12 @@ public class AlterTableParser {
                 } else {
                     parser.throwUnsupportedCommand();
                 }
-            } else if (parser.expectOptional("ENABLE")) {
+            } else if (table != null && parser.expectOptional("ENABLE")) {
                 parseEnable(
-                        parser, outputIgnoredStatements, tableName, database);
-            } else if (parser.expectOptional("DISABLE")) {
+                        parser, outputIgnoredStatements, relName, database);
+            } else if (table != null && parser.expectOptional("DISABLE")) {
                 parseDisable(
-                        parser, outputIgnoredStatements, tableName, database);
+                        parser, outputIgnoredStatements, relName, database);
             } else {
                 parser.throwUnsupportedCommand();
             }
@@ -228,10 +233,10 @@ public class AlterTableParser {
      * Parses ALTER COLUMN action.
      *
      * @param parser parser
-     * @param table  pg table
+     * @param rel    view/table
      */
     private static void parseAlterColumn(final Parser parser,
-            final PgTable table) {
+            final PgRelation rel) {
         parser.expectOptional("COLUMN");
 
         final String columnName =
@@ -239,41 +244,35 @@ public class AlterTableParser {
 
         if (parser.expectOptional("SET")) {
             if (parser.expectOptional("STATISTICS")) {
-                final PgColumn column = table.getColumn(columnName);
+                final PgColumn column = rel.getColumn(columnName);
 
                 if (column == null) {
                     throw new RuntimeException(MessageFormat.format(
                             Resources.getString("CannotFindTableColumn"),
-                            columnName, table.getName(), parser.getString()));
+                            columnName, rel.getName(), parser.getString()));
                 }
 
                 column.setStatistics(parser.parseInteger());
             } else if (parser.expectOptional("DEFAULT")) {
                 final String defaultValue = parser.getExpression();
 
-                if (table.containsColumn(columnName)) {
-                    final PgColumn column = table.getColumn(columnName);
-
-                    if (column == null) {
-                        throw new RuntimeException(MessageFormat.format(
-                                Resources.getString("CannotFindTableColumn"),
-                                columnName, table.getName(),
-                                parser.getString()));
-                    }
-
-                    column.setDefaultValue(defaultValue);
-                } else {
-                    throw new ParserException(MessageFormat.format(
-                            Resources.getString("CannotFindColumnInTable"),
-                            columnName, table.getName()));
-                }
-            } else if (parser.expectOptional("STORAGE")) {
-                final PgColumn column = table.getColumn(columnName);
+                final PgColumn column = rel.getColumn(columnName);
 
                 if (column == null) {
                     throw new RuntimeException(MessageFormat.format(
                             Resources.getString("CannotFindTableColumn"),
-                            columnName, table.getName(), parser.getString()));
+                            columnName, rel.getName(),
+                            parser.getString()));
+                }
+
+                column.setDefaultValue(defaultValue);
+            } else if (parser.expectOptional("STORAGE")) {
+                final PgColumn column = rel.getColumn(columnName);
+
+                if (column == null) {
+                    throw new RuntimeException(MessageFormat.format(
+                            Resources.getString("CannotFindTableColumn"),
+                            columnName, rel.getName(), parser.getString()));
                 }
 
                 if (parser.expectOptional("PLAIN")) {
@@ -327,49 +326,6 @@ public class AlterTableParser {
     }
 
     /**
-     * Parses ALTER TABLE view.
-     *
-     * @param parser                  parser
-     * @param view                    view
-     * @param outputIgnoredStatements whether ignored statements should be
-     *                                output in the diff
-     * @param viewName                view name as it was specified in the
-     *                                statement
-     * @param database                database information
-     */
-    private static void parseView(final Parser parser, final PgView view,
-            final boolean outputIgnoredStatements, final String viewName,
-            final PgDatabase database) {
-        while (!parser.expectOptional(";")) {
-            if (parser.expectOptional("ALTER")) {
-                parser.expectOptional("COLUMN");
-
-                final String columnName =
-                        ParserUtils.getObjectName(parser.parseIdentifier());
-
-                if (parser.expectOptional("SET", "DEFAULT")) {
-                    final String expression = parser.getExpression();
-                    view.addColumnDefaultValue(columnName, expression);
-                } else if (parser.expectOptional("DROP", "DEFAULT")) {
-                    view.removeColumnDefaultValue(columnName);
-                } else {
-                    parser.throwUnsupportedCommand();
-                }
-            } else if (parser.expectOptional("OWNER", "TO")) {
-                // we do not parse this one so we just consume the identifier
-                if (outputIgnoredStatements) {
-                    database.addIgnoredStatement("ALTER TABLE " + viewName
-                            + " OWNER TO " + parser.parseIdentifier() + ';');
-                } else {
-                    parser.parseIdentifier();
-                }
-            } else {
-                parser.throwUnsupportedCommand();
-            }
-        }
-    }
-
-    /**
      * Parses ALTER TABLE sequence.
      *
      * @param parser                  parser
@@ -401,6 +357,6 @@ public class AlterTableParser {
     /**
      * Creates a new instance of AlterTableParser.
      */
-    private AlterTableParser() {
+    private AlterRelationParser() {
     }
 }
