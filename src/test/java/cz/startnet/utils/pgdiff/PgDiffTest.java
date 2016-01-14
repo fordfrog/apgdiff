@@ -72,7 +72,7 @@ public class PgDiffTest {
                     // Tests scenario where NOT NULL constraint is set on COLUMN.
                     {"add_not_null", false, false, false, false},
                     // Tests scenario where NOT NULL constraint is dropped
-                    // from COLUMN.
+                    // from COLUMN.MATERIALIZED
                     {"drop_not_null", false, false, false, false},
                     // Tests scenario where COLUMN is added to TABLE definition.
                     {"add_column", false, false, false, false},
@@ -171,6 +171,12 @@ public class PgDiffTest {
                     {"drop_view", false, false, false, false},
                     // Tests scenario where VIEW is modified.
                     {"modify_view", false, false, false, false},
+                    // Tests scenario where MATERIALIZED VIEW is added.
+                    {"add_materialized_view", false, false, false, false},
+                    // Tests scenario where MATERIALIZED VIEW is dropped.
+                    {"drop_materialized_view", false, false, false, false},
+                    // Tests scenario where MATERIALIZED VIEW is modified.
+                    {"modify_materialized_view", false, false, false, false},
                     // Tests scenario where --add-defaults is specified.
                     {"add_defaults", true, false, false, false},
                     // Tests scenario where multiple schemas are in the dumps.
