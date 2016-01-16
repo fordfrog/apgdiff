@@ -9,7 +9,7 @@ fordfrog@fordfrog.com.
 
 ## Changelog
 
-### Version 2.4.1 (not released yet)
+### Version 2.5 (not released yet)
 
 #### New Features
 * MATERIALIZED VIEW support in PostgreSQL 9.3 (Marti Raudsepp)
@@ -28,6 +28,7 @@ fordfrog@fordfrog.com.
 * Fitted English help to 80 characters in width. (Dave Jarvis)
 * View query changes are now correctly detected even if it has declared
   columns that didn't change. (Marti Raudsepp)
+* Fixed issue with the $ sign in the object name (Anatoliy Basov)
 
 ### 2012-09-21: Version 2.4
 

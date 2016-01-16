@@ -132,6 +132,12 @@ public class PgDumpLoader { //NOPMD
             "^COMMENT[\\s]+ON[\\s]+.*$",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /**
+     * Pattern for testing a dollar quoting tag.
+     */
+    private static final Pattern PATTERN_DOLLAR_TAG= Pattern.compile(
+            "[\"\\s]",
+            Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    /**
      * Storage of unprocessed line part.
      */
     private static String lineBuffer;
@@ -355,10 +361,15 @@ public class PgDumpLoader { //NOPMD
                 final int endPos = sbString.indexOf("$", curPos + 1);
 
                 if (endPos == -1) {
-                    return true;
+                    return false;
                 }
 
                 final String tag = sbString.substring(curPos, endPos + 1);
+
+                if (!isCorrectTag(tag)) {
+                    return false;
+                }
+
                 final int endTagPos = sbString.indexOf(tag, endPos + 1);
 
                 // if end tag was not found or it was found after the checked
@@ -372,6 +383,17 @@ public class PgDumpLoader { //NOPMD
         }
 
         return isQuoted;
+    }
+
+    /**
+     * Checks whether dollar quoting tag is correct.
+     *
+     * @param tag tag to be checked
+     *
+     * @return true if the tag is correct, otherwise false
+     */
+    private static boolean isCorrectTag(final String tag) {
+        return !PATTERN_DOLLAR_TAG.matcher(tag).find();
     }
 
     /**

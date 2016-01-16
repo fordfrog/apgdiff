@@ -212,7 +212,9 @@ public class PgDiffTest {
                     // Tests adding empty table
                     {"add_empty_table", false, false, false, false},
                     // Tests view with column names whose query changes
-                    {"view_colnames", false, false, false, false}
+                    {"view_colnames", false, false, false, false},
+                    // Tests objects with the $ sign in the name
+                    {"add_table_bug102", false, false, false, false}
                 });
     }
     /**
