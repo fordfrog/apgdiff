@@ -29,6 +29,7 @@ fordfrog@fordfrog.com.
 * View query changes are now correctly detected even if it has declared
   columns that didn't change. (Marti Raudsepp)
 * Fixed issue with the $ sign in the object name (Anatoliy Basov)
+* Added French translation. (Jeremy Passeron)
 
 ### 2012-09-21: Version 2.4
 
