@@ -256,7 +256,8 @@ public class AlterRelationParser {
             } else if (parser.expectOptional("DEFAULT")) {
                 final String defaultValue = parser.getExpression();
 
-                final PgColumn column = rel.getColumn(columnName);
+                if (rel.containsColumn(columnName)) {
+                    final PgColumn column = rel.getColumn(columnName);
 
                 if (column == null) {
                     throw new RuntimeException(MessageFormat.format(
@@ -266,6 +267,22 @@ public class AlterRelationParser {
                 }
 
                 column.setDefaultValue(defaultValue);
+                } else if (rel.containsInheritedColumn(columnName)) {
+                    final PgInheritedColumn column = rel.getInheritedColumn(columnName);
+
+                    if (column == null) {
+                        throw new RuntimeException(MessageFormat.format(
+                                Resources.getString("CannotFindTableColumn"),
+                                columnName, rel.getName(),
+                                parser.getString()));
+                    }
+
+                    column.setDefaultValue(defaultValue);
+                } else {
+                    throw new ParserException(MessageFormat.format(
+                            Resources.getString("CannotFindColumnInTable"),
+                            columnName, rel.getName()));
+                }
             } else if (parser.expectOptional("STORAGE")) {
                 final PgColumn column = rel.getColumn(columnName);
 

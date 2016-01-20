@@ -296,6 +296,31 @@ public abstract class PgRelation {
     }
 
     /**
+     * Finds inheritedColumn according to specified name {@code name}.
+     *
+     * @param name name of the inheritedColumn to be searched
+     *
+     * @return found inheritedColumn or null if no such inheritedColumn
+     * has been found
+     */
+    public PgInheritedColumn getInheritedColumn(final String name) {
+        return null;
+    }
+
+    /**
+     * Returns true if table contains given inheritedColumn {@code name},
+     * otherwise false.
+     *
+     * @param name name of the inheritedColumn
+     *
+     * @return true if table contains given inheritedColumn {@code name},
+     * otherwise false
+     */
+    public boolean containsInheritedColumn(final String name) {
+        return false;
+    }
+
+    /**
      * Returns true if table/matview contains given index {@code name}, otherwise false.
      *
      * @param name name of the index

@@ -97,6 +97,12 @@ public class PgDiffTest {
                     // Tests scenario where original and new TABLE contain
                     //different INHERITS.
                     {"modify_inherits", false, false, false, false},
+                    // Add a table with a default value for a column that belongs to an inherited table
+                    {"add_inherits_default_column", false, false, false, false},
+                    // Add a table with a default value for a column that belongs to an inherited table in a different schema
+                    {"add_inherits_schema_default_column", false, false, false, false},
+                    // Tests when a default value is changed for a column that belongs to an inherited table
+                    {"modify_default_value_inherited_column", false, false, false, false},
                     // Tests scenario where SEQUENCE is added.
                     {"add_sequence", false, false, false, false},
                     // Tests scenario where SEQUENCE is dropped.

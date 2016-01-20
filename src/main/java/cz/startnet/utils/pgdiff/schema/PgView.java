@@ -197,4 +197,16 @@ public class PgView extends PgRelation {
         }
         return col;
     }
+
+    /**
+     * Returns true if table contains given column {@code name}, otherwise
+     * false.
+     *
+     * @param name name of the column
+     *
+     * @return true if table contains given column {@code name}, otherwise false
+     */
+    public boolean containsColumn(final String name) {
+        return true;
+    }
 }
