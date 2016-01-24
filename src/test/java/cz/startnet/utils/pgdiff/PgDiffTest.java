@@ -220,7 +220,11 @@ public class PgDiffTest {
                     // Tests view with column names whose query changes
                     {"view_colnames", false, false, false, false},
                     // Tests objects with the $ sign in the name
-                    {"add_table_bug102", false, false, false, false}
+                    {"add_table_bug102", false, false, false, false},
+                    // Tests scenario where new UNLOGGED TABLE is added.
+                    {"add_unlogged_table", false, false, false, false},
+                    // Tests scenario where UNLOGGED TABLE is dropped.
+                    {"drop_unlogged_table", false, false, false, false}
                 });
     }
     /**
