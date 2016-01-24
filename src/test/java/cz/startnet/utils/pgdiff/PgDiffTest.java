@@ -224,7 +224,10 @@ public class PgDiffTest {
                     // Tests scenario where new UNLOGGED TABLE is added.
                     {"add_unlogged_table", false, false, false, false},
                     // Tests scenario where UNLOGGED TABLE is dropped.
-                    {"drop_unlogged_table", false, false, false, false}
+                    {"drop_unlogged_table", false, false, false, false},
+                    // Test scenarios where /**/ comments.
+                    {"add_table_issue115", false, false, false, false},
+                    {"add_column_issue134", false, false, false, false}
                 });
     }
     /**
