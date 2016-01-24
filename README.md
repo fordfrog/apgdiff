@@ -13,7 +13,9 @@ fordfrog@fordfrog.com.
 
 #### New Features
 * MATERIALIZED VIEW support in PostgreSQL 9.3 (Marti Raudsepp)
-* Better support for inherited tables (Daniel Watson) 
+* Better support for inherited tables (Daniel Watson)
+* Added support for CREATE UNLOGGED TABLE (Anatoliy Basov)
+
 
 #### Fixes
 * Added hint to use "CREATE TABLE ... CONSTRAINT name PRIMARY KEY/UNIQUE ..."
