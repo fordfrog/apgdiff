@@ -29,7 +29,9 @@ public class CreateTableParser {
     public static void parse(final PgDatabase database,
             final String statement) {
         final Parser parser = new Parser(statement);
-        parser.expect("CREATE", "TABLE");
+        parser.expect("CREATE");
+        final boolean unlogged = parser.expectOptional("UNLOGGED");
+        parser.expect("TABLE");
 
         // Optional IF NOT EXISTS, irrelevant for our purposes
         parser.expectOptional("IF", "NOT", "EXISTS");
@@ -46,7 +48,7 @@ public class CreateTableParser {
         }
 
         final PgTable table = new PgTable(ParserUtils.getObjectName(tableName), database, schema);
-
+        table.setUnlogged(unlogged);
         schema.addRelation(table);
 
         parser.expect("(");

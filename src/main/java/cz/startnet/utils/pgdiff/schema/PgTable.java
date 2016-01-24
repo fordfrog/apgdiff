@@ -39,6 +39,11 @@ public class PgTable extends PgRelation {
      * OIDS=true, OIDS=false, or storage parameters can be set.
      */
     private String with;
+    /**
+     * Is this a UNLOGGED table?
+     */
+    private boolean unlogged;
+
 
     /**
      * PgDatabase
@@ -105,7 +110,11 @@ public class PgTable extends PgRelation {
      */
     public String getCreationSQL(final PgSchema schema) {
         final StringBuilder sbSQL = new StringBuilder(1000);
-        sbSQL.append("CREATE TABLE ");
+        sbSQL.append("CREATE ");
+        if (isUnlogged()) {
+            sbSQL.append("UNLOGGED ");
+        }
+        sbSQL.append("TABLE ");
         sbSQL.append(PgDiffUtils.getQuotedName(name));
         sbSQL.append(" (\n");
 
@@ -374,5 +383,13 @@ public class PgTable extends PgRelation {
         }
 
         return list;
+    }
+
+    public boolean isUnlogged() {
+        return unlogged;
+    }
+
+    public void setUnlogged(boolean unlogged) {
+        this.unlogged = unlogged;
     }
 }
