@@ -8,6 +8,8 @@ package cz.startnet.utils.pgdiff;
 import cz.startnet.utils.pgdiff.schema.PgConstraint;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
+import cz.startnet.utils.pgdiff.schema.PgFunction.Argument;
+
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,7 @@ public class PgDiffConstraints {
      * @param searchPathHelper search path helper
      */
     public static void createConstraints(final PrintWriter writer,
+    		final PgDiffArguments arguments,
             final PgSchema oldSchema, final PgSchema newSchema,
             final boolean primaryKey, final SearchPathHelper searchPathHelper) {
         for (final PgTable newTable : newSchema.getTables()) {
@@ -44,7 +47,7 @@ public class PgDiffConstraints {
 
             // Add new constraints
             for (final PgConstraint constraint :
-                    getNewConstraints(oldTable, newTable, primaryKey)) {
+                    getNewConstraints(arguments, oldTable, newTable, primaryKey)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(constraint.getCreationSQL());
@@ -64,6 +67,7 @@ public class PgDiffConstraints {
      * @param searchPathHelper search path helper
      */
     public static void dropConstraints(final PrintWriter writer,
+    		final PgDiffArguments arguments,
             final PgSchema oldSchema, final PgSchema newSchema,
             final boolean primaryKey, final SearchPathHelper searchPathHelper) {
         for (final PgTable newTable : newSchema.getTables()) {
@@ -77,7 +81,7 @@ public class PgDiffConstraints {
 
             // Drop constraints that no more exist or are modified
             for (final PgConstraint constraint :
-                    getDropConstraints(oldTable, newTable, primaryKey)) {
+                    getDropConstraints(arguments, oldTable, newTable, primaryKey)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(constraint.getDropSQL());
@@ -98,18 +102,27 @@ public class PgDiffConstraints {
      * @todo Constraints that are depending on a removed field should not be
      * added to drop because they are already removed.
      */
-    private static List<PgConstraint> getDropConstraints(final PgTable oldTable,
+    private static List<PgConstraint> getDropConstraints(
+    		final PgDiffArguments arguments,
+    		final PgTable oldTable,
             final PgTable newTable, final boolean primaryKey) {
         @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<PgConstraint> list = new ArrayList<PgConstraint>();
 
         if (newTable != null && oldTable != null) {
             for (final PgConstraint constraint : oldTable.getConstraints()) {
-                if (constraint.isPrimaryKeyConstraint() == primaryKey
-                        && (!newTable.containsConstraint(constraint.getName())
-                        || !newTable.getConstraint(constraint.getName()).equals(
-                        constraint))) {
-                    list.add(constraint);
+                if (constraint.isPrimaryKeyConstraint() == primaryKey) {
+                	if (arguments.isIgnoreConstraintNames()) {
+                		PgConstraint newConstraint = newTable.findConstraint(constraint.getDefinition());
+                		if (newConstraint==null) {
+                        	list.add(constraint);                			
+                		}
+                	} else { 
+                        if ( !newTable.containsConstraint(constraint.getName())
+                             || !newTable.getConstraint(constraint.getName()).equals(constraint) ) {
+                        	list.add(constraint);
+                        }
+                	}
                 }
             }
         }
@@ -127,7 +140,9 @@ public class PgDiffConstraints {
      *
      * @return list of constraints that should be added
      */
-    private static List<PgConstraint> getNewConstraints(final PgTable oldTable,
+    private static List<PgConstraint> getNewConstraints(
+    		final PgDiffArguments arguments,
+    		final PgTable oldTable,
             final PgTable newTable, final boolean primaryKey) {
         @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<PgConstraint> list = new ArrayList<PgConstraint>();
@@ -141,15 +156,20 @@ public class PgDiffConstraints {
                     }
                 }
             } else {
-                for (final PgConstraint constraint :
-                        newTable.getConstraints()) {
-                    if ((constraint.isPrimaryKeyConstraint() == primaryKey)
-                            && (!oldTable.containsConstraint(
-                            constraint.getName())
-                            || !oldTable.getConstraint(constraint.getName()).
-                            equals(constraint))) {
-                        list.add(constraint);
-                    }
+                for (final PgConstraint constraint : newTable.getConstraints()) {
+                    if (constraint.isPrimaryKeyConstraint() == primaryKey) {
+                    	if (arguments.isIgnoreConstraintNames()) {
+	                    	PgConstraint oldConstraint = oldTable.findConstraint(constraint.getDefinition()); 
+	                    	if (oldConstraint == null) {
+	                    		list.add(constraint);
+	                    	}
+	                    } else {
+	                    	if ( !oldTable.containsConstraint(constraint.getName())
+	                             || !oldTable.getConstraint(constraint.getName()).equals(constraint) ) {
+	                    		list.add(constraint);
+	                    	}
+	                    }
+                	}
                 }
             }
         }

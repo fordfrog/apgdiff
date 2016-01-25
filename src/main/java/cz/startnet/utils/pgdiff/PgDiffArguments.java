@@ -65,8 +65,12 @@ public class PgDiffArguments {
      * Whether Slony triggers should be ignored.
      */
     private boolean ignoreSlonyTriggers;
-
     /**
+     * Whether to ignore constraint names differences
+     */
+    private boolean ignoreConstraintNames;
+
+	/**
      * Setter for {@link #addDefaults}.
      *
      * @param addDefaults {@link #addDefaults}
@@ -253,6 +257,8 @@ public class PgDiffArguments {
                 i++;
             } else if ("--output-ignored-statements".equals(args[i])) {
                 setOutputIgnoredStatements(true);
+            } else if ("--ignore-constraint-names".equals(args[i])) {
+                setIgnoreConstraintNames(true);
             } else if ("--version".equals(args[i])) {
                 setVersion(true);
             } else {
@@ -387,4 +393,12 @@ public class PgDiffArguments {
     public void setIgnoreSlonyTriggers(final boolean ignoreSlonyTriggers) {
         this.ignoreSlonyTriggers = ignoreSlonyTriggers;
     }
+
+    public boolean isIgnoreConstraintNames() {
+		return ignoreConstraintNames;
+	}
+
+	public void setIgnoreConstraintNames(boolean ignoreConstraintNames) {
+		this.ignoreConstraintNames = ignoreConstraintNames;
+	}
 }

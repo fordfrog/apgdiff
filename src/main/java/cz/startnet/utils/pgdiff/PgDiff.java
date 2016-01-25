@@ -230,9 +230,9 @@ public class PgDiff {
             PgDiffViews.dropViews(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffConstraints.dropConstraints(
-                    writer, oldSchema, newSchema, true, searchPathHelper);
+                    writer, arguments, oldSchema, newSchema, true, searchPathHelper);
             PgDiffConstraints.dropConstraints(
-                    writer, oldSchema, newSchema, false, searchPathHelper);
+                    writer, arguments, oldSchema, newSchema, false, searchPathHelper);
             PgDiffIndexes.dropIndexes(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffTables.dropClusters(
@@ -255,9 +255,9 @@ public class PgDiff {
             PgDiffFunctions.createFunctions(
                     writer, arguments, oldSchema, newSchema, searchPathHelper);
             PgDiffConstraints.createConstraints(
-                    writer, oldSchema, newSchema, true, searchPathHelper);
+                    writer, arguments, oldSchema, newSchema, true, searchPathHelper);
             PgDiffConstraints.createConstraints(
-                    writer, oldSchema, newSchema, false, searchPathHelper);
+                    writer, arguments, oldSchema, newSchema, false, searchPathHelper);
             PgDiffIndexes.createIndexes(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffTables.createClusters(
