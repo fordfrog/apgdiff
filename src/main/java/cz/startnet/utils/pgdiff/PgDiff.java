@@ -240,7 +240,7 @@ public class PgDiff {
             PgDiffTables.dropTables(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffSequences.dropSequences(
-                    writer, oldSchema, newSchema, searchPathHelper);
+                    writer, arguments, oldSchema, newSchema, searchPathHelper);
 
             PgDiffSequences.createSequences(
                     writer, oldSchema, newSchema, searchPathHelper);

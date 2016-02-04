@@ -302,6 +302,28 @@ public class PgSequence {
     public String getOwnedBy() {
         return ownedBy;
     }
+    
+    /**
+     * Returns owner table name.
+     * 
+     * @return Table name.
+     */
+    public String getOwnedByTable() {
+        String table;
+        
+        if (ownedBy == null) {
+            table = null;
+        } else {
+            int i = ownedBy.indexOf(".");
+            if (i == -1) {
+                throw new RuntimeException("Can't find sequence owner table name.");
+            }
+            
+            table = ownedBy.substring(0, i);
+        }
+        
+        return table;
+    }
 
     /**
      * Setter for {@link #ownedBy}.

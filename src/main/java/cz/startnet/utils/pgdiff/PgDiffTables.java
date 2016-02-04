@@ -539,6 +539,27 @@ public class PgDiffTables {
             }
         }
     }
+    
+    /**
+     * Returns all tables which will be dropped by dropTables call.
+     * 
+     * @param oldSchema origin schema
+     * @param newSchema new schema
+     * @return 
+     */
+    public static List<PgTable> getDropTableCandidates(final PgSchema oldSchema, final PgSchema newSchema) {
+        List<PgTable> tables = new ArrayList<PgTable>();
+        
+        if (oldSchema != null) {
+            for (final PgTable table : oldSchema.getTables()) {
+                if (!newSchema.containsTable(table.getName())) {
+                    tables.add(table);
+                }
+            }
+        }
+
+        return tables;
+    }
 
     /**
      * Outputs statements for dropping tables.
@@ -554,13 +575,11 @@ public class PgDiffTables {
         if (oldSchema == null) {
             return;
         }
-
-        for (final PgTable table : oldSchema.getTables()) {
-            if (!newSchema.containsTable(table.getName())) {
-                searchPathHelper.outputSearchPath(writer);
-                writer.println();
-                writer.println(table.getDropSQL());
-            }
+        
+        for (PgTable table : getDropTableCandidates(oldSchema, newSchema)) {
+            searchPathHelper.outputSearchPath(writer);
+            writer.println();
+            writer.println(table.getDropSQL());
         }
     }
 
