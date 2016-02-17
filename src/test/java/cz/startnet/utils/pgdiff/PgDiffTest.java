@@ -227,7 +227,9 @@ public class PgDiffTest {
                     {"drop_unlogged_table", false, false, false, false},
                     // Test scenarios where /**/ comments.
                     {"add_table_issue115", false, false, false, false},
-                    {"add_column_issue134", false, false, false, false}
+                    {"add_column_issue134", false, false, false, false},
+                    // Tests view triggers (support for 'INSTEAD OF')
+                    {"view_triggers", false, false, false, false}
                 });
     }
     /**
