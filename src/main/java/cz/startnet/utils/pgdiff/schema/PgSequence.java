@@ -107,16 +107,19 @@ public class PgSequence {
         sbSQL.append(PgDiffUtils.getQuotedName(name));
 
         if (startWith != null) {
-            sbSQL.append("\n\tSTART WITH ");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("\tSTART WITH ");
             sbSQL.append(startWith);
         }
 
         if (increment != null) {
-            sbSQL.append("\n\tINCREMENT BY ");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("\tINCREMENT BY ");
             sbSQL.append(increment);
         }
 
-        sbSQL.append("\n\t");
+        sbSQL.append(System.getProperty("line.separator"));
+        sbSQL.append("\t");
 
         if (maxValue == null) {
             sbSQL.append("NO MAXVALUE");
@@ -125,7 +128,8 @@ public class PgSequence {
             sbSQL.append(maxValue);
         }
 
-        sbSQL.append("\n\t");
+        sbSQL.append(System.getProperty("line.separator"));
+        sbSQL.append("\t");
 
         if (minValue == null) {
             sbSQL.append("NO MINVALUE");
@@ -135,18 +139,22 @@ public class PgSequence {
         }
 
         if (cache != null) {
-            sbSQL.append("\n\tCACHE ");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("\tCACHE ");
             sbSQL.append(cache);
         }
 
         if (cycle) {
-            sbSQL.append("\n\tCYCLE");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("\tCYCLE");
         }
 
         sbSQL.append(';');
 
         if (comment != null && !comment.isEmpty()) {
-            sbSQL.append("\n\nCOMMENT ON SEQUENCE ");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("COMMENT ON SEQUENCE ");
             sbSQL.append(PgDiffUtils.getQuotedName(name));
             sbSQL.append(" IS ");
             sbSQL.append(comment);
@@ -168,7 +176,8 @@ public class PgSequence {
         sbSQL.append(PgDiffUtils.getQuotedName(name));
 
         if (ownedBy != null && !ownedBy.isEmpty()) {
-            sbSQL.append("\n\tOWNED BY ");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("\tOWNED BY ");
             sbSQL.append(ownedBy);
         }
 

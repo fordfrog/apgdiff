@@ -103,7 +103,9 @@ public abstract class PgRelation {
         final StringBuilder sbSQL = new StringBuilder(100);
 
         if (comment != null && !comment.isEmpty()) {
-            sbSQL.append("\n\nCOMMENT ON ");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("COMMENT ON ");
             sbSQL.append(getRelationKind());
             sbSQL.append(' ');
             sbSQL.append(PgDiffUtils.getQuotedName(name));
@@ -114,7 +116,9 @@ public abstract class PgRelation {
 
         for (final PgColumn column : columns) {
             if (column.getComment() != null && !column.getComment().isEmpty()) {
-                sbSQL.append("\n\nCOMMENT ON COLUMN ");
+                sbSQL.append(System.getProperty("line.separator"));
+                sbSQL.append(System.getProperty("line.separator"));
+                sbSQL.append("COMMENT ON COLUMN ");
                 sbSQL.append(PgDiffUtils.getQuotedName(name));
                 sbSQL.append('.');
                 sbSQL.append(PgDiffUtils.getQuotedName(column.getName()));

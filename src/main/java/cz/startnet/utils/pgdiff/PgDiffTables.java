@@ -442,20 +442,19 @@ public class PgDiffTables {
             final String newDefault = (newColumn.getDefaultValue() == null) ? ""
                     : newColumn.getDefaultValue();
             if (!oldDefault.equals(newDefault)) {
+                writer.println();
+                writer.print("ALTER TABLE ONLY ");
+                writer.println(PgDiffUtils.getQuotedName(newTable.getName()));
+                writer.print("\tALTER COLUMN ");
+                writer.print(PgDiffUtils.getQuotedName(newColumn.getInheritedColumn().getName()));
                 if (newDefault.length() == 0) {
-                    writer.println(String.format(
-                        "\nALTER TABLE ONLY %s\n\tALTER COLUMN %s DROP DEFAULT;",
-                        PgDiffUtils.getQuotedName(newTable.getName()),
-                        PgDiffUtils.getQuotedName(newColumn.getInheritedColumn().getName())
-                    ));
-                } else {
-                    writer.println(String.format(
-                        "\nALTER TABLE ONLY %s\n\tALTER COLUMN %s SET DEFAULT %s;",
-                        PgDiffUtils.getQuotedName(newTable.getName()),
-                        PgDiffUtils.getQuotedName(newColumn.getInheritedColumn().getName()),
-                        newDefault
-                    ));
+                    writer.print(" DROP DEFAULT");
+                } else
+                {
+                    writer.print(" SET DEFAULT ");
+                    writer.print(newDefault);
                 }
+                writer.println(";");
             }
         }
     }

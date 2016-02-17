@@ -55,14 +55,17 @@ public class PgConstraint {
         final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("ALTER TABLE ");
         sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
-        sbSQL.append("\n\tADD CONSTRAINT ");
+        sbSQL.append(System.getProperty("line.separator"));
+        sbSQL.append("\tADD CONSTRAINT ");
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(' ');
         sbSQL.append(getDefinition());
         sbSQL.append(';');
 
         if (comment != null && !comment.isEmpty()) {
-            sbSQL.append("\n\nCOMMENT ON CONSTRAINT ");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("COMMENT ON CONSTRAINT ");
             sbSQL.append(PgDiffUtils.getQuotedName(name));
             sbSQL.append(" ON ");
             sbSQL.append(PgDiffUtils.getQuotedName(tableName));
@@ -119,7 +122,8 @@ public class PgConstraint {
         final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("ALTER TABLE ");
         sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
-        sbSQL.append("\n\tDROP CONSTRAINT ");
+        sbSQL.append(System.getProperty("line.separator"));
+        sbSQL.append("\tDROP CONSTRAINT ");
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(';');
 
