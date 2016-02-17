@@ -9,6 +9,8 @@ import cz.startnet.utils.pgdiff.PgDiffUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Stores trigger information.
@@ -16,6 +18,31 @@ import java.util.List;
  * @author fordfrog
  */
 public class PgTrigger {
+
+    /**
+     * Enumeration of when, with respect to event, a trigger should fire.
+     * e.g. BEFORE, AFTER or INSTEAD OF an event.
+     */
+    public enum EventTimeQualification {
+        before,
+        after,
+        instead_of;
+
+        private static final Map<EventTimeQualification, String> stringRepresentation;
+
+        static {
+            HashMap<EventTimeQualification, String> aMap = new HashMap<EventTimeQualification, String>();
+            aMap.put(EventTimeQualification.before, "BEFORE");
+            aMap.put(EventTimeQualification.after, "AFTER");
+            aMap.put(EventTimeQualification.instead_of, "INSTEAD OF");
+
+            stringRepresentation = Collections.unmodifiableMap(aMap);
+        }
+
+        public static String toString(EventTimeQualification eventTimeQualification) {
+            return stringRepresentation.get(eventTimeQualification);
+        }
+    }
 
     /**
      * Function name and arguments that should be fired on the trigger.
@@ -26,14 +53,14 @@ public class PgTrigger {
      */
     private String name;
     /**
-     * Name of the table the trigger is defined on.
+     * Name of the relation the trigger is defined on.
      */
-    private String tableName;
+    private String relationName;
     /**
-     * Whether the trigger should be fired BEFORE or AFTER action. Default is
-     * before.
+     * Whether the trigger should be fired BEFORE, AFTER or INSTEAD OF an event.
+     * Default is before.
      */
-    private boolean before = true;
+    private EventTimeQualification eventTimeQualification = EventTimeQualification.before;
     /**
      * Whether the trigger should be fired FOR EACH ROW or FOR EACH STATEMENT.
      * Default is FOR EACH STATEMENT.
@@ -70,21 +97,21 @@ public class PgTrigger {
     private String comment;
 
     /**
-     * Setter for {@link #before}.
+     * Setter for {@link #eventTimeQualification}.
      *
-     * @param before {@link #before}
+     * @param eventTimeQualification {@link #eventTimeQualification}
      */
-    public void setBefore(final boolean before) {
-        this.before = before;
+    public void setEventTimeQualification(final EventTimeQualification eventTimeQualification) {
+        this.eventTimeQualification = eventTimeQualification;
     }
 
     /**
-     * Getter for {@link #before}.
+     * Getter for {@link #eventTimeQualification}.
      *
-     * @return {@link #before}
+     * @return {@link #eventTimeQualification}
      */
-    public boolean isBefore() {
-        return before;
+    public EventTimeQualification getEventTimeQualification() {
+        return eventTimeQualification;
     }
 
     /**
@@ -115,7 +142,7 @@ public class PgTrigger {
         sbSQL.append("CREATE TRIGGER ");
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append("\n\t");
-        sbSQL.append(isBefore() ? "BEFORE" : "AFTER");
+        sbSQL.append(EventTimeQualification.toString(getEventTimeQualification()));
 
         boolean firstEvent = true;
 
@@ -168,7 +195,7 @@ public class PgTrigger {
         }
 
         sbSQL.append(" ON ");
-        sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
+        sbSQL.append(PgDiffUtils.getQuotedName(getRelationName()));
         sbSQL.append("\n\tFOR EACH ");
         sbSQL.append(isForEachRow() ? "ROW" : "STATEMENT");
 
@@ -186,7 +213,7 @@ public class PgTrigger {
             sbSQL.append("\n\nCOMMENT ON TRIGGER ");
             sbSQL.append(PgDiffUtils.getQuotedName(name));
             sbSQL.append(" ON ");
-            sbSQL.append(PgDiffUtils.getQuotedName(tableName));
+            sbSQL.append(PgDiffUtils.getQuotedName(relationName));
             sbSQL.append(" IS ");
             sbSQL.append(comment);
             sbSQL.append(';');
@@ -202,7 +229,7 @@ public class PgTrigger {
      */
     public String getDropSQL() {
         return "DROP TRIGGER " + PgDiffUtils.getQuotedName(getName()) + " ON "
-                + PgDiffUtils.getQuotedName(getTableName()) + ";";
+                + PgDiffUtils.getQuotedName(getRelationName()) + ";";
     }
 
     /**
@@ -332,21 +359,21 @@ public class PgTrigger {
     }
 
     /**
-     * Setter for {@link #tableName}.
+     * Setter for {@link #relationName}.
      *
-     * @param tableName {@link #tableName}
+     * @param relationName {@link #relationName}
      */
-    public void setTableName(final String tableName) {
-        this.tableName = tableName;
+    public void setRelationName(final String relationName) {
+        this.relationName = relationName;
     }
 
     /**
-     * Getter for {@link #tableName}.
+     * Getter for {@link #relationName}.
      *
-     * @return {@link #tableName}
+     * @return {@link #relationName}
      */
-    public String getTableName() {
-        return tableName;
+    public String getRelationName() {
+        return relationName;
     }
 
     /**
@@ -393,7 +420,7 @@ public class PgTrigger {
             equals = true;
         } else if (object instanceof PgTrigger) {
             final PgTrigger trigger = (PgTrigger) object;
-            equals = (before == trigger.isBefore())
+            equals = (eventTimeQualification == trigger.getEventTimeQualification())
                     && (forEachRow == trigger.isForEachRow())
                     && function.equals(trigger.getFunction())
                     && name.equals(trigger.getName())
@@ -401,7 +428,7 @@ public class PgTrigger {
                     && (onInsert == trigger.isOnInsert())
                     && (onUpdate == trigger.isOnUpdate())
                     && (onTruncate == trigger.isOnTruncate())
-                    && tableName.equals(trigger.getTableName());
+                    && relationName.equals(trigger.getRelationName());
 
             if (equals) {
                 final List<String> sorted1 =
@@ -420,8 +447,8 @@ public class PgTrigger {
 
     @Override
     public int hashCode() {
-        return (getClass().getName() + "|" + before + "|" + forEachRow + "|"
+        return (getClass().getName() + "|" + eventTimeQualification + "|" + forEachRow + "|"
                 + function + "|" + name + "|" + onDelete + "|" + onInsert + "|"
-                + onUpdate + "|" + onTruncate + "|" + tableName).hashCode();
+                + onUpdate + "|" + onTruncate + "|" + relationName).hashCode();
     }
 }

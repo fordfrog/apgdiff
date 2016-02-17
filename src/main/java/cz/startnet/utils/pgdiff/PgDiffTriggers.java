@@ -5,8 +5,8 @@
  */
 package cz.startnet.utils.pgdiff;
 
+import cz.startnet.utils.pgdiff.schema.PgRelation;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
-import cz.startnet.utils.pgdiff.schema.PgTable;
 import cz.startnet.utils.pgdiff.schema.PgTrigger;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -30,17 +30,17 @@ public class PgDiffTriggers {
     public static void createTriggers(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
             final SearchPathHelper searchPathHelper) {
-        for (final PgTable newTable : newSchema.getTables()) {
-            final PgTable oldTable;
+        for (final PgRelation newRelation : newSchema.getRels()) {
+            final PgRelation oldRelation;
 
             if (oldSchema == null) {
-                oldTable = null;
+                oldRelation = null;
             } else {
-                oldTable = oldSchema.getTable(newTable.getName());
+                oldRelation = oldSchema.getRelation(newRelation.getName());
             }
 
             // Add new triggers
-            for (final PgTrigger trigger : getNewTriggers(oldTable, newTable)) {
+            for (final PgTrigger trigger : getNewTriggers(oldRelation, newRelation)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(trigger.getCreationSQL());
@@ -59,18 +59,18 @@ public class PgDiffTriggers {
     public static void dropTriggers(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
             final SearchPathHelper searchPathHelper) {
-        for (final PgTable newTable : newSchema.getTables()) {
-            final PgTable oldTable;
+        for (final PgRelation newRelation : newSchema.getRels()) {
+            final PgRelation oldRelation;
 
             if (oldSchema == null) {
-                oldTable = null;
+                oldRelation = null;
             } else {
-                oldTable = oldSchema.getTable(newTable.getName());
+                oldRelation = oldSchema.getRelation(newRelation.getName());
             }
 
             // Drop triggers that no more exist or are modified
             for (final PgTrigger trigger :
-                    getDropTriggers(oldTable, newTable)) {
+                    getDropTriggers(oldRelation, newRelation)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(trigger.getDropSQL());
@@ -81,20 +81,20 @@ public class PgDiffTriggers {
     /**
      * Returns list of triggers that should be dropped.
      *
-     * @param oldTable original table
-     * @param newTable new table
+     * @param oldRelation original relation
+     * @param newRelation new relation
      *
      * @return list of triggers that should be dropped
      */
-    private static List<PgTrigger> getDropTriggers(final PgTable oldTable,
-            final PgTable newTable) {
+    private static List<PgTrigger> getDropTriggers(final PgRelation oldRelation,
+            final PgRelation newRelation) {
         @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<PgTrigger> list = new ArrayList<PgTrigger>();
 
-        if (newTable != null && oldTable != null) {
-            final List<PgTrigger> newTriggers = newTable.getTriggers();
+        if (newRelation != null && oldRelation != null) {
+            final List<PgTrigger> newTriggers = newRelation.getTriggers();
 
-            for (final PgTrigger oldTrigger : oldTable.getTriggers()) {
+            for (final PgTrigger oldTrigger : oldRelation.getTriggers()) {
                 if (!newTriggers.contains(oldTrigger)) {
                     list.add(oldTrigger);
                 }
@@ -107,22 +107,22 @@ public class PgDiffTriggers {
     /**
      * Returns list of triggers that should be added.
      *
-     * @param oldTable original table
-     * @param newTable new table
+     * @param oldRelation original relation
+     * @param newRelation new relation
      *
      * @return list of triggers that should be added
      */
-    private static List<PgTrigger> getNewTriggers(final PgTable oldTable,
-            final PgTable newTable) {
+    private static List<PgTrigger> getNewTriggers(final PgRelation oldRelation,
+            final PgRelation newRelation) {
         @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<PgTrigger> list = new ArrayList<PgTrigger>();
 
-        if (newTable != null) {
-            if (oldTable == null) {
-                list.addAll(newTable.getTriggers());
+        if (newRelation != null) {
+            if (oldRelation == null) {
+                list.addAll(newRelation.getTriggers());
             } else {
-                for (final PgTrigger newTrigger : newTable.getTriggers()) {
-                    if (!oldTable.getTriggers().contains(newTrigger)) {
+                for (final PgTrigger newTrigger : newRelation.getTriggers()) {
+                    if (!oldRelation.getTriggers().contains(newTrigger)) {
                         list.add(newTrigger);
                     }
                 }
@@ -147,16 +147,16 @@ public class PgDiffTriggers {
             return;
         }
 
-        for (PgTable oldTable : oldSchema.getTables()) {
-            final PgTable newTable = newSchema.getTable(oldTable.getName());
+        for (PgRelation oldRelation : oldSchema.getRels()) {
+            final PgRelation newRelation = newSchema.getRelation(oldRelation.getName());
 
-            if (newTable == null) {
+            if (newRelation == null) {
                 continue;
             }
 
-            for (final PgTrigger oldTrigger : oldTable.getTriggers()) {
+            for (final PgTrigger oldTrigger : oldRelation.getTriggers()) {
                 final PgTrigger newTrigger =
-                        newTable.getTrigger(oldTrigger.getName());
+                        newRelation.getTrigger(oldTrigger.getName());
 
                 if (newTrigger == null) {
                     continue;
@@ -175,7 +175,7 @@ public class PgDiffTriggers {
                             PgDiffUtils.getQuotedName(newTrigger.getName()));
                     writer.print(" ON ");
                     writer.print(PgDiffUtils.getQuotedName(
-                            newTrigger.getTableName()));
+                            newTrigger.getRelationName()));
                     writer.print(" IS ");
                     writer.print(newTrigger.getComment());
                     writer.println(';');
@@ -188,7 +188,7 @@ public class PgDiffTriggers {
                             PgDiffUtils.getQuotedName(newTrigger.getName()));
                     writer.print(" ON ");
                     writer.print(PgDiffUtils.getQuotedName(
-                            newTrigger.getTableName()));
+                            newTrigger.getRelationName()));
                     writer.println(" IS NULL;");
                 }
             }
