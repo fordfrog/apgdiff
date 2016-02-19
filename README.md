@@ -16,6 +16,7 @@ fordfrog@fordfrog.com.
 * Better support for inherited tables (Daniel Watson)
 * Added support for CREATE UNLOGGED TABLE (Anatoliy Basov)
 * Added support for /**/ comments (yulei)
+* Support of triggers for views + clause 'INSTEAD OF' (Sergej Bonich)
 
 #### Fixes
 * Added hint to use "CREATE TABLE ... CONSTRAINT name PRIMARY KEY/UNIQUE ..."
@@ -33,6 +34,7 @@ fordfrog@fordfrog.com.
   columns that didn't change. (Marti Raudsepp)
 * Fixed issue with the $ sign in the object name (Anatoliy Basov)
 * Added French translation. (Jeremy Passeron)
+* Native for OS line endings in resulting diff (Sergej Bonich)
 
 ### 2012-09-21: Version 2.4
 
