@@ -293,7 +293,7 @@ public class PgDumpLoader { //NOPMD
                 }
 
                 if (sbStatement.length() > 0) {
-                    sbStatement.append('\n');
+                    sbStatement.append(System.getProperty("line.separator"));
                 }
 
                 pos = sbStatement.length();

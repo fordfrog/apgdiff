@@ -116,7 +116,8 @@ public class PgTable extends PgRelation {
         }
         sbSQL.append("TABLE ");
         sbSQL.append(PgDiffUtils.getQuotedName(name));
-        sbSQL.append(" (\n");
+        sbSQL.append(" (");
+        sbSQL.append(System.getProperty("line.separator"));
 
         boolean first = true;
 
@@ -127,18 +128,21 @@ public class PgTable extends PgRelation {
                 if (first) {
                     first = false;
                 } else {
-                    sbSQL.append(",\n");
+                    sbSQL.append(",");
+                    sbSQL.append(System.getProperty("line.separator"));
                 }
 
                 sbSQL.append("\t");
                 sbSQL.append(column.getFullDefinition(false));
             }
 
-            sbSQL.append("\n)");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append(")");
         }
 
         if (inherits != null && !inherits.isEmpty()) {
-            sbSQL.append("\nINHERITS (");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("INHERITS (");
 
             first = true;
 
@@ -161,7 +165,7 @@ public class PgTable extends PgRelation {
         }
 
         if (with != null && !with.isEmpty()) {
-            sbSQL.append("\n");
+            sbSQL.append(System.getProperty("line.separator"));
 
             if ("OIDS=false".equalsIgnoreCase(with)) {
                 sbSQL.append("WITHOUT OIDS");
@@ -178,7 +182,8 @@ public class PgTable extends PgRelation {
         }
 
         if (tablespace != null && !tablespace.isEmpty()) {
-            sbSQL.append("\nTABLESPACE ");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("TABLESPACE ");
             sbSQL.append(tablespace);
         }
 
@@ -187,9 +192,12 @@ public class PgTable extends PgRelation {
         //Inherited column default override
         for (PgInheritedColumn column : getInheritedColumns()) {
             if(column.getDefaultValue() != null){
-                sbSQL.append("\n\nALTER TABLE ONLY ");
+                sbSQL.append(System.getProperty("line.separator"));
+                sbSQL.append(System.getProperty("line.separator"));
+                sbSQL.append("ALTER TABLE ONLY ");
                 sbSQL.append(PgDiffUtils.getQuotedName(name));
-                sbSQL.append("\n\tALTER COLUMN ");
+                sbSQL.append(System.getProperty("line.separator"));
+                sbSQL.append("\tALTER COLUMN ");
                 sbSQL.append(
                     PgDiffUtils.getQuotedName(column.getInheritedColumn().getName()));
                 sbSQL.append(" SET DEFAULT ");
@@ -199,7 +207,8 @@ public class PgTable extends PgRelation {
         }
 
         for (PgColumn column : getColumnsWithStatistics()) {
-            sbSQL.append("\nALTER TABLE ONLY ");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("ALTER TABLE ONLY ");
             sbSQL.append(PgDiffUtils.getQuotedName(name));
             sbSQL.append(" ALTER COLUMN ");
             sbSQL.append(

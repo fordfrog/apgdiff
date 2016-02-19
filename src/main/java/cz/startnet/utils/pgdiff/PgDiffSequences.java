@@ -120,7 +120,8 @@ public class PgDiffSequences {
 
             if (newIncrement != null
                     && !newIncrement.equals(oldIncrement)) {
-                sbSQL.append("\n\tINCREMENT BY ");
+                sbSQL.append(System.getProperty("line.separator"));
+                sbSQL.append("\tINCREMENT BY ");
                 sbSQL.append(newIncrement);
             }
 
@@ -128,10 +129,12 @@ public class PgDiffSequences {
             final String newMinValue = newSequence.getMinValue();
 
             if (newMinValue == null && oldMinValue != null) {
-                sbSQL.append("\n\tNO MINVALUE");
+                sbSQL.append(System.getProperty("line.separator"));
+                sbSQL.append("\tNO MINVALUE");
             } else if (newMinValue != null
                     && !newMinValue.equals(oldMinValue)) {
-                sbSQL.append("\n\tMINVALUE ");
+                sbSQL.append(System.getProperty("line.separator"));
+                sbSQL.append("\tMINVALUE ");
                 sbSQL.append(newMinValue);
             }
 
@@ -139,10 +142,12 @@ public class PgDiffSequences {
             final String newMaxValue = newSequence.getMaxValue();
 
             if (newMaxValue == null && oldMaxValue != null) {
-                sbSQL.append("\n\tNO MAXVALUE");
+                sbSQL.append(System.getProperty("line.separator"));
+                sbSQL.append("\tNO MAXVALUE");
             } else if (newMaxValue != null
                     && !newMaxValue.equals(oldMaxValue)) {
-                sbSQL.append("\n\tMAXVALUE ");
+                sbSQL.append(System.getProperty("line.separator"));
+                sbSQL.append("\tMAXVALUE ");
                 sbSQL.append(newMaxValue);
             }
 
@@ -151,7 +156,8 @@ public class PgDiffSequences {
                 final String newStart = newSequence.getStartWith();
 
                 if (newStart != null && !newStart.equals(oldStart)) {
-                    sbSQL.append("\n\tRESTART WITH ");
+                    sbSQL.append(System.getProperty("line.separator"));
+                    sbSQL.append("\tRESTART WITH ");
                     sbSQL.append(newStart);
                 }
             }
@@ -160,7 +166,8 @@ public class PgDiffSequences {
             final String newCache = newSequence.getCache();
 
             if (newCache != null && !newCache.equals(oldCache)) {
-                sbSQL.append("\n\tCACHE ");
+                sbSQL.append(System.getProperty("line.separator"));
+                sbSQL.append("\tCACHE ");
                 sbSQL.append(newCache);
             }
 
@@ -168,16 +175,19 @@ public class PgDiffSequences {
             final boolean newCycle = newSequence.isCycle();
 
             if (oldCycle && !newCycle) {
-                sbSQL.append("\n\tNO CYCLE");
+                sbSQL.append(System.getProperty("line.separator"));
+                sbSQL.append("\tNO CYCLE");
             } else if (!oldCycle && newCycle) {
-                sbSQL.append("\n\tCYCLE");
+                sbSQL.append(System.getProperty("line.separator"));
+                sbSQL.append("\tCYCLE");
             }
 
             final String oldOwnedBy = oldSequence.getOwnedBy();
             final String newOwnedBy = newSequence.getOwnedBy();
 
             if (newOwnedBy != null && !newOwnedBy.equals(oldOwnedBy)) {
-                sbSQL.append("\n\tOWNED BY ");
+                sbSQL.append(System.getProperty("line.separator"));
+                sbSQL.append("\tOWNED BY ");
                 sbSQL.append(newOwnedBy);
             }
 

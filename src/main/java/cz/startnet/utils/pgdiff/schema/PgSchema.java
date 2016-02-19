@@ -141,7 +141,9 @@ public class PgSchema {
         sbSQL.append(';');
 
         if (comment != null && !comment.isEmpty()) {
-            sbSQL.append("\n\nCOMMENT ON SCHEMA ");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("COMMENT ON SCHEMA ");
             sbSQL.append(PgDiffUtils.getQuotedName(name));
             sbSQL.append(" IS ");
             sbSQL.append(comment);

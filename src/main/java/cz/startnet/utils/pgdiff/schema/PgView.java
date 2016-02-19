@@ -116,7 +116,9 @@ public class PgView extends PgRelation {
             sbSQL.append(')');
         }
 
-        sbSQL.append(" AS\n\t");
+        sbSQL.append(" AS");
+        sbSQL.append(System.getProperty("line.separator"));
+        sbSQL.append("\t");
         sbSQL.append(query);
         sbSQL.append(';');
 
@@ -125,7 +127,9 @@ public class PgView extends PgRelation {
             String defaultValue = col.getDefaultValue();
 
             if (defaultValue != null && !defaultValue.isEmpty()) {
-                sbSQL.append("\n\nALTER ");
+                sbSQL.append(System.getProperty("line.separator"));
+                sbSQL.append(System.getProperty("line.separator"));
+                sbSQL.append("ALTER ");
                 sbSQL.append(getRelationKind());
                 sbSQL.append(' ');
                 sbSQL.append(PgDiffUtils.getQuotedName(name));

@@ -82,7 +82,9 @@ public class PgFunction {
         sbSQL.append(';');
 
         if (comment != null && !comment.isEmpty()) {
-            sbSQL.append("\n\nCOMMENT ON FUNCTION ");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("COMMENT ON FUNCTION ");
             sbSQL.append(PgDiffUtils.getQuotedName(name));
             sbSQL.append('(');
 

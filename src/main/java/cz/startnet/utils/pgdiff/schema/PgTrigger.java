@@ -114,7 +114,8 @@ public class PgTrigger {
         final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("CREATE TRIGGER ");
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
-        sbSQL.append("\n\t");
+        sbSQL.append(System.getProperty("line.separator"));
+        sbSQL.append("\t");
         sbSQL.append(isBefore() ? "BEFORE" : "AFTER");
 
         boolean firstEvent = true;
@@ -169,21 +170,26 @@ public class PgTrigger {
 
         sbSQL.append(" ON ");
         sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
-        sbSQL.append("\n\tFOR EACH ");
+        sbSQL.append(System.getProperty("line.separator"));
+        sbSQL.append("\tFOR EACH ");
         sbSQL.append(isForEachRow() ? "ROW" : "STATEMENT");
 
         if (when != null && !when.isEmpty()) {
-            sbSQL.append("\n\tWHEN (");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("\tWHEN (");
             sbSQL.append(when);
             sbSQL.append(')');
         }
 
-        sbSQL.append("\n\tEXECUTE PROCEDURE ");
+        sbSQL.append(System.getProperty("line.separator"));
+        sbSQL.append("\tEXECUTE PROCEDURE ");
         sbSQL.append(getFunction());
         sbSQL.append(';');
 
         if (comment != null && !comment.isEmpty()) {
-            sbSQL.append("\n\nCOMMENT ON TRIGGER ");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("COMMENT ON TRIGGER ");
             sbSQL.append(PgDiffUtils.getQuotedName(name));
             sbSQL.append(" ON ");
             sbSQL.append(PgDiffUtils.getQuotedName(tableName));
