@@ -5,7 +5,7 @@
 -- Dumped from database version 9.5.1
 -- Dumped by pg_dump version 9.5.1
 
--- Started on 2016-03-28 20:49:16 KRAT
+-- Started on 2016-03-28 20:51:36 KRAT
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -114,9 +114,22 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 REVOKE ALL ON TABLE table1 FROM PUBLIC;
 REVOKE ALL ON TABLE table1 FROM dv;
 GRANT ALL ON TABLE table1 TO dv;
+GRANT SELECT,UPDATE ON TABLE table1 TO PUBLIC;
 
 
--- Completed on 2016-03-28 20:49:16 KRAT
+--
+-- TOC entry 2147 (class 0 OID 0)
+-- Dependencies: 181
+-- Name: table1_id_seq; Type: ACL; Schema: public; Owner: dv
+--
+
+REVOKE ALL ON SEQUENCE table1_id_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE table1_id_seq FROM dv;
+GRANT ALL ON SEQUENCE table1_id_seq TO dv;
+GRANT SELECT,USAGE ON SEQUENCE table1_id_seq TO PUBLIC;
+
+
+-- Completed on 2016-03-28 20:51:36 KRAT
 
 --
 -- PostgreSQL database dump complete

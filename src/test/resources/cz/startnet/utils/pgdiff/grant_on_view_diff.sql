@@ -1,9 +1,3 @@
 
-REVOKE ALL ON SEQUENCE table1_id_seq FROM public;
-GRANT SELECT, USAGE ON SEQUENCE table1_id_seq TO public;
-
-REVOKE ALL ON SEQUENCE table1_id_seq FROM dv;
-GRANT ALL ON SEQUENCE table1_id_seq TO dv;
-
-REVOKE ALL ON TABLE table1 FROM public;
-GRANT SELECT, UPDATE ON TABLE table1 TO public;
+REVOKE ALL ON TABLE view1 FROM public;
+GRANT SELECT, INSERT ON TABLE view1 TO public;

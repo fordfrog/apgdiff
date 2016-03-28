@@ -4,5 +4,7 @@ CREATE TABLE "procedureresult$Operation" (
 	result_id bigint
 );
 
+ALTER TABLE "procedureresult$Operation" OWNER TO fordfrog;
+
 ALTER TABLE "procedureresult$Operation"
 	ADD CONSTRAINT $1 FOREIGN KEY (result_id) REFERENCES testtable(field1) ON UPDATE RESTRICT ON DELETE RESTRICT;

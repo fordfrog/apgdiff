@@ -51,6 +51,16 @@ public abstract class PgRelation {
     String comment;
 
     /**
+     * List of privileges defined on the table.
+     */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    private final List<PgRelationPrivilege> privileges = new ArrayList<PgRelationPrivilege>();
+    /**
+     * Column the table is owner to.
+     */
+    private String ownerTo;
+
+    /**
      * Setter for {@link #clusterIndexName}.
      *
      * @param name {@link #clusterIndexName}
@@ -339,5 +349,43 @@ public abstract class PgRelation {
         }
 
         return false;
+    }
+
+    public List<PgRelationPrivilege> getPrivileges() {
+        return Collections.unmodifiableList(privileges);
+    }
+
+    /**
+     * Getter for {@link #ownerTo}.
+     *
+     * @return {@link #ownerTo}
+     */
+    public String getOwnerTo() {
+        return ownerTo;
+    }
+
+    /**
+     * Setter for {@link #ownerTo}.
+     *
+     * @param ownerTo
+     *            {@link #ownerTo}
+     */
+    public void setOwnerTo(final String ownerTo) {
+        this.ownerTo = ownerTo;
+    }
+
+
+    public void addPrivilege(final PgRelationPrivilege privilege) {
+        privileges.add(privilege);
+    }
+
+
+    public PgRelationPrivilege getPrivilege(final String roleName) {
+        for (PgRelationPrivilege privilege : privileges) {
+            if (privilege.getRoleName().equals(roleName)) {
+                return privilege;
+            }
+        }
+        return null;
     }
 }

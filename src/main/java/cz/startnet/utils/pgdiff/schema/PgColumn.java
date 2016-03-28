@@ -5,17 +5,16 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
+import cz.startnet.utils.pgdiff.PgDiffUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import cz.startnet.utils.pgdiff.PgDiffUtils;
-
 /**
  * Stores column information.
- * 
+ *
  * @author fordfrog
  */
 public class PgColumn {
@@ -23,8 +22,8 @@ public class PgColumn {
     /**
      * Pattern for parsing NULL arguments.
      */
-    private static final Pattern PATTERN_NULL = Pattern.compile(
-            "^(.+)[\\s]+NULL$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PATTERN_NULL =
+            Pattern.compile("^(.+)[\\s]+NULL$", Pattern.CASE_INSENSITIVE);
     /**
      * Pattern for parsing NOT NULL arguments.
      */
@@ -71,9 +70,8 @@ public class PgColumn {
 
     /**
      * Creates a new PgColumn object.
-     * 
-     * @param name
-     *            name of the column
+     *
+     * @param name name of the column
      */
     public PgColumn(final String name) {
         this.name = name;
@@ -81,7 +79,7 @@ public class PgColumn {
 
     /**
      * Getter for {@link #comment}.
-     * 
+     *
      * @return {@link #comment}
      */
     public String getComment() {
@@ -90,9 +88,8 @@ public class PgColumn {
 
     /**
      * Setter for {@link #comment}.
-     * 
-     * @param comment
-     *            {@link #comment}
+     *
+     * @param comment {@link #comment}
      */
     public void setComment(final String comment) {
         this.comment = comment;
@@ -100,9 +97,8 @@ public class PgColumn {
 
     /**
      * Setter for {@link #defaultValue}.
-     * 
-     * @param defaultValue
-     *            {@link #defaultValue}
+     *
+     * @param defaultValue {@link #defaultValue}
      */
     public void setDefaultValue(final String defaultValue) {
         this.defaultValue = defaultValue;
@@ -110,7 +106,7 @@ public class PgColumn {
 
     /**
      * Getter for {@link #defaultValue}.
-     * 
+     *
      * @return {@link #defaultValue}
      */
     public String getDefaultValue() {
@@ -119,11 +115,10 @@ public class PgColumn {
 
     /**
      * Returns full definition of the column.
-     * 
-     * @param addDefaults
-     *            whether default value should be added in case NOT NULL
-     *            constraint is specified but no default value is set
-     * 
+     *
+     * @param addDefaults whether default value should be added in case NOT NULL
+     *                    constraint is specified but no default value is set
+     *
      * @return full definition of the column
      */
     public String getFullDefinition(final boolean addDefaults) {
@@ -153,9 +148,8 @@ public class PgColumn {
 
     /**
      * Setter for {@link #name}.
-     * 
-     * @param name
-     *            {@link #name}
+     *
+     * @param name {@link #name}
      */
     public void setName(final String name) {
         this.name = name;
@@ -163,7 +157,7 @@ public class PgColumn {
 
     /**
      * Getter for {@link #name}.
-     * 
+     *
      * @return {@link #name}
      */
     public String getName() {
@@ -172,9 +166,8 @@ public class PgColumn {
 
     /**
      * Setter for {@link #nullValue}.
-     * 
-     * @param nullValue
-     *            {@link #nullValue}
+     *
+     * @param nullValue {@link #nullValue}
      */
     public void setNullValue(final boolean nullValue) {
         this.nullValue = nullValue;
@@ -182,7 +175,7 @@ public class PgColumn {
 
     /**
      * Getter for {@link #nullValue}.
-     * 
+     *
      * @return {@link #nullValue}
      */
     public boolean getNullValue() {
@@ -191,9 +184,8 @@ public class PgColumn {
 
     /**
      * Setter for {@link #statistics}.
-     * 
-     * @param statistics
-     *            {@link #statistics}
+     *
+     * @param statistics {@link #statistics}
      */
     public void setStatistics(final Integer statistics) {
         this.statistics = statistics;
@@ -201,7 +193,7 @@ public class PgColumn {
 
     /**
      * Getter for {@link #statistics}.
-     * 
+     *
      * @return {@link #statistics}
      */
     public Integer getStatistics() {
@@ -210,7 +202,7 @@ public class PgColumn {
 
     /**
      * Getter for {@link #storage}.
-     * 
+     *
      * @return {@link #storage}
      */
     public String getStorage() {
@@ -219,9 +211,8 @@ public class PgColumn {
 
     /**
      * Setter for {@link #storage}.
-     * 
-     * @param storage
-     *            {@link #storage}
+     *
+     * @param storage {@link #storage}
      */
     public void setStorage(final String storage) {
         this.storage = storage;
@@ -229,9 +220,8 @@ public class PgColumn {
 
     /**
      * Setter for {@link #type}.
-     * 
-     * @param type
-     *            {@link #type}
+     *
+     * @param type {@link #type}
      */
     public void setType(final String type) {
         this.type = type;
@@ -239,7 +229,7 @@ public class PgColumn {
 
     /**
      * Getter for {@link #type}.
-     * 
+     *
      * @return {@link #type}
      */
     public String getType() {
@@ -265,9 +255,8 @@ public class PgColumn {
 
     /**
      * Parses definition of the column
-     * 
-     * @param definition
-     *            definition of the column
+     *
+     * @param definition definition of the column
      */
     public void parseDefinition(final String definition) {
         String string = definition;

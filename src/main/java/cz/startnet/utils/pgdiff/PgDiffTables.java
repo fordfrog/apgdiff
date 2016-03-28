@@ -11,7 +11,7 @@ import cz.startnet.utils.pgdiff.schema.PgColumnUtils;
 import cz.startnet.utils.pgdiff.schema.PgInheritedColumn;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
-import cz.startnet.utils.pgdiff.schema.PgTablePrivilege;
+import cz.startnet.utils.pgdiff.schema.PgRelationPrivilege;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -546,7 +546,7 @@ public class PgDiffTables {
                             + PgDiffUtils.getQuotedName(table.getName())
                             + " OWNER TO " + table.getOwnerTo() + ";");
                 }
-                for (PgTablePrivilege tablePrivilege : table.getPrivileges()) {
+                for (PgRelationPrivilege tablePrivilege : table.getPrivileges()) {
                     writer.println("REVOKE ALL ON TABLE "
                             + PgDiffUtils.getQuotedName(table.getName())
                             + " FROM " + tablePrivilege.getRoleName() + ";");
@@ -792,8 +792,8 @@ public class PgDiffTables {
             final PgTable oldTable, final PgTable newTable,
             final SearchPathHelper searchPathHelper) {
         boolean emptyLinePrinted = false;
-        for (PgTablePrivilege oldTablePrivilege : oldTable.getPrivileges()) {
-            PgTablePrivilege newTablePrivilege = newTable
+        for (PgRelationPrivilege oldTablePrivilege : oldTable.getPrivileges()) {
+            PgRelationPrivilege newTablePrivilege = newTable
                     .getPrivilege(oldTablePrivilege.getRoleName());
             if (newTablePrivilege == null) {
                 if (!emptyLinePrinted) {
@@ -828,8 +828,8 @@ public class PgDiffTables {
                 }
             } // else similar privilege will not be updated
         }
-        for (PgTablePrivilege newTablePrivilege : newTable.getPrivileges()) {
-            PgTablePrivilege oldTablePrivilege = oldTable
+        for (PgRelationPrivilege newTablePrivilege : newTable.getPrivileges()) {
+            PgRelationPrivilege oldTablePrivilege = oldTable
                     .getPrivilege(newTablePrivilege.getRoleName());
             if (oldTablePrivilege == null) {
                 if (!emptyLinePrinted) {

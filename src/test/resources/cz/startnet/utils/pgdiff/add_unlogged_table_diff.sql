@@ -5,3 +5,5 @@ CREATE UNLOGGED TABLE asset_country_weight (
 	country character varying(3) NOT NULL,
 	scaled_weight double precision NOT NULL
 );
+
+ALTER TABLE asset_country_weight OWNER TO asi;

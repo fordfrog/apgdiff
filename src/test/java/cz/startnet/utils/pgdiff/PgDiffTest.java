@@ -231,16 +231,10 @@ public class PgDiffTest {
                     // Tests view triggers (support for 'INSTEAD OF')
                     {"view_triggers", false, false, false, false},
                     // Tests privileges
-                    { "privileges_enhancement89_test1", false, false,
-                            false, false },
-                    { "privileges_enhancement89_test1a", false, false,
-                            false, false },
-                    { "privileges_enhancement89_test2", false, false,
-                            false, false },
-                    { "privileges_enhancement89_test3", false, false,
-                            false, false },
-                    { "privileges_enhancement89_test4", false, false,
-                            false, false },
+                        {"grant_on_table_sequence", false, false, false, false},
+                        {"revoke_on_table_sequence", false, false, false, false},
+                        {"grant_on_view", false, false, false, false},
+                        {"revoke_on_view", false, false, false, false}
                 });
     }
     /**

@@ -110,9 +110,6 @@ public class PgDiff {
             writer.println("START TRANSACTION;");
         }
 
-        hasPrint = false;
-        isDifferent = false;
-
         if (oldDatabase.getComment() == null
                 && newDatabase.getComment() != null
                 || oldDatabase.getComment() != null
@@ -131,10 +128,6 @@ public class PgDiff {
         dropOldSchemas(writer, oldDatabase, newDatabase);
         createNewSchemas(writer, oldDatabase, newDatabase);
         updateSchemas(writer, arguments, oldDatabase, newDatabase);
-
-        if (hasPrint) {
-            isDifferent = true;
-        }
 
         if (arguments.isAddTransaction()) {
             writer.println();

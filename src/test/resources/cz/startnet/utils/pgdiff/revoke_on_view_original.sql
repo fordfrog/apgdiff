@@ -5,7 +5,7 @@
 -- Dumped from database version 9.5.1
 -- Dumped by pg_dump version 9.5.1
 
--- Started on 2016-03-28 21:18:55 KRAT
+-- Started on 2016-03-28 21:21:00 KRAT
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -150,9 +150,10 @@ GRANT ALL ON SEQUENCE table1_id_seq TO dv;
 REVOKE ALL ON TABLE view1 FROM PUBLIC;
 REVOKE ALL ON TABLE view1 FROM dv;
 GRANT ALL ON TABLE view1 TO dv;
+GRANT SELECT,INSERT ON TABLE view1 TO PUBLIC;
 
 
--- Completed on 2016-03-28 21:18:55 KRAT
+-- Completed on 2016-03-28 21:21:00 KRAT
 
 --
 -- PostgreSQL database dump complete

@@ -27,7 +27,7 @@ public class PgColumnPrivilege {
     /**
      * Creates a new PgTablePrivilege object.
      * 
-     * @param name
+     * @param roleName
      *            name of the role
      */
     public PgColumnPrivilege(final String roleName) {
@@ -104,8 +104,8 @@ public class PgColumnPrivilege {
     /**
      * true the privileges are the same (no matter of roleName).
      * 
-     * @param name
-     *            name of the column
+     * @param other
+     *            privileges to compare
      */
     public boolean isSimilar(final PgColumnPrivilege other) {
         if (other == null) {

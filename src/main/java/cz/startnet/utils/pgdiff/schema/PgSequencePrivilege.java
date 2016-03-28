@@ -25,7 +25,7 @@ public class PgSequencePrivilege {
 	/**
 	 * Creates a new PgSequencePrivilege object.
 	 * 
-	 * @param name
+	 * @param roleName
 	 *            name of the role
 	 */
 	public PgSequencePrivilege(final String roleName) {
@@ -88,8 +88,8 @@ public class PgSequencePrivilege {
 	/**
 	 * true the privileges are the same (no matter of roleName).
 	 * 
-	 * @param name
-	 *            name of the column
+	 * @param other
+	 *            privileges to compare
 	 */
 	public boolean isSimilar(final PgSequencePrivilege other) {
 		if (other == null) {

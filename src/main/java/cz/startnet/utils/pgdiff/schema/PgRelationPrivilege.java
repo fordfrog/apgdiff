@@ -156,7 +156,7 @@ public class PgRelationPrivilege {
 	 * @param other
 	 *            privileges to compare
 	 */
-	public boolean isSimilar(final PgTablePrivilege other) {
+	public boolean isSimilar(final PgRelationPrivilege other) {
 		if (other == null) {
 			return false;
 		}

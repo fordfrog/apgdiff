@@ -54,15 +54,6 @@ public class PgTable extends PgRelation {
      * PgSchema
      */
     private final PgSchema schema;
-    /**
-     * List of privileges defined on the table.
-     */
-    @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private final List<PgTablePrivilege> privileges = new ArrayList<PgTablePrivilege>();
-    /**
-     * Column the table is owner to.
-     */
-    private String ownerTo;
 
     /**
      * Creates a new PgTable object.
@@ -73,10 +64,6 @@ public class PgTable extends PgRelation {
         setName(name);
         this.database = database;
         this.schema = schema;
-    }
-
-    public List<PgTablePrivilege> getPrivileges() {
-        return Collections.unmodifiableList(privileges);
     }
 
     /**
@@ -236,16 +223,6 @@ public class PgTable extends PgRelation {
         return sbSQL.toString();
     }
 
-
-    public PgTablePrivilege getPrivilege(final String roleName) {
-        for (PgTablePrivilege privilege : privileges) {
-            if (privilege.getRoleName().equals(roleName)) {
-                return privilege;
-            }
-        }
-        return null;
-    }
-
     /**
      * Setter for {@link #inherits}.
      *
@@ -303,25 +280,6 @@ public class PgTable extends PgRelation {
      */
     public void setTablespace(final String tablespace) {
         this.tablespace = tablespace;
-    }
-
-    /**
-     * Getter for {@link #ownerTo}.
-     *
-     * @return {@link #ownerTo}
-     */
-    public String getOwnerTo() {
-        return ownerTo;
-    }
-
-    /**
-     * Setter for {@link #ownerTo}.
-     *
-     * @param ownerTo
-     *            {@link #ownerTo}
-     */
-    public void setOwnerTo(final String ownerTo) {
-        this.ownerTo = ownerTo;
     }
 
     /**
@@ -397,10 +355,6 @@ public class PgTable extends PgRelation {
             }
         }
         return false;
-    }
-
-    public void addPrivilege(final PgTablePrivilege privilege) {
-        privileges.add(privilege);
     }
 
     /**

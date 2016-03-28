@@ -5,7 +5,7 @@
 -- Dumped from database version 9.5.1
 -- Dumped by pg_dump version 9.5.1
 
--- Started on 2016-03-28 20:51:36 KRAT
+-- Started on 2016-03-28 21:12:09 KRAT
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -24,7 +24,7 @@ CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- TOC entry 2144 (class 0 OID 0)
+-- TOC entry 2146 (class 0 OID 0)
 -- Dependencies: 1
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner:
 --
@@ -68,7 +68,7 @@ CREATE SEQUENCE table1_id_seq
 ALTER TABLE table1_id_seq OWNER TO dv;
 
 --
--- TOC entry 2146 (class 0 OID 0)
+-- TOC entry 2148 (class 0 OID 0)
 -- Dependencies: 181
 -- Name: table1_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dv
 --
@@ -85,6 +85,25 @@ ALTER TABLE ONLY table1 ALTER COLUMN id SET DEFAULT nextval('table1_id_seq'::reg
 
 
 --
+-- TOC entry 2138 (class 0 OID 17707)
+-- Dependencies: 182
+-- Data for Name: table1; Type: TABLE DATA; Schema: public; Owner: dv
+--
+
+COPY table1 (id, msg, date_create) FROM stdin;
+\.
+
+
+--
+-- TOC entry 2150 (class 0 OID 0)
+-- Dependencies: 181
+-- Name: table1_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dv
+--
+
+SELECT pg_catalog.setval('table1_id_seq', 1, false);
+
+
+--
 -- TOC entry 2022 (class 2606 OID 17715)
 -- Name: table1_pkey; Type: CONSTRAINT; Schema: public; Owner: dv
 --
@@ -94,7 +113,7 @@ ALTER TABLE ONLY table1
 
 
 --
--- TOC entry 2143 (class 0 OID 0)
+-- TOC entry 2145 (class 0 OID 0)
 -- Dependencies: 6
 -- Name: public; Type: ACL; Schema: -; Owner: postgres
 --
@@ -106,7 +125,7 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
 --
--- TOC entry 2145 (class 0 OID 0)
+-- TOC entry 2147 (class 0 OID 0)
 -- Dependencies: 182
 -- Name: table1; Type: ACL; Schema: public; Owner: dv
 --
@@ -114,11 +133,10 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 REVOKE ALL ON TABLE table1 FROM PUBLIC;
 REVOKE ALL ON TABLE table1 FROM dv;
 GRANT ALL ON TABLE table1 TO dv;
-GRANT SELECT,UPDATE ON TABLE table1 TO PUBLIC;
 
 
 --
--- TOC entry 2147 (class 0 OID 0)
+-- TOC entry 2149 (class 0 OID 0)
 -- Dependencies: 181
 -- Name: table1_id_seq; Type: ACL; Schema: public; Owner: dv
 --
@@ -126,10 +144,9 @@ GRANT SELECT,UPDATE ON TABLE table1 TO PUBLIC;
 REVOKE ALL ON SEQUENCE table1_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE table1_id_seq FROM dv;
 GRANT ALL ON SEQUENCE table1_id_seq TO dv;
-GRANT SELECT,USAGE ON SEQUENCE table1_id_seq TO PUBLIC;
 
 
--- Completed on 2016-03-28 20:51:36 KRAT
+-- Completed on 2016-03-28 21:12:09 KRAT
 
 --
 -- PostgreSQL database dump complete

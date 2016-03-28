@@ -8,7 +8,7 @@ package cz.startnet.utils.pgdiff;
 import cz.startnet.utils.pgdiff.schema.PgColumn;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgView;
-import cz.startnet.utils.pgdiff.schema.PgViewPrivilege;
+import cz.startnet.utils.pgdiff.schema.PgRelationPrivilege;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ public class PgDiffViews {
                 writer.println();
                 writer.println(newView.getCreationSQL());
 
-                for (PgViewPrivilege viewPrivilege : newView.getPrivileges()) {
+                for (PgRelationPrivilege viewPrivilege : newView.getPrivileges()) {
                     writer.println("REVOKE ALL ON TABLE "
                             + PgDiffUtils.getQuotedName(newView.getName())
                             + " FROM " + viewPrivilege.getRoleName() + ";");
@@ -289,8 +289,8 @@ public class PgDiffViews {
             final PgView oldView, final PgView newView,
             final SearchPathHelper searchPathHelper) {
         boolean emptyLinePrinted = false;
-        for (PgViewPrivilege oldViewPrivilege : oldView.getPrivileges()) {
-            PgViewPrivilege newViewPrivilege = newView
+        for (PgRelationPrivilege oldViewPrivilege : oldView.getPrivileges()) {
+            PgRelationPrivilege newViewPrivilege = newView
                     .getPrivilege(oldViewPrivilege.getRoleName());
             if (newViewPrivilege == null) {
                 if (!emptyLinePrinted) {
@@ -323,8 +323,8 @@ public class PgDiffViews {
                 }
             } // else similar privilege will not be updated
         }
-        for (PgViewPrivilege newViewPrivilege : newView.getPrivileges()) {
-            PgViewPrivilege oldViewPrivilege = oldView
+        for (PgRelationPrivilege newViewPrivilege : newView.getPrivileges()) {
+            PgRelationPrivilege oldViewPrivilege = oldView
                     .getPrivilege(newViewPrivilege.getRoleName());
             if (oldViewPrivilege == null) {
                 if (!emptyLinePrinted) {

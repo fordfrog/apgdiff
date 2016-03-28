@@ -7,7 +7,6 @@ package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,12 +28,6 @@ public class PgView extends PgRelation {
      * SQL query of the view.
      */
     private String query;
-
-    /**
-     * List of privileges defined on the view.
-     */
-    @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private final List<PgViewPrivilege> privileges = new ArrayList<PgViewPrivilege>();
 
     /**
      * Creates a new PgView object.
@@ -83,24 +76,6 @@ public class PgView extends PgRelation {
 
         return list;
     }
-
-    public List<PgViewPrivilege> getPrivileges() {
-        return Collections.unmodifiableList(privileges);
-    }
-
-    public PgViewPrivilege getPrivilege(final String roleName) {
-        for (PgViewPrivilege privilege : privileges) {
-            if (privilege.getRoleName().equals(roleName)) {
-                return privilege;
-            }
-        }
-        return null;
-    }
-
-    public void addPrivilege(final PgViewPrivilege privilege) {
-        privileges.add(privilege);
-    }
-
 
     /**
      * Returns relation kind for CREATE/ALTER/DROP commands.

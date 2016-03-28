@@ -17,6 +17,8 @@ fordfrog@fordfrog.com.
 * Added support for CREATE UNLOGGED TABLE (Anatoliy Basov)
 * Added support for /**/ comments (yulei)
 * Support of triggers for views + clause 'INSTEAD OF' (Sergej Bonich)
+* Add support for GRANT and REVOKE on objects: table, view, sequence, column (serge-pouliquen-itf)
+* Add support for ALTER TABLE ... OWNER TO (serge-pouliquen-itf)
 
 #### Fixes
 * Added hint to use "CREATE TABLE ... CONSTRAINT name PRIMARY KEY/UNIQUE ..."

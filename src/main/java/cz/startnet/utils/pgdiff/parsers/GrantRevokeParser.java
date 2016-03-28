@@ -18,9 +18,8 @@ import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgSequence;
 import cz.startnet.utils.pgdiff.schema.PgSequencePrivilege;
 import cz.startnet.utils.pgdiff.schema.PgTable;
-import cz.startnet.utils.pgdiff.schema.PgTablePrivilege;
+import cz.startnet.utils.pgdiff.schema.PgRelationPrivilege;
 import cz.startnet.utils.pgdiff.schema.PgView;
-import cz.startnet.utils.pgdiff.schema.PgViewPrivilege;
 
 /**
  * Parses GRANT statements.
@@ -198,10 +197,10 @@ public class GrantRevokeParser {
 
                 if (table != null) {
                     for (String roleName : roles) {
-                        PgTablePrivilege tablePrivilege = table
+                        PgRelationPrivilege tablePrivilege = table
                                 .getPrivilege(roleName);
                         if (tablePrivilege == null) {
-                            tablePrivilege = new PgTablePrivilege(roleName);
+                            tablePrivilege = new PgRelationPrivilege(roleName);
                             table.addPrivilege(tablePrivilege);
                         }
                         for (String priv : privileges) {
@@ -211,10 +210,10 @@ public class GrantRevokeParser {
                     }
                 } else if (view != null) {
                     for (String roleName : roles) {
-                        PgViewPrivilege viewPrivilege = view
+                        PgRelationPrivilege viewPrivilege = view
                                 .getPrivilege(roleName);
                         if (viewPrivilege == null) {
-                            viewPrivilege = new PgViewPrivilege(roleName);
+                            viewPrivilege = new PgRelationPrivilege(roleName);
                             view.addPrivilege(viewPrivilege);
                         }
                         for (String priv : privileges) {
