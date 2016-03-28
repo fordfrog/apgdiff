@@ -6,10 +6,12 @@
 package cz.startnet.utils.pgdiff;
 
 import cz.startnet.utils.pgdiff.schema.PgColumn;
+import cz.startnet.utils.pgdiff.schema.PgColumnPrivilege;
 import cz.startnet.utils.pgdiff.schema.PgColumnUtils;
 import cz.startnet.utils.pgdiff.schema.PgInheritedColumn;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
+import cz.startnet.utils.pgdiff.schema.PgTablePrivilege;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -137,6 +139,9 @@ public class PgDiffTables {
             addAlterStatistics(writer, oldTable, newTable, searchPathHelper);
             addAlterStorage(writer, oldTable, newTable, searchPathHelper);
             alterComments(writer, oldTable, newTable, searchPathHelper);
+            alterOwnerTo(writer, oldTable, newTable, searchPathHelper);
+            alterPrivileges(writer, oldTable, newTable, searchPathHelper);
+            alterPrivilegesColumns(writer, oldTable, newTable, searchPathHelper);
         }
     }
 
@@ -415,7 +420,7 @@ public class PgDiffTables {
             }
         }
     }
-    
+
     /**
      * Outputs statements for defaults of tables who's column belongs to
      * an inherited table.
@@ -436,7 +441,7 @@ public class PgDiffTables {
             final PgInheritedColumn oldColumn = oldTable.getInheritedColumn(newColumn.getInheritedColumn().getName());
             final String newColumnName =
                     PgDiffUtils.getQuotedName(newColumn.getInheritedColumn().getName());
-            
+
             final String oldDefault = (oldColumn.getDefaultValue() == null) ? ""
                     : oldColumn.getDefaultValue();
             final String newDefault = (newColumn.getDefaultValue() == null) ? ""
@@ -535,6 +540,33 @@ public class PgDiffTables {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(table.getCreationSQL(newSchema));
+                writer.println();
+                if (table.getOwnerTo() != null) {
+                    writer.println("ALTER TABLE "
+                            + PgDiffUtils.getQuotedName(table.getName())
+                            + " OWNER TO " + table.getOwnerTo() + ";");
+                }
+                for (PgTablePrivilege tablePrivilege : table.getPrivileges()) {
+                    writer.println("REVOKE ALL ON TABLE "
+                            + PgDiffUtils.getQuotedName(table.getName())
+                            + " FROM " + tablePrivilege.getRoleName() + ";");
+                    if (!"".equals(tablePrivilege.getPrivilegesSQL(true))) {
+                        writer.println("GRANT "
+                                + tablePrivilege.getPrivilegesSQL(true)
+                                + " ON TABLE "
+                                + PgDiffUtils.getQuotedName(table.getName())
+                                + " TO " + tablePrivilege.getRoleName()
+                                + " WITH GRANT OPTION;");
+                    }
+                    if (!"".equals(tablePrivilege.getPrivilegesSQL(false))) {
+                        writer.println("GRANT "
+                                + tablePrivilege.getPrivilegesSQL(false)
+                                + " ON TABLE "
+                                + PgDiffUtils.getQuotedName(table.getName())
+                                + " TO " + tablePrivilege.getRoleName() + ";");
+                    }
+                }
+
             }
         }
     }
@@ -614,6 +646,86 @@ public class PgDiffTables {
         }
     }
 
+    private static void alterPrivilegesColumns(final PrintWriter writer,
+            final PgTable oldTable, final PgTable newTable,
+            final SearchPathHelper searchPathHelper) {
+        boolean emptyLinePrinted = false;
+        for (PgColumn newColumn : newTable.getColumns()) {
+            final PgColumn oldColumn = oldTable.getColumn(newColumn.getName());
+
+            if (oldColumn != null) {
+                for (PgColumnPrivilege oldColumnPrivilege : oldColumn
+                        .getPrivileges()) {
+                    PgColumnPrivilege newColumnPrivilege = newColumn
+                            .getPrivilege(oldColumnPrivilege.getRoleName());
+                    if (newColumnPrivilege == null) {
+                        if (!emptyLinePrinted) {
+                            emptyLinePrinted = true;
+                            writer.println();
+                        }
+                        writer.println("REVOKE ALL ("
+                                + PgDiffUtils.getQuotedName(newColumn.getName())
+                                + ") ON TABLE "
+                                + PgDiffUtils.getQuotedName(newTable.getName())
+                                + " FROM " + oldColumnPrivilege.getRoleName()
+                                + ";");
+                    }
+                }
+            }
+            if (newColumn != null) {
+                for (PgColumnPrivilege newColumnPrivilege : newColumn
+                        .getPrivileges()) {
+                    PgColumnPrivilege oldColumnPrivilege = null;
+                    if (oldColumn != null) {
+                        oldColumnPrivilege = oldColumn
+                                .getPrivilege(newColumnPrivilege.getRoleName());
+                    }
+                    if (!newColumnPrivilege.isSimilar(oldColumnPrivilege)) {
+                        if (!emptyLinePrinted) {
+                            emptyLinePrinted = true;
+                            writer.println();
+                        }
+                        writer.println("REVOKE ALL ("
+                                + PgDiffUtils.getQuotedName(newColumn.getName())
+                                + ") ON TABLE "
+                                + PgDiffUtils.getQuotedName(newTable.getName())
+                                + " FROM " + newColumnPrivilege.getRoleName()
+                                + ";");
+                        if (!"".equals(newColumnPrivilege.getPrivilegesSQL(
+                                true,
+                                PgDiffUtils.getQuotedName(newColumn.getName())))) {
+                            writer.println("GRANT "
+                                    + newColumnPrivilege.getPrivilegesSQL(true,
+                                            PgDiffUtils.getQuotedName(newColumn
+                                                    .getName()))
+                                    + " ON TABLE "
+                                    + PgDiffUtils.getQuotedName(newTable
+                                            .getName()) + " TO "
+                                    + newColumnPrivilege.getRoleName()
+                                    + " WITH GRANT OPTION;");
+                        }
+                        if (!"".equals(newColumnPrivilege.getPrivilegesSQL(
+                                false,
+                                PgDiffUtils.getQuotedName(newColumn.getName())))) {
+                            writer.println("GRANT "
+                                    + newColumnPrivilege.getPrivilegesSQL(
+                                            false, PgDiffUtils
+                                                    .getQuotedName(newColumn
+                                                            .getName()))
+                                    + " ON TABLE "
+                                    + PgDiffUtils.getQuotedName(newTable
+                                            .getName()) + " TO "
+                                    + newColumnPrivilege.getRoleName() + ";");
+                        }
+
+                    }
+                }
+            }
+
+        }
+
+    }
+
     /**
      * Outputs statements for tables and columns for which comments have
      * changed.
@@ -673,6 +785,89 @@ public class PgDiffTables {
                 writer.print(PgDiffUtils.getQuotedName(newColumn.getName()));
                 writer.println(" IS NULL;");
             }
+        }
+    }
+
+    private static void alterPrivileges(final PrintWriter writer,
+            final PgTable oldTable, final PgTable newTable,
+            final SearchPathHelper searchPathHelper) {
+        boolean emptyLinePrinted = false;
+        for (PgTablePrivilege oldTablePrivilege : oldTable.getPrivileges()) {
+            PgTablePrivilege newTablePrivilege = newTable
+                    .getPrivilege(oldTablePrivilege.getRoleName());
+            if (newTablePrivilege == null) {
+                if (!emptyLinePrinted) {
+                    emptyLinePrinted = true;
+                    writer.println();
+                }
+                writer.println("REVOKE ALL ON TABLE "
+                        + PgDiffUtils.getQuotedName(oldTable.getName())
+                        + " FROM " + oldTablePrivilege.getRoleName() + ";");
+            } else if (!oldTablePrivilege.isSimilar(newTablePrivilege)) {
+                if (!emptyLinePrinted) {
+                    emptyLinePrinted = true;
+                    writer.println();
+                }
+                writer.println("REVOKE ALL ON TABLE "
+                        + PgDiffUtils.getQuotedName(newTable.getName())
+                        + " FROM " + newTablePrivilege.getRoleName() + ";");
+                if (!"".equals(newTablePrivilege.getPrivilegesSQL(true))) {
+                    writer.println("GRANT "
+                            + newTablePrivilege.getPrivilegesSQL(true)
+                            + " ON TABLE "
+                            + PgDiffUtils.getQuotedName(newTable.getName())
+                            + " TO " + newTablePrivilege.getRoleName()
+                            + " WITH GRANT OPTION;");
+                }
+                if (!"".equals(newTablePrivilege.getPrivilegesSQL(false))) {
+                    writer.println("GRANT "
+                            + newTablePrivilege.getPrivilegesSQL(false)
+                            + " ON TABLE "
+                            + PgDiffUtils.getQuotedName(newTable.getName())
+                            + " TO " + newTablePrivilege.getRoleName() + ";");
+                }
+            } // else similar privilege will not be updated
+        }
+        for (PgTablePrivilege newTablePrivilege : newTable.getPrivileges()) {
+            PgTablePrivilege oldTablePrivilege = oldTable
+                    .getPrivilege(newTablePrivilege.getRoleName());
+            if (oldTablePrivilege == null) {
+                if (!emptyLinePrinted) {
+                    writer.println();
+                }
+                writer.println("REVOKE ALL ON TABLE "
+                        + PgDiffUtils.getQuotedName(newTable.getName())
+                        + " FROM " + newTablePrivilege.getRoleName() + ";");
+                if (!"".equals(newTablePrivilege.getPrivilegesSQL(true))) {
+                    writer.println("GRANT "
+                            + newTablePrivilege.getPrivilegesSQL(true)
+                            + " ON TABLE "
+                            + PgDiffUtils.getQuotedName(newTable.getName())
+                            + " TO " + newTablePrivilege.getRoleName()
+                            + " WITH GRANT OPTION;");
+                }
+                if (!"".equals(newTablePrivilege.getPrivilegesSQL(false))) {
+                    writer.println("GRANT "
+                            + newTablePrivilege.getPrivilegesSQL(false)
+                            + " ON TABLE "
+                            + PgDiffUtils.getQuotedName(newTable.getName())
+                            + " TO " + newTablePrivilege.getRoleName() + ";");
+                }
+            }
+        }
+    }
+
+    private static void alterOwnerTo(final PrintWriter writer,
+            final PgTable oldTable, final PgTable newTable,
+            final SearchPathHelper searchPathHelper) {
+        final String oldOwnerTo = oldTable.getOwnerTo();
+        final String newOwnerTo = newTable.getOwnerTo();
+
+        if (newOwnerTo != null && !newOwnerTo.equals(oldOwnerTo)) {
+            writer.println();
+            writer.println("ALTER TABLE "
+                    + PgDiffUtils.getQuotedName(newTable.getName())
+                    + " OWNER TO " + newTable.getOwnerTo() + ";");
         }
     }
 

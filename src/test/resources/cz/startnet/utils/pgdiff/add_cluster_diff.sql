@@ -11,6 +11,8 @@ CREATE TABLE testtable2 (
 	col1 boolean NOT NULL
 );
 
+ALTER TABLE testtable2 OWNER TO fordfrog;
+
 ALTER SEQUENCE testtable2_id_seq
 	OWNED BY testtable2.id;
 

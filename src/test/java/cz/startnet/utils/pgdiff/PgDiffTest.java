@@ -229,7 +229,18 @@ public class PgDiffTest {
                     {"add_table_issue115", false, false, false, false},
                     {"add_column_issue134", false, false, false, false},
                     // Tests view triggers (support for 'INSTEAD OF')
-                    {"view_triggers", false, false, false, false}
+                    {"view_triggers", false, false, false, false},
+                    // Tests privileges
+                    { "privileges_enhancement89_test1", false, false,
+                            false, false },
+                    { "privileges_enhancement89_test1a", false, false,
+                            false, false },
+                    { "privileges_enhancement89_test2", false, false,
+                            false, false },
+                    { "privileges_enhancement89_test3", false, false,
+                            false, false },
+                    { "privileges_enhancement89_test4", false, false,
+                            false, false },
                 });
     }
     /**

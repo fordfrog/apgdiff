@@ -16,6 +16,7 @@ import cz.startnet.utils.pgdiff.parsers.CreateSequenceParser;
 import cz.startnet.utils.pgdiff.parsers.CreateTableParser;
 import cz.startnet.utils.pgdiff.parsers.CreateTriggerParser;
 import cz.startnet.utils.pgdiff.parsers.CreateViewParser;
+import cz.startnet.utils.pgdiff.parsers.GrantRevokeParser;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -132,6 +133,16 @@ public class PgDumpLoader { //NOPMD
             "^COMMENT[\\s]+ON[\\s]+.*$",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /**
+     * Pattern for testing whether it is GRANT statement.
+     */
+    private static final Pattern PATTERN_GRANT = Pattern.compile(
+            "^GRANT[\\s]+.*$", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    /**
+     * Pattern for testing whether it is REVOKE statement.
+     */
+    private static final Pattern PATTERN_REVOKE = Pattern.compile(
+            "^REVOKE[\\s]+.*$", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    /**
      * Pattern for testing a dollar quoting tag.
      */
     private static final Pattern PATTERN_DOLLAR_TAG= Pattern.compile(
@@ -207,6 +218,12 @@ public class PgDumpLoader { //NOPMD
                     || PATTERN_INSERT_INTO.matcher(statement).matches()
                     || PATTERN_UPDATE.matcher(statement).matches()
                     || PATTERN_DELETE_FROM.matcher(statement).matches()) {
+            } else if (PATTERN_GRANT.matcher(statement).matches()) {
+                GrantRevokeParser.parse(database, statement,
+                        outputIgnoredStatements);
+            } else if (PATTERN_REVOKE.matcher(statement).matches()) {
+                GrantRevokeParser.parse(database, statement,
+                        outputIgnoredStatements);
                 // we just ignore these statements
             } else if (outputIgnoredStatements) {
                 database.addIgnoredStatement(statement);
@@ -341,7 +358,7 @@ public class PgDumpLoader { //NOPMD
 
             pos = sbStatement.indexOf("--", pos + 1);
         }
-        
+
         int endPos = sbStatement.indexOf("*/");
         if (endPos >= 0) {
         	int startPos = sbStatement.indexOf("/*");

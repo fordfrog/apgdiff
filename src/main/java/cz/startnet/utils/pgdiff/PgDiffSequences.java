@@ -7,6 +7,8 @@ package cz.startnet.utils.pgdiff;
 
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgSequence;
+import cz.startnet.utils.pgdiff.schema.PgSequencePrivilege;
+
 import java.io.PrintWriter;
 
 /**
@@ -34,6 +36,30 @@ public class PgDiffSequences {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(sequence.getCreationSQL());
+
+                for (PgSequencePrivilege sequencePrivilege : sequence
+                        .getPrivileges()) {
+                    writer.println("REVOKE ALL ON TABLE "
+                            + PgDiffUtils.getQuotedName(sequence.getName())
+                            + " FROM " + sequencePrivilege.getRoleName() + ";");
+                    if (!"".equals(sequencePrivilege.getPrivilegesSQL(true))) {
+                        writer.println("GRANT "
+                                + sequencePrivilege.getPrivilegesSQL(true)
+                                + " ON TABLE "
+                                + PgDiffUtils.getQuotedName(sequence.getName())
+                                + " TO " + sequencePrivilege.getRoleName()
+                                + " WITH GRANT OPTION;");
+                    }
+                    if (!"".equals(sequencePrivilege.getPrivilegesSQL(false))) {
+                        writer.println("GRANT "
+                                + sequencePrivilege.getPrivilegesSQL(false)
+                                + " ON TABLE "
+                                + PgDiffUtils.getQuotedName(sequence.getName())
+                                + " TO " + sequencePrivilege.getRoleName()
+                                + ";");
+                    }
+                }
+
             }
         }
     }
@@ -220,6 +246,77 @@ public class PgDiffSequences {
                 writer.print("COMMENT ON SEQUENCE ");
                 writer.print(newSequence.getName());
                 writer.println(" IS NULL;");
+            }
+
+            alterPrivileges(writer, oldSequence, newSequence, searchPathHelper);
+        }
+    }
+
+    private static void alterPrivileges(final PrintWriter writer,
+            final PgSequence oldSequence, final PgSequence newSequence,
+            final SearchPathHelper searchPathHelper) {
+        boolean emptyLinePrinted = false;
+        for (PgSequencePrivilege oldSequencePrivilege : oldSequence
+                .getPrivileges()) {
+            PgSequencePrivilege newSequencePrivilege = newSequence
+                    .getPrivilege(oldSequencePrivilege.getRoleName());
+            if (newSequencePrivilege == null) {
+                if (!emptyLinePrinted) {
+                    writer.println();
+                }
+                writer.println("REVOKE ALL ON SEQUENCE "
+                        + PgDiffUtils.getQuotedName(oldSequence.getName())
+                        + " FROM " + oldSequencePrivilege.getRoleName() + ";");
+            } else if (!oldSequencePrivilege.isSimilar(newSequencePrivilege)) {
+                if (!emptyLinePrinted) {
+                    writer.println();
+                }
+                writer.println("REVOKE ALL ON SEQUENCE "
+                        + PgDiffUtils.getQuotedName(newSequence.getName())
+                        + " FROM " + newSequencePrivilege.getRoleName() + ";");
+                if (!"".equals(newSequencePrivilege.getPrivilegesSQL(true))) {
+                    writer.println("GRANT "
+                            + newSequencePrivilege.getPrivilegesSQL(true)
+                            + " ON SEQUENCE "
+                            + PgDiffUtils.getQuotedName(newSequence.getName())
+                            + " TO " + newSequencePrivilege.getRoleName()
+                            + " WITH GRANT OPTION;");
+                }
+                if (!"".equals(newSequencePrivilege.getPrivilegesSQL(false))) {
+                    writer.println("GRANT "
+                            + newSequencePrivilege.getPrivilegesSQL(false)
+                            + " ON SEQUENCE "
+                            + PgDiffUtils.getQuotedName(newSequence.getName())
+                            + " TO " + newSequencePrivilege.getRoleName() + ";");
+                }
+            } // else similar privilege will not be updated
+        }
+        for (PgSequencePrivilege newSequencePrivilege : newSequence
+                .getPrivileges()) {
+            PgSequencePrivilege oldSequencePrivilege = oldSequence
+                    .getPrivilege(newSequencePrivilege.getRoleName());
+            if (oldSequencePrivilege == null) {
+                if (!emptyLinePrinted) {
+                    writer.println();
+                }
+                writer.println("REVOKE ALL ON SEQUENCE "
+                        + PgDiffUtils.getQuotedName(newSequence.getName())
+                        + " FROM " + newSequencePrivilege.getRoleName() + ";");
+                if (!"".equals(newSequencePrivilege.getPrivilegesSQL(true))) {
+                    writer.println("GRANT "
+                            + newSequencePrivilege.getPrivilegesSQL(true)
+                            + " ON SEQUENCE "
+                            + PgDiffUtils.getQuotedName(newSequence.getName())
+                            + " TO " + newSequencePrivilege.getRoleName()
+                            + " WITH GRANT OPTION;");
+                }
+                if (!"".equals(newSequencePrivilege.getPrivilegesSQL(false))) {
+                    writer.println("GRANT "
+                            + newSequencePrivilege.getPrivilegesSQL(false)
+                            + " ON SEQUENCE "
+                            + PgDiffUtils.getQuotedName(newSequence.getName())
+                            + " TO " + newSequencePrivilege.getRoleName() + ";");
+                }
             }
         }
     }
