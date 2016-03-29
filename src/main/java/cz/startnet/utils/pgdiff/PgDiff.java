@@ -5,30 +5,24 @@
  */
 package cz.startnet.utils.pgdiff;
 
-import java.io.InputStream;
-import java.io.PrintWriter;
-
 import cz.startnet.utils.pgdiff.loader.PgDumpLoader;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
+import java.io.InputStream;
+import java.io.PrintWriter;
 
 /**
  * Creates diff of two database schemas.
- * 
+ *
  * @author fordfrog
  */
 public class PgDiff {
 
-    public static boolean hasPrint = false;
-    public static boolean isDifferent = false;
-
     /**
      * Creates diff on the two database schemas.
-     * 
-     * @param writer
-     *            writer the output should be written to
-     * @param arguments
-     *            object containing arguments settings
+     *
+     * @param writer    writer the output should be written to
+     * @param arguments object containing arguments settings
      */
     public static void createDiff(final PrintWriter writer,
             final PgDiffArguments arguments) {
@@ -46,15 +40,13 @@ public class PgDiff {
 
     /**
      * Creates diff on the two database schemas.
-     * 
-     * @param writer
-     *            writer the output should be written to
-     * @param arguments
-     *            object containing arguments settings
-     * @param oldInputStream
-     *            input stream of file containing dump of the original schema
-     * @param newInputStream
-     *            input stream of file containing dump of the new schema
+     *
+     * @param writer         writer the output should be written to
+     * @param arguments      object containing arguments settings
+     * @param oldInputStream input stream of file containing dump of the
+     *                       original schema
+     * @param newInputStream input stream of file containing dump of the new
+     *                       schema
      */
     public static void createDiff(final PrintWriter writer,
             final PgDiffArguments arguments, final InputStream oldInputStream,
@@ -73,13 +65,10 @@ public class PgDiff {
 
     /**
      * Creates new schemas (not the objects inside the schemas).
-     * 
-     * @param writer
-     *            writer the output should be written to
-     * @param oldDatabase
-     *            original database schema
-     * @param newDatabase
-     *            new database schema
+     *
+     * @param writer      writer the output should be written to
+     * @param oldDatabase original database schema
+     * @param newDatabase new database schema
      */
     private static void createNewSchemas(final PrintWriter writer,
             final PgDatabase oldDatabase, final PgDatabase newDatabase) {
@@ -93,15 +82,11 @@ public class PgDiff {
 
     /**
      * Creates diff from comparison of two database schemas.
-     * 
-     * @param writer
-     *            writer the output should be written to
-     * @param arguments
-     *            object containing arguments settings
-     * @param oldDatabase
-     *            original database schema
-     * @param newDatabase
-     *            new database schema
+     *
+     * @param writer      writer the output should be written to
+     * @param arguments   object containing arguments settings
+     * @param oldDatabase original database schema
+     * @param newDatabase new database schema
      */
     private static void diffDatabaseSchemas(final PrintWriter writer,
             final PgDiffArguments arguments, final PgDatabase oldDatabase,
@@ -138,11 +123,11 @@ public class PgDiff {
             if (!oldDatabase.getIgnoredStatements().isEmpty()) {
                 writer.println();
                 writer.print("/* ");
-                writer.println(Resources
-                        .getString("OriginalDatabaseIgnoredStatements"));
+                writer.println(Resources.getString(
+                        "OriginalDatabaseIgnoredStatements"));
 
-                for (final String statement : oldDatabase
-                        .getIgnoredStatements()) {
+                for (final String statement :
+                        oldDatabase.getIgnoredStatements()) {
                     writer.println();
                     writer.println(statement);
                 }
@@ -153,11 +138,11 @@ public class PgDiff {
             if (!newDatabase.getIgnoredStatements().isEmpty()) {
                 writer.println();
                 writer.print("/* ");
-                writer.println(Resources
-                        .getString("NewDatabaseIgnoredStatements"));
+                writer.println(
+                        Resources.getString("NewDatabaseIgnoredStatements"));
 
-                for (final String statement : newDatabase
-                        .getIgnoredStatements()) {
+                for (final String statement :
+                        newDatabase.getIgnoredStatements()) {
                     writer.println();
                     writer.println(statement);
                 }
@@ -169,13 +154,10 @@ public class PgDiff {
 
     /**
      * Drops old schemas that do not exist anymore.
-     * 
-     * @param writer
-     *            writer the output should be written to
-     * @param oldDatabase
-     *            original database schema
-     * @param newDatabase
-     *            new database schema
+     *
+     * @param writer      writer the output should be written to
+     * @param oldDatabase original database schema
+     * @param newDatabase new database schema
      */
     private static void dropOldSchemas(final PrintWriter writer,
             final PgDatabase oldDatabase, final PgDatabase newDatabase) {
@@ -191,15 +173,11 @@ public class PgDiff {
 
     /**
      * Updates objects in schemas.
-     * 
-     * @param writer
-     *            writer the output should be written to
-     * @param arguments
-     *            object containing arguments settings
-     * @param oldDatabase
-     *            original database schema
-     * @param newDatabase
-     *            new database schema
+     *
+     * @param writer      writer the output should be written to
+     * @param arguments   object containing arguments settings
+     * @param oldDatabase original database schema
+     * @param newDatabase new database schema
      */
     private static void updateSchemas(final PrintWriter writer,
             final PgDiffArguments arguments, final PgDatabase oldDatabase,
@@ -218,8 +196,8 @@ public class PgDiff {
                 searchPathHelper = new SearchPathHelper(null);
             }
 
-            final PgSchema oldSchema = oldDatabase.getSchema(newSchema
-                    .getName());
+            final PgSchema oldSchema =
+                    oldDatabase.getSchema(newSchema.getName());
 
             if (oldSchema != null) {
                 if (oldSchema.getComment() == null
@@ -227,10 +205,11 @@ public class PgDiff {
                         || oldSchema.getComment() != null
                         && newSchema.getComment() != null
                         && !oldSchema.getComment().equals(
-                                newSchema.getComment())) {
+                        newSchema.getComment())) {
                     writer.println();
                     writer.print("COMMENT ON SCHEMA ");
-                    writer.print(PgDiffUtils.getQuotedName(newSchema.getName()));
+                    writer.print(
+                            PgDiffUtils.getQuotedName(newSchema.getName()));
                     writer.print(" IS ");
                     writer.print(newSchema.getComment());
                     writer.println(';');
@@ -238,65 +217,69 @@ public class PgDiff {
                         && newSchema.getComment() == null) {
                     writer.println();
                     writer.print("COMMENT ON SCHEMA ");
-                    writer.print(PgDiffUtils.getQuotedName(newSchema.getName()));
+                    writer.print(
+                            PgDiffUtils.getQuotedName(newSchema.getName()));
                     writer.println(" IS NULL;");
                 }
             }
 
-            PgDiffTriggers.dropTriggers(writer, oldSchema, newSchema,
-                    searchPathHelper);
-            PgDiffFunctions.dropFunctions(writer, arguments, oldSchema,
-                    newSchema, searchPathHelper);
-            PgDiffViews.dropViews(writer, oldSchema, newSchema,
-                    searchPathHelper);
-            PgDiffConstraints.dropConstraints(writer, oldSchema, newSchema,
-                    true, searchPathHelper);
-            PgDiffConstraints.dropConstraints(writer, oldSchema, newSchema,
-                    false, searchPathHelper);
-            PgDiffIndexes.dropIndexes(writer, oldSchema, newSchema,
-                    searchPathHelper);
-            PgDiffTables.dropClusters(writer, oldSchema, newSchema,
-                    searchPathHelper);
-            PgDiffTables.dropTables(writer, oldSchema, newSchema,
-                    searchPathHelper);
-            PgDiffSequences.dropSequences(writer, oldSchema, newSchema,
-                    searchPathHelper);
+            PgDiffTriggers.dropTriggers(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffFunctions.dropFunctions(
+                    writer, arguments, oldSchema, newSchema, searchPathHelper);
+            PgDiffViews.dropViews(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffConstraints.dropConstraints(
+                    writer, oldSchema, newSchema, true, searchPathHelper);
+            PgDiffConstraints.dropConstraints(
+                    writer, oldSchema, newSchema, false, searchPathHelper);
+            PgDiffIndexes.dropIndexes(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffTables.dropClusters(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffTables.dropTables(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffSequences.dropSequences(
+                    writer, oldSchema, newSchema, searchPathHelper);
 
-            PgDiffSequences.createSequences(writer, oldSchema, newSchema,
-                    searchPathHelper);
-            PgDiffSequences.alterSequences(writer, arguments, oldSchema,
-                    newSchema, searchPathHelper);
-            PgDiffTables.createTables(writer, oldSchema, newSchema,
-                    searchPathHelper);
-            PgDiffTables.alterTables(writer, arguments, oldSchema, newSchema,
-                    searchPathHelper);
-            PgDiffSequences.alterCreatedSequences(writer, oldSchema, newSchema,
-                    searchPathHelper);
-            PgDiffFunctions.createFunctions(writer, arguments, oldSchema,
-                    newSchema, searchPathHelper);
-            PgDiffConstraints.createConstraints(writer, oldSchema, newSchema,
-                    true, searchPathHelper);
-            PgDiffConstraints.createConstraints(writer, oldSchema, newSchema,
-                    false, searchPathHelper);
-            PgDiffIndexes.createIndexes(writer, oldSchema, newSchema,
-                    searchPathHelper);
-            PgDiffTables.createClusters(writer, oldSchema, newSchema,
-                    searchPathHelper);
-            PgDiffTriggers.createTriggers(writer, oldSchema, newSchema,
-                    searchPathHelper);
-            PgDiffViews.createViews(writer, oldSchema, newSchema,
-                    searchPathHelper);
-            PgDiffViews.alterViews(writer, oldSchema, newSchema,
-                    searchPathHelper);
+            PgDiffSequences.createSequences(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffSequences.alterSequences(
+                    writer, arguments, oldSchema, newSchema, searchPathHelper);
+            PgDiffTypes.alterTypes(writer, arguments, oldSchema, newSchema, searchPathHelper);
+            PgDiffTypes.createTypes(writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffTypes.dropTypes(writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffTables.createTables(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffTables.alterTables(
+                    writer, arguments, oldSchema, newSchema, searchPathHelper);
+            PgDiffSequences.alterCreatedSequences(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffFunctions.createFunctions(
+                    writer, arguments, oldSchema, newSchema, searchPathHelper);
+            PgDiffConstraints.createConstraints(
+                    writer, oldSchema, newSchema, true, searchPathHelper);
+            PgDiffConstraints.createConstraints(
+                    writer, oldSchema, newSchema, false, searchPathHelper);
+            PgDiffIndexes.createIndexes(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffTables.createClusters(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffTriggers.createTriggers(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffViews.createViews(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffViews.alterViews(
+                    writer, oldSchema, newSchema, searchPathHelper);
 
-            PgDiffFunctions.alterComments(writer, oldSchema, newSchema,
-                    searchPathHelper);
-            PgDiffConstraints.alterComments(writer, oldSchema, newSchema,
-                    searchPathHelper);
-            PgDiffIndexes.alterComments(writer, oldSchema, newSchema,
-                    searchPathHelper);
-            PgDiffTriggers.alterComments(writer, oldSchema, newSchema,
-                    searchPathHelper);
+            PgDiffFunctions.alterComments(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffConstraints.alterComments(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffIndexes.alterComments(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffTriggers.alterComments(
+                    writer, oldSchema, newSchema, searchPathHelper);
         }
     }
 

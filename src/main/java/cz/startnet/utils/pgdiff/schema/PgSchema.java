@@ -33,6 +33,11 @@ public class PgSchema {
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final List<PgRelation> rels = new ArrayList<PgRelation>();
     /**
+     * List of types defined in the schema.
+     */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    private final List<PgType> types = new ArrayList<PgType>();
+    /**
      * List of indexes defined in the schema.
      */
     @SuppressWarnings("CollectionWithoutInitialCapacity")
@@ -399,6 +404,60 @@ public class PgSchema {
      */
     public void addRelation(final PgRelation rel) {
         rels.add(rel);
+    }
+
+    /**
+     * Adds {@code type} to the list of types.
+     *
+     * @param type type
+     */
+    public void addType(final PgType type) {
+        types.add(type);
+    }
+
+    /**
+     * Returns a list of types
+     *
+     * @return types List<PgType>
+     */
+    public List<PgType> getTypes() {
+        return types;
+    }
+
+    /**
+     * Finds type according to specified name {@code name}.
+     *
+     * @param name name of the type to be searched
+     *
+     * @return found type or null if no such table has been found
+     */
+    public PgType getType(final String name) {
+        for (PgType type : types) {
+            if (type.getName().equals(name)) {
+                return type;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns true if schema contains type with given {@code name}, otherwise
+     * false.
+     *
+     * @param name name of the table
+     *
+     * @return true if schema contains table with given {@code name}, otherwise
+     * false.
+     */
+    public boolean containsType(final String name) {
+        for (PgType type : types) {
+            if (type.getName().equals(name)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

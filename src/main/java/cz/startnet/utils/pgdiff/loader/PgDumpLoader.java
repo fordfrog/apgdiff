@@ -10,6 +10,7 @@ import cz.startnet.utils.pgdiff.parsers.AlterSequenceParser;
 import cz.startnet.utils.pgdiff.parsers.AlterRelationParser;
 import cz.startnet.utils.pgdiff.parsers.CommentParser;
 import cz.startnet.utils.pgdiff.parsers.CreateFunctionParser;
+import cz.startnet.utils.pgdiff.parsers.CreateTypeParser;
 import cz.startnet.utils.pgdiff.parsers.CreateIndexParser;
 import cz.startnet.utils.pgdiff.parsers.CreateSchemaParser;
 import cz.startnet.utils.pgdiff.parsers.CreateSequenceParser;
@@ -133,6 +134,12 @@ public class PgDumpLoader { //NOPMD
             "^COMMENT[\\s]+ON[\\s]+.*$",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /**
+     * Pattern for testing whether it is CREATE TYPE statement.
+     */
+    private static final Pattern PATTERN_CREATE_TYPE = Pattern.compile(
+            "^CREATE[\\s]+TYPE[\\s]+.*$",
+            Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    /**
      * Pattern for testing whether it is GRANT statement.
      */
     private static final Pattern PATTERN_GRANT = Pattern.compile(
@@ -211,6 +218,8 @@ public class PgDumpLoader { //NOPMD
                         database, statement, ignoreSlonyTriggers);
             } else if (PATTERN_CREATE_FUNCTION.matcher(statement).matches()) {
                 CreateFunctionParser.parse(database, statement);
+            } else if (PATTERN_CREATE_TYPE.matcher(statement).matches()) {
+                CreateTypeParser.parse(database, statement);
             } else if (PATTERN_COMMENT.matcher(statement).matches()) {
                 CommentParser.parse(
                         database, statement, outputIgnoredStatements);
@@ -358,7 +367,7 @@ public class PgDumpLoader { //NOPMD
 
             pos = sbStatement.indexOf("--", pos + 1);
         }
-        
+
         int endPos = sbStatement.indexOf("*/");
         if (endPos >= 0) {
         	int startPos = sbStatement.indexOf("/*");
