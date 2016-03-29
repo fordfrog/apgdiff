@@ -21,8 +21,8 @@ public class PgType {
      * List of columns defined on the table.
      */
     @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private final List<PgColumn> columns = new ArrayList<>();
-    private final List<String> enumValues = new ArrayList<>();
+    private final List<PgColumn> columns = new ArrayList<PgColumn>();
+    private final List<String> enumValues = new ArrayList<String>();
 
     /**
      * Name of the table.
@@ -187,7 +187,7 @@ public class PgType {
      */
     private List<PgColumn> getColumnsWithStatistics() {
         @SuppressWarnings("CollectionWithoutInitialCapacity")
-        final List<PgColumn> list = new ArrayList<>();
+        final List<PgColumn> list = new ArrayList<PgColumn>();
 
         for (PgColumn column : columns) {
             if (column.getStatistics() != null) {
