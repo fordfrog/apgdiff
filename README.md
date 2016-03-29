@@ -19,6 +19,7 @@ fordfrog@fordfrog.com.
 * Support of triggers for views + clause 'INSTEAD OF' (Sergej Bonich)
 * Add support for GRANT and REVOKE on objects: table, view, sequence, column (serge-pouliquen-itf)
 * Add support for ALTER TABLE ... OWNER TO (serge-pouliquen-itf)
+* Add support for CREATE TYPE (Karol Rybak)
 
 #### Fixes
 * Added hint to use "CREATE TABLE ... CONSTRAINT name PRIMARY KEY/UNIQUE ..."
