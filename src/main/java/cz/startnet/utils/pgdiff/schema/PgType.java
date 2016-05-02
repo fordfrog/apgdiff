@@ -76,10 +76,11 @@ public class PgType {
         sbSQL.append("CREATE TYPE ");
         sbSQL.append(PgDiffUtils.getQuotedName(name));
         if (isEnum) {
-            sbSQL.append(" AS ENUM (\n");
+            sbSQL.append(" AS ENUM (");
         } else {
-            sbSQL.append(" AS (\n");
+            sbSQL.append(" AS (");
         }
+        sbSQL.append(System.getProperty("line.separator"));
 
         boolean first = true;
         if (isEnum) {
@@ -87,12 +88,14 @@ public class PgType {
                 if (first) {
                     first = false;
                 } else {
-                    sbSQL.append(",\n");
+                    sbSQL.append(",");
+                    sbSQL.append(System.getProperty("line.separator"));
                 }
                 sbSQL.append("\t");
                 sbSQL.append(enumValue);
             }
-            sbSQL.append("\n)");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append(")");
         } else {
             if (columns.isEmpty()) {
                 sbSQL.append(')');
@@ -101,21 +104,23 @@ public class PgType {
                     if (first) {
                         first = false;
                     } else {
-                        sbSQL.append(",\n");
+                        sbSQL.append(",");
+                        sbSQL.append(System.getProperty("line.separator"));
                     }
 
                     sbSQL.append("\t");
                     sbSQL.append(column.getFullDefinition(false));
                 }
-                
-                sbSQL.append("\n)");
+                sbSQL.append(System.getProperty("line.separator"));
+                sbSQL.append(")");
             }
         }
 
         sbSQL.append(';');
 
         for (PgColumn column : getColumnsWithStatistics()) {
-            sbSQL.append("\nALTER TABLE ONLY ");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("ALTER TABLE ONLY ");
             sbSQL.append(PgDiffUtils.getQuotedName(name));
             sbSQL.append(" ALTER COLUMN ");
             sbSQL.append(
