@@ -253,8 +253,10 @@ public final class Parser {
             for (; endPos < string.length(); endPos++) {
                 final char chr = string.charAt(endPos);
 
-                if (chr == '\\') {
-                    escape = !escape;
+                if (escape) {
+                    escape = false;
+                } else if (chr == '\\') {
+                     escape = true;
                 } else if (!escape && chr == '\'') {
                     if (endPos + 1 < string.length()
                             && string.charAt(endPos + 1) == '\'') {
@@ -347,9 +349,9 @@ public final class Parser {
         for (; charPos < string.length(); charPos++) {
             final char chr = string.charAt(charPos);
 
-            if (chr == '(' || chr == '[') {
+            if ((chr == '(' || chr == '[') && !singleQuoteOn) {
                 bracesCount++;
-            } else if (chr == ')' || chr == ']') {
+            } else if ((chr == ')' || chr == ']') && !singleQuoteOn) {
                 if (bracesCount == 0) {
                     break;
                 } else {

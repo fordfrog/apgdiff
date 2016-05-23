@@ -101,6 +101,8 @@ public class AlterRelationParser {
             } else if (table != null && parser.expectOptional("DISABLE")) {
                 parseDisable(
                         parser, outputIgnoredStatements, relName, database);
+            } else if (table != null && parser.expectOptional("REPLICA", "IDENTITY")) {
+                parseReplicaIdentity(parser, outputIgnoredStatements, relName, database);
             } else {
                 parser.throwUnsupportedCommand();
             }
@@ -362,6 +364,43 @@ public class AlterRelationParser {
             } else {
                 parser.throwUnsupportedCommand();
             }
+        }
+    }
+
+    /**
+     * Parses REPLICA IDENTITY statements.
+     *
+     * @param parser                  parser
+     * @param outputIgnoredStatements whether ignored statements should be
+     *                                output in the diff
+     * @param tableName               table name as it was specified in the
+     *                                statement
+     * @param database                database information
+     */
+    private static void parseReplicaIdentity(final Parser parser,
+            final boolean outputIgnoredStatements, final String tableName,
+            final PgDatabase database) {
+        if (parser.expectOptional("DEFAULT")) {
+            if (outputIgnoredStatements) {
+                database.addIgnoredStatement("ALTER TABLE " + tableName + " REPLICA IDENTITY DEFAULT;");
+            }
+        } else if (parser.expectOptional("USING", "INDEX")) {
+            if (outputIgnoredStatements) {
+                database.addIgnoredStatement("ALTER TABLE " + tableName
+                        + " REPLICA IDENTITY USING INDEX " + parser.parseIdentifier() + ';');
+            } else {
+                parser.parseIdentifier();
+            }
+        } else if (parser.expectOptional("FULL")) {
+            if (outputIgnoredStatements) {
+                database.addIgnoredStatement("ALTER TABLE " + tableName + " REPLICA IDENTITY FULL;");
+            }
+        } else if (parser.expectOptional("NOTHING")) {
+            if (outputIgnoredStatements) {
+                database.addIgnoredStatement("ALTER TABLE " + tableName + " REPLICA IDENTITY NOTHING;");
+            }
+        } else {
+            parser.throwUnsupportedCommand();
         }
     }
 
