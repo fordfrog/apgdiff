@@ -368,10 +368,10 @@ public class PgDumpLoader { //NOPMD
             pos = sbStatement.indexOf("--", pos + 1);
         }
 
+        int startPos = sbStatement.indexOf("/*");
         int endPos = sbStatement.indexOf("*/");
-        if (endPos >= 0) {
-        	int startPos = sbStatement.indexOf("/*");
-        	sbStatement.replace(startPos, endPos + 2, "");
+        if (endPos >= 0 && startPos >= 0) {
+            sbStatement.replace(startPos, endPos + 2, "");
         }
     }
 
