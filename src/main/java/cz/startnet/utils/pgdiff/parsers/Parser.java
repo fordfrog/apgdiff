@@ -253,8 +253,10 @@ public final class Parser {
             for (; endPos < string.length(); endPos++) {
                 final char chr = string.charAt(endPos);
 
-                if (chr == '\\') {
-                    escape = !escape;
+                if (escape) {
+                    escape = false;
+                } else if (chr == '\\') {
+                     escape = true;
                 } else if (!escape && chr == '\'') {
                     if (endPos + 1 < string.length()
                             && string.charAt(endPos + 1) == '\'') {
