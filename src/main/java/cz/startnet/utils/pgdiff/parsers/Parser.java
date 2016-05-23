@@ -349,9 +349,9 @@ public final class Parser {
         for (; charPos < string.length(); charPos++) {
             final char chr = string.charAt(charPos);
 
-            if (chr == '(' || chr == '[') {
+            if ((chr == '(' || chr == '[') && !singleQuoteOn) {
                 bracesCount++;
-            } else if (chr == ')' || chr == ']') {
+            } else if ((chr == ')' || chr == ']') && !singleQuoteOn) {
                 if (bracesCount == 0) {
                     break;
                 } else {
