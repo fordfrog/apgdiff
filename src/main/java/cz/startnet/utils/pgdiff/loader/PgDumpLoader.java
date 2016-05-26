@@ -369,9 +369,14 @@ public class PgDumpLoader { //NOPMD
         }
 
         int endPos = sbStatement.indexOf("*/");
-        if (endPos >= 0) {
-        	int startPos = sbStatement.indexOf("/*");
-        	sbStatement.replace(startPos, endPos + 2, "");
+        while (endPos >= 0) {
+            if (!isQuoted(sbStatement, endPos)) {
+                int startPos = sbStatement.lastIndexOf("/*", endPos);
+                if (startPos < endPos && !isQuoted(sbStatement, startPos)) {
+                    sbStatement.replace(startPos, endPos + 2, "");
+                }
+            }
+            endPos = sbStatement.indexOf("*/", endPos+2);
         }
     }
 

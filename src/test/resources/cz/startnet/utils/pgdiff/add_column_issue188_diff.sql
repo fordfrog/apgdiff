@@ -1,0 +1,4 @@
+ALTER TABLE test1
+	ADD COLUMN test2 TEXT DEFAULT '*/',
+	ADD COLUMN test TEXT DEFAULT 'this /*is*/ test',
+	ADD COLUMN test3 TEXT DEFAULT '*/';
