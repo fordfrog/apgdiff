@@ -287,7 +287,7 @@ public abstract class PgRelation {
      * @return created SQL statement
      */
     public String getDropSQL() {
-        return "DROP IF NOT EXISTS" + getRelationKind() + " " +
+        return "DROP IF EXISTS" + getRelationKind() + " " +
                 PgDiffUtils.getQuotedName(getName()) + ";";
     }
 
