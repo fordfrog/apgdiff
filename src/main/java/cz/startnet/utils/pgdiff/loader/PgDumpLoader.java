@@ -393,37 +393,48 @@ public class PgDumpLoader { //NOPMD
     private static boolean isQuoted(final StringBuilder sbString,
             final int pos) {
         boolean isQuoted = false;
-
+        boolean insideDoubleQuotes = false;
+        boolean insideSingeQuote = false; // Determine if double quote is inside of a single quote.
+        
         for (int curPos = 0; curPos < pos; curPos++) {
-            if (sbString.charAt(curPos) == '\'') {
-                isQuoted = !isQuoted;
-
-                // if quote was escaped by backslash, it's like double quote
-                if (pos > 0 && sbString.charAt(pos - 1) == '\\') {
+            // Check if the quote is inside of a double quotes
+            if (sbString.charAt(curPos) == '\"' && !insideSingeQuote ){
+                insideDoubleQuotes = !insideDoubleQuotes;
+            }
+            if (sbString.charAt(curPos) == '\'' && !insideDoubleQuotes ){
+                insideSingeQuote = !insideSingeQuote;
+            }
+            if(!insideDoubleQuotes){
+                if (sbString.charAt(curPos) == '\'') {
                     isQuoted = !isQuoted;
+
+                    // if quote was escaped by backslash, it's like double quote
+                    if (pos > 0 && sbString.charAt(pos - 1) == '\\') {
+                        isQuoted = !isQuoted;
+                    }
+                } else if (sbString.charAt(curPos) == '$' && !isQuoted) {
+                    final int endPos = sbString.indexOf("$", curPos + 1);
+
+                    if (endPos == -1) {
+                        return false;
+                    }
+
+                    final String tag = sbString.substring(curPos, endPos + 1);
+
+                    if (!isCorrectTag(tag)) {
+                        return false;
+                    }
+
+                    final int endTagPos = sbString.indexOf(tag, endPos + 1);
+
+                    // if end tag was not found or it was found after the checked
+                    // position, it's quoted
+                    if (endTagPos == -1 || endTagPos > pos) {
+                        return true;
+                    }
+
+                    curPos = endTagPos + tag.length() - 1;
                 }
-            } else if (sbString.charAt(curPos) == '$' && !isQuoted) {
-                final int endPos = sbString.indexOf("$", curPos + 1);
-
-                if (endPos == -1) {
-                    return false;
-                }
-
-                final String tag = sbString.substring(curPos, endPos + 1);
-
-                if (!isCorrectTag(tag)) {
-                    return false;
-                }
-
-                final int endTagPos = sbString.indexOf(tag, endPos + 1);
-
-                // if end tag was not found or it was found after the checked
-                // position, it's quoted
-                if (endTagPos == -1 || endTagPos > pos) {
-                    return true;
-                }
-
-                curPos = endTagPos + tag.length() - 1;
             }
         }
 
