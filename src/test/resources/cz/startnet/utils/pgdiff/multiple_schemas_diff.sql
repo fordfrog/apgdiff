@@ -5,9 +5,9 @@ CREATE SCHEMA testschema2;
 
 SET search_path = public, pg_catalog;
 
-DROP TABLE testtable2;
+DROP TABLE IF EXISTS testtable2;
 
-DROP SEQUENCE testtable2_id_seq;
+DROP SEQUENCE IF EXISTS testtable2_id_seq;
 
 CREATE SEQUENCE testtable3_id_seq
 	START WITH 1

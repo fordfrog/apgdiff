@@ -219,7 +219,7 @@ public class PgSequence {
      * @return created SQL
      */
     public String getDropSQL() {
-        return "DROP SEQUENCE " + PgDiffUtils.getQuotedName(getName()) + ";";
+        return "DROP SEQUENCE IF EXISTS " + PgDiffUtils.getQuotedName(getName()) + ";";
     }
 
     /**

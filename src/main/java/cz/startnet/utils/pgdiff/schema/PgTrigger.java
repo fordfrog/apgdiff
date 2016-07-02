@@ -234,7 +234,7 @@ public class PgTrigger {
      * @return created SQL
      */
     public String getDropSQL() {
-        return "DROP TRIGGER " + PgDiffUtils.getQuotedName(getName()) + " ON "
+        return "DROP TRIGGER IF EXISTS " + PgDiffUtils.getQuotedName(getName()) + " ON "
                 + PgDiffUtils.getQuotedName(getRelationName()) + ";";
     }
 

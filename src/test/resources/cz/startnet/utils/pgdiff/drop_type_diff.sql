@@ -1,4 +1,4 @@
-DROP TABLE t1;
+DROP TABLE IF EXISTS t1;
 
 DROP TYPE bug_status;
 
