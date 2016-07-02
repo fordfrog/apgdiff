@@ -137,7 +137,7 @@ public class PgType {
      * @return created SQL statement
      */
     public String getDropSQL() {
-        return "DROP TYPE " + PgDiffUtils.getQuotedName(getName()) + ";";
+        return "DROP TYPE IF EXISTS " + PgDiffUtils.getQuotedName(getName()) + ";";
     }
 
     /**
