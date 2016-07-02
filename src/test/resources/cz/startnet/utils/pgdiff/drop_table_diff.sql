@@ -1,2 +1,2 @@
 
-DROP TABLE testtable2;
+DROP TABLE IF EXISTS testtable2;
