@@ -1,287 +1,301 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:pom="http://maven.apache.org/POM/4.0.0">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <groupId>cz.startnet</groupId>
-    <artifactId>apgdiff</artifactId>
-    <name>Another PostgreSQL Diff Tool</name>
-    <version>2.5.0-SNAPSHOT</version>
-    <description>Simple PostgreSQL diff tool that is useful for schema upgrades. The tool compares two schema dump files and creates output file that is (after some hand-made modifications) suitable for upgrade of old schema.</description>
+	<repositories>
+		<repository>
+			<id>MavenCentral</id>
+			<name>Maven repository</name>
+			<url>http://repo1.maven.org/maven2</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 
-    <url>http://www.apgdiff.com/</url>
 
-    <issueManagement>
-        <system>GitHub Issue Tracker</system>
-        <url>https://github.com/fordfrog/apgdiff/issues?sort=created&amp;state=open</url>
-    </issueManagement>
+	<groupId>cz.startnet</groupId>
+	<artifactId>apgdiff</artifactId>
+	<name>Another PostgreSQL Diff Tool</name>
+	<version>2.5.0-SNAPSHOT</version>
+	<description>Simple PostgreSQL diff tool that is useful for schema upgrades. The tool compares two schema dump files and creates output file that is (after some hand-made modifications) suitable for upgrade of old schema.</description>
 
-    <inceptionYear>2006</inceptionYear>
+	<url>http://www.apgdiff.com/</url>
 
-    <developers>
-        <developer>
-            <id>fordfrog</id>
-            <name>Miroslav Šulc</name>
-            <email>miroslav.sulc@startnet.cz</email>
-            <organization>StartNet s.r.o.</organization>
-            <organizationUrl>http://www.startnet.biz/</organizationUrl>
-            <roles>
-                <role>main developer</role>
-            </roles>
-            <timezone>+1</timezone>
-        </developer>
-    </developers>
+	<issueManagement>
+		<system>GitHub Issue Tracker</system>
+		<url>https://github.com/fordfrog/apgdiff/issues?sort=created&amp;state=open</url>
+	</issueManagement>
 
-    <contributors>
-        <contributor>
-            <name>Matthieu Patou</name>
-            <roles>
-                <role>CLUSTER and STATISTICS support + ordering of columns according to source DDL</role>
-            </roles>
-        </contributor>
-        <contributor>
-            <name>Jure Mercun</name>
-            <roles>
-                <role>Case insensitivity of parsers + correct handling of quoted names</role>
-            </roles>
-        </contributor>
-        <contributor>
-            <name>Hans Idink</name>
-            <roles>
-                <role>Initial help with support of FUNCTIONs</role>
-            </roles>
-        </contributor>
-        <contributor>
-            <name>Anders Semb Hermansen </name>
-            <roles>
-                <role>Ignoring multiple whitespace while comparing content of functions </role>
-            </roles>
-        </contributor>
-    </contributors>
+	<inceptionYear>2006</inceptionYear>
 
-    <licenses>
-        <license>
-            <name>MIT</name>
-            <url>license.txt</url>
-            <distribution>repo</distribution>
-            <comments>A business-friendly OSS license</comments>
-        </license>
-    </licenses>
+	<developers>
+		<developer>
+			<id>fordfrog</id>
+			<name>Miroslav Šulc</name>
+			<email>miroslav.sulc@startnet.cz</email>
+			<organization>StartNet s.r.o.</organization>
+			<organizationUrl>http://www.startnet.biz/</organizationUrl>
+			<roles>
+				<role>main developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
 
-    <scm>
-        <connection>scm:git:git://github.com/fordfrog/apgdiff.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com:fordfrog/apgdiff.git</developerConnection>
-        <url>https://github.com/fordfrog/apgdiff.git</url>
-    </scm>
+	<contributors>
+		<contributor>
+			<name>Matthieu Patou</name>
+			<roles>
+				<role>CLUSTER and STATISTICS support + ordering of columns according to source DDL</role>
+			</roles>
+		</contributor>
+		<contributor>
+			<name>Jure Mercun</name>
+			<roles>
+				<role>Case insensitivity of parsers + correct handling of quoted names</role>
+			</roles>
+		</contributor>
+		<contributor>
+			<name>Hans Idink</name>
+			<roles>
+				<role>Initial help with support of FUNCTIONs</role>
+			</roles>
+		</contributor>
+		<contributor>
+			<name>Anders Semb Hermansen </name>
+			<roles>
+				<role>Ignoring multiple whitespace while comparing content of functions </role>
+			</roles>
+		</contributor>
+	</contributors>
 
-    <organization>
-        <name>StartNet s.r.o.</name>
-        <url>http://www.startnet.biz</url>
-    </organization>
+	<licenses>
+		<license>
+			<name>MIT</name>
+			<url>license.txt</url>
+			<distribution>repo</distribution>
+			<comments>A business-friendly OSS license</comments>
+		</license>
+	</licenses>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+	<scm>
+		<connection>scm:git:git://github.com/fordfrog/apgdiff.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com:fordfrog/apgdiff.git</developerConnection>
+		<url>https://github.com/fordfrog/apgdiff.git</url>
+	</scm>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.0</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.13</version>
-            </plugin>
-            <plugin>
-                <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>2.13</version>
-            </plugin>
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib</classpathPrefix>
-                            <mainClass>cz.startnet.utils.pgdiff.Main</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9</version>
-                <executions>
-                    <execution>
-                        <id>attach-javadoc</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <show>private</show>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor>${basedir}/src/main/assembly/bin.xml</descriptor>
-                        <descriptor>${basedir}/src/main/assembly/src.xml</descriptor>
-                    </descriptors>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.4.3</version>
-                <configuration>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+	<organization>
+		<name>StartNet s.r.o.</name>
+		<url>http://www.startnet.biz</url>
+	</organization>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <releases />
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>codehaus-plugins</id>
-            <name>codehaus-plugins</name>
-            <url>http://repository.codehaus.org/</url>
-        </pluginRepository>
-        <pluginRepository>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots />
-            <id>codehaus-snapshot-plugins</id>
-            <name>codehaus-shapshot-plugins</name>
-            <url>http://snapshots.repository.codehaus.org/</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>unto.net</id>
-            <url>http://repository.unto.net/maven/</url>
-            <releases>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>warn</checksumPolicy>
-            </releases>
-            <snapshots>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>warn</checksumPolicy>
-            </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>stat-scm-sourceforge</id>
-            <url>http://stat-scm.sourceforge.net/maven2</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>stat-scm-sourceforge-snapshot</id>
-            <url>http://stat-scm.sourceforge.net/maven2-snapshots</url>
-        </pluginRepository>
-    </pluginRepositories>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-all</artifactId>
-            <version>1.1</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.5.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.9</version>
+			</plugin>
+			<plugin>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<version>2.9</version>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib</classpathPrefix>
+							<mainClass>cz.startnet.utils.pgdiff.Main</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.4</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<executions>
+					<execution>
+						<id>attach-javadoc</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<show>private</show>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptors>
+						<descriptor>${basedir}/src/main/assembly/bin.xml</descriptor>
+						<descriptor>${basedir}/src/main/assembly/src.xml</descriptor>
+					</descriptors>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
-    <reporting>
-        <plugins>
-            <plugin>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.6</version>
-            </plugin>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9</version>
-                <configuration>
-                    <minmemory>128m</minmemory>
-                    <maxmemory>512</maxmemory>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                    <tags>
-                        <tag>
-                            <name>todo</name>
-                            <placement>a</placement>
-                            <head>To do something:</head>
-                        </tag>
-                    </tags>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>net.sf</groupId>
-                <artifactId>stat-scm</artifactId>
-                <version>1.2.0</version>
-            </plugin>
-            <plugin>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>2.7.1</version>
-                <configuration>
-                    <sourceEncoding>utf-8</sourceEncoding>
-                    <targetJdk>1.6</targetJdk>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>taglist-maven-plugin</artifactId>
-                <version>2.4</version>
-            </plugin>
-            <plugin>
-                <artifactId>maven-jxr-plugin</artifactId>
-                <version>2.3</version>
-                <configuration>
-                    <inputEncoding>UTF-8</inputEncoding>
-                    <outputEncoding>UTF-8</outputEncoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>2.5.2</version>
-                <configuration>
-                    <threshold>Ignore</threshold>
-                    <effort>Max</effort>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>stat-scm-sourceforge</id>
+			<url>http://stat-scm.sourceforge.net/maven2</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>stat-scm-sourceforge-snapshot</id>
+			<url>http://stat-scm.sourceforge.net/maven2-snapshots</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-resources-plugin</artifactId>
+			<version>2.6</version>
+			<type>maven-plugin</type>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-compiler-plugin</artifactId>
+			<version>3.5.1</version>
+			<type>maven-plugin</type>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-clean-plugin</artifactId>
+			<version>3.0.0</version>
+			<type>maven-plugin</type>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
+			<version>1.1</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>2.9</version>
+			</plugin>
+			<plugin>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<minmemory>128m</minmemory>
+					<maxmemory>512</maxmemory>
+					<source>1.8</source>
+					<target>1.8</target>
+					<tags>
+						<tag>
+							<name>todo</name>
+							<placement>a</placement>
+							<head>To do something:</head>
+						</tag>
+					</tags>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>net.sf</groupId>
+				<artifactId>stat-scm</artifactId>
+				<version>1.2.0</version>
+			</plugin>
+			<plugin>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<version>2.7.1</version>
+				<configuration>
+					<sourceEncoding>utf-8</sourceEncoding>
+					<targetJdk>1.6</targetJdk>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>taglist-maven-plugin</artifactId>
+				<version>2.4</version>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jxr-plugin</artifactId>
+				<version>2.3</version>
+				<configuration>
+					<inputEncoding>UTF-8</inputEncoding>
+					<outputEncoding>UTF-8</outputEncoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>2.5.2</version>
+				<configuration>
+					<threshold>Ignore</threshold>
+					<effort>Max</effort>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 
 </project>
