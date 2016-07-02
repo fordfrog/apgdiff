@@ -1,5 +1,5 @@
 
-CREATE TABLE parenttable2 (
+CREATE TABLE IF NOT EXISTS parenttable2 (
 	id bigserial NOT NULL
 );
 

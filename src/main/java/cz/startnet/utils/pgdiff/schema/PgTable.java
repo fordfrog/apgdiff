@@ -115,6 +115,7 @@ public class PgTable extends PgRelation {
             sbSQL.append("UNLOGGED ");
         }
         sbSQL.append("TABLE ");
+        sbSQL.append("IF NOT EXISTS ");
         sbSQL.append(PgDiffUtils.getQuotedName(name));
         sbSQL.append(" (");
         sbSQL.append(System.getProperty("line.separator"));

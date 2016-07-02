@@ -1,4 +1,4 @@
-CREATE TABLE "procedureresult$Operation" (
+CREATE TABLE IF NOT EXISTS "procedureresult$Operation" (
 	id bigint NOT NULL,
 	name character varying(255),
 	result_id bigint

@@ -76,6 +76,7 @@ public class PgIndex {
         }
 
         sbSQL.append("INDEX ");
+        sbSQL.append("IF NOT EXISTS ");
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(" ON ");
         sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));

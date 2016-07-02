@@ -112,7 +112,7 @@ public class PgSequence {
      */
     public String getCreationSQL() {
         final StringBuilder sbSQL = new StringBuilder(100);
-        sbSQL.append("CREATE SEQUENCE ");
+        sbSQL.append("CREATE SEQUENCE IF NOT EXISTS ");
         sbSQL.append(PgDiffUtils.getQuotedName(name));
 
         if (startWith != null) {
