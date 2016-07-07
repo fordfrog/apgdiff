@@ -21,6 +21,7 @@ fordfrog@fordfrog.com.
 * Add support for ALTER TABLE ... OWNER TO (serge-pouliquen-itf)
 * Add support for CREATE TYPE (Karol Rybak)
 * Add CREATE AND DROP IF EXISTS on objects(table,view,index,sequence,trigger,type) (Jalisson Mello)
+* Use using column::type to cast the type of column (erhuabushuo)
 
 #### Fixes
 * Added hint to use "CREATE TABLE ... CONSTRAINT name PRIMARY KEY/UNIQUE ..."

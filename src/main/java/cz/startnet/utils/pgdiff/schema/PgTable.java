@@ -59,6 +59,8 @@ public class PgTable extends PgRelation {
      * Creates a new PgTable object.
      *
      * @param name {@link #name}
+     * @param database name of database
+     * @param schema name of schema
      */
     public PgTable(final String name, final PgDatabase database, final PgSchema schema) {
         setName(name);
@@ -227,6 +229,7 @@ public class PgTable extends PgRelation {
     /**
      * Setter for {@link #inherits}.
      *
+     * @param schemaName name of schema
      * @param tableName name of inherited table
      */
     public void addInherits(final String schemaName, final String tableName) {
