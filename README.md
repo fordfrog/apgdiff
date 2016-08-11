@@ -21,6 +21,7 @@ fordfrog@fordfrog.com.
 * Add support for ALTER TABLE ... OWNER TO (serge-pouliquen-itf)
 * Add support for CREATE TYPE (Karol Rybak)
 * Add support for CREATE EXTENSION (Átila Camurça Alves)
+* Add basic support for CREATE FOREIGN TABLE (Bruno Almeida)
 
 #### Fixes
 * Added hint to use "CREATE TABLE ... CONSTRAINT name PRIMARY KEY/UNIQUE ..."

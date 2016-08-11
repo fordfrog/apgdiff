@@ -54,7 +54,7 @@ public class PgDumpLoader { //NOPMD
      * Pattern for testing whether it is CREATE TABLE statement.
      */
     private static final Pattern PATTERN_CREATE_TABLE = Pattern.compile(
-            "^CREATE[\\s]+(UNLOGGED\\s)*TABLE[\\s]+.*$",
+            "^CREATE[\\s]+(UNLOGGED\\s|FOREIGN\\s)*TABLE[\\s]+.*$",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /**
      * Pattern for testing whether it is CREATE VIEW or CREATE MATERIALIZED
@@ -67,7 +67,7 @@ public class PgDumpLoader { //NOPMD
      * Pattern for testing whether it is ALTER TABLE statement.
      */
     private static final Pattern PATTERN_ALTER_TABLE =
-            Pattern.compile("^ALTER[\\s]+TABLE[\\s]+.*$",
+            Pattern.compile("^ALTER[\\s](FOREIGN)*TABLE[\\s]+.*$",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /**
      * Pattern for testing whether it is CREATE SEQUENCE statement.
