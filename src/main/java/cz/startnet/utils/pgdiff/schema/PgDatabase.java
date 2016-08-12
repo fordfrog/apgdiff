@@ -33,6 +33,10 @@ public class PgDatabase {
      * Comment.
      */
     private String comment;
+    /**
+     * List of extensions.
+     */
+    private final List<PgExtension> extensions = new ArrayList<PgExtension>();
 
     /**
      * Creates a new PgDatabase object.
@@ -134,5 +138,38 @@ public class PgDatabase {
      */
     public void addSchema(final PgSchema schema) {
         schemas.add(schema);
+    }
+
+    /**
+     * Getter for {@link #extensions}. The list cannot be modified.
+     *
+     * @return {@link #extensions}
+     */
+    public List<PgExtension> getExtensions() {
+        return Collections.unmodifiableList(extensions);
+    }
+
+    /**
+     * Adds {@code extension} to the list of extensions.
+     *
+     * @param extension extension
+     */
+    public void addExtension(final PgExtension extension) {
+        extensions.add(extension);
+    }
+    
+    /**
+     * Returns extension of given name or null if the extension has not been found.
+     *
+     * @param name extension name
+     * @return found extension or null
+     */
+    public PgExtension getExtension(final String name) {
+        for (final PgExtension extension : extensions) {
+            if (extension.getName().equals(name)) {
+                return extension;
+            }
+        }
+        return null;
     }
 }
