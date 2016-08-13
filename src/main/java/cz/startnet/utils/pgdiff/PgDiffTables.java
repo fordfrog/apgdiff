@@ -255,7 +255,7 @@ public class PgDiffTables {
             final PgTable newTable, final List<PgColumn> dropDefaultsColumns) {
         for (final PgColumn column : newTable.getColumns()) {
             if (!oldTable.containsColumn(column.getName())) {
-                statements.add("\tADD COLUMN "
+                statements.add("\tADD COLUMN IF NOT EXISTS "
                         + column.getFullDefinition(arguments.isAddDefaults()));
 
                 if (arguments.isAddDefaults() && !column.getNullValue()

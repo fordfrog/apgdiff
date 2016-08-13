@@ -1,3 +1,3 @@
 
 ALTER TABLE testtable
-	ADD COLUMN field2 information_schema.cardinal_number;
+	ADD COLUMN IF NOT EXISTS field2 information_schema.cardinal_number;
