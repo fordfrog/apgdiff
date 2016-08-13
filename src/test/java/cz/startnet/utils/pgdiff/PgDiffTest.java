@@ -45,6 +45,10 @@ public class PgDiffTest {
                     {"drop_cluster", false, false, false, false},
                     // Tests scenario where CLUSTER is changed on TABLE.
                     {"modify_cluster", false, false, false, false},
+                    // Tests scenario where EXTENSION is added to TABLE.
+                    {"add_extension", false, false, false, false},
+                    // Tests scenario where EXTENSION is dropped from TABLE.
+                    {"drop_extension", false, false, false, false},
                     // Tests scenario where WITH OIDS is dropped from TABLE.
                     {"drop_with_oids", false, false, false, false},
                     // Tests scenario where INDEX is added.
