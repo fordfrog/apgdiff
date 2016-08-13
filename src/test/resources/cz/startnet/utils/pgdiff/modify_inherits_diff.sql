@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS parenttable2 (
 ALTER TABLE parenttable2 OWNER TO fordfrog;
 
 ALTER TABLE parenttable
-	DROP COLUMN id,
+	DROP COLUMN IF EXISTS id,
 	ADD COLUMN field3 information_schema.cardinal_number;
 
 ALTER TABLE testtable

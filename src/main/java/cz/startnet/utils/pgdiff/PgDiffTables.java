@@ -278,7 +278,7 @@ public class PgDiffTables {
             final PgTable oldTable, final PgTable newTable) {
         for (final PgColumn column : oldTable.getColumns()) {
             if (!newTable.containsColumn(column.getName())) {
-                statements.add("\tDROP COLUMN "
+                statements.add("\tDROP COLUMN IF EXISTS "
                         + PgDiffUtils.getQuotedName(column.getName()));
             }
         }
