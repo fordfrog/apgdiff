@@ -31,6 +31,7 @@ public class CreateTableParser {
         final Parser parser = new Parser(statement);
         parser.expect("CREATE");
         final boolean unlogged = parser.expectOptional("UNLOGGED");
+        final boolean foreign = parser.expectOptional("FOREIGN");
         parser.expect("TABLE");
 
         // Optional IF NOT EXISTS, irrelevant for our purposes
@@ -49,6 +50,7 @@ public class CreateTableParser {
 
         final PgTable table = new PgTable(ParserUtils.getObjectName(tableName), database, schema);
         table.setUnlogged(unlogged);
+        table.setForeign(foreign);
         schema.addRelation(table);
 
         parser.expect("(");
@@ -77,7 +79,7 @@ public class CreateTableParser {
             if (parser.expectOptional("INHERITS")) {
                 parseInherits(database, parser, table);
             } else if (parser.expectOptional("WITHOUT")) {
-                table.setWith("OIDS=false");
+                table.setWith("OIDS=false");            
             } else if (parser.expectOptional("WITH")) {
                 if (parser.expectOptional("OIDS")
                         || parser.expectOptional("OIDS=true")) {
@@ -89,8 +91,10 @@ public class CreateTableParser {
                 }
             } else if (parser.expectOptional("TABLESPACE")) {
                 table.setTablespace(parser.parseString());
+            } else if (parser.expectOptional("SERVER")) {
+            	table.setForeignServer(parser.getExpression());
             } else {
-                parser.throwUnsupportedCommand();
+            	parser.throwUnsupportedCommand();
             }
         }
     }

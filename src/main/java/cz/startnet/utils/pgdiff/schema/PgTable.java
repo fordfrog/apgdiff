@@ -43,7 +43,11 @@ public class PgTable extends PgRelation {
      * Is this a UNLOGGED table?
      */
     private boolean unlogged;
-
+    /**
+     * Is this a FOREIGN table?
+     */
+    private boolean foreign;
+    private String foreignServer;
 
     /**
      * PgDatabase
@@ -114,6 +118,9 @@ public class PgTable extends PgRelation {
         if (isUnlogged()) {
             sbSQL.append("UNLOGGED ");
         }
+        if (isForeign()) {
+            sbSQL.append("FOREIGN ");
+        }
         sbSQL.append("TABLE ");
         sbSQL.append(PgDiffUtils.getQuotedName(name));
         sbSQL.append(" (");
@@ -181,6 +188,10 @@ public class PgTable extends PgRelation {
             }
         }
 
+        if (isForeign()) {
+            sbSQL.append("SERVER " + getForeignServer());
+        }
+        
         if (tablespace != null && !tablespace.isEmpty()) {
             sbSQL.append(System.getProperty("line.separator"));
             sbSQL.append("TABLESPACE ");
@@ -400,5 +411,31 @@ public class PgTable extends PgRelation {
 
     public void setUnlogged(boolean unlogged) {
         this.unlogged = unlogged;
+    }
+    
+    /**
+     * Foreign Tables
+     */
+    
+    @Override
+    public String getDropSQL() {
+        return "DROP " + ((isForeign()) ? "FOREIGN ":"") + getRelationKind() + " " +
+                PgDiffUtils.getQuotedName(getName()) + ";";
+    }
+    
+    public boolean isForeign() {
+        return foreign;
+    }
+
+    public void setForeign(boolean foreign) {
+        this.foreign = foreign;
+    }
+    
+    public void setForeignServer(String server){
+    	foreignServer = server;
+    }
+    
+    public String getForeignServer(){
+    	return foreignServer;
     }
 }
