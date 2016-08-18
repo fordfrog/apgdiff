@@ -417,6 +417,12 @@ public class PgTable extends PgRelation {
      * Foreign Tables
      */
     
+    @Override
+    public String getDropSQL() {
+        return "DROP " + ((isForeign()) ? "FOREIGN ":"") + getRelationKind() + " " +
+                PgDiffUtils.getQuotedName(getName()) + ";";
+    }
+    
     public boolean isForeign() {
         return foreign;
     }

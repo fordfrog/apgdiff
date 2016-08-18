@@ -623,7 +623,7 @@ public class PgDiffTables {
                     PgDiffUtils.getQuotedName(newTable.getName());
             searchPathHelper.outputSearchPath(writer);
             writer.println();
-            writer.println("ALTER TABLE " + quotedTableName);
+            writer.println("ALTER " + ((newTable.isForeign()) ? "FOREIGN ":"") + "TABLE " + quotedTableName);
 
             for (int i = 0; i < statements.size(); i++) {
                 writer.print(statements.get(i));
@@ -632,7 +632,7 @@ public class PgDiffTables {
 
             if (!dropDefaultsColumns.isEmpty()) {
                 writer.println();
-                writer.println("ALTER TABLE " + quotedTableName);
+                writer.println("ALTER " + ((newTable.isForeign()) ? "FOREIGN ":"") + "TABLE " + quotedTableName);
 
                 for (int i = 0; i < dropDefaultsColumns.size(); i++) {
                     writer.print("\tALTER COLUMN ");
@@ -865,7 +865,7 @@ public class PgDiffTables {
 
         if (newOwnerTo != null && !newOwnerTo.equals(oldOwnerTo)) {
             writer.println();
-            writer.println("ALTER TABLE "
+            writer.println("ALTER " + ((newTable.isForeign()) ? "FOREIGN ":"") + "TABLE "
                     + PgDiffUtils.getQuotedName(newTable.getName())
                     + " OWNER TO " + newTable.getOwnerTo() + ";");
         }

@@ -37,6 +37,8 @@ public class AlterRelationParser {
          * relation types, so we just ignore type here and derive its type from
          * the original CREATE command.
          */
+        parser.expectOptional("FOREIGN");
+        	//OK FOREIGN TABLE
         if (parser.expectOptional("TABLE")) {
             parser.expectOptional("ONLY");
         } else if (parser.expectOptional("MATERIALIZED", "VIEW")

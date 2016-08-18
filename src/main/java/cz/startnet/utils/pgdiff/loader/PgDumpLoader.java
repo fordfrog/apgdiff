@@ -66,7 +66,7 @@ public class PgDumpLoader { //NOPMD
      * Pattern for testing whether it is ALTER TABLE statement.
      */
     private static final Pattern PATTERN_ALTER_TABLE =
-            Pattern.compile("^ALTER[\\s]+TABLE[\\s]+.*$",
+            Pattern.compile("^ALTER[\\s](FOREIGN)*TABLE[\\s]+.*$",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /**
      * Pattern for testing whether it is CREATE SEQUENCE statement.
