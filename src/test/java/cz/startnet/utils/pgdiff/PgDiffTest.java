@@ -228,13 +228,24 @@ public class PgDiffTest {
                     // Test scenarios where /**/ comments.
                     {"add_table_issue115", false, false, false, false},
                     {"add_column_issue134", false, false, false, false},
+                    {"add_column_issue188", false, false, false, false},
                     // Tests view triggers (support for 'INSTEAD OF')
+                    //90
                     {"view_triggers", false, false, false, false},
                     // Tests privileges
                         {"grant_on_table_sequence", false, false, false, false},
                         {"revoke_on_table_sequence", false, false, false, false},
                         {"grant_on_view", false, false, false, false},
                         {"revoke_on_view", false, false, false, false}
+                    // Tests types
+                    , {"add_type", false, false, false, false}
+                    , {"drop_type", false, false, false, false}
+                    , {"alter_type", false, false, false, false}
+                    // Test Foreign Tables
+                    , {"foreign_create_table", false, false, false, false}
+                    , {"foreign_drop_table", false, false, false, false}
+                    //100
+                    , {"foreign_alter_type", false, false, false, false}
                 });
     }
     /**
