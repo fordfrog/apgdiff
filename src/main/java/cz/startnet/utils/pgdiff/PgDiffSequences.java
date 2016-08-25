@@ -98,7 +98,7 @@ public class PgDiffSequences {
      */
     public static void dropSequences(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final SearchPathHelper searchPathHelper) {
+            final SearchPathHelper searchPathHelper,final PgDiffArguments arguments) {
         if (oldSchema == null) {
             return;
         }
@@ -108,7 +108,7 @@ public class PgDiffSequences {
             if (!newSchema.containsSequence(sequence.getName())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(sequence.getDropSQL());
+                writer.println(sequence.getDropSQL(arguments.isUseIfExists()));
             }
         }
     }

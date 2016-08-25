@@ -120,8 +120,8 @@ public class PgIndex {
      *
      * @return created SQL statement
      */
-    public String getDropSQL() {
-        return "DROP INDEX IF EXISTS " + PgDiffUtils.getQuotedName(getName()) + ";";
+    public String getDropSQL(final boolean dropIfExists) {
+        return "DROP INDEX " + PgDiffUtils.getDropIfExists(dropIfExists) + PgDiffUtils.getQuotedName(getName()) + ";";
     }
 
     /**

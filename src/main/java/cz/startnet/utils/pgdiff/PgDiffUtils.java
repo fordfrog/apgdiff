@@ -527,6 +527,16 @@ public class PgDiffUtils {
     public static String getQuotedName(final String name) {
         return getQuotedName(name, false);
     }
+    
+    public static String getDropIfExists (final boolean dropIfExists){
+    	
+    	if(dropIfExists) {
+    		return "IF EXISTS ";
+    	}
+    	 
+    	return "";
+    	
+    }
 
     /**
      * Creates a new PgDiffUtils object.

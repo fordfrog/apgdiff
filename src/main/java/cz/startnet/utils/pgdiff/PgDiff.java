@@ -228,19 +228,19 @@ public class PgDiff {
             PgDiffFunctions.dropFunctions(
                     writer, arguments, oldSchema, newSchema, searchPathHelper);
             PgDiffViews.dropViews(
-                    writer, oldSchema, newSchema, searchPathHelper);
+                    writer, oldSchema, newSchema, searchPathHelper,arguments);
             PgDiffConstraints.dropConstraints(
-                    writer, oldSchema, newSchema, true, searchPathHelper);
+                    writer, oldSchema, newSchema, true, searchPathHelper,arguments);
             PgDiffConstraints.dropConstraints(
-                    writer, oldSchema, newSchema, false, searchPathHelper);
+                    writer, oldSchema, newSchema, false, searchPathHelper,arguments);
             PgDiffIndexes.dropIndexes(
-                    writer, oldSchema, newSchema, searchPathHelper);
+                    writer, oldSchema, newSchema, searchPathHelper,arguments);
             PgDiffTables.dropClusters(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffTables.dropTables(
-                    writer, oldSchema, newSchema, searchPathHelper);
+                    writer, oldSchema, newSchema, searchPathHelper,arguments);
             PgDiffSequences.dropSequences(
-                    writer, oldSchema, newSchema, searchPathHelper);
+                    writer, oldSchema, newSchema, searchPathHelper, arguments);
 
             PgDiffSequences.createSequences(
                     writer, oldSchema, newSchema, searchPathHelper);
@@ -248,7 +248,7 @@ public class PgDiff {
                     writer, arguments, oldSchema, newSchema, searchPathHelper);
             PgDiffTypes.alterTypes(writer, arguments, oldSchema, newSchema, searchPathHelper);
             PgDiffTypes.createTypes(writer, oldSchema, newSchema, searchPathHelper);
-            PgDiffTypes.dropTypes(writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffTypes.dropTypes(writer, oldSchema, newSchema, searchPathHelper,arguments);
             PgDiffTables.createTables(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffTables.alterTables(

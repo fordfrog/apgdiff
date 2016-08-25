@@ -65,6 +65,11 @@ public class PgDiffArguments {
      * Whether Slony triggers should be ignored.
      */
     private boolean ignoreSlonyTriggers;
+    
+    /**
+     * Whether Slony triggers should be ignored.
+     */
+    private boolean useIfExists;
 
     /**
      * Setter for {@link #addDefaults}.
@@ -255,6 +260,8 @@ public class PgDiffArguments {
                 setOutputIgnoredStatements(true);
             } else if ("--version".equals(args[i])) {
                 setVersion(true);
+            } else if ("--drop-if-exists".equals(args[i])) {
+                setUseIfExists(true);    
             } else {
                 writer.print(Resources.getString("ErrorUnknownOption"));
                 writer.print(": ");
@@ -387,4 +394,24 @@ public class PgDiffArguments {
     public void setIgnoreSlonyTriggers(final boolean ignoreSlonyTriggers) {
         this.ignoreSlonyTriggers = ignoreSlonyTriggers;
     }
+    
+    /**
+     * Getter for {@link #useIfExists}.
+     *
+     * @return {@link #useIfExists}
+     */
+    public boolean isUseIfExists() {
+        return useIfExists;
+    }
+
+    /**
+     * Setter for {@link #useIfExists}.
+     *
+     * @param arguments {@link #useIfExists}
+     */
+    public void setUseIfExists(final boolean useIfExists) {
+        this.useIfExists = useIfExists;
+    }
+    
+    
 }

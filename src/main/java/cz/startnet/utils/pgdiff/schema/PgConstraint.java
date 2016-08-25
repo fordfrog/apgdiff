@@ -118,12 +118,13 @@ public class PgConstraint {
      *
      * @return created SQL
      */
-    public String getDropSQL() {
+    public String getDropSQL(final boolean dropIfExists) {
         final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("ALTER TABLE ");
         sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
         sbSQL.append(System.getProperty("line.separator"));
         sbSQL.append("\tDROP CONSTRAINT ");
+        sbSQL.append(PgDiffUtils.getDropIfExists(dropIfExists));
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(';');
 

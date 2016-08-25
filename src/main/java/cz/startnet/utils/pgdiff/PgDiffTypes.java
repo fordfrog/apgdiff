@@ -173,7 +173,8 @@ public class PgDiffTypes {
      */
     public static void createTypes(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final SearchPathHelper searchPathHelper) {
+            final SearchPathHelper searchPathHelper
+            ) {
         for (final PgType type : newSchema.getTypes()) {
             if (oldSchema == null
                     || !oldSchema.containsType(type.getName())) {
@@ -194,7 +195,8 @@ public class PgDiffTypes {
      */
     public static void dropTypes(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final SearchPathHelper searchPathHelper) {
+            final SearchPathHelper searchPathHelper,
+            final PgDiffArguments arguments) {
         if (oldSchema == null) {
             return;
         }
@@ -203,7 +205,7 @@ public class PgDiffTypes {
             if (!newSchema.containsType(type.getName())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(type.getDropSQL());
+                writer.println(type.getDropSQL(arguments.isUseIfExists()));
             }
         }
     }

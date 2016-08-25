@@ -61,7 +61,7 @@ public class PgDiffIndexes {
      */
     public static void dropIndexes(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final SearchPathHelper searchPathHelper) {
+            final SearchPathHelper searchPathHelper,final PgDiffArguments arguments) {
         for (final PgTable newTable : newSchema.getTables()) {
             final String newTableName = newTable.getName();
             final PgTable oldTable;
@@ -76,7 +76,7 @@ public class PgDiffIndexes {
             for (final PgIndex index : getDropIndexes(oldTable, newTable)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(index.getDropSQL());
+                writer.println(index.getDropSQL(arguments.isUseIfExists()));
             }
         }
     }

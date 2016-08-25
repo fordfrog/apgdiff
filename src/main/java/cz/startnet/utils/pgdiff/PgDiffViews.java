@@ -75,7 +75,8 @@ public class PgDiffViews {
      */
     public static void dropViews(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final SearchPathHelper searchPathHelper) {
+            final SearchPathHelper searchPathHelper,
+            final PgDiffArguments arguments) {
         if (oldSchema == null) {
             return;
         }
@@ -86,7 +87,7 @@ public class PgDiffViews {
             if (newView == null || isViewModified(oldView, newView)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(oldView.getDropSQL());
+                writer.println(oldView.getDropSQL(arguments.isUseIfExists()));
             }
         }
     }
