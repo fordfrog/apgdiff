@@ -9,6 +9,7 @@ import cz.startnet.utils.pgdiff.Resources;
 import cz.startnet.utils.pgdiff.parsers.AlterSequenceParser;
 import cz.startnet.utils.pgdiff.parsers.AlterRelationParser;
 import cz.startnet.utils.pgdiff.parsers.CommentParser;
+import cz.startnet.utils.pgdiff.parsers.CreateExtensionParser;
 import cz.startnet.utils.pgdiff.parsers.CreateFunctionParser;
 import cz.startnet.utils.pgdiff.parsers.CreateTypeParser;
 import cz.startnet.utils.pgdiff.parsers.CreateIndexParser;
@@ -156,6 +157,12 @@ public class PgDumpLoader { //NOPMD
             "[\"\\s]",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /**
+     * Pattern for testing whether it is CREATE EXTENSION statement.
+     */
+    private static final Pattern PATTERN_CREATE_EXTENSION = Pattern.compile(
+            "^CREATE[\\s]+EXTENSION[\\s]+.*$",
+            Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    /**
      * Storage of unprocessed line part.
      */
     private static String lineBuffer;
@@ -193,6 +200,8 @@ public class PgDumpLoader { //NOPMD
         while (statement != null) {
             if (PATTERN_CREATE_SCHEMA.matcher(statement).matches()) {
                 CreateSchemaParser.parse(database, statement);
+            } else if (PATTERN_CREATE_EXTENSION.matcher(statement).matches()) {
+                CreateExtensionParser.parse(database, statement);
             } else if (PATTERN_DEFAULT_SCHEMA.matcher(statement).matches()) {
                 final Matcher matcher =
                         PATTERN_DEFAULT_SCHEMA.matcher(statement);

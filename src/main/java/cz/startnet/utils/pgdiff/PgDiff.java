@@ -7,6 +7,7 @@ package cz.startnet.utils.pgdiff;
 
 import cz.startnet.utils.pgdiff.loader.PgDumpLoader;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
+import cz.startnet.utils.pgdiff.schema.PgExtension;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -79,6 +80,23 @@ public class PgDiff {
             }
         }
     }
+    
+    /**
+     * Creates new extensions.
+     *
+     * @param writer      writer the output should be written to
+     * @param oldDatabase original database schema
+     * @param newDatabase new database schema
+     */
+    private static void createNewExtensions(final PrintWriter writer,
+            final PgDatabase oldDatabase, final PgDatabase newDatabase) {
+        for (final PgExtension newExtension : newDatabase.getExtensions()) {
+            if (oldDatabase.getExtension(newExtension.getName()) == null) {
+                writer.println();
+                writer.println(newExtension.getCreationSQL());
+            }
+        }
+    }
 
     /**
      * Creates diff from comparison of two database schemas.
@@ -112,6 +130,8 @@ public class PgDiff {
 
         dropOldSchemas(writer, oldDatabase, newDatabase);
         createNewSchemas(writer, oldDatabase, newDatabase);
+        dropOldExtensions(writer, oldDatabase, newDatabase);
+        createNewExtensions(writer, oldDatabase, newDatabase);
         updateSchemas(writer, arguments, oldDatabase, newDatabase);
 
         if (arguments.isAddTransaction()) {
@@ -166,6 +186,25 @@ public class PgDiff {
                 writer.println();
                 writer.println("DROP SCHEMA "
                         + PgDiffUtils.getQuotedName(oldSchema.getName())
+                        + " CASCADE;");
+            }
+        }
+    }
+    
+    /**
+     * Drops old extensions that do not exist anymore.
+     *
+     * @param writer      writer the output should be written to
+     * @param oldDatabase original database schema
+     * @param newDatabase new database schema
+     */
+    private static void dropOldExtensions(final PrintWriter writer,
+            final PgDatabase oldDatabase, final PgDatabase newDatabase) {
+        for (final PgExtension oldExtension : oldDatabase.getExtensions()) {
+            if (newDatabase.getExtension(oldExtension.getName()) == null) {
+                writer.println();
+                writer.println("DROP EXTENSION "
+                        + PgDiffUtils.getQuotedName(oldExtension.getName())
                         + " CASCADE;");
             }
         }
