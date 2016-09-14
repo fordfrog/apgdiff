@@ -32,7 +32,8 @@ public class PgDiffConstraints {
      */
     public static void createConstraints(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final boolean primaryKey, final SearchPathHelper searchPathHelper) {
+            final boolean primaryKey, final SearchPathHelper searchPathHelper,
+            final PgDiffArguments arguments) {
         for (final PgTable newTable : newSchema.getTables()) {
             final PgTable oldTable;
 
@@ -47,7 +48,7 @@ public class PgDiffConstraints {
                     getNewConstraints(oldTable, newTable, primaryKey)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(constraint.getCreationSQL());
+                writer.println(constraint.getCreationSQL(arguments.isUseIfExists()));
             }
         }
     }

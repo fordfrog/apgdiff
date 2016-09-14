@@ -71,11 +71,12 @@ public class PgDiff {
      * @param newDatabase new database schema
      */
     private static void createNewSchemas(final PrintWriter writer,
-            final PgDatabase oldDatabase, final PgDatabase newDatabase) {
+            final PgDatabase oldDatabase, final PgDatabase newDatabase,
+            final PgDiffArguments arguments) {
         for (final PgSchema newSchema : newDatabase.getSchemas()) {
             if (oldDatabase.getSchema(newSchema.getName()) == null) {
                 writer.println();
-                writer.println(newSchema.getCreationSQL());
+                writer.println(newSchema.getCreationSQL(arguments.isUseIfExists()));
             }
         }
     }
@@ -111,7 +112,7 @@ public class PgDiff {
         }
 
         dropOldSchemas(writer, oldDatabase, newDatabase);
-        createNewSchemas(writer, oldDatabase, newDatabase);
+        createNewSchemas(writer, oldDatabase, newDatabase,arguments);
         updateSchemas(writer, arguments, oldDatabase, newDatabase);
 
         if (arguments.isAddTransaction()) {
@@ -247,7 +248,7 @@ public class PgDiff {
             PgDiffSequences.alterSequences(
                     writer, arguments, oldSchema, newSchema, searchPathHelper);
             PgDiffTypes.alterTypes(writer, arguments, oldSchema, newSchema, searchPathHelper);
-            PgDiffTypes.createTypes(writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffTypes.createTypes(writer, oldSchema, newSchema, searchPathHelper,arguments);
             PgDiffTypes.dropTypes(writer, oldSchema, newSchema, searchPathHelper,arguments);
             PgDiffTables.createTables(
                     writer, oldSchema, newSchema, searchPathHelper,arguments);
@@ -258,15 +259,15 @@ public class PgDiff {
             PgDiffFunctions.createFunctions(
                     writer, arguments, oldSchema, newSchema, searchPathHelper);
             PgDiffConstraints.createConstraints(
-                    writer, oldSchema, newSchema, true, searchPathHelper);
+                    writer, oldSchema, newSchema, true, searchPathHelper,arguments);
             PgDiffConstraints.createConstraints(
-                    writer, oldSchema, newSchema, false, searchPathHelper);
+                    writer, oldSchema, newSchema, false, searchPathHelper,arguments);
             PgDiffIndexes.createIndexes(
-                    writer, oldSchema, newSchema, searchPathHelper);
+                    writer, oldSchema, newSchema, searchPathHelper,arguments);
             PgDiffTables.createClusters(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffTriggers.createTriggers(
-                    writer, oldSchema, newSchema, searchPathHelper);
+                    writer, oldSchema, newSchema, searchPathHelper,arguments);
             PgDiffViews.createViews(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffViews.alterViews(

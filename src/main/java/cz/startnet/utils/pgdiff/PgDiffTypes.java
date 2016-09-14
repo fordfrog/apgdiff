@@ -173,14 +173,15 @@ public class PgDiffTypes {
      */
     public static void createTypes(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final SearchPathHelper searchPathHelper
+            final SearchPathHelper searchPathHelper,
+            final PgDiffArguments arguments
             ) {
         for (final PgType type : newSchema.getTypes()) {
             if (oldSchema == null
                     || !oldSchema.containsType(type.getName())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(type.getCreationSQL());
+                writer.println(type.getCreationSQL(arguments.isUseIfExists()));
             }
         }
     }

@@ -133,9 +133,10 @@ public class PgSchema {
      *
      * @return created SQL
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(boolean useIfExists) {
         final StringBuilder sbSQL = new StringBuilder(50);
         sbSQL.append("CREATE SCHEMA ");
+        sbSQL.append(PgDiffUtils.getCreateIfNotExists(useIfExists));
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
 
         if (getAuthorization() != null) {

@@ -71,9 +71,10 @@ public class PgType {
      *
      * @return created SQL statement
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(boolean useIfExists) {
         final StringBuilder sbSQL = new StringBuilder(1000);
         sbSQL.append("CREATE TYPE ");
+        sbSQL.append(PgDiffUtils.getCreateIfNotExists(useIfExists));
         sbSQL.append(PgDiffUtils.getQuotedName(name));
         if (isEnum) {
             sbSQL.append(" AS ENUM (");

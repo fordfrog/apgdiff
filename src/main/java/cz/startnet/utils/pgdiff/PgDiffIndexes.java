@@ -29,7 +29,8 @@ public class PgDiffIndexes {
      */
     public static void createIndexes(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final SearchPathHelper searchPathHelper) {
+            final SearchPathHelper searchPathHelper,
+            final PgDiffArguments arguments) {
         for (final PgTable newTable : newSchema.getTables()) {
             final String newTableName = newTable.getName();
 
@@ -38,14 +39,14 @@ public class PgDiffIndexes {
                 for (PgIndex index : newTable.getIndexes()) {
                     searchPathHelper.outputSearchPath(writer);
                     writer.println();
-                    writer.println(index.getCreationSQL());
+                    writer.println(index.getCreationSQL(arguments.isUseIfExists()));
                 }
             } else {
                 for (PgIndex index : getNewIndexes(
                         oldSchema.getTable(newTableName), newTable)) {
                     searchPathHelper.outputSearchPath(writer);
                     writer.println();
-                    writer.println(index.getCreationSQL());
+                    writer.println(index.getCreationSQL(arguments.isUseIfExists()));
                 }
             }
         }

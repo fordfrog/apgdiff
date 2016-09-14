@@ -51,12 +51,13 @@ public class PgConstraint {
      *
      * @return created SQL
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(boolean useIfExists) {
         final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("ALTER TABLE ");
         sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
         sbSQL.append(System.getProperty("line.separator"));
         sbSQL.append("\tADD CONSTRAINT ");
+        sbSQL.append(PgDiffUtils.getCreateIfNotExists(useIfExists));
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(' ');
         sbSQL.append(getDefinition());

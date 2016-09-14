@@ -137,9 +137,10 @@ public class PgTrigger {
      *
      * @return created SQL
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(boolean useIfExists) {
         final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("CREATE TRIGGER ");
+        sbSQL.append(PgDiffUtils.getCreateIfNotExists(useIfExists));
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(System.getProperty("line.separator"));
         sbSQL.append("\t");
