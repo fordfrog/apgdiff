@@ -243,14 +243,14 @@ public class PgDiff {
                     writer, oldSchema, newSchema, searchPathHelper, arguments);
 
             PgDiffSequences.createSequences(
-                    writer, oldSchema, newSchema, searchPathHelper);
+                    writer, oldSchema, newSchema, searchPathHelper,arguments);
             PgDiffSequences.alterSequences(
                     writer, arguments, oldSchema, newSchema, searchPathHelper);
             PgDiffTypes.alterTypes(writer, arguments, oldSchema, newSchema, searchPathHelper);
             PgDiffTypes.createTypes(writer, oldSchema, newSchema, searchPathHelper);
             PgDiffTypes.dropTypes(writer, oldSchema, newSchema, searchPathHelper,arguments);
             PgDiffTables.createTables(
-                    writer, oldSchema, newSchema, searchPathHelper);
+                    writer, oldSchema, newSchema, searchPathHelper,arguments);
             PgDiffTables.alterTables(
                     writer, arguments, oldSchema, newSchema, searchPathHelper);
             PgDiffSequences.alterCreatedSequences(

@@ -67,7 +67,7 @@ public class PgIndex {
      *
      * @return created SQL
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(boolean useIfExists) {
         final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("CREATE ");
 
@@ -76,7 +76,7 @@ public class PgIndex {
         }
 
         sbSQL.append("INDEX ");
-        sbSQL.append("IF NOT EXISTS ");
+        sbSQL.append(PgDiffUtils.getCreateIfNotExists(useIfExists));        
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(" ON ");
         sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));

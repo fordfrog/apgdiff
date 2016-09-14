@@ -537,6 +537,16 @@ public class PgDiffUtils {
     	return "";
     	
     }
+    
+ public static String getCreateIfNotExists (final boolean createIfNotExists){
+    	
+    	if(createIfNotExists) {
+    		return "IF NOT EXISTS ";
+    	}
+    	 
+    	return "";
+    	
+    }
 
     /**
      * Creates a new PgDiffUtils object.

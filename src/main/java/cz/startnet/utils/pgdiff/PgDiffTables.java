@@ -255,7 +255,7 @@ public class PgDiffTables {
             final PgTable newTable, final List<PgColumn> dropDefaultsColumns) {
         for (final PgColumn column : newTable.getColumns()) {
             if (!oldTable.containsColumn(column.getName())) {
-                statements.add("\tADD COLUMN IF NOT EXISTS "
+                statements.add("\tADD COLUMN "+ PgDiffUtils.getCreateIfNotExists(arguments.isUseIfExists())
                         + column.getFullDefinition(arguments.isAddDefaults()));
 
                 if (arguments.isAddDefaults() && !column.getNullValue()
@@ -533,13 +533,14 @@ public class PgDiffTables {
      */
     public static void createTables(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final SearchPathHelper searchPathHelper) {
+            final SearchPathHelper searchPathHelper,
+            final PgDiffArguments arguments) {
         for (final PgTable table : newSchema.getTables()) {
             if (oldSchema == null
                     || !oldSchema.containsTable(table.getName())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(table.getCreationSQL(newSchema));
+                writer.println(table.getCreationSQL(newSchema,arguments.isUseIfExists()));
                 writer.println();
                 if (table.getOwnerTo() != null) {
                     writer.println("ALTER TABLE "

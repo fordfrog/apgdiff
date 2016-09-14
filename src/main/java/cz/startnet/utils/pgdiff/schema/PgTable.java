@@ -110,14 +110,14 @@ public class PgTable extends PgRelation {
      *
      * @return created SQL statement
      */
-    public String getCreationSQL(final PgSchema schema) {
+    public String getCreationSQL(final PgSchema schema,boolean useIfExists) {
         final StringBuilder sbSQL = new StringBuilder(1000);
         sbSQL.append("CREATE ");
         if (isUnlogged()) {
             sbSQL.append("UNLOGGED ");
         }
         sbSQL.append("TABLE ");
-        sbSQL.append("IF NOT EXISTS ");
+        sbSQL.append(PgDiffUtils.getCreateIfNotExists(useIfExists));
         sbSQL.append(PgDiffUtils.getQuotedName(name));
         sbSQL.append(" (");
         sbSQL.append(System.getProperty("line.separator"));

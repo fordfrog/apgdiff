@@ -110,9 +110,12 @@ public class PgSequence {
      *
      * @return created SQL statement
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(boolean useIfExists) {
         final StringBuilder sbSQL = new StringBuilder(100);
-        sbSQL.append("CREATE SEQUENCE IF NOT EXISTS ");
+        sbSQL.append("CREATE SEQUENCE  ");
+        
+        sbSQL.append(PgDiffUtils.getCreateIfNotExists(useIfExists));
+        
         sbSQL.append(PgDiffUtils.getQuotedName(name));
 
         if (startWith != null) {
