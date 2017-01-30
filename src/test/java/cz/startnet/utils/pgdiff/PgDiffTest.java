@@ -243,7 +243,8 @@ public class PgDiffTest {
                         {"revoke_on_table_sequence", false, false, false, false},
                         {"grant_on_view", false, false, false, false},
                         {"revoke_on_view", false, false, false, false},
-                        {"revoke_on_table_column", false, false, false, false}
+                        {"revoke_on_table_column", false, false, false, false},
+                        {"multiple_schema_privileges", false, false, false, false}
                     // Tests types
                     , {"add_type", false, false, false, false}
                     , {"drop_type", false, false, false, false}

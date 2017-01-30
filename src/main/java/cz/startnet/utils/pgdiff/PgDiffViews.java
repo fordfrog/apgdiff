@@ -294,6 +294,7 @@ public class PgDiffViews {
                     .getPrivilege(oldViewPrivilege.getRoleName());
             if (newViewPrivilege == null) {
                 if (!emptyLinePrinted) {
+                	searchPathHelper.outputSearchPath(writer);
                     writer.println();
                 }
                 writer.println("REVOKE ALL ON TABLE "
@@ -301,6 +302,7 @@ public class PgDiffViews {
                         + " FROM " + oldViewPrivilege.getRoleName() + ";");
             } else if (!oldViewPrivilege.isSimilar(newViewPrivilege)) {
                 if (!emptyLinePrinted) {
+                	searchPathHelper.outputSearchPath(writer);
                     writer.println();
                 }
                 writer.println("REVOKE ALL ON TABLE "
@@ -328,6 +330,7 @@ public class PgDiffViews {
                     .getPrivilege(newViewPrivilege.getRoleName());
             if (oldViewPrivilege == null) {
                 if (!emptyLinePrinted) {
+                	searchPathHelper.outputSearchPath(writer);
                     writer.println();
                 }
                 writer.println("REVOKE ALL ON TABLE "

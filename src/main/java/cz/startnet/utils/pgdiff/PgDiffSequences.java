@@ -262,6 +262,7 @@ public class PgDiffSequences {
                     .getPrivilege(oldSequencePrivilege.getRoleName());
             if (newSequencePrivilege == null) {
                 if (!emptyLinePrinted) {
+                	searchPathHelper.outputSearchPath(writer);
                     writer.println();
                 }
                 writer.println("REVOKE ALL ON SEQUENCE "
@@ -269,6 +270,7 @@ public class PgDiffSequences {
                         + " FROM " + oldSequencePrivilege.getRoleName() + ";");
             } else if (!oldSequencePrivilege.isSimilar(newSequencePrivilege)) {
                 if (!emptyLinePrinted) {
+                	searchPathHelper.outputSearchPath(writer);
                     writer.println();
                 }
                 writer.println("REVOKE ALL ON SEQUENCE "
@@ -297,6 +299,7 @@ public class PgDiffSequences {
                     .getPrivilege(newSequencePrivilege.getRoleName());
             if (oldSequencePrivilege == null) {
                 if (!emptyLinePrinted) {
+                	searchPathHelper.outputSearchPath(writer);
                     writer.println();
                 }
                 writer.println("REVOKE ALL ON SEQUENCE "

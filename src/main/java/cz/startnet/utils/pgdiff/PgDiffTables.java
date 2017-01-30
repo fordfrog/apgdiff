@@ -547,7 +547,8 @@ public class PgDiffTables {
                             + " OWNER TO " + table.getOwnerTo() + ";");
                 }
                 for (PgRelationPrivilege tablePrivilege : table.getPrivileges()) {
-                    writer.println("REVOKE ALL ON TABLE "
+                	searchPathHelper.outputSearchPath(writer);
+                	writer.println("REVOKE ALL ON TABLE "
                             + PgDiffUtils.getQuotedName(table.getName())
                             + " FROM " + tablePrivilege.getRoleName() + ";");
                     if (!"".equals(tablePrivilege.getPrivilegesSQL(true))) {
@@ -660,6 +661,7 @@ public class PgDiffTables {
                             .getPrivilege(oldColumnPrivilege.getRoleName());
                     if (newColumnPrivilege == null) {
                         if (!emptyLinePrinted) {
+                        	searchPathHelper.outputSearchPath(writer);
                             emptyLinePrinted = true;
                             writer.println();
                         }
@@ -682,6 +684,7 @@ public class PgDiffTables {
                     }
                     if (!newColumnPrivilege.isSimilar(oldColumnPrivilege)) {
                         if (!emptyLinePrinted) {
+                        	searchPathHelper.outputSearchPath(writer);
                             emptyLinePrinted = true;
                             writer.println();
                         }
@@ -797,6 +800,7 @@ public class PgDiffTables {
                     .getPrivilege(oldTablePrivilege.getRoleName());
             if (newTablePrivilege == null) {
                 if (!emptyLinePrinted) {
+                	searchPathHelper.outputSearchPath(writer);
                     emptyLinePrinted = true;
                     writer.println();
                 }
@@ -805,6 +809,7 @@ public class PgDiffTables {
                         + " FROM " + oldTablePrivilege.getRoleName() + ";");
             } else if (!oldTablePrivilege.isSimilar(newTablePrivilege)) {
                 if (!emptyLinePrinted) {
+                	searchPathHelper.outputSearchPath(writer);
                     emptyLinePrinted = true;
                     writer.println();
                 }
@@ -833,6 +838,7 @@ public class PgDiffTables {
                     .getPrivilege(newTablePrivilege.getRoleName());
             if (oldTablePrivilege == null) {
                 if (!emptyLinePrinted) {
+                	searchPathHelper.outputSearchPath(writer);
                     writer.println();
                 }
                 writer.println("REVOKE ALL ON TABLE "
@@ -864,6 +870,7 @@ public class PgDiffTables {
         final String newOwnerTo = newTable.getOwnerTo();
 
         if (newOwnerTo != null && !newOwnerTo.equals(oldOwnerTo)) {
+        	searchPathHelper.outputSearchPath(writer);
             writer.println();
             writer.println("ALTER " + ((newTable.isForeign()) ? "FOREIGN ":"") + "TABLE "
                     + PgDiffUtils.getQuotedName(newTable.getName())
