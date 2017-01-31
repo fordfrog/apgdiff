@@ -38,14 +38,14 @@ public class PgDiffIndexes {
                 for (PgIndex index : newTable.getIndexes()) {
                     searchPathHelper.outputSearchPath(writer);
                     writer.println();
-                    writer.println(index.getCreationSQL());
+                    writer.println(index.getCreationSQL(searchPathHelper));
                 }
             } else {
                 for (PgIndex index : getNewIndexes(
                         oldSchema.getTable(newTableName), newTable)) {
                     searchPathHelper.outputSearchPath(writer);
                     writer.println();
-                    writer.println(index.getCreationSQL());
+                    writer.println(index.getCreationSQL(searchPathHelper));
                 }
             }
         }
@@ -76,7 +76,7 @@ public class PgDiffIndexes {
             for (final PgIndex index : getDropIndexes(oldTable, newTable)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(index.getDropSQL());
+                writer.println(index.getDropSQL(searchPathHelper));
             }
         }
     }
@@ -173,7 +173,7 @@ public class PgDiffIndexes {
                 writer.println();
                 writer.print("COMMENT ON INDEX ");
                 writer.print(
-                        PgDiffUtils.getQuotedName(newIndex.getName()));
+                		searchPathHelper.getQuotedName(newIndex.getName()));
                 writer.print(" IS ");
                 writer.print(newIndex.getComment());
                 writer.println(';');
@@ -183,7 +183,7 @@ public class PgDiffIndexes {
                 writer.println();
                 writer.print("COMMENT ON INDEX ");
                 writer.print(
-                        PgDiffUtils.getQuotedName(newIndex.getName()));
+                		searchPathHelper.getQuotedName(newIndex.getName()));
                 writer.println(" IS NULL;");
             }
         }

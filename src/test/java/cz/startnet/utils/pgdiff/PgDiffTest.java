@@ -38,222 +38,216 @@ public class PgDiffTest {
         return Arrays.asList(
                 new Object[][]{
                     // Tests scenario where COLUMN type is modified.
-                    {"modify_column_type", false, false, false, false},
+                    {"modify_column_type", false, false, false, false, false},
                     // Tests scenario where CLUSTER is added to TABLE.
-                    {"add_cluster", false, false, false, false},
+                    {"add_cluster", false, false, false, false, false},
                     // Tests scenario where CLUSTER is dropped from TABLE.
-                    {"drop_cluster", false, false, false, false},
+                    {"drop_cluster", false, false, false, false, false},
                     // Tests scenario where CLUSTER is changed on TABLE.
-                    {"modify_cluster", false, false, false, false},
+                    {"modify_cluster", false, false, false, false, false},
                     // Tests scenario where EXTENSION is added to TABLE.
-                    {"add_extension", false, false, false, false},
+                    {"add_extension", false, false, false, false, false},
                     // Tests scenario where EXTENSION is dropped from TABLE.
-                    {"drop_extension", false, false, false, false},
+                    {"drop_extension", false, false, false, false, false},
                     // Tests scenario where WITH OIDS is dropped from TABLE.
-                    {"drop_with_oids", false, false, false, false},
+                    {"drop_with_oids", false, false, false, false, false},
                     // Tests scenario where INDEX is added.
-                    {"add_index", false, false, false, false},
+                    {"add_index", false, false, false, false, false},
                     // Tests scenario where INDEX is dropped.
-                    {"drop_index", false, false, false, false},
+                    {"drop_index", false, false, false, false, false},
                     // Tests scenario where INDEX that TABLE CLUSTER is based
                     // on is dropped.
-                    {"drop_index_with_cluster", false, false, false, false},
+                    {"drop_index_with_cluster", false, false, false, false, false},
                     // Tests scenario where INDEX definition is modified.
-                    {"modify_index", false, false, false, false},
+                    {"modify_index", false, false, false, false, false},
                     // Tests scenario where STATISTICS information is added
                     // to COLUMN.
-                    {"add_statistics", false, false, false, false},
+                    {"add_statistics", false, false, false, false, false},
                     // Tests scenario where STATISTICS information is modified.
-                    {"modify_statistics", false, false, false, false},
+                    {"modify_statistics", false, false, false, false, false},
                     // Tests scenario where STATISTICS information is dropped.
-                    {"drop_statistics", false, false, false, false},
+                    {"drop_statistics", false, false, false, false, false},
                     // Tests scenario where DEFAULT value is set on COLUMN.
-                    {"add_default_value", false, false, false, false},
+                    {"add_default_value", false, false, false, false, false},
                     // Tests scenario where DEFAULT value is modified.
-                    {"modify_default_value", false, false, false, false},
+                    {"modify_default_value", false, false, false, false, false},
                     // Tests scenario where DEFAULT value is dropped from COLUMN.
-                    {"drop_default_value", false, false, false, false},
+                    {"drop_default_value", false, false, false, false, false},
                     // Tests scenario where NOT NULL constraint is set on COLUMN.
-                    {"add_not_null", false, false, false, false},
+                    {"add_not_null", false, false, false, false, false},
                     // Tests scenario where NOT NULL constraint is dropped
                     // from COLUMN.MATERIALIZED
-                    {"drop_not_null", false, false, false, false},
+                    {"drop_not_null", false, false, false, false, false},
                     // Tests scenario where COLUMN is added to TABLE definition.
-                    {"add_column", false, false, false, false},
+                    {"add_column", false, false, false, false, false},
                     // Tests scenario where COLUMN is dropped from TABLE.
-                    {"drop_column", false, false, false, false},
+                    {"drop_column", false, false, false, false, false},
                     // Tests scenario where new TABLE is added.
-                    {"add_table", false, false, false, false},
+                    {"add_table", false, false, false, false, false},
                     // Tests scenario where TABLE is dropped.
-                    {"drop_table", false, false, false, false},
+                    {"drop_table", false, false, false, false, false},
                     // Tests scenario where TABLE CONSTRAINT is added.
-                    {"add_constraint", false, false, false, false},
+                    {"add_constraint", false, false, false, false, false},
                     // Tests scenario where TABLE CONSTRAINT is modified.
-                    {"modify_constraint", false, false, false, false},
+                    {"modify_constraint", false, false, false, false, false},
                     // Tests scenario where TABLE CONSTRAINT is dropped.
-                    {"drop_constraint", false, false, false, false},
+                    {"drop_constraint", false, false, false, false, false},
                     // Tests scenario where UNIQUE TABLE CONSTRAINT is added.
-                    {"add_unique_constraint", false, false, false, true},
+                    {"add_unique_constraint", false, false, false, true, false},
                     // Tests reading of TABLE with INHERITS.
-                    {"read_inherits", false, false, false, false},
+                    {"read_inherits", false, false, false, false, false},
                     // Tests scenario where TABLE with INHERITS is added.
-                    {"add_inherits", false, false, false, false},
+                    {"add_inherits", false, false, false, false, false},
                     // Tests scenario where original and new TABLE contain
                     //different INHERITS.
-                    {"modify_inherits", false, false, false, false},
+                    {"modify_inherits", false, false, false, false, false},
                     // Add a table with a default value for a column that belongs to an inherited table
-                    {"add_inherits_default_column", false, false, false, false},
+                    {"add_inherits_default_column", false, false, false, false, false},
                     // Add a table with a default value for a column that belongs to an inherited table in a different schema
-                    {"add_inherits_schema_default_column", false, false, false, false},
+                    {"add_inherits_schema_default_column", false, false, false, false, false},
                     // Tests when a default value is changed for a column that belongs to an inherited table
-                    {"modify_default_value_inherited_column", false, false, false, false},
+                    {"modify_default_value_inherited_column", false, false, false, false, false},
                     // Tests scenario where SEQUENCE is added.
-                    {"add_sequence", false, false, false, false},
+                    {"add_sequence", false, false, false, false, false},
                     // Tests scenario where SEQUENCE is dropped.
-                    {"drop_sequence", false, false, false, false},
+                    {"drop_sequence", false, false, false, false, false},
                     // Tests scenario where INCREMENT BY is modified on SEQUENCE.
-                    {"modify_sequence_increment", false, false, false, false},
+                    {"modify_sequence_increment", false, false, false, false, false},
                     // Tests scenario where START WITH is modified on SEQUENCE
                     // (both with --ignore-start-with turned off and on).
-                    {"modify_sequence_start_ignore_off", false, false, false,
-                        false
-                    },
-                    {"modify_sequence_start_ignore_on", false, false, false,
-                        true
-                    },
+                    {"modify_sequence_start_ignore_off", false, false, false, false, false},
+                    {"modify_sequence_start_ignore_on", false, false, false, true, false},
                     // Tests scenario where MINVALUE is modified on SEQUENCE
                     // (both setting and unsetting the value).
-                    {"modify_sequence_minvalue_set", false, false, false, false},
-                    {"modify_sequence_minvalue_unset", false, false, false,
-                        false
-                    },
+                    {"modify_sequence_minvalue_set", false, false, false, false, false},
+                    {"modify_sequence_minvalue_unset", false, false, false, false, false},
                     // Tests scenario where MAXVALUE is modified on SEQUENCE
                     // (both setting and unsetting the value).
-                    {"modify_sequence_maxvalue_set", false, false, false, false},
-                    {"modify_sequence_maxvalue_unset", false, false, false,
-                        false
-                    },
+                    {"modify_sequence_maxvalue_set", false, false, false, false, false},
+                    {"modify_sequence_maxvalue_unset", false, false, false, false, false},
                     // Tests scenario where CACHE is modified on SEQUENCE.
-                    {"modify_sequence_cache", false, false, false, false},
+                    {"modify_sequence_cache", false, false, false, false, false},
                     // Tests scenario where CYCLE is modified on SEQUENCE.
-                    {"modify_sequence_cycle_on", false, false, false, false},
-                    {"modify_sequence_cycle_off", false, false, false, false},
+                    {"modify_sequence_cycle_on", false, false, false, false, false},
+                    {"modify_sequence_cycle_off", false, false, false, false, false},
                     // Tests correct finding of function end.
-                    {"modify_function_end_detection", false, false, false, false},
+                    {"modify_function_end_detection", false, false, false, false, false},
                     // Tests scenario where new FUNCTION without args is added.
-                    {"add_function_noargs", false, false, false, false},
+                    {"add_function_noargs", false, false, false, false, false},
                     // Tests scenario where FUNCTION without args is dropped.
-                    {"drop_function_noargs", false, false, false, false},
+                    {"drop_function_noargs", false, false, false, false, false},
                     // Tests scenario where FUNCTION without args is modified.
-                    {"modify_function_noargs", false, false, false, false},
+                    {"modify_function_noargs", false, false, false, false, false},
                     // Tests scenario where new FUNCTION with args is added.
-                    {"add_function_args", false, false, false, false},
+                    {"add_function_args", false, false, false, false, false},
                     // Tests scenario where FUNCTION with args is dropped.
-                    {"drop_function_args", false, false, false, false},
+                    {"drop_function_args", false, false, false, false, false},
                     // Tests scenario where FUNCTION with args is modified.
-                    {"modify_function_args", false, false, false, false},
+                    {"modify_function_args", false, false, false, false, false},
                     // Tests scenario where new FUNCTION with args is added.
-                    {"add_function_args2", false, false, false, false},
+                    {"add_function_args2", false, false, false, false, false},
                     // Tests scenario where FUNCTION with args is dropped.
-                    {"drop_function_args2", false, false, false, false},
+                    {"drop_function_args2", false, false, false, false, false},
                     // Tests scenario where FUNCTION with args is modified.
-                    {"modify_function_args2", false, false, false, false},
+                    {"modify_function_args2", false, false, false, false, false},
                     // Tests scenario where FUNCTION with same name but
                     // different args is added.
-                    {"add_function_similar", false, false, false, false},
+                    {"add_function_similar", false, false, false, false, false},
                     // Tests scenario where FUNCTION with same name but
                     // different args is dropped.
-                    {"drop_function_similar", false, false, false, false},
+                    {"drop_function_similar", false, false, false, false, false},
                     // Tests scenario where FUNCTION with same name but
                     // different args is modified.
-                    {"modify_function_similar", false, false, false, false},
+                    {"modify_function_similar", false, false, false, false, false},
                     // Tests different whitespace formatting in functions
-                    {"function_equal_whitespace", false, false, true, false},
+                    {"function_equal_whitespace", false, false, true, false, false},
                     // Tests scenario where TRIGGER is added.
-                    {"add_trigger", false, false, false, false},
+                    {"add_trigger", false, false, false, false, false},
                     // Tests scenario where TRIGGER is dropped.
-                    {"drop_trigger", false, false, false, false},
+                    {"drop_trigger", false, false, false, false, false},
                     // Tests scenario where TRIGGER is modified.
-                    {"modify_trigger", false, false, false, false},
+                    {"modify_trigger", false, false, false, false, false},
                     // Tests scenario where VIEW is added.
-                    {"add_view", false, false, false, false},
+                    {"add_view", false, false, false, false, false},
                     // Tests scenario where VIEW is dropped.
-                    {"drop_view", false, false, false, false},
+                    {"drop_view", false, false, false, false, false},
                     // Tests scenario where VIEW is modified.
-                    {"modify_view", false, false, false, false},
+                    {"modify_view", false, false, false, false, false},
                     // Tests scenario where MATERIALIZED VIEW is added.
-                    {"add_materialized_view", false, false, false, false},
+                    {"add_materialized_view", false, false, false, false, false},
                     // Tests scenario where MATERIALIZED VIEW is dropped.
-                    {"drop_materialized_view", false, false, false, false},
+                    {"drop_materialized_view", false, false, false, false, false},
                     // Tests scenario where MATERIALIZED VIEW is modified.
-                    {"modify_materialized_view", false, false, false, false},
+                    {"modify_materialized_view", false, false, false, false, false},
                     // Tests scenario where --add-defaults is specified.
-                    {"add_defaults", true, false, false, false},
+                    {"add_defaults", true, false, false, false, false},
                     // Tests scenario where multiple schemas are in the dumps.
-                    {"multiple_schemas", false, false, false, false},
+                    {"multiple_schemas", false, false, false, false, false},
                     // Tests scenario where --add-transaction is specified.
-                    {"multiple_schemas", false, true, false, false},
+                    {"multiple_schemas", false, true, false, false, false},
                     // Tests dropping view default value
-                    {"alter_view_drop_default", false, true, false, false},
+                    {"alter_view_drop_default", false, true, false, false, false},
                     // Tests adding view default value
-                    {"alter_view_add_default", false, true, false, false},
+                    {"alter_view_add_default", false, true, false, false, false},
                     // Tests adding of comments
-                    {"add_comments", false, true, false, false},
+                    {"add_comments", false, true, false, false, false},
                     // Tests dropping of comments
-                    {"drop_comments", false, true, false, false},
+                    {"drop_comments", false, true, false, false, false},
                     // Tests altering of comments
-                    {"alter_comments", false, true, false, false},
+                    {"alter_comments", false, true, false, false, false},
                     // Tests changing view default value
-                    {"alter_view_change_default", false, true, false, false},
+                    {"alter_view_change_default", false, true, false, false, false},
                     // Tests creation of sequence with bug in MINVALUE value
-                    {"add_sequence_bug2100013", false, true, false, false},
+                    {"add_sequence_bug2100013", false, true, false, false, false},
                     // Tests view with default value
-                    {"view_bug3080388", false, true, false, false},
+                    {"view_bug3080388", false, true, false, false, false},
                     // Tests function arguments beginning with in_
-                    {"function_bug3084274", false, true, false, false},
+                    {"function_bug3084274", false, true, false, false, false},
                     // Tests addition of comment when new column has been added
-                    {"add_comment_new_column", false, true, false, false},
+                    {"add_comment_new_column", false, true, false, false, false},
                     // Tests handling of quoted schemas in search_path
-                    {"quoted_schema", false, true, false, false},
+                    {"quoted_schema", false, true, false, false, false},
                     // Tests adding new column with add defaults turned on
-                    {"add_column_add_defaults", true, true, false, false},
+                    {"add_column_add_defaults", true, true, false, false, false},
                     // Tests adding new sequence that is owned by table
-                    {"add_owned_sequence", false, true, false, false},
+                    {"add_owned_sequence", false, true, false, false, false},
                     // Tests adding empty table
-                    {"add_empty_table", false, false, false, false},
+                    {"add_empty_table", false, false, false, false, false},
                     // Tests view with column names whose query changes
-                    {"view_colnames", false, false, false, false},
+                    {"view_colnames", false, false, false, false, false},
                     // Tests objects with the $ sign in the name
-                    {"add_table_bug102", false, false, false, false},
+                    {"add_table_bug102", false, false, false, false, false},
                     // Tests scenario where new UNLOGGED TABLE is added.
-                    {"add_unlogged_table", false, false, false, false},
+                    {"add_unlogged_table", false, false, false, false, false},
                     // Tests scenario where UNLOGGED TABLE is dropped.
-                    {"drop_unlogged_table", false, false, false, false},
+                    {"drop_unlogged_table", false, false, false, false, false},
                     // Test scenarios where /**/ comments.
-                    {"add_table_issue115", false, false, false, false},
-                    {"add_column_issue134", false, false, false, false},
-                    {"add_column_issue188", false, false, false, false},
-                    {"add_column_issue188", false, false, false, false},
-                    {"view_alias_with_quote", false, false, false, false},
+                    {"add_table_issue115", false, false, false, false, false},
+                    {"add_column_issue134", false, false, false, false, false},
+                    {"add_column_issue188", false, false, false, false, false},
+                    {"add_column_issue188", false, false, false, false, false},
+                    {"view_alias_with_quote", false, false, false, false, false},
                     // Tests view triggers (support for 'INSTEAD OF')
                     //90
-                    {"view_triggers", false, false, false, false},
+                    {"view_triggers", false, false, false, false, false},
                     // Tests privileges
-                        {"grant_on_table_sequence", false, false, false, false},
-                        {"revoke_on_table_sequence", false, false, false, false},
-                        {"grant_on_view", false, false, false, false},
-                        {"revoke_on_view", false, false, false, false},
-                        {"revoke_on_table_column", false, false, false, false},
-                        {"multiple_schema_privileges", false, false, false, false}
+                        {"grant_on_table_sequence", false, false, false, false, false},
+                        {"revoke_on_table_sequence", false, false, false, false, false},
+                        {"grant_on_view", false, false, false, false, false},
+                        {"revoke_on_view", false, false, false, false, false},
+                        {"revoke_on_table_column", false, false, false, false, false},
+                        {"multiple_schema_privileges", false, false, false, false, false}
                     // Tests types
-                    , {"add_type", false, false, false, false}
-                    , {"drop_type", false, false, false, false}
-                    , {"alter_type", false, false, false, false}
+                    , {"add_type", false, false, false, false, false}
+                    , {"drop_type", false, false, false, false, false}
+                    , {"alter_type", false, false, false, false, false}
                     // Test Foreign Tables
-                    , {"foreign_create_table", false, false, false, false}
-                    , {"foreign_drop_table", false, false, false, false}
+                    , {"foreign_create_table", false, false, false, false, false}
+                    , {"foreign_drop_table", false, false, false, false, false}
                     //100
-                    , {"foreign_alter_type", false, false, false, false}
+                    , {"foreign_alter_type", false, false, false, false, false}
+                    //Test schema qualified option.
+                    , {"schema_qualified", false, false, false, false, true}
                 });
     }
     /**
@@ -278,6 +272,10 @@ public class PgDiffTest {
      * Value for the same named command line argument.
      */
     private final boolean ignoreStartWith;
+    /**
+     * Value for the same named command line argument.
+     */
+    private final boolean schemaQualifyObjects;
 
     /**
      * Creates a new PgDiffTest object.
@@ -287,17 +285,20 @@ public class PgDiffTest {
      * @param addTransaction           {@link #addTransaction}
      * @param ignoreFunctionWhitespace {@link #ignoreFunctionWhitespace}
      * @param ignoreStartWith          {@link #ignoreStartWith}
+     * @param schemaQualifyObjects     {@link #schemaQualifyObjects}
      */
     public PgDiffTest(final String fileNameTemplate,
             final boolean addDefaults, final boolean addTransaction,
             final boolean ignoreFunctionWhitespace,
-            final boolean ignoreStartWith) {
+            final boolean ignoreStartWith,
+            final boolean schemaQualifyObjects) {
         super();
         this.fileNameTemplate = fileNameTemplate;
         this.addDefaults = addDefaults;
         this.addTransaction = addTransaction;
         this.ignoreFunctionWhitespace = ignoreFunctionWhitespace;
         this.ignoreStartWith = ignoreStartWith;
+        this.schemaQualifyObjects = schemaQualifyObjects;
         Locale.setDefault(Locale.ENGLISH);
     }
 
@@ -362,6 +363,7 @@ public class PgDiffTest {
         arguments.setAddDefaults(addDefaults);
         arguments.setIgnoreFunctionWhitespace(ignoreFunctionWhitespace);
         arguments.setIgnoreStartWith(ignoreStartWith);
+        arguments.setSchemaQualifyObjects(schemaQualifyObjects);
         PgDiff.createDiff(writer, arguments,
                 PgDiffTest.class.getResourceAsStream(
                 fileNameTemplate + "_original.sql"),
@@ -372,8 +374,8 @@ public class PgDiffTest {
         final BufferedReader reader = new BufferedReader(new InputStreamReader(
                 PgDiffTest.class.getResourceAsStream(
                 fileNameTemplate + "_diff.sql")));
-        final char[] part = new char[1024];
-        final StringBuilder sbExpDiff = new StringBuilder(1024);
+        final char[] part = new char[2048];
+        final StringBuilder sbExpDiff = new StringBuilder(2048);
 
         while (reader.read(part) != -1) {
             sbExpDiff.append(part);

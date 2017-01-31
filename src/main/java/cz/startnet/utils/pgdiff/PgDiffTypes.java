@@ -179,7 +179,7 @@ public class PgDiffTypes {
                     || !oldSchema.containsType(type.getName())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(type.getCreationSQL());
+                writer.println(type.getCreationSQL(searchPathHelper));
             }
         }
     }
@@ -203,7 +203,7 @@ public class PgDiffTypes {
             if (!newSchema.containsType(type.getName())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(type.getDropSQL());
+                writer.println(type.getDropSQL(searchPathHelper));
             }
         }
     }
@@ -233,7 +233,7 @@ public class PgDiffTypes {
 
         if (!statements.isEmpty()) {
             final String quotedTypeName =
-                    PgDiffUtils.getQuotedName(newType.getName());
+            		searchPathHelper.getQuotedName(newType.getName());
             searchPathHelper.outputSearchPath(writer);
             writer.println();
             writer.println("ALTER TYPE " + quotedTypeName);

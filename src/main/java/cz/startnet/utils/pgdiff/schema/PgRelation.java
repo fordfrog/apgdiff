@@ -6,6 +6,7 @@
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
+import cz.startnet.utils.pgdiff.SearchPathHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -109,7 +110,7 @@ public abstract class PgRelation {
      *
      * @return SQL code for declaring relation and column comments
      */
-    protected String getCommentDefinitionSQL() {
+    protected String getCommentDefinitionSQL(SearchPathHelper searchPathHelper) {
         final StringBuilder sbSQL = new StringBuilder(100);
 
         if (comment != null && !comment.isEmpty()) {
@@ -118,7 +119,7 @@ public abstract class PgRelation {
             sbSQL.append("COMMENT ON ");
             sbSQL.append(getRelationKind());
             sbSQL.append(' ');
-            sbSQL.append(PgDiffUtils.getQuotedName(name));
+            sbSQL.append(searchPathHelper.getQuotedName(name));
             sbSQL.append(" IS ");
             sbSQL.append(comment);
             sbSQL.append(';');
@@ -129,7 +130,7 @@ public abstract class PgRelation {
                 sbSQL.append(System.getProperty("line.separator"));
                 sbSQL.append(System.getProperty("line.separator"));
                 sbSQL.append("COMMENT ON COLUMN ");
-                sbSQL.append(PgDiffUtils.getQuotedName(name));
+                sbSQL.append(searchPathHelper.getQuotedName(name));
                 sbSQL.append('.');
                 sbSQL.append(PgDiffUtils.getQuotedName(column.getName()));
                 sbSQL.append(" IS ");
@@ -286,9 +287,9 @@ public abstract class PgRelation {
      *
      * @return created SQL statement
      */
-    public String getDropSQL() {
+    public String getDropSQL(SearchPathHelper searchPathHelper) {
         return "DROP " + getRelationKind() + " " +
-                PgDiffUtils.getQuotedName(getName()) + ";";
+        		searchPathHelper.getQuotedName(getName()) + ";";
     }
 
     /**

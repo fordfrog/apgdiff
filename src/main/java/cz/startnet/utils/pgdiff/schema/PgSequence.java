@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
+import cz.startnet.utils.pgdiff.SearchPathHelper;
 
 /**
  * Stores sequence information.
@@ -110,10 +111,10 @@ public class PgSequence {
      *
      * @return created SQL statement
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(SearchPathHelper searchPathHelper) {
         final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("CREATE SEQUENCE ");
-        sbSQL.append(PgDiffUtils.getQuotedName(name));
+        sbSQL.append(searchPathHelper.getQuotedName(name));
 
         if (startWith != null) {
             sbSQL.append(System.getProperty("line.separator"));
@@ -164,7 +165,7 @@ public class PgSequence {
             sbSQL.append(System.getProperty("line.separator"));
             sbSQL.append(System.getProperty("line.separator"));
             sbSQL.append("COMMENT ON SEQUENCE ");
-            sbSQL.append(PgDiffUtils.getQuotedName(name));
+            sbSQL.append(searchPathHelper.getQuotedName(name));
             sbSQL.append(" IS ");
             sbSQL.append(comment);
             sbSQL.append(';');
@@ -178,11 +179,11 @@ public class PgSequence {
      *
      * @return created SQL statement
      */
-    public String getOwnedBySQL() {
+    public String getOwnedBySQL(SearchPathHelper searchPathHelper) {
         final StringBuilder sbSQL = new StringBuilder(100);
 
         sbSQL.append("ALTER SEQUENCE ");
-        sbSQL.append(PgDiffUtils.getQuotedName(name));
+        sbSQL.append(searchPathHelper.getQuotedName(name));
 
         if (ownedBy != null && !ownedBy.isEmpty()) {
             sbSQL.append(System.getProperty("line.separator"));
@@ -218,8 +219,8 @@ public class PgSequence {
      *
      * @return created SQL
      */
-    public String getDropSQL() {
-        return "DROP SEQUENCE " + PgDiffUtils.getQuotedName(getName()) + ";";
+    public String getDropSQL(SearchPathHelper searchPathHelper) {
+        return "DROP SEQUENCE " + searchPathHelper.getQuotedName(getName()) + ";";
     }
 
     /**

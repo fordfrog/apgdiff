@@ -6,6 +6,8 @@
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
+import cz.startnet.utils.pgdiff.SearchPathHelper;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -137,7 +139,7 @@ public class PgTrigger {
      *
      * @return created SQL
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(SearchPathHelper searchPathHelper) {
         final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("CREATE TRIGGER ");
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
@@ -196,7 +198,7 @@ public class PgTrigger {
         }
 
         sbSQL.append(" ON ");
-        sbSQL.append(PgDiffUtils.getQuotedName(getRelationName()));
+        sbSQL.append(searchPathHelper.getQuotedName(getRelationName()));
         sbSQL.append(System.getProperty("line.separator"));
         sbSQL.append("\tFOR EACH ");
         sbSQL.append(isForEachRow() ? "ROW" : "STATEMENT");
@@ -219,7 +221,7 @@ public class PgTrigger {
             sbSQL.append("COMMENT ON TRIGGER ");
             sbSQL.append(PgDiffUtils.getQuotedName(name));
             sbSQL.append(" ON ");
-            sbSQL.append(PgDiffUtils.getQuotedName(relationName));
+            sbSQL.append(searchPathHelper.getQuotedName(relationName));
             sbSQL.append(" IS ");
             sbSQL.append(comment);
             sbSQL.append(';');
@@ -233,9 +235,9 @@ public class PgTrigger {
      *
      * @return created SQL
      */
-    public String getDropSQL() {
+    public String getDropSQL(SearchPathHelper searchPathHelper) {
         return "DROP TRIGGER " + PgDiffUtils.getQuotedName(getName()) + " ON "
-                + PgDiffUtils.getQuotedName(getRelationName()) + ";";
+                + searchPathHelper.getQuotedName(getRelationName()) + ";";
     }
 
     /**

@@ -6,6 +6,8 @@
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
+import cz.startnet.utils.pgdiff.SearchPathHelper;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -71,10 +73,10 @@ public class PgType {
      *
      * @return created SQL statement
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(SearchPathHelper searchPathHelper) {
         final StringBuilder sbSQL = new StringBuilder(1000);
         sbSQL.append("CREATE TYPE ");
-        sbSQL.append(PgDiffUtils.getQuotedName(name));
+        sbSQL.append(searchPathHelper.getQuotedName(name));
         if (isEnum) {
             sbSQL.append(" AS ENUM (");
         } else {
@@ -121,7 +123,7 @@ public class PgType {
         for (PgColumn column : getColumnsWithStatistics()) {
             sbSQL.append(System.getProperty("line.separator"));
             sbSQL.append("ALTER TABLE ONLY ");
-            sbSQL.append(PgDiffUtils.getQuotedName(name));
+            sbSQL.append(searchPathHelper.getQuotedName(name));
             sbSQL.append(" ALTER COLUMN ");
             sbSQL.append(
                     PgDiffUtils.getQuotedName(column.getName()));
@@ -136,8 +138,8 @@ public class PgType {
      *
      * @return created SQL statement
      */
-    public String getDropSQL() {
-        return "DROP TYPE " + PgDiffUtils.getQuotedName(getName()) + ";";
+    public String getDropSQL(SearchPathHelper searchPathHelper) {
+        return "DROP TYPE " + searchPathHelper.getQuotedName(getName()) + ";";
     }
 
     /**

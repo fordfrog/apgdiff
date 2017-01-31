@@ -6,6 +6,8 @@
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
+import cz.startnet.utils.pgdiff.SearchPathHelper;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,12 +96,12 @@ public class PgView extends PgRelation {
      *
      * @return created SQL statement
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(SearchPathHelper searchPathHelper) {
         final StringBuilder sbSQL = new StringBuilder(query.length() * 2);
         sbSQL.append("CREATE ");
         sbSQL.append(getRelationKind());
         sbSQL.append(' ');
-        sbSQL.append(PgDiffUtils.getQuotedName(name));
+        sbSQL.append(searchPathHelper.getQuotedName(name));
 
         if (declareColumnNames) {
             assert columns != null && !columns.isEmpty();
@@ -141,7 +143,7 @@ public class PgView extends PgRelation {
             }
         }
 
-        sbSQL.append(getCommentDefinitionSQL());
+        sbSQL.append(getCommentDefinitionSQL(searchPathHelper));
 
         return sbSQL.toString();
     }
