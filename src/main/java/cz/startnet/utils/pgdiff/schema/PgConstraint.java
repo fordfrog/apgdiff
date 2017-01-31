@@ -6,6 +6,8 @@
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
+import cz.startnet.utils.pgdiff.SearchPathHelper;
+
 import java.util.regex.Pattern;
 
 /**
@@ -51,10 +53,10 @@ public class PgConstraint {
      *
      * @return created SQL
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(SearchPathHelper searchPathHelper) {
         final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("ALTER TABLE ");
-        sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
+        sbSQL.append(searchPathHelper.getQuotedName(getTableName()));
         sbSQL.append(System.getProperty("line.separator"));
         sbSQL.append("\tADD CONSTRAINT ");
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
@@ -68,7 +70,7 @@ public class PgConstraint {
             sbSQL.append("COMMENT ON CONSTRAINT ");
             sbSQL.append(PgDiffUtils.getQuotedName(name));
             sbSQL.append(" ON ");
-            sbSQL.append(PgDiffUtils.getQuotedName(tableName));
+            sbSQL.append(searchPathHelper.getQuotedName(tableName));
             sbSQL.append(" IS ");
             sbSQL.append(comment);
             sbSQL.append(';');
@@ -118,10 +120,10 @@ public class PgConstraint {
      *
      * @return created SQL
      */
-    public String getDropSQL() {
+    public String getDropSQL(SearchPathHelper searchPathHelper) {
         final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("ALTER TABLE ");
-        sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
+        sbSQL.append(searchPathHelper.getQuotedName(getTableName()));
         sbSQL.append(System.getProperty("line.separator"));
         sbSQL.append("\tDROP CONSTRAINT ");
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));

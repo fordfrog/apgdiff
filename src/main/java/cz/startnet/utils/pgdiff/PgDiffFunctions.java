@@ -42,7 +42,7 @@ public class PgDiffFunctions {
                     oldFunction, arguments.isIgnoreFunctionWhitespace())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(newFunction.getCreationSQL());
+                writer.println(newFunction.getCreationSQL(searchPathHelper));
             }
         }
     }
@@ -68,7 +68,7 @@ public class PgDiffFunctions {
             if (!newSchema.containsFunction(oldFunction.getSignature())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(oldFunction.getDropSQL());
+                writer.println(oldFunction.getDropSQL(searchPathHelper));
             }
         }
     }
@@ -105,7 +105,7 @@ public class PgDiffFunctions {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.print("COMMENT ON FUNCTION ");
-                writer.print(PgDiffUtils.getQuotedName(newFunction.getName()));
+                writer.print(searchPathHelper.getQuotedName(newFunction.getName()));
                 writer.print('(');
 
                 boolean addComma = false;
@@ -129,7 +129,7 @@ public class PgDiffFunctions {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.print("COMMENT ON FUNCTION ");
-                writer.print(PgDiffUtils.getQuotedName(newFunction.getName()));
+                writer.print(searchPathHelper.getQuotedName(newFunction.getName()));
                 writer.print('(');
 
                 boolean addComma = false;

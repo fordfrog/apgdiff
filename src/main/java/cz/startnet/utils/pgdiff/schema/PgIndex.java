@@ -6,6 +6,7 @@
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
+import cz.startnet.utils.pgdiff.SearchPathHelper;
 
 /**
  * Stores table index information.
@@ -67,7 +68,7 @@ public class PgIndex {
      *
      * @return created SQL
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(SearchPathHelper searchPathHelper) {
         final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("CREATE ");
 
@@ -78,7 +79,7 @@ public class PgIndex {
         sbSQL.append("INDEX ");
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(" ON ");
-        sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
+        sbSQL.append(searchPathHelper.getQuotedName(getTableName()));
         sbSQL.append(' ');
         sbSQL.append(getDefinition());
         sbSQL.append(';');
@@ -87,7 +88,7 @@ public class PgIndex {
             sbSQL.append(System.getProperty("line.separator"));
             sbSQL.append(System.getProperty("line.separator"));
             sbSQL.append("COMMENT ON INDEX ");
-            sbSQL.append(PgDiffUtils.getQuotedName(name));
+            sbSQL.append(searchPathHelper.getQuotedName(name));
             sbSQL.append(" IS ");
             sbSQL.append(comment);
             sbSQL.append(';');
@@ -119,8 +120,8 @@ public class PgIndex {
      *
      * @return created SQL statement
      */
-    public String getDropSQL() {
-        return "DROP INDEX " + PgDiffUtils.getQuotedName(getName()) + ";";
+    public String getDropSQL(SearchPathHelper searchPathHelper) {
+        return "DROP INDEX " + searchPathHelper.getQuotedName(getName()) + ";";
     }
 
     /**

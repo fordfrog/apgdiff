@@ -69,6 +69,7 @@ public final class Parser {
                 || Character.isWhitespace(string.charAt(wordEnd))
                 || string.charAt(wordEnd) == ';'
                 || string.charAt(wordEnd) == ')'
+                || string.charAt(wordEnd) == '('
                 || string.charAt(wordEnd) == ','
                 || string.charAt(wordEnd) == '['
                 || "(".equals(word) || ",".equals(word) || "[".equals(word)

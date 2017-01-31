@@ -7,6 +7,8 @@ package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.Pair;
 import cz.startnet.utils.pgdiff.PgDiffUtils;
+import cz.startnet.utils.pgdiff.SearchPathHelper;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -112,7 +114,7 @@ public class PgTable extends PgRelation {
      *
      * @return created SQL statement
      */
-    public String getCreationSQL(final PgSchema schema) {
+    public String getCreationSQL(final PgSchema schema, SearchPathHelper searchPathHelper) {
         final StringBuilder sbSQL = new StringBuilder(1000);
         sbSQL.append("CREATE ");
         if (isUnlogged()) {
@@ -122,7 +124,7 @@ public class PgTable extends PgRelation {
             sbSQL.append("FOREIGN ");
         }
         sbSQL.append("TABLE ");
-        sbSQL.append(PgDiffUtils.getQuotedName(name));
+        sbSQL.append(searchPathHelper.getQuotedName(name));
         sbSQL.append(" (");
         sbSQL.append(System.getProperty("line.separator"));
 
@@ -207,7 +209,7 @@ public class PgTable extends PgRelation {
                 sbSQL.append(System.getProperty("line.separator"));
                 sbSQL.append(System.getProperty("line.separator"));
                 sbSQL.append("ALTER TABLE ONLY ");
-                sbSQL.append(PgDiffUtils.getQuotedName(name));
+                sbSQL.append(searchPathHelper.getQuotedName(name));
                 sbSQL.append(System.getProperty("line.separator"));
                 sbSQL.append("\tALTER COLUMN ");
                 sbSQL.append(
@@ -221,7 +223,7 @@ public class PgTable extends PgRelation {
         for (PgColumn column : getColumnsWithStatistics()) {
             sbSQL.append(System.getProperty("line.separator"));
             sbSQL.append("ALTER TABLE ONLY ");
-            sbSQL.append(PgDiffUtils.getQuotedName(name));
+            sbSQL.append(searchPathHelper.getQuotedName(name));
             sbSQL.append(" ALTER COLUMN ");
             sbSQL.append(
                     PgDiffUtils.getQuotedName(column.getName()));
@@ -230,7 +232,7 @@ public class PgTable extends PgRelation {
             sbSQL.append(';');
         }
 
-        sbSQL.append(getCommentDefinitionSQL());
+        sbSQL.append(getCommentDefinitionSQL(searchPathHelper));
 
         return sbSQL.toString();
     }
@@ -419,9 +421,9 @@ public class PgTable extends PgRelation {
      */
     
     @Override
-    public String getDropSQL() {
+    public String getDropSQL(SearchPathHelper searchPathHelper) {
         return "DROP " + ((isForeign()) ? "FOREIGN ":"") + getRelationKind() + " " +
-                PgDiffUtils.getQuotedName(getName()) + ";";
+        		searchPathHelper.getQuotedName(getName()) + ";";
     }
     
     public boolean isForeign() {

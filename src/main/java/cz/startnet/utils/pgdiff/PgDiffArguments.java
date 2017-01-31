@@ -65,6 +65,10 @@ public class PgDiffArguments {
      * Whether Slony triggers should be ignored.
      */
     private boolean ignoreSlonyTriggers;
+    /**
+     * Whether statements should be schema qualified.
+     */
+    private boolean schemaQualifyObjects;
 
     /**
      * Setter for {@link #addDefaults}.
@@ -253,6 +257,8 @@ public class PgDiffArguments {
                 i++;
             } else if ("--output-ignored-statements".equals(args[i])) {
                 setOutputIgnoredStatements(true);
+            } else if ("--schema-qualify-objects".equals(args[i])) {
+                setSchemaQualifyObjects(true);
             } else if ("--version".equals(args[i])) {
                 setVersion(true);
             } else {
@@ -387,4 +393,24 @@ public class PgDiffArguments {
     public void setIgnoreSlonyTriggers(final boolean ignoreSlonyTriggers) {
         this.ignoreSlonyTriggers = ignoreSlonyTriggers;
     }
+    
+    /**
+     * Getter for {@link #schemaQualifyObjects}.
+     *
+     * @return {@link #schemaQualifyObjects}
+     */
+    public boolean isSchemaQualifyObjects() {
+        return schemaQualifyObjects;
+    }
+
+    /**
+     * Setter for {@link #schemaQualifyObjects}.
+     *
+     * @param schemaQualifyObjects {@link #schemaQualifyObjects}
+     */
+    public void setSchemaQualifyObjects(final boolean schemaQualifyObjects) {
+        this.schemaQualifyObjects = schemaQualifyObjects;
+    }
+    
+    
 }

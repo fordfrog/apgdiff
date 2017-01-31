@@ -43,7 +43,7 @@ public class PgDiffTriggers {
             for (final PgTrigger trigger : getNewTriggers(oldRelation, newRelation)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(trigger.getCreationSQL());
+                writer.println(trigger.getCreationSQL(searchPathHelper));
             }
         }
     }
@@ -73,7 +73,7 @@ public class PgDiffTriggers {
                     getDropTriggers(oldRelation, newRelation)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(trigger.getDropSQL());
+                writer.println(trigger.getDropSQL(searchPathHelper));
             }
         }
     }
@@ -174,7 +174,7 @@ public class PgDiffTriggers {
                     writer.print(
                             PgDiffUtils.getQuotedName(newTrigger.getName()));
                     writer.print(" ON ");
-                    writer.print(PgDiffUtils.getQuotedName(
+                    writer.print(searchPathHelper.getQuotedName(
                             newTrigger.getRelationName()));
                     writer.print(" IS ");
                     writer.print(newTrigger.getComment());
@@ -187,7 +187,7 @@ public class PgDiffTriggers {
                     writer.print(
                             PgDiffUtils.getQuotedName(newTrigger.getName()));
                     writer.print(" ON ");
-                    writer.print(PgDiffUtils.getQuotedName(
+                    writer.print(searchPathHelper.getQuotedName(
                             newTrigger.getRelationName()));
                     writer.println(" IS NULL;");
                 }

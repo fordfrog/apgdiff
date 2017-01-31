@@ -6,6 +6,8 @@
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
+import cz.startnet.utils.pgdiff.SearchPathHelper;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -59,10 +61,10 @@ public class PgFunction {
      *
      * @return creation SQL
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(SearchPathHelper searchPathHelper) {
         final StringBuilder sbSQL = new StringBuilder(500);
         sbSQL.append("CREATE OR REPLACE FUNCTION ");
-        sbSQL.append(PgDiffUtils.getQuotedName(name));
+        sbSQL.append(searchPathHelper.getQuotedName(name));
         sbSQL.append('(');
 
         boolean addComma = false;
@@ -85,7 +87,7 @@ public class PgFunction {
             sbSQL.append(System.getProperty("line.separator"));
             sbSQL.append(System.getProperty("line.separator"));
             sbSQL.append("COMMENT ON FUNCTION ");
-            sbSQL.append(PgDiffUtils.getQuotedName(name));
+            sbSQL.append(searchPathHelper.getQuotedName(name));
             sbSQL.append('(');
 
             addComma = false;
@@ -131,10 +133,10 @@ public class PgFunction {
      *
      * @return created SQL
      */
-    public String getDropSQL() {
+    public String getDropSQL(SearchPathHelper searchPathHelper) {
         final StringBuilder sbString = new StringBuilder(100);
         sbString.append("DROP FUNCTION ");
-        sbString.append(name);
+        sbString.append(searchPathHelper.getQuotedName(name));
         sbString.append('(');
 
         boolean addComma = false;

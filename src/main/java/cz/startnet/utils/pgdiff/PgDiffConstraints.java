@@ -47,7 +47,7 @@ public class PgDiffConstraints {
                     getNewConstraints(oldTable, newTable, primaryKey)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(constraint.getCreationSQL());
+                writer.println(constraint.getCreationSQL(searchPathHelper));
             }
         }
     }
@@ -80,7 +80,7 @@ public class PgDiffConstraints {
                     getDropConstraints(oldTable, newTable, primaryKey)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(constraint.getDropSQL());
+                writer.println(constraint.getDropSQL(searchPathHelper));
             }
         }
     }
@@ -199,14 +199,14 @@ public class PgDiffConstraints {
 
                     if (newConstraint.isPrimaryKeyConstraint()) {
                         writer.print("INDEX ");
-                        writer.print(PgDiffUtils.getQuotedName(
+                        writer.print(searchPathHelper.getQuotedName(
                                 newConstraint.getName()));
                     } else {
                         writer.print("CONSTRAINT ");
                         writer.print(PgDiffUtils.getQuotedName(
                                 newConstraint.getName()));
                         writer.print(" ON ");
-                        writer.print(PgDiffUtils.getQuotedName(
+                        writer.print(searchPathHelper.getQuotedName(
                                 newConstraint.getTableName()));
                     }
 
@@ -221,14 +221,14 @@ public class PgDiffConstraints {
 
                     if (newConstraint.isPrimaryKeyConstraint()) {
                         writer.print("INDEX ");
-                        writer.print(PgDiffUtils.getQuotedName(
+                        writer.print(searchPathHelper.getQuotedName(
                                 newConstraint.getName()));
                     } else {
                         writer.print("CONSTRAINT ");
                         writer.print(PgDiffUtils.getQuotedName(
                                 newConstraint.getName()));
                         writer.print(" ON ");
-                        writer.print(PgDiffUtils.getQuotedName(
+                        writer.print(searchPathHelper.getQuotedName(
                                 newConstraint.getTableName()));
                     }
 

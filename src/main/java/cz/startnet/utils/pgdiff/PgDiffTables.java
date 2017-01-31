@@ -61,7 +61,7 @@ public class PgDiffTables {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.print("ALTER TABLE ");
-                writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
+                writer.print(searchPathHelper.getQuotedName(newTable.getName()));
                 writer.println(" SET WITHOUT CLUSTER;");
             }
         }
@@ -103,7 +103,7 @@ public class PgDiffTables {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.print("ALTER TABLE ");
-                writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
+                writer.print(searchPathHelper.getQuotedName(newTable.getName()));
                 writer.print(" CLUSTER ON ");
                 writer.print(PgDiffUtils.getQuotedName(newCluster));
                 writer.println(';');
@@ -184,7 +184,7 @@ public class PgDiffTables {
             searchPathHelper.outputSearchPath(writer);
             writer.println();
             writer.print("ALTER TABLE ONLY ");
-            writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
+            writer.print(searchPathHelper.getQuotedName(newTable.getName()));
             writer.print(" ALTER COLUMN ");
             writer.print(PgDiffUtils.getQuotedName(entry.getKey()));
             writer.print(" SET STATISTICS ");
@@ -231,7 +231,7 @@ public class PgDiffTables {
             searchPathHelper.outputSearchPath(writer);
             writer.println();
             writer.print("ALTER TABLE ONLY ");
-            writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
+            writer.print(searchPathHelper.getQuotedName(newTable.getName()));
             writer.print(" ALTER COLUMN ");
             writer.print(PgDiffUtils.getQuotedName(newColumn.getName()));
             writer.print(" SET STORAGE ");
@@ -388,7 +388,7 @@ public class PgDiffTables {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println("ALTER TABLE "
-                        + PgDiffUtils.getQuotedName(newTable.getName()));
+                        + searchPathHelper.getQuotedName(newTable.getName()));
                 writer.println("\tNO INHERIT "
                         + inheritTableName + ';');
             }
@@ -414,7 +414,7 @@ public class PgDiffTables {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println("ALTER TABLE "
-                        + PgDiffUtils.getQuotedName(newTable.getName()));
+                        + searchPathHelper.getQuotedName(newTable.getName()));
                 writer.println("\tINHERIT "
                         + inheritTableName + ';');
             }
@@ -449,7 +449,7 @@ public class PgDiffTables {
             if (!oldDefault.equals(newDefault)) {
                 writer.println();
                 writer.print("ALTER TABLE ONLY ");
-                writer.println(PgDiffUtils.getQuotedName(newTable.getName()));
+                writer.println(searchPathHelper.getQuotedName(newTable.getName()));
                 writer.print("\tALTER COLUMN ");
                 writer.print(PgDiffUtils.getQuotedName(newColumn.getInheritedColumn().getName()));
                 if (newDefault.length() == 0) {
@@ -486,7 +486,7 @@ public class PgDiffTables {
         searchPathHelper.outputSearchPath(writer);
         writer.println();
         writer.println("ALTER TABLE "
-                + PgDiffUtils.getQuotedName(newTable.getName()));
+                + searchPathHelper.getQuotedName(newTable.getName()));
 
         if (newTable.getWith() == null
                 || "OIDS=false".equalsIgnoreCase(newTable.getWith())) {
@@ -519,7 +519,7 @@ public class PgDiffTables {
         searchPathHelper.outputSearchPath(writer);
         writer.println();
         writer.println("ALTER TABLE "
-                + PgDiffUtils.getQuotedName(newTable.getName()));
+                + searchPathHelper.getQuotedName(newTable.getName()));
         writer.println("\tTABLESPACE " + newTable.getTablespace() + ';');
     }
 
@@ -539,22 +539,23 @@ public class PgDiffTables {
                     || !oldSchema.containsTable(table.getName())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(table.getCreationSQL(newSchema));
+                writer.println(table.getCreationSQL(newSchema, searchPathHelper));
                 writer.println();
                 if (table.getOwnerTo() != null) {
                     writer.println("ALTER TABLE "
-                            + PgDiffUtils.getQuotedName(table.getName())
+                            + searchPathHelper.getQuotedName(table.getName())
                             + " OWNER TO " + table.getOwnerTo() + ";");
                 }
                 for (PgRelationPrivilege tablePrivilege : table.getPrivileges()) {
-                    writer.println("REVOKE ALL ON TABLE "
-                            + PgDiffUtils.getQuotedName(table.getName())
+                	searchPathHelper.outputSearchPath(writer);
+                	writer.println("REVOKE ALL ON TABLE "
+                            + searchPathHelper.getQuotedName(table.getName())
                             + " FROM " + tablePrivilege.getRoleName() + ";");
                     if (!"".equals(tablePrivilege.getPrivilegesSQL(true))) {
                         writer.println("GRANT "
                                 + tablePrivilege.getPrivilegesSQL(true)
                                 + " ON TABLE "
-                                + PgDiffUtils.getQuotedName(table.getName())
+                                + searchPathHelper.getQuotedName(table.getName())
                                 + " TO " + tablePrivilege.getRoleName()
                                 + " WITH GRANT OPTION;");
                     }
@@ -562,7 +563,7 @@ public class PgDiffTables {
                         writer.println("GRANT "
                                 + tablePrivilege.getPrivilegesSQL(false)
                                 + " ON TABLE "
-                                + PgDiffUtils.getQuotedName(table.getName())
+                                + searchPathHelper.getQuotedName(table.getName())
                                 + " TO " + tablePrivilege.getRoleName() + ";");
                     }
                 }
@@ -590,7 +591,7 @@ public class PgDiffTables {
             if (!newSchema.containsTable(table.getName())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(table.getDropSQL());
+                writer.println(table.getDropSQL(searchPathHelper));
             }
         }
     }
@@ -620,7 +621,7 @@ public class PgDiffTables {
 
         if (!statements.isEmpty()) {
             final String quotedTableName =
-                    PgDiffUtils.getQuotedName(newTable.getName());
+            		searchPathHelper.getQuotedName(newTable.getName());
             searchPathHelper.outputSearchPath(writer);
             writer.println();
             writer.println("ALTER " + ((newTable.isForeign()) ? "FOREIGN ":"") + "TABLE " + quotedTableName);
@@ -660,13 +661,14 @@ public class PgDiffTables {
                             .getPrivilege(oldColumnPrivilege.getRoleName());
                     if (newColumnPrivilege == null) {
                         if (!emptyLinePrinted) {
+                        	searchPathHelper.outputSearchPath(writer);
                             emptyLinePrinted = true;
                             writer.println();
                         }
                         writer.println("REVOKE ALL ("
                                 + PgDiffUtils.getQuotedName(newColumn.getName())
                                 + ") ON TABLE "
-                                + PgDiffUtils.getQuotedName(newTable.getName())
+                                + searchPathHelper.getQuotedName(newTable.getName())
                                 + " FROM " + oldColumnPrivilege.getRoleName()
                                 + ";");
                     }
@@ -682,13 +684,14 @@ public class PgDiffTables {
                     }
                     if (!newColumnPrivilege.isSimilar(oldColumnPrivilege)) {
                         if (!emptyLinePrinted) {
+                        	searchPathHelper.outputSearchPath(writer);
                             emptyLinePrinted = true;
                             writer.println();
                         }
                         writer.println("REVOKE ALL ("
                                 + PgDiffUtils.getQuotedName(newColumn.getName())
                                 + ") ON TABLE "
-                                + PgDiffUtils.getQuotedName(newTable.getName())
+                                + searchPathHelper.getQuotedName(newTable.getName())
                                 + " FROM " + newColumnPrivilege.getRoleName()
                                 + ";");
                         if (!"".equals(newColumnPrivilege.getPrivilegesSQL(
@@ -699,7 +702,7 @@ public class PgDiffTables {
                                             PgDiffUtils.getQuotedName(newColumn
                                                     .getName()))
                                     + " ON TABLE "
-                                    + PgDiffUtils.getQuotedName(newTable
+                                    + searchPathHelper.getQuotedName(newTable
                                             .getName()) + " TO "
                                     + newColumnPrivilege.getRoleName()
                                     + " WITH GRANT OPTION;");
@@ -713,7 +716,7 @@ public class PgDiffTables {
                                                     .getQuotedName(newColumn
                                                             .getName()))
                                     + " ON TABLE "
-                                    + PgDiffUtils.getQuotedName(newTable
+                                    + searchPathHelper.getQuotedName(newTable
                                             .getName()) + " TO "
                                     + newColumnPrivilege.getRoleName() + ";");
                         }
@@ -746,7 +749,7 @@ public class PgDiffTables {
             searchPathHelper.outputSearchPath(writer);
             writer.println();
             writer.print("COMMENT ON TABLE ");
-            writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
+            writer.print(searchPathHelper.getQuotedName(newTable.getName()));
             writer.print(" IS ");
             writer.print(newTable.getComment());
             writer.println(';');
@@ -755,7 +758,7 @@ public class PgDiffTables {
             searchPathHelper.outputSearchPath(writer);
             writer.println();
             writer.print("COMMENT ON TABLE ");
-            writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
+            writer.print(searchPathHelper.getQuotedName(newTable.getName()));
             writer.println(" IS NULL;");
         }
 
@@ -770,7 +773,7 @@ public class PgDiffTables {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.print("COMMENT ON COLUMN ");
-                writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
+                writer.print(searchPathHelper.getQuotedName(newTable.getName()));
                 writer.print('.');
                 writer.print(PgDiffUtils.getQuotedName(newColumn.getName()));
                 writer.print(" IS ");
@@ -780,7 +783,7 @@ public class PgDiffTables {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.print("COMMENT ON COLUMN ");
-                writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
+                writer.print(searchPathHelper.getQuotedName(newTable.getName()));
                 writer.print('.');
                 writer.print(PgDiffUtils.getQuotedName(newColumn.getName()));
                 writer.println(" IS NULL;");
@@ -797,25 +800,27 @@ public class PgDiffTables {
                     .getPrivilege(oldTablePrivilege.getRoleName());
             if (newTablePrivilege == null) {
                 if (!emptyLinePrinted) {
+                	searchPathHelper.outputSearchPath(writer);
                     emptyLinePrinted = true;
                     writer.println();
                 }
                 writer.println("REVOKE ALL ON TABLE "
-                        + PgDiffUtils.getQuotedName(oldTable.getName())
+                        + searchPathHelper.getQuotedName(oldTable.getName())
                         + " FROM " + oldTablePrivilege.getRoleName() + ";");
             } else if (!oldTablePrivilege.isSimilar(newTablePrivilege)) {
                 if (!emptyLinePrinted) {
+                	searchPathHelper.outputSearchPath(writer);
                     emptyLinePrinted = true;
                     writer.println();
                 }
                 writer.println("REVOKE ALL ON TABLE "
-                        + PgDiffUtils.getQuotedName(newTable.getName())
+                        + searchPathHelper.getQuotedName(newTable.getName())
                         + " FROM " + newTablePrivilege.getRoleName() + ";");
                 if (!"".equals(newTablePrivilege.getPrivilegesSQL(true))) {
                     writer.println("GRANT "
                             + newTablePrivilege.getPrivilegesSQL(true)
                             + " ON TABLE "
-                            + PgDiffUtils.getQuotedName(newTable.getName())
+                            + searchPathHelper.getQuotedName(newTable.getName())
                             + " TO " + newTablePrivilege.getRoleName()
                             + " WITH GRANT OPTION;");
                 }
@@ -823,7 +828,7 @@ public class PgDiffTables {
                     writer.println("GRANT "
                             + newTablePrivilege.getPrivilegesSQL(false)
                             + " ON TABLE "
-                            + PgDiffUtils.getQuotedName(newTable.getName())
+                            + searchPathHelper.getQuotedName(newTable.getName())
                             + " TO " + newTablePrivilege.getRoleName() + ";");
                 }
             } // else similar privilege will not be updated
@@ -833,16 +838,17 @@ public class PgDiffTables {
                     .getPrivilege(newTablePrivilege.getRoleName());
             if (oldTablePrivilege == null) {
                 if (!emptyLinePrinted) {
+                	searchPathHelper.outputSearchPath(writer);
                     writer.println();
                 }
                 writer.println("REVOKE ALL ON TABLE "
-                        + PgDiffUtils.getQuotedName(newTable.getName())
+                        + searchPathHelper.getQuotedName(newTable.getName())
                         + " FROM " + newTablePrivilege.getRoleName() + ";");
                 if (!"".equals(newTablePrivilege.getPrivilegesSQL(true))) {
                     writer.println("GRANT "
                             + newTablePrivilege.getPrivilegesSQL(true)
                             + " ON TABLE "
-                            + PgDiffUtils.getQuotedName(newTable.getName())
+                            + searchPathHelper.getQuotedName(newTable.getName())
                             + " TO " + newTablePrivilege.getRoleName()
                             + " WITH GRANT OPTION;");
                 }
@@ -850,7 +856,7 @@ public class PgDiffTables {
                     writer.println("GRANT "
                             + newTablePrivilege.getPrivilegesSQL(false)
                             + " ON TABLE "
-                            + PgDiffUtils.getQuotedName(newTable.getName())
+                            + searchPathHelper.getQuotedName(newTable.getName())
                             + " TO " + newTablePrivilege.getRoleName() + ";");
                 }
             }
@@ -864,9 +870,10 @@ public class PgDiffTables {
         final String newOwnerTo = newTable.getOwnerTo();
 
         if (newOwnerTo != null && !newOwnerTo.equals(oldOwnerTo)) {
+        	searchPathHelper.outputSearchPath(writer);
             writer.println();
             writer.println("ALTER " + ((newTable.isForeign()) ? "FOREIGN ":"") + "TABLE "
-                    + PgDiffUtils.getQuotedName(newTable.getName())
+                    + searchPathHelper.getQuotedName(newTable.getName())
                     + " OWNER TO " + newTable.getOwnerTo() + ";");
         }
     }

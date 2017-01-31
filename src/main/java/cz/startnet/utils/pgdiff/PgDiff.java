@@ -227,14 +227,9 @@ public class PgDiff {
         for (final PgSchema newSchema : newDatabase.getSchemas()) {
             final SearchPathHelper searchPathHelper;
 
-            if (setSearchPath) {
-                searchPathHelper = new SearchPathHelper("SET search_path = "
-                        + PgDiffUtils.getQuotedName(newSchema.getName(), true)
-                        + ", pg_catalog;");
-            } else {
-                searchPathHelper = new SearchPathHelper(null);
-            }
-
+            searchPathHelper = new SearchPathHelper(newSchema.getName(), 
+            		arguments.isSchemaQualifyObjects(), setSearchPath);
+            
             final PgSchema oldSchema =
                     oldDatabase.getSchema(newSchema.getName());
 
