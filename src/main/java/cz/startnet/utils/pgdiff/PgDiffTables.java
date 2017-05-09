@@ -467,7 +467,7 @@ public class PgDiffTables {
                     || !oldSchema.containsTable(table.getName())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(table.getCreationSQL(pkConstraints,fkConstraints));
+                writer.println(table.getCreationSQL(oldSchema,pkConstraints,fkConstraints));
             }
         }
     }

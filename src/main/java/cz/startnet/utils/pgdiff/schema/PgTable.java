@@ -206,7 +206,7 @@ public class PgTable {
      * it is generated "inline" in the CREATE TABLE statement, and removed from the list.
      * @return created SQL statement
      */
-    public String getCreationSQL(Map<PgTable,PgPkConstraint> pkConstraints, Map<PgTable,Map<Set<String>,PgFkConstraint>> fkConstraints) {
+    public String getCreationSQL(PgSchema oldSchema, Map<PgTable,PgPkConstraint> pkConstraints, Map<PgTable,Map<Set<String>,PgFkConstraint>> fkConstraints) {
         final StringBuilder sbSQL = new StringBuilder(1000);
         sbSQL.append("CREATE TABLE ");
         sbSQL.append(PgDiffUtils.getQuotedName(name));
@@ -241,7 +241,7 @@ public class PgTable {
                 }
                 if (tableForeignKeys!=null) {
                     PgFkConstraint fk = tableForeignKeys.get(new HashSet<String>(Arrays.asList(column.getName())));
-                    if (fk!=null) {
+                    if (fk!=null && oldSchema.containsTable(fk.getTargetTableName())) {
                     	sbSQL.append(" REFERENCES "+fk.getTargetTableName()+"("+StringUtils.join(fk.getTargetColumnNames(),",")+")");
                     	fkConstraints.remove(this);
                     }
