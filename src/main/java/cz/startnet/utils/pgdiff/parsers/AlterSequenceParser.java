@@ -27,7 +27,7 @@ public class AlterSequenceParser {
      *                                output in the diff
      */
     public static void parse(final PgDatabase database,
-            final String statement, final boolean outputIgnoredStatements) {
+            final String statement, @SuppressWarnings("unused") final boolean outputIgnoredStatements) {
         final Parser parser = new Parser(statement);
 
         parser.expect("ALTER", "SEQUENCE");

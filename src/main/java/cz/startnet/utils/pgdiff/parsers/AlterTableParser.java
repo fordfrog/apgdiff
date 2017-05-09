@@ -381,8 +381,11 @@ public class AlterTableParser {
      * @param database                database information
      */
     private static void parseSequence(final Parser parser,
-            final PgSequence sequence, final boolean outputIgnoredStatements,
-            final String sequenceName, final PgDatabase database) {
+            @SuppressWarnings("unused") final PgSequence sequence,
+            final boolean outputIgnoredStatements,
+            final String sequenceName,
+            final PgDatabase database)
+    {
         while (!parser.expectOptional(";")) {
             if (parser.expectOptional("OWNER", "TO")) {
                 // we do not parse this one so we just consume the identifier
