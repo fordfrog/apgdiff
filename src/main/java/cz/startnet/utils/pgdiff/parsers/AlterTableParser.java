@@ -102,6 +102,15 @@ public class AlterTableParser {
             } else if (parser.expectOptional("DISABLE")) {
                 parseDisable(
                         parser, outputIgnoredStatements, tableName, database);
+            } else if (parser.expectOptional("REPLICA IDENTITY")) {
+            	String replicaIdentityOption = parser.expectOptionalOneOf("DEFAULT","FULL","NOTHING");
+            	if (replicaIdentityOption==null)
+            		parser.throwUnsupportedCommand();
+            	else
+                    if (outputIgnoredStatements) {
+                        database.addIgnoredStatement("ALTER TABLE " + tableName
+                                + " REPLICA IDENTITY " + replicaIdentityOption + ';');
+                    }
             } else {
                 parser.throwUnsupportedCommand();
             }
