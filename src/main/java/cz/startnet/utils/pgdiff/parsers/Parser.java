@@ -132,7 +132,7 @@ public final class Parser {
     public String parseIdentifier() {
         String identifier = parseIdentifierInternal();
 
-        if (string.charAt(position) == '.') {
+        if (string.length()>position && string.charAt(position) == '.') {
             position++;
             identifier += '.' + parseIdentifierInternal();
         }

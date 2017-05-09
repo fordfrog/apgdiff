@@ -122,10 +122,10 @@ public class CreateTableParser {
      */
     private static void parseConstraint(final Parser parser,
             final PgTable table) {
-        final PgConstraint constraint = new PgConstraint(
-                ParserUtils.getObjectName(parser.parseIdentifier()));
+    	String name = ParserUtils.getObjectName(parser.parseIdentifier());
+    	String definition = parser.getExpression();
+        final PgConstraint constraint = PgConstraint.newConstraint(name,definition,table);
         table.addConstraint(constraint);
-        constraint.setDefinition(parser.getExpression());
         constraint.setTableName(table.getName());
     }
 

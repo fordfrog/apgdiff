@@ -5,16 +5,21 @@
  */
 package cz.startnet.utils.pgdiff;
 
-import cz.startnet.utils.pgdiff.schema.PgColumn;
-import cz.startnet.utils.pgdiff.schema.PgColumnUtils;
-import cz.startnet.utils.pgdiff.schema.PgSchema;
-import cz.startnet.utils.pgdiff.schema.PgTable;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import cz.startnet.utils.pgdiff.schema.PgColumn;
+import cz.startnet.utils.pgdiff.schema.PgColumnConstraint;
+import cz.startnet.utils.pgdiff.schema.PgColumnUtils;
+import cz.startnet.utils.pgdiff.schema.PgFkConstraint;
+import cz.startnet.utils.pgdiff.schema.PgPkConstraint;
+import cz.startnet.utils.pgdiff.schema.PgSchema;
+import cz.startnet.utils.pgdiff.schema.PgTable;
 
 /**
  * Diffs tables.
@@ -449,15 +454,20 @@ public class PgDiffTables {
      * @param newSchema        new schema
      * @param searchPathHelper search path helper
      */
-    public static void createTables(final PrintWriter writer,
-            final PgSchema oldSchema, final PgSchema newSchema,
-            final SearchPathHelper searchPathHelper) {
+    public static void createTables(
+    		final PrintWriter writer,
+            final PgSchema oldSchema,
+            final PgSchema newSchema,
+            final SearchPathHelper searchPathHelper,
+            Map<PgTable,PgPkConstraint> pkConstraints,
+            Map<PgTable,Map<Set<String>,PgFkConstraint>>  fkConstraints)
+    {
         for (final PgTable table : newSchema.getTables()) {
             if (oldSchema == null
                     || !oldSchema.containsTable(table.getName())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(table.getCreationSQL());
+                writer.println(table.getCreationSQL(pkConstraints,fkConstraints));
             }
         }
     }

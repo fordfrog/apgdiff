@@ -69,6 +69,15 @@ public class PgDiffArguments {
      * Whether to ignore constraint names differences
      */
     private boolean ignoreConstraintNames;
+    /**
+     * Wether to generate primary key constraints in the CREATE TABLE statement if possible
+     */
+    private boolean inlinePrimaryKeys;
+
+    /**
+     * Wether to generate foriegn key constraints in the CREATE TABLE statement if possible
+     */
+    private boolean inlineForeignKeys;
 
 	/**
      * Setter for {@link #addDefaults}.
@@ -259,6 +268,13 @@ public class PgDiffArguments {
                 setOutputIgnoredStatements(true);
             } else if ("--ignore-constraint-names".equals(args[i])) {
                 setIgnoreConstraintNames(true);
+            } else if ("--inline-primary-keys".equals(args[i])) {
+                setInlinePrimaryKeys(true);
+            } else if ("--inline-foreign-keys".equals(args[i])) {
+                setInlineForeignKeys(true);
+            } else if ("--inline-constraints".equals(args[i])) {
+                setInlinePrimaryKeys(true);
+                setInlineForeignKeys(true);
             } else if ("--version".equals(args[i])) {
                 setVersion(true);
             } else {
@@ -400,5 +416,19 @@ public class PgDiffArguments {
 
 	public void setIgnoreConstraintNames(boolean ignoreConstraintNames) {
 		this.ignoreConstraintNames = ignoreConstraintNames;
+	}
+
+	public boolean isInlinePrimaryKeys() {
+		return inlinePrimaryKeys;
+	}
+	public void setInlinePrimaryKeys(boolean inlinePrimaryKeys) {
+		this.inlinePrimaryKeys = inlinePrimaryKeys;
+	}
+
+	public boolean isInlineForeignKeys() {
+		return inlineForeignKeys;
+	}
+	public void setInlineForeignKeys(boolean inlineForeignKeys) {
+		this.inlineForeignKeys = inlineForeignKeys;
 	}
 }

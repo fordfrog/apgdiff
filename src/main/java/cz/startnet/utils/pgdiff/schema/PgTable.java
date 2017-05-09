@@ -5,10 +5,19 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
-import cz.startnet.utils.pgdiff.PgDiffUtils;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import cz.startnet.utils.pgdiff.PgDiffUtils;
 
 /**
  * Stores table information.
@@ -109,6 +118,17 @@ public class PgTable {
         return null;
     }
 
+    public Set<PgColumn> getColumns(final Collection<String> names) {
+    	HashSet<PgColumn> result = new HashSet<PgColumn>();
+    	for(String colName: names) {
+    		PgColumn column = getColumn(colName);
+    		if (column==null)
+    			throw new RuntimeException("No such column "+getName()+"."+colName);
+    		result.add(column);
+    	}
+        return result;
+    }
+
     /**
      * Getter for {@link #columns}. The list cannot be modified.
      *
@@ -182,15 +202,25 @@ public class PgTable {
     /**
      * Creates and returns SQL for creation of the table.
      *
+     * @param pkConstraints available primary key constraints. If not null and there is a PK constraint for the table,
+     * it is generated "inline" in the CREATE TABLE statement, and removed from the list.
      * @return created SQL statement
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(Map<PgTable,PgPkConstraint> pkConstraints, Map<PgTable,Map<Set<String>,PgFkConstraint>> fkConstraints) {
         final StringBuilder sbSQL = new StringBuilder(1000);
         sbSQL.append("CREATE TABLE ");
         sbSQL.append(PgDiffUtils.getQuotedName(name));
         sbSQL.append(" (\n");
 
         boolean first = true;
+        PgPkConstraint pk = null;
+        Map<Set<String>,PgFkConstraint> tableForeignKeys = null;
+        if (pkConstraints!=null && pkConstraints.containsKey(this)) {
+        	pk = pkConstraints.get(this);
+        }
+        if (fkConstraints!=null && fkConstraints.containsKey(this)) {
+        	tableForeignKeys = fkConstraints.get(this);
+        }
 
         if (columns.isEmpty()) {
             sbSQL.append(')');
@@ -203,7 +233,19 @@ public class PgTable {
                 }
 
                 sbSQL.append("\t");
-                sbSQL.append(column.getFullDefinition(false));
+                boolean isPk = pk!=null && pk.getColumns().size()==1 && IterableUtils.get(pk.getColumns(),0).equals(column);
+                sbSQL.append(column.getFullDefinition(false,isPk));
+                if (isPk) {
+                	sbSQL.append(" PRIMARY KEY");
+                	pkConstraints.remove(this);
+                }
+                if (tableForeignKeys!=null) {
+                    PgFkConstraint fk = tableForeignKeys.get(new HashSet<String>(Arrays.asList(column.getName())));
+                    if (fk!=null) {
+                    	sbSQL.append(" REFERENCES "+fk.getTargetTableName()+"("+StringUtils.join(fk.getTargetColumnNames(),",")+")");
+                    	fkConstraints.remove(this);
+                    }
+                }
             }
 
             sbSQL.append("\n)");
@@ -524,5 +566,9 @@ public class PgTable {
         }
 
         return list;
+    }
+
+    public String toString() {
+    	return "PgTable{name="+name+"}";
     }
 }

@@ -5,8 +5,11 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
-import cz.startnet.utils.pgdiff.PgDiffUtils;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import cz.startnet.utils.pgdiff.PgDiffUtils;
+import cz.startnet.utils.pgdiff.parsers.ParserUtils;
 
 /**
  * Stores table constraint information.
@@ -16,10 +19,19 @@ import java.util.regex.Pattern;
 public class PgConstraint {
 
     /**
-     * Pattern for checking whether the constraint is PRIMARY KEY constraint.
+     * Pattern for checking whether the constraint is PRIMARY KEY constraint,
+     * and extract the columns forming the primary key (group#1).
      */
     private static final Pattern PATTERN_PRIMARY_KEY =
-            Pattern.compile(".*PRIMARY[\\s]+KEY.*", Pattern.CASE_INSENSITIVE);
+            Pattern.compile(".*PRIMARY[\\s]+KEY[\\s]+\\(([^)]+)\\).*", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * Pattern for checking whether the constraint is FOREIGN KEY constraint.
+     * and extract the columns forming the foreign key (group#1), and the references table(group#2) and columns(group#3).
+     */
+    public static final Pattern PATTERN_FOREIGN_KEY =
+    		Pattern.compile(".*FOREIGN\\s+KEY\\s*\\(\\s*([^)]+)\\s*\\)\\s+REFERENCES\\s+([^\\s]+)\\s*\\(\\s*([^)]+)\\s*\\).*",Pattern.CASE_INSENSITIVE);
+
     /**
      * Definition of the constraint.
      */
@@ -44,6 +56,36 @@ public class PgConstraint {
      */
     public PgConstraint(String name) {
         this.name = name;
+    }
+
+    public PgConstraint(String name, String definition, PgTable table) {
+        this.name = name;
+        this.definition = definition;
+        this.tableName = table.getName();
+    }
+
+    public static PgConstraint newConstraint(String name, String definition, PgTable table) {
+    	if (isPrimaryKeyConstraint(definition)) {
+    		Matcher matcher = PATTERN_PRIMARY_KEY.matcher(definition);
+    		matcher.matches();
+    		return new PgPkConstraint(
+    				name,
+    				definition,
+    				table,
+    				ParserUtils.splitIdentifierList(matcher.group(1)));
+    	} else if (isForeignKeyConstraint(definition)) {
+    		Matcher matcher = PATTERN_FOREIGN_KEY.matcher(definition);
+    		matcher.matches();
+    		return new PgFkConstraint(
+    				name,
+    				definition,
+    				table,
+    				ParserUtils.splitIdentifierList(matcher.group(1)),
+    				matcher.group(2),
+    				ParserUtils.splitIdentifierList(matcher.group(3)));
+    	} else {
+    		return new PgConstraint(name,definition,table);
+    	}
     }
 
     /**
@@ -150,7 +192,23 @@ public class PgConstraint {
      * @return true if this is a PRIMARY KEY constraint, otherwise false
      */
     public boolean isPrimaryKeyConstraint() {
-        return PATTERN_PRIMARY_KEY.matcher(definition).matches();
+        return isPrimaryKeyConstraint(definition);
+    }
+
+    public static boolean isPrimaryKeyConstraint(String definition) {
+    	return PATTERN_PRIMARY_KEY.matcher(definition).matches();
+    }
+
+    /**
+     * Returns true if this is a FOREIGN KEY constraint, otherwise false.
+     *
+     * @return true if this is a FOREIGN KEY constraint, otherwise false
+     */
+    public boolean isForeignKeyConstraint() {
+        return isForeignKeyConstraint(definition);
+    }
+    public static boolean isForeignKeyConstraint(String definition) {
+    	return PATTERN_FOREIGN_KEY.matcher(definition).matches();
     }
 
     /**
@@ -203,5 +261,9 @@ public class PgConstraint {
     public int hashCode() {
         return (getClass().getName() + "|" + definition + "|" + name + "|"
                 + tableName).hashCode();
+    }
+
+    public String toString() {
+    	return "PgConstraint: "+name+" "+definition;
     }
 }

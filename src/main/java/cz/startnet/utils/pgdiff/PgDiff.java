@@ -6,10 +6,19 @@
 package cz.startnet.utils.pgdiff;
 
 import cz.startnet.utils.pgdiff.loader.PgDumpLoader;
+import cz.startnet.utils.pgdiff.schema.PgColumnConstraint;
+import cz.startnet.utils.pgdiff.schema.PgConstraint;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
+import cz.startnet.utils.pgdiff.schema.PgFkConstraint;
+import cz.startnet.utils.pgdiff.schema.PgPkConstraint;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
+import cz.startnet.utils.pgdiff.schema.PgTable;
+
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Creates diff of two database schemas.
@@ -242,12 +251,22 @@ public class PgDiff {
             PgDiffSequences.dropSequences(
                     writer, oldSchema, newSchema, searchPathHelper);
 
+            Map<PgTable,PgPkConstraint> pkConstraints =
+            		arguments.isInlinePrimaryKeys()
+            		? PgDiffConstraints.getPKConstraints(arguments, oldSchema, newSchema)
+            		: null;
+
+            Map<PgTable,Map<Set<String>,PgFkConstraint>> fkConstraints =
+               		arguments.isInlineForeignKeys()
+            		? PgDiffConstraints.getFKConstraints(arguments, oldSchema, newSchema)
+            		: null;
+
             PgDiffSequences.createSequences(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffSequences.alterSequences(
                     writer, arguments, oldSchema, newSchema, searchPathHelper);
             PgDiffTables.createTables(
-                    writer, oldSchema, newSchema, searchPathHelper);
+                    writer, oldSchema, newSchema, searchPathHelper, pkConstraints, fkConstraints);
             PgDiffTables.alterTables(
                     writer, arguments, oldSchema, newSchema, searchPathHelper);
             PgDiffSequences.alterCreatedSequences(
@@ -255,9 +274,11 @@ public class PgDiff {
             PgDiffFunctions.createFunctions(
                     writer, arguments, oldSchema, newSchema, searchPathHelper);
             PgDiffConstraints.createConstraints(
-                    writer, arguments, oldSchema, newSchema, true, searchPathHelper);
+                    writer, arguments, oldSchema, newSchema, PgDiffConstraints.PRIMARY_KEYS, searchPathHelper);
             PgDiffConstraints.createConstraints(
-                    writer, arguments, oldSchema, newSchema, false, searchPathHelper);
+                    writer, arguments, oldSchema, newSchema, PgDiffConstraints.FOREIGN_KEYS, searchPathHelper);
+            PgDiffConstraints.createConstraints(
+                    writer, arguments, oldSchema, newSchema, PgDiffConstraints.OTHER_CONSTRAINTS, searchPathHelper);
             PgDiffIndexes.createIndexes(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffTables.createClusters(

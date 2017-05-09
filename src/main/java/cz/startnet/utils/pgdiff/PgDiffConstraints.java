@@ -5,20 +5,29 @@
  */
 package cz.startnet.utils.pgdiff;
 
-import cz.startnet.utils.pgdiff.schema.PgConstraint;
-import cz.startnet.utils.pgdiff.schema.PgSchema;
-import cz.startnet.utils.pgdiff.schema.PgTable;
-
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import cz.startnet.utils.pgdiff.schema.PgConstraint;
+import cz.startnet.utils.pgdiff.schema.PgFkConstraint;
+import cz.startnet.utils.pgdiff.schema.PgPkConstraint;
+import cz.startnet.utils.pgdiff.schema.PgSchema;
+import cz.startnet.utils.pgdiff.schema.PgTable;
 
 /**
  * Diffs constraints.
  *
  * @author fordfrog
  */
-public class PgDiffConstraints {
+public class PgDiffConstraints
+{
+	public static int OTHER_CONSTRAINTS = 0;
+	public static int PRIMARY_KEYS = 1;
+	public static int FOREIGN_KEYS = 2;
 
     /**
      * Outputs statements for creation of new constraints.
@@ -34,7 +43,8 @@ public class PgDiffConstraints {
     public static void createConstraints(final PrintWriter writer,
     		final PgDiffArguments arguments,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final boolean primaryKey, final SearchPathHelper searchPathHelper) {
+            final int constraintType, final SearchPathHelper searchPathHelper)
+    {
         for (final PgTable newTable : newSchema.getTables()) {
             final PgTable oldTable;
 
@@ -46,12 +56,69 @@ public class PgDiffConstraints {
 
             // Add new constraints
             for (final PgConstraint constraint :
-                    getNewConstraints(arguments, oldTable, newTable, primaryKey)) {
+                    getNewConstraints(arguments, oldTable, newTable, constraintType)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(constraint.getCreationSQL());
             }
         }
+    }
+
+    public static Map<PgTable,PgPkConstraint> getPKConstraints(
+    		final PgDiffArguments arguments,
+            final PgSchema oldSchema,
+            final PgSchema newSchema)
+    {
+    	Map<PgTable,PgPkConstraint> constraints = new HashMap<PgTable,PgPkConstraint>();
+
+        for (final PgTable newTable : newSchema.getTables()) {
+            final PgTable oldTable;
+
+            if (oldSchema == null) {
+                oldTable = null;
+            } else {
+                oldTable = oldSchema.getTable(newTable.getName());
+            }
+
+            List<PgConstraint> newConstraints = getNewConstraints(arguments, oldTable, newTable, PRIMARY_KEYS);
+            if (!newConstraints.isEmpty()) {
+            	if (newConstraints.size()>1)
+            		throw new RuntimeException("Too many PRIMARY KEY constaints for new table "+newTable.getName());
+                constraints.put(newTable,(PgPkConstraint)newConstraints.get(0));
+            }
+        }
+
+    	return constraints;
+    }
+
+    public static Map<PgTable,Map<Set<String>,PgFkConstraint>> getFKConstraints(
+    		final PgDiffArguments arguments,
+            final PgSchema oldSchema,
+            final PgSchema newSchema)
+    {
+    	Map<PgTable,Map<Set<String>,PgFkConstraint>> constraints = new HashMap<PgTable, Map<Set<String>,PgFkConstraint>>();
+
+        for (final PgTable newTable : newSchema.getTables()) {
+            final PgTable oldTable;
+
+            if (oldSchema == null) {
+                oldTable = null;
+            } else {
+                oldTable = oldSchema.getTable(newTable.getName());
+            }
+
+            List<PgConstraint> newConstraints = getNewConstraints(arguments, oldTable, newTable, FOREIGN_KEYS);
+            if (!newConstraints.isEmpty()) {
+            	Map<Set<String>,PgFkConstraint> foreignKeys = new HashMap<Set<String>, PgFkConstraint>();
+            	for(final PgConstraint constraint: newConstraints) {
+            		final PgFkConstraint fk = (PgFkConstraint)constraint;
+            		foreignKeys.put(fk.getColumnNames(), fk);
+            	}
+                constraints.put(newTable,foreignKeys);
+            }
+        }
+
+    	return constraints;
     }
 
     /**
@@ -134,7 +201,7 @@ public class PgDiffConstraints {
      *
      * @param oldTable   original table
      * @param newTable   new table
-     * @param primaryKey determines whether primary keys should be processed or
+     * @param constraintType determines whether primary keys, foreign keys or
      *                   any other constraints should be processed
      *
      * @return list of constraints that should be added
@@ -142,7 +209,9 @@ public class PgDiffConstraints {
     private static List<PgConstraint> getNewConstraints(
     		final PgDiffArguments arguments,
     		final PgTable oldTable,
-            final PgTable newTable, final boolean primaryKey) {
+            final PgTable newTable,
+            final int constraintType)
+    {
         @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<PgConstraint> list = new ArrayList<PgConstraint>();
 
@@ -150,13 +219,22 @@ public class PgDiffConstraints {
             if (oldTable == null) {
                 for (final PgConstraint constraint :
                         newTable.getConstraints()) {
-                    if (constraint.isPrimaryKeyConstraint() == primaryKey) {
+                	boolean isPK = constraint instanceof PgPkConstraint;
+                	boolean isFK = constraint instanceof PgFkConstraint;
+                    if ( (constraintType == PRIMARY_KEYS && isPK)
+                    	|| (constraintType == FOREIGN_KEYS && isFK)
+                    	|| (constraintType == OTHER_CONSTRAINTS && !(isPK || isFK)) ) {
                         list.add(constraint);
                     }
                 }
             } else {
                 for (final PgConstraint constraint : newTable.getConstraints()) {
-                    if (constraint.isPrimaryKeyConstraint() == primaryKey) {
+                	boolean isPK = constraint instanceof PgPkConstraint;
+                	boolean isFK = constraint instanceof PgFkConstraint;
+                    if ((constraintType == PRIMARY_KEYS && isPK)
+                        	|| (constraintType == FOREIGN_KEYS && isFK)
+                        	|| (constraintType == OTHER_CONSTRAINTS && !(isPK || isFK)))
+                    {
                     	if (arguments.isIgnoreConstraintNames()) {
 	                    	PgConstraint oldConstraint = oldTable.findConstraint(constraint.getDefinition()); 
 	                    	if (oldConstraint == null) {

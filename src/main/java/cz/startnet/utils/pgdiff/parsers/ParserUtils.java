@@ -7,7 +7,11 @@ package cz.startnet.utils.pgdiff.parsers;
 
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Transformer;
 
 /**
  * Parser utilities.
@@ -162,6 +166,22 @@ public class ParserUtils {
 
             return strings.toArray(new String[strings.size()]);
         }
+    }
+
+    public static List<String> splitIdentifierList(final String string) {
+    	List<String> identifiers = Arrays.asList(string.split("\\s*,\\s*"));
+    	CollectionUtils.transform(
+    			identifiers,
+    			new Transformer<String,String>() {
+					@Override
+					public String transform(String identifier) {
+						identifier = new Parser(identifier).parseIdentifier();
+						if (identifier.charAt(0)=='"')
+							identifier = identifier.substring(1, identifier.length()-1);
+						return identifier;
+					}
+				});
+    	return identifiers;
     }
 
     /**

@@ -9,6 +9,7 @@ import cz.startnet.utils.pgdiff.Resources;
 import cz.startnet.utils.pgdiff.schema.PgColumn;
 import cz.startnet.utils.pgdiff.schema.PgConstraint;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
+import cz.startnet.utils.pgdiff.schema.PgPkConstraint;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgSequence;
 import cz.startnet.utils.pgdiff.schema.PgTable;
@@ -221,15 +222,11 @@ public class AlterTableParser {
             final PgTable table, final PgSchema schema) {
         final String constraintName =
                 ParserUtils.getObjectName(parser.parseIdentifier());
-        final PgConstraint constraint = new PgConstraint(constraintName);
-        constraint.setTableName(table.getName());
+        final PgConstraint constraint = PgConstraint.newConstraint(constraintName, parser.getExpression(), table);
         table.addConstraint(constraint);
 
-        if (parser.expectOptional("PRIMARY", "KEY")) {
+        if (constraint instanceof PgPkConstraint) {
             schema.addPrimaryKey(constraint);
-            constraint.setDefinition("PRIMARY KEY " + parser.getExpression());
-        } else {
-            constraint.setDefinition(parser.getExpression());
         }
     }
 

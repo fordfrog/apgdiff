@@ -114,6 +114,19 @@ public class PgColumn {
      * @return full definition of the column
      */
     public String getFullDefinition(final boolean addDefaults) {
+    	return getFullDefinition(addDefaults, false);
+    }
+
+    /**
+     * Returns full definition of the column.
+     *
+     * @param addDefaults whether default value should be added in case NOT NULL
+     *                    constraint is specified but no default value is set
+     * @param isPk Wether the column is part of a PK. NOT NULL is then implicit and not generated.
+     *
+     * @return full definition of the column
+     */
+    public String getFullDefinition(final boolean addDefaults, final boolean isPk) {
         final StringBuilder sbDefinition = new StringBuilder(100);
         sbDefinition.append(PgDiffUtils.getQuotedName(name));
         sbDefinition.append(' ');
@@ -131,7 +144,7 @@ public class PgColumn {
             }
         }
 
-        if (!nullValue) {
+        if (!nullValue && !isPk) {
             sbDefinition.append(" NOT NULL");
         }
 
@@ -259,4 +272,9 @@ public class PgColumn {
 
         setType(string);
     }
+
+    public String toString() {
+    	return "PgColumn{name="+name+",type="+type+"}";
+    }
+
 }
