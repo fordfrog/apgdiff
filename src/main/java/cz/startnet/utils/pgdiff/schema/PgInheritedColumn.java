@@ -33,6 +33,11 @@ package cz.startnet.utils.pgdiff.schema;
      * Default value of the column.
      */
     private String defaultValue;
+
+    /**
+     * Determines whether null value is allowed in the column.
+     */
+    private boolean nullValue = true;
     
     /**
      * Setter for {@link #defaultValue}.
@@ -50,5 +55,23 @@ package cz.startnet.utils.pgdiff.schema;
      */
     public String getDefaultValue() {
         return defaultValue;
+    }
+
+    /**
+     * Setter for {@link #nullValue}.
+     *
+     * @param nullValue {@link #nullValue}
+     */
+    public void setNullValue(final boolean nullValue) {
+        this.nullValue = nullValue;
+    }
+
+    /**
+     * Getter for {@link #nullValue}.
+     *
+     * @return {@link #nullValue}
+     */
+    public boolean getNullValue() {
+        return nullValue;
     }
  }
