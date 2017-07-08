@@ -79,6 +79,11 @@ public class PgDiffArguments {
      */
     private boolean inlineForeignKeys;
 
+    /**
+     * Wether to group ALTER TABLE statements for the same table into one statement
+     */
+    private boolean groupAlterTables;
+
 	/**
      * Setter for {@link #addDefaults}.
      *
@@ -275,6 +280,8 @@ public class PgDiffArguments {
             } else if ("--inline-constraints".equals(args[i])) {
                 setInlinePrimaryKeys(true);
                 setInlineForeignKeys(true);
+            } else if ("--group-alter-tables".equals(args[i])) {
+                setGroupAlterTables(true);
             } else if ("--version".equals(args[i])) {
                 setVersion(true);
             } else {
@@ -430,5 +437,12 @@ public class PgDiffArguments {
 	}
 	public void setInlineForeignKeys(boolean inlineForeignKeys) {
 		this.inlineForeignKeys = inlineForeignKeys;
+	}
+
+	public boolean isGroupAlterTables() {
+		return groupAlterTables;
+	}
+	public void setGroupAlterTables(boolean groupAlterTables) {
+		this.groupAlterTables = groupAlterTables;
 	}
 }

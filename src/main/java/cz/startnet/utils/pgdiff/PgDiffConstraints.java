@@ -54,14 +54,40 @@ public class PgDiffConstraints
                 oldTable = oldSchema.getTable(newTable.getName());
             }
 
+            boolean first=true;
             // Add new constraints
             for (final PgConstraint constraint :
                     getNewConstraints(arguments, oldTable, newTable, constraintType)) {
                 searchPathHelper.outputSearchPath(writer);
-                writer.println();
-                writer.println(constraint.getCreationSQL());
+                if (arguments.isGroupAlterTables()) {
+                	if (first) {
+                        writer.println();
+                		writer.print(constraint.getCreationSQL(PgConstraint.Mode.StandAlone));
+                		first = false;
+                	} else {
+                		writer.println(",");
+                		writer.print(constraint.getCreationSQL(PgConstraint.Mode.GroupElement));
+                	}
+                } else {
+                    writer.println();
+                	writer.println(constraint.getCreationSQL());
+                	printComment(writer,constraint);
+                }
+            }
+            if (!first) {
+            	writer.println(";");
+                for (final PgConstraint constraint :
+                    getNewConstraints(arguments, oldTable, newTable, constraintType)) {
+                	printComment(writer,constraint);
+                }
             }
         }
+    }
+
+    public static void printComment(final PrintWriter writer, final PgConstraint constraint) {
+    	String comment = constraint.getCommentSQL();
+    	if (!comment.isEmpty())
+    		writer.println(comment);
     }
 
     public static Map<PgTable,PgPkConstraint> getPKConstraints(

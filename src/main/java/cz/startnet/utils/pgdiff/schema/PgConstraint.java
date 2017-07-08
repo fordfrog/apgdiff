@@ -32,6 +32,11 @@ public class PgConstraint {
     public static final Pattern PATTERN_FOREIGN_KEY =
     		Pattern.compile(".*FOREIGN\\s+KEY\\s*\\(\\s*([^)]+)\\s*\\)\\s+REFERENCES\\s+([^\\s]+)\\s*\\(\\s*([^)]+)\\s*\\).*",Pattern.CASE_INSENSITIVE);
 
+    public static enum Mode {
+    	StandAlone,
+    	GroupElement
+    };
+
     /**
      * Definition of the constraint.
      */
@@ -88,21 +93,32 @@ public class PgConstraint {
     	}
     }
 
+    public String getCreationSQL() {
+    	return getCreationSQL(Mode.StandAlone)+";";
+    }
+
     /**
      * Creates and returns SQL for creation of the constraint.
      *
      * @return created SQL
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(Mode mode) {
         final StringBuilder sbSQL = new StringBuilder(100);
-        sbSQL.append("ALTER TABLE ");
-        sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
-        sbSQL.append("\n\tADD CONSTRAINT ");
+        if (mode==Mode.StandAlone) {
+        	sbSQL.append("ALTER TABLE ");
+        	sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
+            sbSQL.append("\n");
+        }
+        sbSQL.append("\tADD CONSTRAINT ");
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(' ');
         sbSQL.append(getDefinition());
-        sbSQL.append(';');
 
+        return sbSQL.toString();
+    }
+
+    public String getCommentSQL() {
+        final StringBuilder sbSQL = new StringBuilder(100);
         if (comment != null && !comment.isEmpty()) {
             sbSQL.append("\n\nCOMMENT ON CONSTRAINT ");
             sbSQL.append(PgDiffUtils.getQuotedName(name));
