@@ -142,6 +142,7 @@ public class PgDiffTables {
             alterOwnerTo(writer, oldTable, newTable, searchPathHelper);
             alterPrivileges(writer, oldTable, newTable, searchPathHelper);
             alterPrivilegesColumns(writer, oldTable, newTable, searchPathHelper);
+            alterRLS(writer, oldTable, newTable, searchPathHelper);
         }
     }
 
@@ -868,6 +869,43 @@ public class PgDiffTables {
             writer.println("ALTER " + ((newTable.isForeign()) ? "FOREIGN ":"") + "TABLE "
                     + PgDiffUtils.getQuotedName(newTable.getName())
                     + " OWNER TO " + newTable.getOwnerTo() + ";");
+        }
+    }
+
+    private static void alterRLS(final PrintWriter writer,
+            final PgTable oldTable, final PgTable newTable,
+            final SearchPathHelper searchPathHelper) {
+        if ((oldTable.hasRLSEnabled() == null || oldTable.hasRLSEnabled() != null && !oldTable.hasRLSEnabled())
+            && newTable.hasRLSEnabled() != null && newTable.hasRLSEnabled()) {
+            searchPathHelper.outputSearchPath(writer);
+            writer.println();
+            writer.print("ALTER TABLE ");
+            writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
+            writer.println(" ENABLE ROW LEVEL SECURITY;");
+        }
+        if (oldTable.hasRLSEnabled() != null && oldTable.hasRLSEnabled()
+            && (newTable.hasRLSEnabled() == null || newTable.hasRLSEnabled() != null && !newTable.hasRLSEnabled())) {
+            searchPathHelper.outputSearchPath(writer);
+            writer.println();
+            writer.print("ALTER TABLE ");
+            writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
+            writer.println(" DISABLE ROW LEVEL SECURITY;");
+        }
+        if ((oldTable.hasRLSForced() == null || oldTable.hasRLSForced() != null && !oldTable.hasRLSForced())
+            && newTable.hasRLSForced() != null && newTable.hasRLSForced()) {
+            searchPathHelper.outputSearchPath(writer);
+            writer.println();
+            writer.print("ALTER TABLE ");
+            writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
+            writer.println(" FORCE ROW LEVEL SECURITY;");
+        }
+        if (oldTable.hasRLSForced() != null && oldTable.hasRLSForced()
+            && (newTable.hasRLSForced() == null || newTable.hasRLSForced() != null && !newTable.hasRLSForced())) {
+            searchPathHelper.outputSearchPath(writer);
+            writer.println();
+            writer.print("ALTER TABLE ");
+            writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
+            writer.println(" NO FORCE ROW LEVEL SECURITY;");
         }
     }
 

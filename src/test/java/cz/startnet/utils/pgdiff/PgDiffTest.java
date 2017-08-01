@@ -239,19 +239,22 @@ public class PgDiffTest {
                     //90
                     {"view_triggers", false, false, false, false},
                     // Tests privileges
-                        {"grant_on_table_sequence", false, false, false, false},
-                        {"revoke_on_table_sequence", false, false, false, false},
-                        {"grant_on_view", false, false, false, false},
-                        {"revoke_on_view", false, false, false, false}
+                    {"grant_on_table_sequence", false, false, false, false},
+                    {"revoke_on_table_sequence", false, false, false, false},
+                    {"grant_on_view", false, false, false, false},
+                    {"revoke_on_view", false, false, false, false}
                     // Tests types
-                    , {"add_type", false, false, false, false}
-                    , {"drop_type", false, false, false, false}
-                    , {"alter_type", false, false, false, false}
+                  , {"add_type", false, false, false, false}
+                  , {"drop_type", false, false, false, false}
+                  , {"alter_type", false, false, false, false}
                     // Test Foreign Tables
-                    , {"foreign_create_table", false, false, false, false}
-                    , {"foreign_drop_table", false, false, false, false}
+                  , {"foreign_create_table", false, false, false, false}
+                  , {"foreign_drop_table", false, false, false, false}
                     //100
-                    , {"foreign_alter_type", false, false, false, false}
+                  , {"foreign_alter_type", false, false, false, false}
+                    // Tests privileges
+                  , {"enable_force_rls", false, false, false, false}
+                  , {"disable_no_force_rls", false, false, false, false}
                 });
     }
     /**
