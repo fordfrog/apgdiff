@@ -59,6 +59,11 @@ public class PgTable extends PgRelation {
     private String foreignServer;
 
     /**
+     * RLS Policies
+     */
+    private List<PgPolicy> policies = new ArrayList<PgPolicy>();
+
+    /**
      * PgDatabase
      */
     private final PgDatabase database;
@@ -463,5 +468,23 @@ public class PgTable extends PgRelation {
 
     public void setRLSForced(Boolean rlsForced) {
         this.rlsForced = rlsForced;
+    }
+
+    public void addPolicy(final PgPolicy policy) {
+        policies.add(policy);
+    }
+
+    public PgPolicy getPolicy(final String name) {
+        for (PgPolicy policy : policies) {
+            if (policy.getName().equals(name)) {
+                return policy;
+            }
+        }
+
+        return null;
+    }
+
+    public List<PgPolicy> getPolicies() {
+        return Collections.unmodifiableList(policies);
     }
 }

@@ -19,6 +19,7 @@ import cz.startnet.utils.pgdiff.parsers.CreateTableParser;
 import cz.startnet.utils.pgdiff.parsers.CreateTriggerParser;
 import cz.startnet.utils.pgdiff.parsers.CreateViewParser;
 import cz.startnet.utils.pgdiff.parsers.GrantRevokeParser;
+import cz.startnet.utils.pgdiff.parsers.CreatePolicyParser;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -163,6 +164,13 @@ public class PgDumpLoader { //NOPMD
             "^CREATE[\\s]+EXTENSION[\\s]+.*$",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /**
+     * Pattern for testing whether it is CREATE POLICY statement.
+     */
+    private static final Pattern PATTERN_CREATE_POLICY = Pattern.compile(
+            "^CREATE[\\s]+POLICY[\\s]+.*$",
+            Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    /**
+    /**
      * Storage of unprocessed line part.
      */
     private static String lineBuffer;
@@ -242,6 +250,8 @@ public class PgDumpLoader { //NOPMD
             } else if (PATTERN_REVOKE.matcher(statement).matches()) {
                 GrantRevokeParser.parse(database, statement,
                         outputIgnoredStatements);
+            } else if (PATTERN_CREATE_POLICY.matcher(statement).matches()) {
+                CreatePolicyParser.parse(database, statement);
                 // we just ignore these statements
             } else if (outputIgnoredStatements) {
                 database.addIgnoredStatement(statement);

@@ -252,9 +252,13 @@ public class PgDiffTest {
                   , {"foreign_drop_table", false, false, false, false}
                     //100
                   , {"foreign_alter_type", false, false, false, false}
-                    // Tests privileges
+                    // Tests enable/force rls
                   , {"enable_force_rls", false, false, false, false}
                   , {"disable_no_force_rls", false, false, false, false}
+                    // Tests policies
+                  , {"create_policies", false, false, false, false}
+                  , {"drop_policies", false, false, false, false}
+                  , {"alter_policies", false, false, false, false}
                 });
     }
     /**
