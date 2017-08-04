@@ -47,7 +47,21 @@ public class PgTable extends PgRelation {
      * Is this a FOREIGN table?
      */
     private boolean foreign;
+    /**
+     * Does this table have RLS enabled?
+     */
+    private Boolean rlsEnabled;
+    /**
+     * Does this table have RLS forced?
+     */
+    private Boolean rlsForced;
+
     private String foreignServer;
+
+    /**
+     * RLS Policies
+     */
+    private List<PgPolicy> policies = new ArrayList<PgPolicy>();
 
     /**
      * PgDatabase
@@ -438,5 +452,39 @@ public class PgTable extends PgRelation {
     
     public String getForeignServer(){
     	return foreignServer;
+    }
+
+    public Boolean hasRLSEnabled() {
+        return rlsEnabled;
+    }
+
+    public void setRLSEnabled(Boolean rlsEnabled) {
+        this.rlsEnabled = rlsEnabled;
+    }
+
+    public Boolean hasRLSForced() {
+        return rlsForced;
+    }
+
+    public void setRLSForced(Boolean rlsForced) {
+        this.rlsForced = rlsForced;
+    }
+
+    public void addPolicy(final PgPolicy policy) {
+        policies.add(policy);
+    }
+
+    public PgPolicy getPolicy(final String name) {
+        for (PgPolicy policy : policies) {
+            if (policy.getName().equals(name)) {
+                return policy;
+            }
+        }
+
+        return null;
+    }
+
+    public List<PgPolicy> getPolicies() {
+        return Collections.unmodifiableList(policies);
     }
 }
