@@ -68,6 +68,8 @@ public class GrantRevokeParser {
             if (outputIgnoredStatements) {
                 database.addIgnoredStatement(statement);
                 return;
+            } else {
+                return;
             }
         }
         if (privilege != null && "ALL".equalsIgnoreCase(privilege)) {
