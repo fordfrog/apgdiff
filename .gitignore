@@ -1,2 +1,7 @@
 /target/
 nbactions.xml
+lib
+build
+.settings
+.classpath
+.project
