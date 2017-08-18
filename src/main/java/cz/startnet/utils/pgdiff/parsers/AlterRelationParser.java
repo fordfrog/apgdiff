@@ -180,6 +180,13 @@ public class AlterRelationParser {
             } else {
                 parser.throwUnsupportedCommand();
             }
+        } else if (parser.expectOptional("ROW", "LEVEL", "SECURITY")) {
+            if (outputIgnoredStatements) {
+                database.addIgnoredStatement("ALTER TABLE " + tableName
+                        + " ENABLE ROW LEVEL SECURITY;");
+            } else {
+                parser.parseIdentifier();
+            }
         }
     }
 
