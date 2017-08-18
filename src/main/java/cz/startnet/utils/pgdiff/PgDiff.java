@@ -280,6 +280,8 @@ public class PgDiff {
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffSequences.dropSequences(
                     writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffPolicies.dropPolicies(
+                    writer, oldSchema, newSchema, searchPathHelper);
 
             PgDiffSequences.createSequences(
                     writer, oldSchema, newSchema, searchPathHelper);
@@ -309,6 +311,10 @@ public class PgDiff {
             PgDiffViews.createViews(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffViews.alterViews(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffPolicies.createPolicies(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffPolicies.alterPolicies(
                     writer, oldSchema, newSchema, searchPathHelper);
 
             PgDiffFunctions.alterComments(
