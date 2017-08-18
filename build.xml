@@ -1,6 +1,6 @@
 <project name="apgdiff" default="jar" basedir=".">
     <property name="name" value="Another PostgreSQL Diff Tool"/>
-    <property name="version" value="2.5.1-subzero"/>
+    <property name="version" value="2.5"/>
     <property name="build" value="build"/>
     <property name="dist" value="dist"/>
     <property name="build.output" value="${build}/classes"/>
