@@ -5,3 +5,4 @@ build
 .settings
 .classpath
 .project
+dist
