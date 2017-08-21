@@ -82,7 +82,7 @@ public class PgDiff {
         }
     }
     
-    /**
+        /**
      * Creates new extensions.
      *
      * @param writer      writer the output should be written to
@@ -191,7 +191,7 @@ public class PgDiff {
             }
         }
     }
-    
+
     /**
      * Drops old extensions that do not exist anymore.
      *
@@ -283,7 +283,6 @@ public class PgDiff {
                     writer, oldSchema, newSchema, searchPathHelper, arguments);
             PgDiffPolicies.dropPolicies(
                     writer, oldSchema, newSchema, searchPathHelper);
-
             PgDiffSequences.createSequences(
                     writer, oldSchema, newSchema, searchPathHelper,arguments);
             PgDiffSequences.alterSequences(
@@ -317,7 +316,6 @@ public class PgDiff {
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffPolicies.alterPolicies(
                     writer, oldSchema, newSchema, searchPathHelper);
-
             PgDiffFunctions.alterComments(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffConstraints.alterComments(
