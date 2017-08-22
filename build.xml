@@ -93,9 +93,9 @@
     <target name="get-deps" description="Download all dependencies"
             unless="noget">
         <mkdir dir="${lib}"/>
-        <get src="http://mirrors.ibiblio.org/pub/mirrors/maven2/junit/junit/4.8.1/junit-4.8.1.jar"
+        <get src="http://central.maven.org/maven2/junit/junit/4.8.1/junit-4.8.1.jar"
              dest="${lib}/junit.jar"/>
-	<get src="http://mirrors.ibiblio.org/pub/mirrors/maven2/org/hamcrest/hamcrest-all/1.1/hamcrest-all-1.1.jar"
+	<get src="http://central.maven.org/maven2/org/hamcrest/hamcrest-all/1.1/hamcrest-all-1.1.jar"
 	     dest="${lib}/hamcrest-all.jar"/>
     </target>
 

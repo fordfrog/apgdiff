@@ -83,9 +83,14 @@ public final class Parser {
             return false;
         }
 
+        int dumpEndPosition = position + 20;
+        if (string.length() - (position + 1) < 20) {
+            dumpEndPosition = string.length() - 1;
+        }
+
         throw new ParserException(MessageFormat.format(
                 Resources.getString("CannotParseStringExpectedWord"), string,
-                word, position + 1, string.substring(position, position + 20)));
+                word, position + 1, string.substring(position, dumpEndPosition)));
     }
 
     /**

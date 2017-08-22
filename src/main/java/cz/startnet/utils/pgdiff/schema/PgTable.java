@@ -43,7 +43,25 @@ public class PgTable extends PgRelation {
      * Is this a UNLOGGED table?
      */
     private boolean unlogged;
+    /**
+     * Is this a FOREIGN table?
+     */
+    private boolean foreign;
+    /**
+     * Does this table have RLS enabled?
+     */
+    private Boolean rlsEnabled;
+    /**
+     * Does this table have RLS forced?
+     */
+    private Boolean rlsForced;
 
+    private String foreignServer;
+
+    /**
+     * RLS Policies
+     */
+    private List<PgPolicy> policies = new ArrayList<PgPolicy>();
 
     /**
      * PgDatabase
@@ -116,6 +134,9 @@ public class PgTable extends PgRelation {
         if (isUnlogged()) {
             sbSQL.append("UNLOGGED ");
         }
+        if (isForeign()) {
+            sbSQL.append("FOREIGN ");
+        }
         sbSQL.append("TABLE ");
         sbSQL.append(PgDiffUtils.getCreateIfNotExists(useIfExists));
         sbSQL.append(PgDiffUtils.getQuotedName(name));
@@ -184,6 +205,11 @@ public class PgTable extends PgRelation {
             }
         }
 
+        if (isForeign()) {
+            sbSQL.append("SERVER ");
+            sbSQL.append(getForeignServer());
+        }
+        
         if (tablespace != null && !tablespace.isEmpty()) {
             sbSQL.append(System.getProperty("line.separator"));
             sbSQL.append("TABLESPACE ");
@@ -404,5 +430,65 @@ public class PgTable extends PgRelation {
 
     public void setUnlogged(boolean unlogged) {
         this.unlogged = unlogged;
+    }
+    
+    /**
+     * Foreign Tables
+     */
+    
+    @Override
+    public String getDropSQL() {
+        return "DROP " + ((isForeign()) ? "FOREIGN ":"") + getRelationKind() + " " +
+                PgDiffUtils.getQuotedName(getName()) + ";";
+    }
+    
+    public boolean isForeign() {
+        return foreign;
+    }
+
+    public void setForeign(boolean foreign) {
+        this.foreign = foreign;
+    }
+    
+    public void setForeignServer(String server){
+    	foreignServer = server;
+    }
+    
+    public String getForeignServer(){
+    	return foreignServer;
+    }
+
+    public Boolean hasRLSEnabled() {
+        return rlsEnabled;
+    }
+
+    public void setRLSEnabled(Boolean rlsEnabled) {
+        this.rlsEnabled = rlsEnabled;
+    }
+
+    public Boolean hasRLSForced() {
+        return rlsForced;
+    }
+
+    public void setRLSForced(Boolean rlsForced) {
+        this.rlsForced = rlsForced;
+    }
+
+    public void addPolicy(final PgPolicy policy) {
+        policies.add(policy);
+    }
+
+    public PgPolicy getPolicy(final String name) {
+        for (PgPolicy policy : policies) {
+            if (policy.getName().equals(name)) {
+                return policy;
+            }
+        }
+
+        return null;
+    }
+
+    public List<PgPolicy> getPolicies() {
+        return Collections.unmodifiableList(policies);
     }
 }

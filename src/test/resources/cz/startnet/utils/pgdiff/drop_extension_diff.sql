@@ -1,0 +1,2 @@
+
+DROP EXTENSION plpgsql CASCADE;

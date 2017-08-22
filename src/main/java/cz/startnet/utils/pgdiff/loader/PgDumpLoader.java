@@ -9,6 +9,7 @@ import cz.startnet.utils.pgdiff.Resources;
 import cz.startnet.utils.pgdiff.parsers.AlterSequenceParser;
 import cz.startnet.utils.pgdiff.parsers.AlterRelationParser;
 import cz.startnet.utils.pgdiff.parsers.CommentParser;
+import cz.startnet.utils.pgdiff.parsers.CreateExtensionParser;
 import cz.startnet.utils.pgdiff.parsers.CreateFunctionParser;
 import cz.startnet.utils.pgdiff.parsers.CreateTypeParser;
 import cz.startnet.utils.pgdiff.parsers.CreateIndexParser;
@@ -18,6 +19,7 @@ import cz.startnet.utils.pgdiff.parsers.CreateTableParser;
 import cz.startnet.utils.pgdiff.parsers.CreateTriggerParser;
 import cz.startnet.utils.pgdiff.parsers.CreateViewParser;
 import cz.startnet.utils.pgdiff.parsers.GrantRevokeParser;
+import cz.startnet.utils.pgdiff.parsers.CreatePolicyParser;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -53,7 +55,7 @@ public class PgDumpLoader { //NOPMD
      * Pattern for testing whether it is CREATE TABLE statement.
      */
     private static final Pattern PATTERN_CREATE_TABLE = Pattern.compile(
-            "^CREATE[\\s]+(UNLOGGED\\s)*TABLE[\\s]+.*$",
+            "^CREATE[\\s]+(UNLOGGED\\s|FOREIGN\\s)*TABLE[\\s]+.*$",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /**
      * Pattern for testing whether it is CREATE VIEW or CREATE MATERIALIZED
@@ -66,7 +68,7 @@ public class PgDumpLoader { //NOPMD
      * Pattern for testing whether it is ALTER TABLE statement.
      */
     private static final Pattern PATTERN_ALTER_TABLE =
-            Pattern.compile("^ALTER[\\s]+TABLE[\\s]+.*$",
+            Pattern.compile("^ALTER[\\s](FOREIGN)*TABLE[\\s]+.*$",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /**
      * Pattern for testing whether it is CREATE SEQUENCE statement.
@@ -156,6 +158,19 @@ public class PgDumpLoader { //NOPMD
             "[\"\\s]",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /**
+     * Pattern for testing whether it is CREATE EXTENSION statement.
+     */
+    private static final Pattern PATTERN_CREATE_EXTENSION = Pattern.compile(
+            "^CREATE[\\s]+EXTENSION[\\s]+.*$",
+            Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    /**
+     * Pattern for testing whether it is CREATE POLICY statement.
+     */
+    private static final Pattern PATTERN_CREATE_POLICY = Pattern.compile(
+            "^CREATE[\\s]+POLICY[\\s]+.*$",
+            Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    /**
+    /**
      * Storage of unprocessed line part.
      */
     private static String lineBuffer;
@@ -193,6 +208,8 @@ public class PgDumpLoader { //NOPMD
         while (statement != null) {
             if (PATTERN_CREATE_SCHEMA.matcher(statement).matches()) {
                 CreateSchemaParser.parse(database, statement);
+            } else if (PATTERN_CREATE_EXTENSION.matcher(statement).matches()) {
+                CreateExtensionParser.parse(database, statement);
             } else if (PATTERN_DEFAULT_SCHEMA.matcher(statement).matches()) {
                 final Matcher matcher =
                         PATTERN_DEFAULT_SCHEMA.matcher(statement);
@@ -233,6 +250,8 @@ public class PgDumpLoader { //NOPMD
             } else if (PATTERN_REVOKE.matcher(statement).matches()) {
                 GrantRevokeParser.parse(database, statement,
                         outputIgnoredStatements);
+            } else if (PATTERN_CREATE_POLICY.matcher(statement).matches()) {
+                CreatePolicyParser.parse(database, statement);
                 // we just ignore these statements
             } else if (outputIgnoredStatements) {
                 database.addIgnoredStatement(statement);
@@ -393,37 +412,48 @@ public class PgDumpLoader { //NOPMD
     private static boolean isQuoted(final StringBuilder sbString,
             final int pos) {
         boolean isQuoted = false;
-
+        boolean insideDoubleQuotes = false;
+        boolean insideSingeQuote = false; // Determine if double quote is inside of a single quote.
+        
         for (int curPos = 0; curPos < pos; curPos++) {
-            if (sbString.charAt(curPos) == '\'') {
-                isQuoted = !isQuoted;
-
-                // if quote was escaped by backslash, it's like double quote
-                if (pos > 0 && sbString.charAt(pos - 1) == '\\') {
+            // Check if the quote is inside of a double quotes
+            if (sbString.charAt(curPos) == '\"' && !insideSingeQuote ){
+                insideDoubleQuotes = !insideDoubleQuotes;
+            }
+            if (sbString.charAt(curPos) == '\'' && !insideDoubleQuotes ){
+                insideSingeQuote = !insideSingeQuote;
+            }
+            if(!insideDoubleQuotes){
+                if (sbString.charAt(curPos) == '\'') {
                     isQuoted = !isQuoted;
+
+                    // if quote was escaped by backslash, it's like double quote
+                    if (pos > 0 && sbString.charAt(pos - 1) == '\\') {
+                        isQuoted = !isQuoted;
+                    }
+                } else if (sbString.charAt(curPos) == '$' && !isQuoted) {
+                    final int endPos = sbString.indexOf("$", curPos + 1);
+
+                    if (endPos == -1) {
+                        return false;
+                    }
+
+                    final String tag = sbString.substring(curPos, endPos + 1);
+
+                    if (!isCorrectTag(tag)) {
+                        return false;
+                    }
+
+                    final int endTagPos = sbString.indexOf(tag, endPos + 1);
+
+                    // if end tag was not found or it was found after the checked
+                    // position, it's quoted
+                    if (endTagPos == -1 || endTagPos > pos) {
+                        return true;
+                    }
+
+                    curPos = endTagPos + tag.length() - 1;
                 }
-            } else if (sbString.charAt(curPos) == '$' && !isQuoted) {
-                final int endPos = sbString.indexOf("$", curPos + 1);
-
-                if (endPos == -1) {
-                    return false;
-                }
-
-                final String tag = sbString.substring(curPos, endPos + 1);
-
-                if (!isCorrectTag(tag)) {
-                    return false;
-                }
-
-                final int endTagPos = sbString.indexOf(tag, endPos + 1);
-
-                // if end tag was not found or it was found after the checked
-                // position, it's quoted
-                if (endTagPos == -1 || endTagPos > pos) {
-                    return true;
-                }
-
-                curPos = endTagPos + tag.length() - 1;
             }
         }
 

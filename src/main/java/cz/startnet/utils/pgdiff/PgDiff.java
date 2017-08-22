@@ -82,7 +82,7 @@ public class PgDiff {
         }
     }
     
-        /**
+   /**
      * Creates new extensions.
      *
      * @param writer      writer the output should be written to

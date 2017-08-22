@@ -37,6 +37,8 @@ public class AlterRelationParser {
          * relation types, so we just ignore type here and derive its type from
          * the original CREATE command.
          */
+        parser.expectOptional("FOREIGN");
+        	//OK FOREIGN TABLE
         if (parser.expectOptional("TABLE")) {
             parser.expectOptional("ONLY");
         } else if (parser.expectOptional("MATERIALIZED", "VIEW")
@@ -95,6 +97,18 @@ public class AlterRelationParser {
                 } else {
                     parser.throwUnsupportedCommand();
                 }
+            } else if (table != null
+                && parser.expectOptional("ENABLE", "ROW", "LEVEL", "SECURITY")) {
+                table.setRLSEnabled(true);
+            } else if (table != null
+                && parser.expectOptional("DISABLE", "ROW", "LEVEL", "SECURITY")) {
+                table.setRLSEnabled(false);
+            } else if (table != null
+                && parser.expectOptional("FORCE", "ROW", "LEVEL", "SECURITY")) {
+                table.setRLSForced(true);
+            } else if (table != null
+                && parser.expectOptional("NO", "FORCE", "ROW", "LEVEL", "SECURITY")) {
+                table.setRLSForced(false);
             } else if (table != null && parser.expectOptional("ENABLE")) {
                 parseEnable(
                         parser, outputIgnoredStatements, relName, database);
@@ -122,6 +136,7 @@ public class AlterRelationParser {
      * @param tableName               table name as it was specified in the
      *                                statement
      * @param database                database information
+     *
      */
     private static void parseEnable(final Parser parser,
             final boolean outputIgnoredStatements, final String tableName,
@@ -177,6 +192,7 @@ public class AlterRelationParser {
      * @param tableName               table name as it was specified in the
      *                                statement
      * @param database                database information
+     *
      */
     private static void parseDisable(final Parser parser,
             final boolean outputIgnoredStatements, final String tableName,

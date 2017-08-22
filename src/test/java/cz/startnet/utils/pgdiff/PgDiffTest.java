@@ -45,6 +45,10 @@ public class PgDiffTest {
                     {"drop_cluster", false, false, false, false},
                     // Tests scenario where CLUSTER is changed on TABLE.
                     {"modify_cluster", false, false, false, false},
+                    // Tests scenario where EXTENSION is added to TABLE.
+                    {"add_extension", false, false, false, false},
+                    // Tests scenario where EXTENSION is dropped from TABLE.
+                    {"drop_extension", false, false, false, false},
                     // Tests scenario where WITH OIDS is dropped from TABLE.
                     {"drop_with_oids", false, false, false, false},
                     // Tests scenario where INDEX is added.
@@ -229,17 +233,32 @@ public class PgDiffTest {
                     {"add_table_issue115", false, false, false, false},
                     {"add_column_issue134", false, false, false, false},
                     {"add_column_issue188", false, false, false, false},
+                    {"add_column_issue188", false, false, false, false},
+                    {"view_alias_with_quote", false, false, false, false},
                     // Tests view triggers (support for 'INSTEAD OF')
+                    //90
                     {"view_triggers", false, false, false, false},
                     // Tests privileges
-                        {"grant_on_table_sequence", false, false, false, false},
-                        {"revoke_on_table_sequence", false, false, false, false},
-                        {"grant_on_view", false, false, false, false},
-                        {"revoke_on_view", false, false, false, false}
+                    {"grant_on_table_sequence", false, false, false, false},
+                    {"revoke_on_table_sequence", false, false, false, false},
+                    {"grant_on_view", false, false, false, false},
+                    {"revoke_on_view", false, false, false, false}
                     // Tests types
-                    , {"add_type", false, false, false, false}
-                    , {"drop_type", false, false, false, false}
-                    , {"alter_type", false, false, false, false}
+                  , {"add_type", false, false, false, false}
+                  , {"drop_type", false, false, false, false}
+                  , {"alter_type", false, false, false, false}
+                    // Test Foreign Tables
+                  , {"foreign_create_table", false, false, false, false}
+                  , {"foreign_drop_table", false, false, false, false}
+                    //100
+                  , {"foreign_alter_type", false, false, false, false}
+                    // Tests enable/force rls
+                  , {"enable_force_rls", false, false, false, false}
+                  , {"disable_no_force_rls", false, false, false, false}
+                    // Tests policies
+                  , {"create_policies", false, false, false, false}
+                  , {"drop_policies", false, false, false, false}
+                  , {"alter_policies", false, false, false, false}
                 });
     }
     /**
