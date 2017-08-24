@@ -131,6 +131,7 @@ public class PgSchema {
     /**
      * Creates and returns SQL for creation of the schema.
      *
+     * @param useIfExists use IF EXISTS IN STATEMENTS
      * @return created SQL
      */
     public String getCreationSQL(boolean useIfExists) {

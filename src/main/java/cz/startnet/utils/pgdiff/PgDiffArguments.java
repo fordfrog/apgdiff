@@ -407,7 +407,7 @@ public class PgDiffArguments {
     /**
      * Setter for {@link #useIfExists}.
      *
-     * @param arguments {@link #useIfExists}
+     * @param useIfExists use IF EXISTS IN STATEMENTS
      */
     public void setUseIfExists(final boolean useIfExists) {
         this.useIfExists = useIfExists;

@@ -130,6 +130,7 @@ public class PgFunction {
     /**
      * Creates and returns SQL for dropping the function.
      *
+     * @param pgDiffArguments object with pgDiff settings
      * @return created SQL
      */
     public String getDropSQL(final PgDiffArguments pgDiffArguments) {

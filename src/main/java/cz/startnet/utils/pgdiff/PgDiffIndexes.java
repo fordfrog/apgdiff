@@ -26,6 +26,7 @@ public class PgDiffIndexes {
      * @param oldSchema        original schema
      * @param newSchema        new schema
      * @param searchPathHelper search path helper
+     * @param arguments object containing arguments settings
      */
     public static void createIndexes(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
@@ -59,6 +60,7 @@ public class PgDiffIndexes {
      * @param oldSchema        original schema
      * @param newSchema        new schema
      * @param searchPathHelper search path helper
+     * @param arguments object containing arguments settings
      */
     public static void dropIndexes(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,

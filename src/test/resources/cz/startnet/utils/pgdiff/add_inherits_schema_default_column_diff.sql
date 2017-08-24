@@ -1,5 +1,5 @@
 
-CREATE SCHEMA schema1;
+CREATE SCHEMA IF NOT EXISTS schema1;
 
 SET search_path = schema1, pg_catalog;
 

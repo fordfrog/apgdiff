@@ -48,7 +48,7 @@ public class PgConstraint {
 
     /**
      * Creates and returns SQL for creation of the constraint.
-     *
+     * @param useIfExists use IF EXISTS IN STATEMENTS
      * @return created SQL
      */
     public String getCreationSQL(boolean useIfExists) {
@@ -116,7 +116,7 @@ public class PgConstraint {
 
     /**
      * Creates and returns SQL for dropping the constraint.
-     *
+     * @param dropIfExists drop object IF EXISTS
      * @return created SQL
      */
     public String getDropSQL(final boolean dropIfExists) {

@@ -284,6 +284,7 @@ public abstract class PgRelation {
     /**
      * Creates and returns SQL statement for dropping the relation.
      *
+     * @param dropIfExists drop object IF EXISTS
      * @return created SQL statement
      */
     public String getDropSQL(final boolean dropIfExists) {

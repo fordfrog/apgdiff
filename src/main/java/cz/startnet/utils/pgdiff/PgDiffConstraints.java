@@ -29,6 +29,7 @@ public class PgDiffConstraints {
      *                         processed or any other constraints should be
      *                         processed
      * @param searchPathHelper search path helper
+     * @param arguments object containing arguments settings
      */
     public static void createConstraints(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
@@ -63,6 +64,7 @@ public class PgDiffConstraints {
      *                         processed or any other constraints should be
      *                         processed
      * @param searchPathHelper search path helper
+     * @param arguments object containing arguments settings
      */
     public static void dropConstraints(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,

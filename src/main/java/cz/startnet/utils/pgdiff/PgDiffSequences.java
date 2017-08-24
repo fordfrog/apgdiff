@@ -25,6 +25,7 @@ public class PgDiffSequences {
      * @param oldSchema        original schema
      * @param newSchema        new schema
      * @param searchPathHelper search path helper
+     * @param arguments object containing arguments settings
      */
     public static void createSequences(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
@@ -95,6 +96,7 @@ public class PgDiffSequences {
      * @param oldSchema        original schema
      * @param newSchema        new schema
      * @param searchPathHelper search path helper
+     * @param arguments object containing arguments settings
      */
     public static void dropSequences(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,

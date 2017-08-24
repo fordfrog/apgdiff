@@ -72,6 +72,7 @@ public class PgDiffViews {
      * @param oldSchema        original schema
      * @param newSchema        new schema
      * @param searchPathHelper search path helper
+     * @param arguments  object containing arguments settings
      */
     public static void dropViews(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,

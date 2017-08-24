@@ -1,7 +1,7 @@
 
-DROP SCHEMA testschema1 CASCADE;
+DROP SCHEMA IF EXISTS testschema1 CASCADE;
 
-CREATE SCHEMA testschema2;
+CREATE SCHEMA IF NOT EXISTS testschema2;
 
 SET search_path = public, pg_catalog;
 

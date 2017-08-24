@@ -70,6 +70,7 @@ public class PgDiff {
      * @param writer      writer the output should be written to
      * @param oldDatabase original database schema
      * @param newDatabase new database schema
+     * @param arguments object containing arguments settings
      */
     private static void createNewSchemas(final PrintWriter writer,
             final PgDatabase oldDatabase, final PgDatabase newDatabase,
@@ -88,13 +89,15 @@ public class PgDiff {
      * @param writer      writer the output should be written to
      * @param oldDatabase original database schema
      * @param newDatabase new database schema
+     * @param arguments object containing arguments settings
      */
     private static void createNewExtensions(final PrintWriter writer,
-            final PgDatabase oldDatabase, final PgDatabase newDatabase) {
+            final PgDatabase oldDatabase, final PgDatabase newDatabase,
+            final PgDiffArguments arguments) {
         for (final PgExtension newExtension : newDatabase.getExtensions()) {
             if (oldDatabase.getExtension(newExtension.getName()) == null) {
                 writer.println();
-                writer.println(newExtension.getCreationSQL());
+                writer.println(newExtension.getCreationSQL(arguments.isUseIfExists()));
             }
         }
     }
@@ -129,10 +132,10 @@ public class PgDiff {
             writer.println("COMMENT ON DATABASE current_database() IS NULL;");
         }
 
-        dropOldSchemas(writer, oldDatabase, newDatabase);
+        dropOldSchemas(writer, oldDatabase, newDatabase,arguments);
         createNewSchemas(writer, oldDatabase, newDatabase,arguments);
-        dropOldExtensions(writer, oldDatabase, newDatabase);
-        createNewExtensions(writer, oldDatabase, newDatabase);
+        dropOldExtensions(writer, oldDatabase, newDatabase,arguments);
+        createNewExtensions(writer, oldDatabase, newDatabase,arguments);
         updateSchemas(writer, arguments, oldDatabase, newDatabase);
 
         if (arguments.isAddTransaction()) {
@@ -179,13 +182,15 @@ public class PgDiff {
      * @param writer      writer the output should be written to
      * @param oldDatabase original database schema
      * @param newDatabase new database schema
+     * @param arguments object containing arguments settings
      */
     private static void dropOldSchemas(final PrintWriter writer,
-            final PgDatabase oldDatabase, final PgDatabase newDatabase) {
+            final PgDatabase oldDatabase, final PgDatabase newDatabase,
+            final PgDiffArguments arguments) {
         for (final PgSchema oldSchema : oldDatabase.getSchemas()) {
             if (newDatabase.getSchema(oldSchema.getName()) == null) {
                 writer.println();
-                writer.println("DROP SCHEMA "
+                writer.println("DROP SCHEMA " +PgDiffUtils.getDropIfExists(arguments.isUseIfExists())
                         + PgDiffUtils.getQuotedName(oldSchema.getName())
                         + " CASCADE;");
             }
@@ -198,13 +203,15 @@ public class PgDiff {
      * @param writer      writer the output should be written to
      * @param oldDatabase original database schema
      * @param newDatabase new database schema
+     * @param arguments object containing arguments settings
      */
     private static void dropOldExtensions(final PrintWriter writer,
-            final PgDatabase oldDatabase, final PgDatabase newDatabase) {
+            final PgDatabase oldDatabase, final PgDatabase newDatabase,
+            final PgDiffArguments arguments) {
         for (final PgExtension oldExtension : oldDatabase.getExtensions()) {
             if (newDatabase.getExtension(oldExtension.getName()) == null) {
                 writer.println();
-                writer.println("DROP EXTENSION "
+                writer.println("DROP EXTENSION " +PgDiffUtils.getDropIfExists(arguments.isUseIfExists())
                         + PgDiffUtils.getQuotedName(oldExtension.getName())
                         + " CASCADE;");
             }
@@ -288,7 +295,7 @@ public class PgDiff {
             PgDiffSequences.alterSequences(
                     writer, arguments, oldSchema, newSchema, searchPathHelper);
             PgDiffTypes.alterTypes(writer, arguments, oldSchema, newSchema, searchPathHelper);
-            PgDiffTypes.createTypes(writer, oldSchema, newSchema, searchPathHelper,arguments);
+            PgDiffTypes.createTypes(writer, oldSchema, newSchema, searchPathHelper);
             PgDiffTypes.dropTypes(writer, oldSchema, newSchema, searchPathHelper,arguments);
             PgDiffTables.createTables(
                     writer, oldSchema, newSchema, searchPathHelper,arguments);

@@ -125,6 +125,7 @@ public class PgTable extends PgRelation {
      * Creates and returns SQL for creation of the table.
      *
      * @param schema schema of current statement
+     * @param useIfExists use IF EXISTS IN STATEMENTS
      *
      * @return created SQL statement
      */
@@ -437,8 +438,9 @@ public class PgTable extends PgRelation {
      */
     
     @Override
-    public String getDropSQL() {
-        return "DROP " + ((isForeign()) ? "FOREIGN ":"") + getRelationKind() + " " +
+    public String getDropSQL(boolean dropIfExists) {
+        
+        return "DROP " + ((isForeign()) ? "FOREIGN ":"") + getRelationKind() + " " + PgDiffUtils.getDropIfExists(dropIfExists) +
                 PgDiffUtils.getQuotedName(getName()) + ";";
     }
     

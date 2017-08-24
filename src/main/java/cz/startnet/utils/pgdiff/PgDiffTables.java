@@ -274,6 +274,7 @@ public class PgDiffTables {
      * @param statements list of statements
      * @param oldTable   original table
      * @param newTable   new table
+    * @param arguments object containing arguments settings
      */
     private static void addDropTableColumns(final List<String> statements,
             final PgTable oldTable, final PgTable newTable, final PgDiffArguments arguments) {
@@ -531,6 +532,7 @@ public class PgDiffTables {
      * @param oldSchema        original schema
      * @param newSchema        new schema
      * @param searchPathHelper search path helper
+     * @param arguments object containing arguments settings
      */
     public static void createTables(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
@@ -580,6 +582,7 @@ public class PgDiffTables {
      * @param oldSchema        original schema
      * @param newSchema        new schema
      * @param searchPathHelper search path helper
+     * @param arguments object containing arguments settings
      */
     public static void dropTables(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
