@@ -39,13 +39,13 @@ public class PgDiffSequences {
 
                 for (PgSequencePrivilege sequencePrivilege : sequence
                         .getPrivileges()) {
-                    writer.println("REVOKE ALL ON TABLE "
+                    writer.println("REVOKE ALL ON SEQUENCE "
                             + PgDiffUtils.getQuotedName(sequence.getName())
                             + " FROM " + sequencePrivilege.getRoleName() + ";");
                     if (!"".equals(sequencePrivilege.getPrivilegesSQL(true))) {
                         writer.println("GRANT "
                                 + sequencePrivilege.getPrivilegesSQL(true)
-                                + " ON TABLE "
+                                + " ON SEQUENCE "
                                 + PgDiffUtils.getQuotedName(sequence.getName())
                                 + " TO " + sequencePrivilege.getRoleName()
                                 + " WITH GRANT OPTION;");
@@ -53,7 +53,7 @@ public class PgDiffSequences {
                     if (!"".equals(sequencePrivilege.getPrivilegesSQL(false))) {
                         writer.println("GRANT "
                                 + sequencePrivilege.getPrivilegesSQL(false)
-                                + " ON TABLE "
+                                + " ON SEQUENCE "
                                 + PgDiffUtils.getQuotedName(sequence.getName())
                                 + " TO " + sequencePrivilege.getRoleName()
                                 + ";");

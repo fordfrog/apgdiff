@@ -260,6 +260,8 @@ public class PgDiffTest {
                   , {"create_policies", false, false, false, false}
                   , {"drop_policies", false, false, false, false}
                   , {"alter_policies", false, false, false, false}
+                    // Tests grant on new sequence
+                  , {"grant_on_new_sequence", false, false, false, false}
                 });
     }
     /**
