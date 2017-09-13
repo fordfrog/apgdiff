@@ -69,23 +69,13 @@ public class CreatePolicyParser {
             policy.getRoles().add("PUBLIC");
         }
 
-        // We need this workaround to recognize USING( with the
-        // parentheses without space
-        if (parser.expectOptional("USING(")) {
-            policy.setUsing(parser.getExpression());
-            parser.expect(")");
-        } else if (parser.expectOptional("USING")){
+        if (parser.expectOptional("USING")){
             parser.expect("(");
             policy.setUsing(parser.getExpression());
             parser.expect(")");
         }
 
-        // We need this workaround to recognize WITH CHECK( with the
-        // parentheses without space
-        if (parser.expectOptional("WITH CHECK(")){
-            policy.setWithCheck(parser.getExpression());
-            parser.expect(")");
-        } else if (parser.expectOptional("WITH", "CHECK")){
+        if (parser.expectOptional("WITH", "CHECK")){
             parser.expect("(");
             policy.setWithCheck(parser.getExpression());
             parser.expect(")");
