@@ -204,7 +204,9 @@ public class PgDiffTest {
                     // Tests adding new sequence that is owned by table
                     {"add_owned_sequence", false, true, false, false},
                     // Tests adding empty table
-                    {"add_empty_table", false, false, false, false}
+                    {"add_empty_table", false, false, false, false},
+                    // Tests rename column
+                    {"modify_column_name", false, false, false, false}
                 });
     }
     /**

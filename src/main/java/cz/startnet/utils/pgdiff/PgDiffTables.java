@@ -9,6 +9,7 @@ import cz.startnet.utils.pgdiff.schema.PgColumn;
 import cz.startnet.utils.pgdiff.schema.PgColumnUtils;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
+import cz.startnet.utils.pgdiff.util.ColumnComparator;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -246,8 +247,9 @@ public class PgDiffTables {
     private static void addCreateTableColumns(final List<String> statements,
             final PgDiffArguments arguments, final PgTable oldTable,
             final PgTable newTable, final List<PgColumn> dropDefaultsColumns) {
+        ColumnComparator comparator = new ColumnComparator(oldTable, newTable);
         for (final PgColumn column : newTable.getColumns()) {
-            if (!oldTable.containsColumn(column.getName())) {
+            if (comparator.hasNotColumn(column.getName())) {
                 statements.add("\tADD COLUMN "
                         + column.getFullDefinition(arguments.isAddDefaults()));
 
@@ -269,8 +271,9 @@ public class PgDiffTables {
      */
     private static void addDropTableColumns(final List<String> statements,
             final PgTable oldTable, final PgTable newTable) {
+        ColumnComparator comparator = new ColumnComparator(newTable, oldTable);
         for (final PgColumn column : oldTable.getColumns()) {
-            if (!newTable.containsColumn(column.getName())) {
+            if (comparator.hasNotColumn(column.getName())) {
                 statements.add("\tDROP COLUMN "
                         + PgDiffUtils.getQuotedName(column.getName()));
             }
@@ -290,15 +293,26 @@ public class PgDiffTables {
     private static void addModifyTableColumns(final List<String> statements,
             final PgDiffArguments arguments, final PgTable oldTable,
             final PgTable newTable, final List<PgColumn> dropDefaultsColumns) {
+        ColumnComparator comparator = new ColumnComparator(oldTable, newTable);
         for (final PgColumn newColumn : newTable.getColumns()) {
-            if (!oldTable.containsColumn(newColumn.getName())) {
+            if (comparator.hasNotColumn(newColumn.getName())) {
                 continue;
             }
 
-            final PgColumn oldColumn = oldTable.getColumn(newColumn.getName());
+            final PgColumn oldColumn = comparator.getColumn(newColumn.getName());
+            final String oldColumnName = 
+                    PgDiffUtils.getQuotedName(oldColumn.getName());
             final String newColumnName =
                     PgDiffUtils.getQuotedName(newColumn.getName());
 
+            if (!oldColumn.getName().equals(newColumn.getName())) {
+                statements.add("\tRENAME COLUMN " + oldColumnName + " TO " + newColumnName + " /* "
+                        + MessageFormat.format(
+                        Resources.getString("RenameColumn"),
+                        newTable.getName(), oldColumn.getName(),
+                        newColumn.getName()) + " */");
+            }
+            
             if (!oldColumn.getType().equals(newColumn.getType())) {
                 statements.add("\tALTER COLUMN " + newColumnName + " TYPE "
                         + newColumn.getType() + " /* "
@@ -307,6 +321,7 @@ public class PgDiffTables {
                         newTable.getName(), oldColumn.getType(),
                         newColumn.getType()) + " */");
             }
+            
 
             final String oldDefault = (oldColumn.getDefaultValue() == null) ? ""
                     : oldColumn.getDefaultValue();
