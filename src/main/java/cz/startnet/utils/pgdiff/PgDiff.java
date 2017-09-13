@@ -29,13 +29,11 @@ public class PgDiff {
         final PgDatabase oldDatabase = PgDumpLoader.loadDatabaseSchema(
                 arguments.getOldDumpFile(), arguments.getInCharsetName(),
                 arguments.isOutputIgnoredStatements(),
-                arguments.isIgnoreSlonyTriggers(),
-                arguments.isIgnoreSchemaCreation());
+                arguments.isIgnoreSlonyTriggers());
         final PgDatabase newDatabase = PgDumpLoader.loadDatabaseSchema(
                 arguments.getNewDumpFile(), arguments.getInCharsetName(),
                 arguments.isOutputIgnoredStatements(),
-                arguments.isIgnoreSlonyTriggers(),
-                arguments.isIgnoreSchemaCreation());
+                arguments.isIgnoreSlonyTriggers());
 
         diffDatabaseSchemas(writer, arguments, oldDatabase, newDatabase);
     }
@@ -56,13 +54,11 @@ public class PgDiff {
         final PgDatabase oldDatabase = PgDumpLoader.loadDatabaseSchema(
                 oldInputStream, arguments.getInCharsetName(),
                 arguments.isOutputIgnoredStatements(),
-                arguments.isIgnoreSlonyTriggers(),
-                arguments.isIgnoreSchemaCreation());
+                arguments.isIgnoreSlonyTriggers());
         final PgDatabase newDatabase = PgDumpLoader.loadDatabaseSchema(
                 newInputStream, arguments.getInCharsetName(),
                 arguments.isOutputIgnoredStatements(),
-                arguments.isIgnoreSlonyTriggers(),
-                arguments.isIgnoreSchemaCreation());
+                arguments.isIgnoreSlonyTriggers());
 
         diffDatabaseSchemas(writer, arguments, oldDatabase, newDatabase);
     }

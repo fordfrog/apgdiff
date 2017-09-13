@@ -25,10 +25,9 @@ public class CreateTableParser {
      *
      * @param database  database
      * @param statement CREATE TABLE statement
-     * @param ignoreSchemaCreation whether schema creation should be ignored
      */
     public static void parse(final PgDatabase database,
-            final String statement, final boolean ignoreSchemaCreation) {
+            final String statement) {
         final Parser parser = new Parser(statement);
         parser.expect("CREATE", "TABLE");
 
@@ -39,17 +38,12 @@ public class CreateTableParser {
         final PgTable table = new PgTable(ParserUtils.getObjectName(tableName));
         final String schemaName =
                 ParserUtils.getSchemaName(tableName, database);
-        PgSchema schema = database.getSchema(schemaName);
+        final PgSchema schema = database.getSchema(schemaName);
 
         if (schema == null) {
-            if (ignoreSchemaCreation) {
-                schema = new PgSchema(schemaName);
-                database.addSchema(schema);
-            } else {
-                throw new RuntimeException(MessageFormat.format(
+            throw new RuntimeException(MessageFormat.format(
                     Resources.getString("CannotFindSchema"), schemaName,
                     statement));
-            }
         }
 
         schema.addTable(table);
