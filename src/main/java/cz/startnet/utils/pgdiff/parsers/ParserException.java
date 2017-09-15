@@ -6,7 +6,7 @@
 package cz.startnet.utils.pgdiff.parsers;
 
 /**
- * Thrown if parsing problem occured.
+ * Thrown if parsing problem occurred.
  *
  * @author fordfrog
  */

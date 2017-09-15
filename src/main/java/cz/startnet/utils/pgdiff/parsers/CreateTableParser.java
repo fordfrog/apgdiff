@@ -30,13 +30,15 @@ public class CreateTableParser {
     public static void parse(final PgDatabase database,
             final String statement, final boolean ignoreSchemaCreation) {
         final Parser parser = new Parser(statement);
-        parser.expect("CREATE", "TABLE");
+        parser.expect("CREATE");
+        final boolean unlogged = parser.expectOptional("UNLOGGED");
+        final boolean foreign = parser.expectOptional("FOREIGN");
+        parser.expect("TABLE");
 
         // Optional IF NOT EXISTS, irrelevant for our purposes
         parser.expectOptional("IF", "NOT", "EXISTS");
 
         final String tableName = parser.parseIdentifier();
-        final PgTable table = new PgTable(ParserUtils.getObjectName(tableName));
         final String schemaName =
                 ParserUtils.getSchemaName(tableName, database);
         PgSchema schema = database.getSchema(schemaName);
@@ -52,13 +54,22 @@ public class CreateTableParser {
             }
         }
 
-        schema.addTable(table);
+        final PgTable table = new PgTable(ParserUtils.getObjectName(tableName), database, schema);
+        table.setUnlogged(unlogged);
+        table.setForeign(foreign);
+        schema.addRelation(table);
 
         parser.expect("(");
 
         while (!parser.expectOptional(")")) {
             if (parser.expectOptional("CONSTRAINT")) {
                 parseConstraint(parser, table);
+            } else if (parser.expectOptional("PRIMARY", "KEY")) {
+                throw new ParserException(Resources.getString(
+                        "CreateTablePrimaryKeyNotSupported"));
+            } else if (parser.expectOptional("UNIQUE")) {
+                throw new ParserException(
+                        Resources.getString("CreateTableUniqueNotSupported"));
             } else {
                 parseColumn(parser, table);
             }
@@ -72,9 +83,9 @@ public class CreateTableParser {
 
         while (!parser.expectOptional(";")) {
             if (parser.expectOptional("INHERITS")) {
-                parseInherits(parser, table);
+                parseInherits(database, parser, table);
             } else if (parser.expectOptional("WITHOUT")) {
-                table.setWith("OIDS=false");
+                table.setWith("OIDS=false");            
             } else if (parser.expectOptional("WITH")) {
                 if (parser.expectOptional("OIDS")
                         || parser.expectOptional("OIDS=true")) {
@@ -86,8 +97,10 @@ public class CreateTableParser {
                 }
             } else if (parser.expectOptional("TABLESPACE")) {
                 table.setTablespace(parser.parseString());
+            } else if (parser.expectOptional("SERVER")) {
+            	table.setForeignServer(parser.getExpression());
             } else {
-                parser.throwUnsupportedCommand();
+            	parser.throwUnsupportedCommand();
             }
         }
     }
@@ -95,17 +108,21 @@ public class CreateTableParser {
     /**
      * Parses INHERITS.
      *
+     * @param database database
      * @param parser parser
      * @param table  pg table
      */
-    private static void parseInherits(final Parser parser,
+    private static void parseInherits(final PgDatabase database,final Parser parser,
             final PgTable table) {
         parser.expect("(");
 
         while (!parser.expectOptional(")")) {
-            table.addInherits(
-                    ParserUtils.getObjectName(parser.parseIdentifier()));
-
+         final String parsedString = parser.parseIdentifier();
+         final String tableName = ParserUtils.getObjectName(parsedString);
+         final String schemaName = parsedString.contains(".") ?
+             ParserUtils.getSecondObjectName(parsedString) :
+             database.getDefaultSchema().getName();
+            table.addInherits(schemaName, tableName);
             if (parser.expectOptional(")")) {
                 break;
             } else {

@@ -5,11 +5,13 @@
  */
 package cz.startnet.utils.pgdiff;
 
+import cz.startnet.utils.pgdiff.schema.PgColumn;
+import cz.startnet.utils.pgdiff.schema.PgColumnPrivilege;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgView;
+import cz.startnet.utils.pgdiff.schema.PgRelationPrivilege;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -38,6 +40,28 @@ public class PgDiffViews {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(newView.getCreationSQL());
+
+                for (PgRelationPrivilege viewPrivilege : newView.getPrivileges()) {
+                    writer.println("REVOKE ALL ON TABLE "
+                            + PgDiffUtils.getQuotedName(newView.getName())
+                            + " FROM " + viewPrivilege.getRoleName() + ";");
+                    if (!"".equals(viewPrivilege.getPrivilegesSQL(true))) {
+                        writer.println("GRANT "
+                                + viewPrivilege.getPrivilegesSQL(true)
+                                + " ON TABLE "
+                                + PgDiffUtils.getQuotedName(newView.getName())
+                                + " TO " + viewPrivilege.getRoleName()
+                                + " WITH GRANT OPTION;");
+                    }
+                    if (!"".equals(viewPrivilege.getPrivilegesSQL(false))) {
+                        writer.println("GRANT "
+                                + viewPrivilege.getPrivilegesSQL(false)
+                                + " ON TABLE "
+                                + PgDiffUtils.getQuotedName(newView.getName())
+                                + " TO " + viewPrivilege.getRoleName() + ";");
+                    }
+                }
+
             }
         }
     }
@@ -79,30 +103,22 @@ public class PgDiffViews {
      */
     private static boolean isViewModified(final PgView oldView,
             final PgView newView) {
-        final String[] oldViewColumnNames;
+        if (!oldView.getQuery().trim().equals(newView.getQuery().trim()))
+            return true;
 
-        if (oldView.getColumnNames() == null
-                || oldView.getColumnNames().isEmpty()) {
-            oldViewColumnNames = null;
+        if (oldView.isMaterialized() != newView.isMaterialized())
+            return true;
+
+        final List<String> oldViewColumnNames =
+                oldView.getDeclaredColumnNames();
+        final List<String> newViewColumnNames =
+                newView.getDeclaredColumnNames();
+
+        if (oldViewColumnNames != null && newViewColumnNames != null) {
+            return !oldViewColumnNames.equals(newViewColumnNames);
         } else {
-            oldViewColumnNames = oldView.getColumnNames().toArray(
-                    new String[oldView.getColumnNames().size()]);
-        }
-
-        final String[] newViewColumnNames;
-
-        if (newView.getColumnNames() == null
-                || newView.getColumnNames().isEmpty()) {
-            newViewColumnNames = null;
-        } else {
-            newViewColumnNames = newView.getColumnNames().toArray(
-                    new String[newView.getColumnNames().size()]);
-        }
-
-        if (oldViewColumnNames == null && newViewColumnNames == null) {
-            return !oldView.getQuery().trim().equals(newView.getQuery().trim());
-        } else {
-            return !Arrays.equals(oldViewColumnNames, newViewColumnNames);
+            // At least one of the two is null. Are both?
+            return oldViewColumnNames != newViewColumnNames;
         }
     }
 
@@ -154,66 +170,55 @@ public class PgDiffViews {
             }
 
             final List<String> columnNames =
-                    new ArrayList<String>(newView.getColumnComments().size());
+                    new ArrayList<String>(newView.getColumns().size());
 
-            for (final PgView.ColumnComment columnComment :
-                    newView.getColumnComments()) {
-                columnNames.add(columnComment.getColumnName());
+            for (final PgColumn col : newView.getColumns()) {
+                columnNames.add(col.getName());
             }
 
-            for (final PgView.ColumnComment columnComment :
-                    oldView.getColumnComments()) {
-                if (!columnNames.contains(columnComment.getColumnName())) {
-                    columnNames.add(columnComment.getColumnName());
+            for (final PgColumn col : oldView.getColumns()) {
+                if (!columnNames.contains(col.getName())) {
+                    columnNames.add(col.getName());
                 }
             }
 
             for (final String columnName : columnNames) {
-                PgView.ColumnComment oldColumnComment = null;
-                PgView.ColumnComment newColumnComment = null;
+                String oldComment = null;
+                String newComment = null;
+                PgColumn oldCol = oldView.getColumn(columnName);
+                PgColumn newCol = newView.getColumn(columnName);
 
-                for (final PgView.ColumnComment columnComment :
-                        oldView.getColumnComments()) {
-                    if (columnName.equals(columnComment.getColumnName())) {
-                        oldColumnComment = columnComment;
-                        break;
-                    }
-                }
+                if (oldCol != null)
+                    oldComment = oldCol.getComment();
+                if (newCol != null)
+                    newComment = newCol.getComment();
 
-                for (final PgView.ColumnComment columnComment :
-                        newView.getColumnComments()) {
-                    if (columnName.equals(columnComment.getColumnName())) {
-                        newColumnComment = columnComment;
-                        break;
-                    }
-                }
-
-                if (oldColumnComment == null && newColumnComment != null
-                        || oldColumnComment != null && newColumnComment != null
-                        && !oldColumnComment.getComment().equals(
-                        newColumnComment.getComment())) {
+                if (oldComment == null && newComment != null
+                        || oldComment != null && newComment != null
+                        && !oldComment.equals(newComment)) {
                     searchPathHelper.outputSearchPath(writer);
                     writer.println();
                     writer.print("COMMENT ON COLUMN ");
                     writer.print(PgDiffUtils.getQuotedName(newView.getName()));
                     writer.print('.');
-                    writer.print(PgDiffUtils.getQuotedName(
-                            newColumnComment.getColumnName()));
+                    writer.print(PgDiffUtils.getQuotedName(newCol.getName()));
                     writer.print(" IS ");
-                    writer.print(newColumnComment.getComment());
+                    writer.print(newCol.getComment());
                     writer.println(';');
-                } else if (oldColumnComment != null
-                        && newColumnComment == null) {
+                } else if (oldComment != null
+                        && newComment == null) {
                     searchPathHelper.outputSearchPath(writer);
                     writer.println();
                     writer.print("COMMENT ON COLUMN ");
                     writer.print(PgDiffUtils.getQuotedName(newView.getName()));
                     writer.print('.');
-                    writer.print(PgDiffUtils.getQuotedName(
-                            oldColumnComment.getColumnName()));
+                    writer.print(PgDiffUtils.getQuotedName(oldCol.getName()));
                     writer.println(" IS NULL;");
                 }
             }
+
+            alterPrivileges(writer, oldView, newView, searchPathHelper);
+            alterPrivilegesColumns(writer, oldView, newView, searchPathHelper);
         }
     }
 
@@ -228,62 +233,45 @@ public class PgDiffViews {
     private static void diffDefaultValues(final PrintWriter writer,
             final PgView oldView, final PgView newView,
             final SearchPathHelper searchPathHelper) {
-        final List<PgView.DefaultValue> oldValues =
-                oldView.getDefaultValues();
-        final List<PgView.DefaultValue> newValues =
-                newView.getDefaultValues();
 
         // modify defaults that are in old view
-        for (final PgView.DefaultValue oldValue : oldValues) {
-            boolean found = false;
+        for (final PgColumn oldCol : oldView.getColumns()) {
+            if (oldCol.getDefaultValue() == null)
+                continue;
 
-            for (final PgView.DefaultValue newValue : newValues) {
-                if (oldValue.getColumnName().equals(newValue.getColumnName())) {
-                    found = true;
+            PgColumn newCol = newView.getColumn(oldCol.getName());
 
-                    if (!oldValue.getDefaultValue().equals(
-                            newValue.getDefaultValue())) {
-                        searchPathHelper.outputSearchPath(writer);
-                        writer.println();
-                        writer.print("ALTER TABLE ");
-                        writer.print(
-                                PgDiffUtils.getQuotedName(newView.getName()));
-                        writer.print(" ALTER COLUMN ");
-                        writer.print(PgDiffUtils.getQuotedName(
-                                newValue.getColumnName()));
-                        writer.print(" SET DEFAULT ");
-                        writer.print(newValue.getDefaultValue());
-                        writer.println(';');
-                    }
-
-                    break;
+            if (newCol != null && newCol.getDefaultValue() != null) {
+                if (!oldCol.getDefaultValue().equals(
+                        newCol.getDefaultValue())) {
+                    searchPathHelper.outputSearchPath(writer);
+                    writer.println();
+                    writer.print("ALTER TABLE ");
+                    writer.print(
+                            PgDiffUtils.getQuotedName(newView.getName()));
+                    writer.print(" ALTER COLUMN ");
+                    writer.print(PgDiffUtils.getQuotedName(newCol.getName()));
+                    writer.print(" SET DEFAULT ");
+                    writer.print(newCol.getDefaultValue());
+                    writer.println(';');
                 }
-            }
-
-            if (!found) {
+            } else {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.print("ALTER TABLE ");
                 writer.print(PgDiffUtils.getQuotedName(newView.getName()));
                 writer.print(" ALTER COLUMN ");
-                writer.print(PgDiffUtils.getQuotedName(
-                        oldValue.getColumnName()));
+                writer.print(PgDiffUtils.getQuotedName(oldCol.getName()));
                 writer.println(" DROP DEFAULT;");
             }
         }
 
         // add new defaults
-        for (final PgView.DefaultValue newValue : newValues) {
-            boolean found = false;
+        for (final PgColumn newCol : newView.getColumns()) {
+            PgColumn oldCol = oldView.getColumn(newCol.getName());
 
-            for (final PgView.DefaultValue oldValue : oldValues) {
-                if (newValue.getColumnName().equals(oldValue.getColumnName())) {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (found) {
+            if ((oldCol != null && oldCol.getDefaultValue() != null)
+                    || newCol.getDefaultValue() == null) {
                 continue;
             }
 
@@ -292,11 +280,158 @@ public class PgDiffViews {
             writer.print("ALTER TABLE ");
             writer.print(PgDiffUtils.getQuotedName(newView.getName()));
             writer.print(" ALTER COLUMN ");
-            writer.print(PgDiffUtils.getQuotedName(newValue.getColumnName()));
+            writer.print(PgDiffUtils.getQuotedName(newCol.getName()));
             writer.print(" SET DEFAULT ");
-            writer.print(newValue.getDefaultValue());
+            writer.print(newCol.getDefaultValue());
             writer.println(';');
         }
+    }
+
+    private static void alterPrivileges(final PrintWriter writer,
+            final PgView oldView, final PgView newView,
+            final SearchPathHelper searchPathHelper) {
+        boolean emptyLinePrinted = false;
+        for (PgRelationPrivilege oldViewPrivilege : oldView.getPrivileges()) {
+            PgRelationPrivilege newViewPrivilege = newView
+                    .getPrivilege(oldViewPrivilege.getRoleName());
+            if (newViewPrivilege == null) {
+                if (!emptyLinePrinted) {
+                    writer.println();
+                }
+                writer.println("REVOKE ALL ON TABLE "
+                        + PgDiffUtils.getQuotedName(oldView.getName())
+                        + " FROM " + oldViewPrivilege.getRoleName() + ";");
+            } else if (!oldViewPrivilege.isSimilar(newViewPrivilege)) {
+                if (!emptyLinePrinted) {
+                    writer.println();
+                }
+                writer.println("REVOKE ALL ON TABLE "
+                        + PgDiffUtils.getQuotedName(newView.getName())
+                        + " FROM " + newViewPrivilege.getRoleName() + ";");
+                if (!"".equals(newViewPrivilege.getPrivilegesSQL(true))) {
+                    writer.println("GRANT "
+                            + newViewPrivilege.getPrivilegesSQL(true)
+                            + " ON TABLE "
+                            + PgDiffUtils.getQuotedName(newView.getName())
+                            + " TO " + newViewPrivilege.getRoleName()
+                            + " WITH GRANT OPTION;");
+                }
+                if (!"".equals(newViewPrivilege.getPrivilegesSQL(false))) {
+                    writer.println("GRANT "
+                            + newViewPrivilege.getPrivilegesSQL(false)
+                            + " ON TABLE "
+                            + PgDiffUtils.getQuotedName(newView.getName())
+                            + " TO " + newViewPrivilege.getRoleName() + ";");
+                }
+            } // else similar privilege will not be updated
+        }
+        for (PgRelationPrivilege newViewPrivilege : newView.getPrivileges()) {
+            PgRelationPrivilege oldViewPrivilege = oldView
+                    .getPrivilege(newViewPrivilege.getRoleName());
+            if (oldViewPrivilege == null) {
+                if (!emptyLinePrinted) {
+                    writer.println();
+                }
+                writer.println("REVOKE ALL ON TABLE "
+                        + PgDiffUtils.getQuotedName(newView.getName())
+                        + " FROM " + newViewPrivilege.getRoleName() + ";");
+                if (!"".equals(newViewPrivilege.getPrivilegesSQL(true))) {
+                    writer.println("GRANT "
+                            + newViewPrivilege.getPrivilegesSQL(true)
+                            + " ON TABLE "
+                            + PgDiffUtils.getQuotedName(newView.getName())
+                            + " TO " + newViewPrivilege.getRoleName()
+                            + " WITH GRANT OPTION;");
+                }
+                if (!"".equals(newViewPrivilege.getPrivilegesSQL(false))) {
+                    writer.println("GRANT "
+                            + newViewPrivilege.getPrivilegesSQL(false)
+                            + " ON TABLE "
+                            + PgDiffUtils.getQuotedName(newView.getName())
+                            + " TO " + newViewPrivilege.getRoleName() + ";");
+                }
+            }
+        }
+    }
+
+    private static void alterPrivilegesColumns(final PrintWriter writer,
+            final PgView oldView, final PgView newView,
+            final SearchPathHelper searchPathHelper) {
+        boolean emptyLinePrinted = false;
+        for (PgColumn newColumn : newView.getColumns()) {
+            final PgColumn oldColumn = oldView.getColumn(newColumn.getName());
+
+            if (oldColumn != null) {
+                for (PgColumnPrivilege oldColumnPrivilege : oldColumn
+                        .getPrivileges()) {
+                    PgColumnPrivilege newColumnPrivilege = newColumn
+                            .getPrivilege(oldColumnPrivilege.getRoleName());
+                    if (newColumnPrivilege == null) {
+                        if (!emptyLinePrinted) {
+                            emptyLinePrinted = true;
+                            writer.println();
+                        }
+                        writer.println("REVOKE ALL ("
+                                + PgDiffUtils.getQuotedName(newColumn.getName())
+                                + ") ON TABLE "
+                                + PgDiffUtils.getQuotedName(newView.getName())
+                                + " FROM " + oldColumnPrivilege.getRoleName()
+                                + ";");
+                    }
+                }
+            }
+            if (newColumn != null) {
+                for (PgColumnPrivilege newColumnPrivilege : newColumn
+                        .getPrivileges()) {
+                    PgColumnPrivilege oldColumnPrivilege = null;
+                    if (oldColumn != null) {
+                        oldColumnPrivilege = oldColumn
+                                .getPrivilege(newColumnPrivilege.getRoleName());
+                    }
+                    if (!newColumnPrivilege.isSimilar(oldColumnPrivilege)) {
+                        if (!emptyLinePrinted) {
+                            emptyLinePrinted = true;
+                            writer.println();
+                        }
+                        writer.println("REVOKE ALL ("
+                                + PgDiffUtils.getQuotedName(newColumn.getName())
+                                + ") ON TABLE "
+                                + PgDiffUtils.getQuotedName(newView.getName())
+                                + " FROM " + newColumnPrivilege.getRoleName()
+                                + ";");
+                        if (!"".equals(newColumnPrivilege.getPrivilegesSQL(
+                                true,
+                                PgDiffUtils.getQuotedName(newColumn.getName())))) {
+                            writer.println("GRANT "
+                                    + newColumnPrivilege.getPrivilegesSQL(true,
+                                            PgDiffUtils.getQuotedName(newColumn
+                                                    .getName()))
+                                    + " ON TABLE "
+                                    + PgDiffUtils.getQuotedName(newView
+                                            .getName()) + " TO "
+                                    + newColumnPrivilege.getRoleName()
+                                    + " WITH GRANT OPTION;");
+                        }
+                        if (!"".equals(newColumnPrivilege.getPrivilegesSQL(
+                                false,
+                                PgDiffUtils.getQuotedName(newColumn.getName())))) {
+                            writer.println("GRANT "
+                                    + newColumnPrivilege.getPrivilegesSQL(
+                                            false, PgDiffUtils
+                                                    .getQuotedName(newColumn
+                                                            .getName()))
+                                    + " ON TABLE "
+                                    + PgDiffUtils.getQuotedName(newView
+                                            .getName()) + " TO "
+                                    + newColumnPrivilege.getRoleName() + ";");
+                        }
+
+                    }
+                }
+            }
+
+        }
+
     }
 
     /**

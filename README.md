@@ -1,10 +1,45 @@
 # Another PostgreSQL Diff Tool (aka apgdiff)
 
-Ahother PostgreSQL Diff Tool is free PostgreSQL diff tool that is useful for
+Another PostgreSQL Diff Tool is free PostgreSQL diff tool that is useful for
 comparison/diffing of database schemas. You can find more information at its
-website at http://apgdiff.startnet.biz/
+website at http://www.apgdiff.com/. If you found an issue in apgdiff, please
+file it at https://github.com/fordfrog/apgdiff/issues. If you for some reason
+need to contact author of this application, you can email him at
+fordfrog@fordfrog.com.
 
 ## Changelog
+
+### Version 2.5 (not released yet)
+
+#### New Features
+* MATERIALIZED VIEW support in PostgreSQL 9.3 (Marti Raudsepp)
+* Better support for inherited tables (Daniel Watson)
+* Added support for CREATE UNLOGGED TABLE (Anatoliy Basov)
+* Added support for /**/ comments (yulei)
+* Support of triggers for views + clause 'INSTEAD OF' (Sergej Bonich)
+* Add support for GRANT and REVOKE on objects: table, view, sequence, column (serge-pouliquen-itf)
+* Add support for ALTER TABLE ... OWNER TO (serge-pouliquen-itf)
+* Add support for CREATE TYPE (Karol Rybak)
+* Add support for CREATE EXTENSION (Átila Camurça Alves)
+* Add basic support for CREATE FOREIGN TABLE (Bruno Almeida)
+
+#### Fixes
+* Added hint to use "CREATE TABLE ... CONSTRAINT name PRIMARY KEY/UNIQUE ..."
+  instead of "CREATE TABLE ... PRIMARY KEY/UNIQUE ..." because apgdiff cannot
+  easily support unnamed constraints.
+* Fixed issue with incorrect end of expression detection because of ignored [
+  and ] brackets. This caused issues for example in statements like
+  "... DEFAULT ARRAY[1, 2, 3], ..." where end of expression was detected at
+  first comma (and not the third one) which then resulted in parser exception.
+* Fixed issue when outputting unsupported command information and the
+  unsupported command string is shorter than 20 characters. (Linas Valiukas)
+* Added Spanish translation. (Sebastian Ortiz)
+* Fitted English help to 80 characters in width. (Dave Jarvis)
+* View query changes are now correctly detected even if it has declared
+  columns that didn't change. (Marti Raudsepp)
+* Fixed issue with the $ sign in the object name (Anatoliy Basov)
+* Added French translation. (Jeremy Passeron)
+* Native for OS line endings in resulting diff (Sergej Bonich)
 
 ### 2012-09-21: Version 2.4
 

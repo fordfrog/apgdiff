@@ -5,6 +5,7 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
+import cz.startnet.utils.pgdiff.Pair;
 import cz.startnet.utils.pgdiff.PgDiffUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,13 +16,13 @@ import java.util.List;
  *
  * @author fordfrog
  */
-public class PgTable {
+public class PgTable extends PgRelation {
 
     /**
-     * List of columns defined on the table.
+     * List of inheritedColumns defined on the table.
      */
     @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private final List<PgColumn> columns = new ArrayList<PgColumn>();
+    private final List<PgInheritedColumn> inheritedColumns = new ArrayList<PgInheritedColumn>();
     /**
      * List of constraints defined on the table.
      */
@@ -29,111 +30,58 @@ public class PgTable {
     private final List<PgConstraint> constraints =
             new ArrayList<PgConstraint>();
     /**
-     * List of indexes defined on the table.
-     */
-    @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private final List<PgIndex> indexes = new ArrayList<PgIndex>();
-    /**
-     * List of triggers defined on the table.
-     */
-    @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private final List<PgTrigger> triggers = new ArrayList<PgTrigger>();
-    /**
-     * Name of the index on which the table is clustered
-     */
-    private String clusterIndexName;
-    /**
      * List of names of inherited tables.
      */
     @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private final List<String> inherits = new ArrayList<String>();
-    /**
-     * Name of the table.
-     */
-    private String name;
+    private final List<Pair<String,String>> inherits = new ArrayList<Pair<String,String>>();
     /**
      * WITH clause. If value is null then it is not set, otherwise can be set to
      * OIDS=true, OIDS=false, or storage parameters can be set.
      */
     private String with;
     /**
-     * Tablespace value.
+     * Is this a UNLOGGED table?
      */
-    private String tablespace;
+    private boolean unlogged;
     /**
-     * Comment.
+     * Is this a FOREIGN table?
      */
-    private String comment;
+    private boolean foreign;
+    /**
+     * Does this table have RLS enabled?
+     */
+    private Boolean rlsEnabled;
+    /**
+     * Does this table have RLS forced?
+     */
+    private Boolean rlsForced;
+
+    private String foreignServer;
+
+    /**
+     * RLS Policies
+     */
+    private List<PgPolicy> policies = new ArrayList<PgPolicy>();
+
+    /**
+     * PgDatabase
+     */
+    private final PgDatabase database;
+
+    /**
+     * PgSchema
+     */
+    private final PgSchema schema;
 
     /**
      * Creates a new PgTable object.
      *
      * @param name {@link #name}
      */
-    public PgTable(final String name) {
-        this.name = name;
-    }
-
-    /**
-     * Setter for {@link #clusterIndexName}.
-     *
-     * @param name {@link #clusterIndexName}
-     */
-    public void setClusterIndexName(final String name) {
-        clusterIndexName = name;
-    }
-
-    /**
-     * Getter for {@link #clusterIndexName}.
-     *
-     * @return {@link #clusterIndexName}
-     */
-    public String getClusterIndexName() {
-        return clusterIndexName;
-    }
-
-    /**
-     * Finds column according to specified column {@code name}.
-     *
-     * @param name name of the column to be searched
-     *
-     * @return found column or null if no such column has been found
-     */
-    public PgColumn getColumn(final String name) {
-        for (PgColumn column : columns) {
-            if (column.getName().equals(name)) {
-                return column;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Getter for {@link #columns}. The list cannot be modified.
-     *
-     * @return {@link #columns}
-     */
-    public List<PgColumn> getColumns() {
-        return Collections.unmodifiableList(columns);
-    }
-
-    /**
-     * Getter for {@link #comment}.
-     *
-     * @return {@link #comment}
-     */
-    public String getComment() {
-        return comment;
-    }
-
-    /**
-     * Setter for {@link #comment}.
-     *
-     * @param comment {@link #comment}
-     */
-    public void setComment(final String comment) {
-        this.comment = comment;
+    public PgTable(final String name, final PgDatabase database, final PgSchema schema) {
+        setName(name);
+        this.database = database;
+        this.schema = schema;
     }
 
     /**
@@ -163,15 +111,34 @@ public class PgTable {
     }
 
     /**
+     * Returns relation kind for CREATE/ALTER/DROP commands.
+     *
+     * @return relation kind
+     */
+    public String getRelationKind() {
+        return "TABLE";
+    }
+
+    /**
      * Creates and returns SQL for creation of the table.
+     *
+     * @param schema schema of current statement
      *
      * @return created SQL statement
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(final PgSchema schema) {
         final StringBuilder sbSQL = new StringBuilder(1000);
-        sbSQL.append("CREATE TABLE ");
+        sbSQL.append("CREATE ");
+        if (isUnlogged()) {
+            sbSQL.append("UNLOGGED ");
+        }
+        if (isForeign()) {
+            sbSQL.append("FOREIGN ");
+        }
+        sbSQL.append("TABLE ");
         sbSQL.append(PgDiffUtils.getQuotedName(name));
-        sbSQL.append(" (\n");
+        sbSQL.append(" (");
+        sbSQL.append(System.getProperty("line.separator"));
 
         boolean first = true;
 
@@ -182,36 +149,44 @@ public class PgTable {
                 if (first) {
                     first = false;
                 } else {
-                    sbSQL.append(",\n");
+                    sbSQL.append(",");
+                    sbSQL.append(System.getProperty("line.separator"));
                 }
 
                 sbSQL.append("\t");
                 sbSQL.append(column.getFullDefinition(false));
             }
 
-            sbSQL.append("\n)");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append(")");
         }
 
         if (inherits != null && !inherits.isEmpty()) {
-            sbSQL.append("\nINHERITS (");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("INHERITS (");
 
             first = true;
 
-            for (final String tableName : inherits) {
+            for (final Pair<String,String> inheritPair : inherits) {
                 if (first) {
                     first = false;
                 } else {
                     sbSQL.append(", ");
                 }
-
-                sbSQL.append(tableName);
+                String inheritTableName = null;
+                if(schema.getName().equals(inheritPair.getL())){
+                    inheritTableName = inheritPair.getR();
+                } else {
+                    inheritTableName = String.format("%s.%s", inheritPair.getL(), inheritPair.getR());
+                }
+                sbSQL.append(inheritTableName);
             }
 
             sbSQL.append(")");
         }
 
         if (with != null && !with.isEmpty()) {
-            sbSQL.append("\n");
+            sbSQL.append(System.getProperty("line.separator"));
 
             if ("OIDS=false".equalsIgnoreCase(with)) {
                 sbSQL.append("WITHOUT OIDS");
@@ -227,15 +202,39 @@ public class PgTable {
             }
         }
 
+        if (isForeign()) {
+            sbSQL.append("SERVER ");
+            sbSQL.append(getForeignServer());
+        }
+        
         if (tablespace != null && !tablespace.isEmpty()) {
-            sbSQL.append("\nTABLESPACE ");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("TABLESPACE ");
             sbSQL.append(tablespace);
         }
 
         sbSQL.append(';');
 
+        //Inherited column default override
+        for (PgInheritedColumn column : getInheritedColumns()) {
+            if(column.getDefaultValue() != null){
+                sbSQL.append(System.getProperty("line.separator"));
+                sbSQL.append(System.getProperty("line.separator"));
+                sbSQL.append("ALTER TABLE ONLY ");
+                sbSQL.append(PgDiffUtils.getQuotedName(name));
+                sbSQL.append(System.getProperty("line.separator"));
+                sbSQL.append("\tALTER COLUMN ");
+                sbSQL.append(
+                    PgDiffUtils.getQuotedName(column.getInheritedColumn().getName()));
+                sbSQL.append(" SET DEFAULT ");
+                sbSQL.append(column.getDefaultValue());
+                sbSQL.append(';');
+            }
+        }
+
         for (PgColumn column : getColumnsWithStatistics()) {
-            sbSQL.append("\nALTER TABLE ONLY ");
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("ALTER TABLE ONLY ");
             sbSQL.append(PgDiffUtils.getQuotedName(name));
             sbSQL.append(" ALTER COLUMN ");
             sbSQL.append(
@@ -245,79 +244,9 @@ public class PgTable {
             sbSQL.append(';');
         }
 
-        if (comment != null && !comment.isEmpty()) {
-            sbSQL.append("\n\nCOMMENT ON TABLE ");
-            sbSQL.append(PgDiffUtils.getQuotedName(name));
-            sbSQL.append(" IS ");
-            sbSQL.append(comment);
-            sbSQL.append(';');
-        }
-
-        for (final PgColumn column : columns) {
-            if (column.getComment() != null && !column.getComment().isEmpty()) {
-                sbSQL.append("\n\nCOMMENT ON COLUMN ");
-                sbSQL.append(PgDiffUtils.getQuotedName(name));
-                sbSQL.append('.');
-                sbSQL.append(PgDiffUtils.getQuotedName(column.getName()));
-                sbSQL.append(" IS ");
-                sbSQL.append(column.getComment());
-                sbSQL.append(';');
-            }
-        }
+        sbSQL.append(getCommentDefinitionSQL());
 
         return sbSQL.toString();
-    }
-
-    /**
-     * Creates and returns SQL statement for dropping the table.
-     *
-     * @return created SQL statement
-     */
-    public String getDropSQL() {
-        return "DROP TABLE " + PgDiffUtils.getQuotedName(getName()) + ";";
-    }
-
-    /**
-     * Finds index according to specified index {@code name}.
-     *
-     * @param name name of the index to be searched
-     *
-     * @return found index or null if no such index has been found
-     */
-    public PgIndex getIndex(final String name) {
-        for (PgIndex index : indexes) {
-            if (index.getName().equals(name)) {
-                return index;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Finds trigger according to specified trigger {@code name}.
-     *
-     * @param name name of the trigger to be searched
-     *
-     * @return found trigger or null if no such trigger has been found
-     */
-    public PgTrigger getTrigger(final String name) {
-        for (PgTrigger trigger : triggers) {
-            if (trigger.getName().equals(name)) {
-                return trigger;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Getter for {@link #indexes}. The list cannot be modified.
-     *
-     * @return {@link #indexes}
-     */
-    public List<PgIndex> getIndexes() {
-        return Collections.unmodifiableList(indexes);
     }
 
     /**
@@ -325,8 +254,13 @@ public class PgTable {
      *
      * @param tableName name of inherited table
      */
-    public void addInherits(final String tableName) {
-        inherits.add(tableName);
+    public void addInherits(final String schemaName, final String tableName) {
+        inherits.add(new Pair<String, String>(schemaName, tableName));
+        final PgTable inheritedTable = database.getSchema(schemaName).getTable(tableName);
+        for( PgColumn column : inheritedTable.getColumns() ) {
+          PgInheritedColumn inheritedColumn = new PgInheritedColumn(column);
+          inheritedColumns.add(inheritedColumn);
+        }
     }
 
     /**
@@ -334,35 +268,8 @@ public class PgTable {
      *
      * @return {@link #inherits}
      */
-    public List<String> getInherits() {
+    public List<Pair<String,String>> getInherits() {
         return Collections.unmodifiableList(inherits);
-    }
-
-    /**
-     * Setter for {@link #name}.
-     *
-     * @param name {@link #name}
-     */
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    /**
-     * Getter for {@link #name}.
-     *
-     * @return {@link #name}
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Getter for {@link #triggers}. The list cannot be modified.
-     *
-     * @return {@link #triggers}
-     */
-    public List<PgTrigger> getTriggers() {
-        return Collections.unmodifiableList(triggers);
     }
 
     /**
@@ -411,6 +318,43 @@ public class PgTable {
     }
 
     /**
+     * Adds {@code inheritedColumn} to the list of inheritedColumns.
+     *
+     * @param inheritedColumn inheritedColumn
+     */
+    public void addInheritedColumn(final PgInheritedColumn inheritedColumn) {
+        inheritedColumns.add(inheritedColumn);
+    }
+
+    /**
+     * Finds inheritedColumn according to specified name {@code name}.
+     *
+     * @param name name of the inheritedColumn to be searched
+     *
+     * @return found inheritedColumn or null if no such inheritedColumn
+     * has been found
+     */
+    public PgInheritedColumn getInheritedColumn(final String name) {
+        if (inherits != null && !inherits.isEmpty()) {
+            for (PgInheritedColumn inheritedColumn : inheritedColumns) {
+                if (inheritedColumn.getInheritedColumn().getName().equals(name)) {
+                    return inheritedColumn;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Getter for {@link #inheritedColumns}. The list cannot be modified.
+     *
+     * @return {@link #inheritedColumns}
+     */
+    public List<PgInheritedColumn> getInheritedColumns() {
+        return Collections.unmodifiableList(inheritedColumns);
+    }
+
+    /**
      * Adds {@code constraint} to the list of constraints.
      *
      * @param constraint constraint
@@ -420,38 +364,22 @@ public class PgTable {
     }
 
     /**
-     * Adds {@code index} to the list of indexes.
+     * Returns true if table contains given inheritedColumn {@code name},
+     * otherwise false.
      *
-     * @param index index
+     * @param name name of the inheritedColumn
+     *
+     * @return true if table contains given inheritedColumn {@code name},
+     * otherwise false
      */
-    public void addIndex(final PgIndex index) {
-        indexes.add(index);
-    }
-
-    /**
-     * Adds {@code trigger} to the list of triggers.
-     *
-     * @param trigger trigger
-     */
-    public void addTrigger(final PgTrigger trigger) {
-        triggers.add(trigger);
-    }
-
-    /**
-     * Returns true if table contains given column {@code name}, otherwise
-     * false.
-     *
-     * @param name name of the column
-     *
-     * @return true if table contains given column {@code name}, otherwise false
-     */
-    public boolean containsColumn(final String name) {
-        for (PgColumn column : columns) {
-            if (column.getName().equals(name)) {
-                return true;
+    public boolean containsInheritedColumn(final String name) {
+        if (inherits != null && !inherits.isEmpty()) {
+            for (PgInheritedColumn inheritedColumn : inheritedColumns) {
+                if (inheritedColumn.getInheritedColumn().getName().equals(name)) {
+                    return true;
+                }
             }
         }
-
         return false;
     }
 
@@ -475,23 +403,6 @@ public class PgTable {
     }
 
     /**
-     * Returns true if table contains given index {@code name}, otherwise false.
-     *
-     * @param name name of the index
-     *
-     * @return true if table contains given index {@code name}, otherwise false
-     */
-    public boolean containsIndex(final String name) {
-        for (PgIndex index : indexes) {
-            if (index.getName().equals(name)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Returns list of columns that have statistics defined.
      *
      * @return list of columns that have statistics defined
@@ -507,5 +418,73 @@ public class PgTable {
         }
 
         return list;
+    }
+
+    public boolean isUnlogged() {
+        return unlogged;
+    }
+
+    public void setUnlogged(boolean unlogged) {
+        this.unlogged = unlogged;
+    }
+    
+    /**
+     * Foreign Tables
+     */
+    
+    @Override
+    public String getDropSQL() {
+        return "DROP " + ((isForeign()) ? "FOREIGN ":"") + getRelationKind() + " " +
+                PgDiffUtils.getQuotedName(getName()) + ";";
+    }
+    
+    public boolean isForeign() {
+        return foreign;
+    }
+
+    public void setForeign(boolean foreign) {
+        this.foreign = foreign;
+    }
+    
+    public void setForeignServer(String server){
+    	foreignServer = server;
+    }
+    
+    public String getForeignServer(){
+    	return foreignServer;
+    }
+
+    public Boolean hasRLSEnabled() {
+        return rlsEnabled;
+    }
+
+    public void setRLSEnabled(Boolean rlsEnabled) {
+        this.rlsEnabled = rlsEnabled;
+    }
+
+    public Boolean hasRLSForced() {
+        return rlsForced;
+    }
+
+    public void setRLSForced(Boolean rlsForced) {
+        this.rlsForced = rlsForced;
+    }
+
+    public void addPolicy(final PgPolicy policy) {
+        policies.add(policy);
+    }
+
+    public PgPolicy getPolicy(final String name) {
+        for (PgPolicy policy : policies) {
+            if (policy.getName().equals(name)) {
+                return policy;
+            }
+        }
+
+        return null;
+    }
+
+    public List<PgPolicy> getPolicies() {
+        return Collections.unmodifiableList(policies);
     }
 }

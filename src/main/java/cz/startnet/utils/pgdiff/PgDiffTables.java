@@ -6,9 +6,12 @@
 package cz.startnet.utils.pgdiff;
 
 import cz.startnet.utils.pgdiff.schema.PgColumn;
+import cz.startnet.utils.pgdiff.schema.PgColumnPrivilege;
 import cz.startnet.utils.pgdiff.schema.PgColumnUtils;
+import cz.startnet.utils.pgdiff.schema.PgInheritedColumn;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgTable;
+import cz.startnet.utils.pgdiff.schema.PgRelationPrivilege;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -130,11 +133,16 @@ public class PgDiffTables {
             updateTableColumns(
                     writer, arguments, oldTable, newTable, searchPathHelper);
             checkWithOIDS(writer, oldTable, newTable, searchPathHelper);
-            checkInherits(writer, oldTable, newTable, searchPathHelper);
+            checkInherits(writer, oldTable, newTable, newSchema, searchPathHelper);
+            addInheritedColumnDefaults(writer, arguments, oldTable, newTable, searchPathHelper);
             checkTablespace(writer, oldTable, newTable, searchPathHelper);
             addAlterStatistics(writer, oldTable, newTable, searchPathHelper);
             addAlterStorage(writer, oldTable, newTable, searchPathHelper);
             alterComments(writer, oldTable, newTable, searchPathHelper);
+            alterOwnerTo(writer, oldTable, newTable, searchPathHelper);
+            alterPrivileges(writer, oldTable, newTable, searchPathHelper);
+            alterPrivilegesColumns(writer, oldTable, newTable, searchPathHelper);
+            alterRLS(writer, oldTable, newTable, searchPathHelper);
         }
     }
 
@@ -354,30 +362,105 @@ public class PgDiffTables {
      * @param writer           writer the output should be written to
      * @param oldTable         original table
      * @param newTable         new table
+     * @param newSchema        new schema
      * @param searchPathHelper search path helper
      */
     private static void checkInherits(final PrintWriter writer,
             final PgTable oldTable, final PgTable newTable,
+            final PgSchema newSchema,
             final SearchPathHelper searchPathHelper) {
-        for (final String tableName : oldTable.getInherits()) {
-            if (!newTable.getInherits().contains(tableName)) {
+        for (final Pair<String,String> inheritPairO : oldTable.getInherits()) {
+            final String schemaName = inheritPairO.getL();
+            final String tableName = inheritPairO.getR();
+            boolean isFound = false;
+            for (final Pair<String,String> inheritPairN : newTable.getInherits()) {
+              if(schemaName.equals(inheritPairN.getL()) && tableName.equals(inheritPairN.getR())) {
+                  isFound = true;
+                  break;
+              }
+            }
+            if (!isFound) {
+                String inheritTableName = null;
+                if(newSchema.getName().equals(schemaName)){
+                    inheritTableName = PgDiffUtils.getQuotedName(tableName);
+                } else {
+                    inheritTableName = String.format("%s.%s",PgDiffUtils.getQuotedName(schemaName),PgDiffUtils.getQuotedName(tableName));
+                }
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println("ALTER TABLE "
                         + PgDiffUtils.getQuotedName(newTable.getName()));
                 writer.println("\tNO INHERIT "
-                        + PgDiffUtils.getQuotedName(tableName) + ';');
+                        + inheritTableName + ';');
             }
         }
 
-        for (final String tableName : newTable.getInherits()) {
-            if (!oldTable.getInherits().contains(tableName)) {
+        for (final Pair<String,String> inheritPairN : newTable.getInherits()) {
+            final String schemaName = inheritPairN.getL();
+            final String tableName = inheritPairN.getR();
+            boolean isFound = false;
+            for (final Pair<String,String> inheritPairO : oldTable.getInherits()) {
+              if(schemaName.equals(inheritPairO.getL()) && tableName.equals(inheritPairO.getR())) {
+                  isFound = true;
+                  break;
+              }
+            }
+            if (!isFound) {
+                String inheritTableName = null;
+                if(newSchema.getName().equals(schemaName)){
+                    inheritTableName = PgDiffUtils.getQuotedName(tableName);
+                } else {
+                    inheritTableName = String.format("%s.%s",PgDiffUtils.getQuotedName(schemaName),PgDiffUtils.getQuotedName(tableName));
+                }
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println("ALTER TABLE "
                         + PgDiffUtils.getQuotedName(newTable.getName()));
                 writer.println("\tINHERIT "
-                        + PgDiffUtils.getQuotedName(tableName) + ';');
+                        + inheritTableName + ';');
+            }
+        }
+    }
+
+    /**
+     * Outputs statements for defaults of tables who's column belongs to
+     * an inherited table.
+     *
+     * @param writer           writer the output should be written to
+     * @param arguments        object containing arguments settings
+     * @param oldTable         original table
+     * @param newTable         new table
+     * @param searchPathHelper search path helper
+     */
+    private static void addInheritedColumnDefaults(final PrintWriter writer,
+            final PgDiffArguments arguments, final PgTable oldTable,
+            final PgTable newTable, final SearchPathHelper searchPathHelper) {
+        for (final PgInheritedColumn newColumn : newTable.getInheritedColumns()) {
+            if (!oldTable.containsInheritedColumn(newColumn.getInheritedColumn().getName())) {
+                continue;
+            }
+            final PgInheritedColumn oldColumn = oldTable.getInheritedColumn(newColumn.getInheritedColumn().getName());
+            final String newColumnName =
+                    PgDiffUtils.getQuotedName(newColumn.getInheritedColumn().getName());
+
+            final String oldDefault = (oldColumn.getDefaultValue() == null) ? ""
+                    : oldColumn.getDefaultValue();
+            final String newDefault = (newColumn.getDefaultValue() == null) ? ""
+                    : newColumn.getDefaultValue();
+            if (!oldDefault.equals(newDefault)) {
+                writer.println();
+                writer.print("ALTER TABLE ONLY ");
+                writer.println(PgDiffUtils.getQuotedName(newTable.getName()));
+                writer.print("\tALTER COLUMN ");
+                writer.print(PgDiffUtils.getQuotedName(newColumn.getInheritedColumn().getName()));
+                if (newDefault.length() == 0) {
+                    writer.print(" DROP DEFAULT");
+                } else
+                {
+                    writer.print(" SET DEFAULT ");
+                    writer.print(newDefault);
+                }
+                writer.println(";");
             }
         }
     }
@@ -457,7 +540,44 @@ public class PgDiffTables {
                     || !oldSchema.containsTable(table.getName())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(table.getCreationSQL());
+                writer.println(table.getCreationSQL(newSchema));
+                writer.println();
+                if (table.getOwnerTo() != null) {
+                    writer.println("ALTER TABLE "
+                            + PgDiffUtils.getQuotedName(table.getName())
+                            + " OWNER TO " + table.getOwnerTo() + ";");
+                }
+                for (PgRelationPrivilege tablePrivilege : table.getPrivileges()) {
+                    writer.println("REVOKE ALL ON TABLE "
+                            + PgDiffUtils.getQuotedName(table.getName())
+                            + " FROM " + tablePrivilege.getRoleName() + ";");
+                    if (!"".equals(tablePrivilege.getPrivilegesSQL(true))) {
+                        writer.println("GRANT "
+                                + tablePrivilege.getPrivilegesSQL(true)
+                                + " ON TABLE "
+                                + PgDiffUtils.getQuotedName(table.getName())
+                                + " TO " + tablePrivilege.getRoleName()
+                                + " WITH GRANT OPTION;");
+                    }
+                    if (!"".equals(tablePrivilege.getPrivilegesSQL(false))) {
+                        writer.println("GRANT "
+                                + tablePrivilege.getPrivilegesSQL(false)
+                                + " ON TABLE "
+                                + PgDiffUtils.getQuotedName(table.getName())
+                                + " TO " + tablePrivilege.getRoleName() + ";");
+                    }
+                }
+                if (table.hasRLSEnabled() != null && table.hasRLSEnabled()) {
+                    writer.println("ALTER TABLE "
+                            + PgDiffUtils.getQuotedName(table.getName())
+                            + "  ENABLE ROW LEVEL SECURITY;");
+                }
+                if (table.hasRLSForced() != null && table.hasRLSForced()) {
+                    writer.println("ALTER TABLE "
+                            + PgDiffUtils.getQuotedName(table.getName())
+                            + "  FORCE ROW LEVEL SECURITY;");
+                }
+
             }
         }
     }
@@ -514,7 +634,7 @@ public class PgDiffTables {
                     PgDiffUtils.getQuotedName(newTable.getName());
             searchPathHelper.outputSearchPath(writer);
             writer.println();
-            writer.println("ALTER TABLE " + quotedTableName);
+            writer.println("ALTER " + ((newTable.isForeign()) ? "FOREIGN ":"") + "TABLE " + quotedTableName);
 
             for (int i = 0; i < statements.size(); i++) {
                 writer.print(statements.get(i));
@@ -523,7 +643,7 @@ public class PgDiffTables {
 
             if (!dropDefaultsColumns.isEmpty()) {
                 writer.println();
-                writer.println("ALTER TABLE " + quotedTableName);
+                writer.println("ALTER " + ((newTable.isForeign()) ? "FOREIGN ":"") + "TABLE " + quotedTableName);
 
                 for (int i = 0; i < dropDefaultsColumns.size(); i++) {
                     writer.print("\tALTER COLUMN ");
@@ -535,6 +655,86 @@ public class PgDiffTables {
                 }
             }
         }
+    }
+
+    private static void alterPrivilegesColumns(final PrintWriter writer,
+            final PgTable oldTable, final PgTable newTable,
+            final SearchPathHelper searchPathHelper) {
+        boolean emptyLinePrinted = false;
+        for (PgColumn newColumn : newTable.getColumns()) {
+            final PgColumn oldColumn = oldTable.getColumn(newColumn.getName());
+
+            if (oldColumn != null) {
+                for (PgColumnPrivilege oldColumnPrivilege : oldColumn
+                        .getPrivileges()) {
+                    PgColumnPrivilege newColumnPrivilege = newColumn
+                            .getPrivilege(oldColumnPrivilege.getRoleName());
+                    if (newColumnPrivilege == null) {
+                        if (!emptyLinePrinted) {
+                            emptyLinePrinted = true;
+                            writer.println();
+                        }
+                        writer.println("REVOKE ALL ("
+                                + PgDiffUtils.getQuotedName(newColumn.getName())
+                                + ") ON TABLE "
+                                + PgDiffUtils.getQuotedName(newTable.getName())
+                                + " FROM " + oldColumnPrivilege.getRoleName()
+                                + ";");
+                    }
+                }
+            }
+            if (newColumn != null) {
+                for (PgColumnPrivilege newColumnPrivilege : newColumn
+                        .getPrivileges()) {
+                    PgColumnPrivilege oldColumnPrivilege = null;
+                    if (oldColumn != null) {
+                        oldColumnPrivilege = oldColumn
+                                .getPrivilege(newColumnPrivilege.getRoleName());
+                    }
+                    if (!newColumnPrivilege.isSimilar(oldColumnPrivilege)) {
+                        if (!emptyLinePrinted) {
+                            emptyLinePrinted = true;
+                            writer.println();
+                        }
+                        writer.println("REVOKE ALL ("
+                                + PgDiffUtils.getQuotedName(newColumn.getName())
+                                + ") ON TABLE "
+                                + PgDiffUtils.getQuotedName(newTable.getName())
+                                + " FROM " + newColumnPrivilege.getRoleName()
+                                + ";");
+                        if (!"".equals(newColumnPrivilege.getPrivilegesSQL(
+                                true,
+                                PgDiffUtils.getQuotedName(newColumn.getName())))) {
+                            writer.println("GRANT "
+                                    + newColumnPrivilege.getPrivilegesSQL(true,
+                                            PgDiffUtils.getQuotedName(newColumn
+                                                    .getName()))
+                                    + " ON TABLE "
+                                    + PgDiffUtils.getQuotedName(newTable
+                                            .getName()) + " TO "
+                                    + newColumnPrivilege.getRoleName()
+                                    + " WITH GRANT OPTION;");
+                        }
+                        if (!"".equals(newColumnPrivilege.getPrivilegesSQL(
+                                false,
+                                PgDiffUtils.getQuotedName(newColumn.getName())))) {
+                            writer.println("GRANT "
+                                    + newColumnPrivilege.getPrivilegesSQL(
+                                            false, PgDiffUtils
+                                                    .getQuotedName(newColumn
+                                                            .getName()))
+                                    + " ON TABLE "
+                                    + PgDiffUtils.getQuotedName(newTable
+                                            .getName()) + " TO "
+                                    + newColumnPrivilege.getRoleName() + ";");
+                        }
+
+                    }
+                }
+            }
+
+        }
+
     }
 
     /**
@@ -596,6 +796,126 @@ public class PgDiffTables {
                 writer.print(PgDiffUtils.getQuotedName(newColumn.getName()));
                 writer.println(" IS NULL;");
             }
+        }
+    }
+
+    private static void alterPrivileges(final PrintWriter writer,
+            final PgTable oldTable, final PgTable newTable,
+            final SearchPathHelper searchPathHelper) {
+        boolean emptyLinePrinted = false;
+        for (PgRelationPrivilege oldTablePrivilege : oldTable.getPrivileges()) {
+            PgRelationPrivilege newTablePrivilege = newTable
+                    .getPrivilege(oldTablePrivilege.getRoleName());
+            if (newTablePrivilege == null) {
+                if (!emptyLinePrinted) {
+                    emptyLinePrinted = true;
+                    writer.println();
+                }
+                writer.println("REVOKE ALL ON TABLE "
+                        + PgDiffUtils.getQuotedName(oldTable.getName())
+                        + " FROM " + oldTablePrivilege.getRoleName() + ";");
+            } else if (!oldTablePrivilege.isSimilar(newTablePrivilege)) {
+                if (!emptyLinePrinted) {
+                    emptyLinePrinted = true;
+                    writer.println();
+                }
+                writer.println("REVOKE ALL ON TABLE "
+                        + PgDiffUtils.getQuotedName(newTable.getName())
+                        + " FROM " + newTablePrivilege.getRoleName() + ";");
+                if (!"".equals(newTablePrivilege.getPrivilegesSQL(true))) {
+                    writer.println("GRANT "
+                            + newTablePrivilege.getPrivilegesSQL(true)
+                            + " ON TABLE "
+                            + PgDiffUtils.getQuotedName(newTable.getName())
+                            + " TO " + newTablePrivilege.getRoleName()
+                            + " WITH GRANT OPTION;");
+                }
+                if (!"".equals(newTablePrivilege.getPrivilegesSQL(false))) {
+                    writer.println("GRANT "
+                            + newTablePrivilege.getPrivilegesSQL(false)
+                            + " ON TABLE "
+                            + PgDiffUtils.getQuotedName(newTable.getName())
+                            + " TO " + newTablePrivilege.getRoleName() + ";");
+                }
+            } // else similar privilege will not be updated
+        }
+        for (PgRelationPrivilege newTablePrivilege : newTable.getPrivileges()) {
+            PgRelationPrivilege oldTablePrivilege = oldTable
+                    .getPrivilege(newTablePrivilege.getRoleName());
+            if (oldTablePrivilege == null) {
+                if (!emptyLinePrinted) {
+                    writer.println();
+                }
+                writer.println("REVOKE ALL ON TABLE "
+                        + PgDiffUtils.getQuotedName(newTable.getName())
+                        + " FROM " + newTablePrivilege.getRoleName() + ";");
+                if (!"".equals(newTablePrivilege.getPrivilegesSQL(true))) {
+                    writer.println("GRANT "
+                            + newTablePrivilege.getPrivilegesSQL(true)
+                            + " ON TABLE "
+                            + PgDiffUtils.getQuotedName(newTable.getName())
+                            + " TO " + newTablePrivilege.getRoleName()
+                            + " WITH GRANT OPTION;");
+                }
+                if (!"".equals(newTablePrivilege.getPrivilegesSQL(false))) {
+                    writer.println("GRANT "
+                            + newTablePrivilege.getPrivilegesSQL(false)
+                            + " ON TABLE "
+                            + PgDiffUtils.getQuotedName(newTable.getName())
+                            + " TO " + newTablePrivilege.getRoleName() + ";");
+                }
+            }
+        }
+    }
+
+    private static void alterOwnerTo(final PrintWriter writer,
+            final PgTable oldTable, final PgTable newTable,
+            final SearchPathHelper searchPathHelper) {
+        final String oldOwnerTo = oldTable.getOwnerTo();
+        final String newOwnerTo = newTable.getOwnerTo();
+
+        if (newOwnerTo != null && !newOwnerTo.equals(oldOwnerTo)) {
+            writer.println();
+            writer.println("ALTER " + ((newTable.isForeign()) ? "FOREIGN ":"") + "TABLE "
+                    + PgDiffUtils.getQuotedName(newTable.getName())
+                    + " OWNER TO " + newTable.getOwnerTo() + ";");
+        }
+    }
+
+    private static void alterRLS(final PrintWriter writer,
+            final PgTable oldTable, final PgTable newTable,
+            final SearchPathHelper searchPathHelper) {
+        if ((oldTable.hasRLSEnabled() == null || oldTable.hasRLSEnabled() != null && !oldTable.hasRLSEnabled())
+            && newTable.hasRLSEnabled() != null && newTable.hasRLSEnabled()) {
+            searchPathHelper.outputSearchPath(writer);
+            writer.println();
+            writer.print("ALTER TABLE ");
+            writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
+            writer.println(" ENABLE ROW LEVEL SECURITY;");
+        }
+        if (oldTable.hasRLSEnabled() != null && oldTable.hasRLSEnabled()
+            && (newTable.hasRLSEnabled() == null || newTable.hasRLSEnabled() != null && !newTable.hasRLSEnabled())) {
+            searchPathHelper.outputSearchPath(writer);
+            writer.println();
+            writer.print("ALTER TABLE ");
+            writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
+            writer.println(" DISABLE ROW LEVEL SECURITY;");
+        }
+        if ((oldTable.hasRLSForced() == null || oldTable.hasRLSForced() != null && !oldTable.hasRLSForced())
+            && newTable.hasRLSForced() != null && newTable.hasRLSForced()) {
+            searchPathHelper.outputSearchPath(writer);
+            writer.println();
+            writer.print("ALTER TABLE ");
+            writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
+            writer.println(" FORCE ROW LEVEL SECURITY;");
+        }
+        if (oldTable.hasRLSForced() != null && oldTable.hasRLSForced()
+            && (newTable.hasRLSForced() == null || newTable.hasRLSForced() != null && !newTable.hasRLSForced())) {
+            searchPathHelper.outputSearchPath(writer);
+            writer.println();
+            writer.print("ALTER TABLE ");
+            writer.print(PgDiffUtils.getQuotedName(newTable.getName()));
+            writer.println(" NO FORCE ROW LEVEL SECURITY;");
         }
     }
 

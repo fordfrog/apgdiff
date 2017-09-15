@@ -3,6 +3,8 @@ CREATE TABLE parenttable2 (
 	id bigserial NOT NULL
 );
 
+ALTER TABLE parenttable2 OWNER TO fordfrog;
+
 ALTER TABLE parenttable
 	DROP COLUMN id,
 	ADD COLUMN field3 information_schema.cardinal_number;

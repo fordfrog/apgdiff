@@ -6,6 +6,9 @@
 package cz.startnet.utils.pgdiff.schema;
 
 import cz.startnet.utils.pgdiff.PgDiffUtils;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,7 +47,7 @@ public class PgColumn {
      */
     private String name;
     /**
-     * Type of the column.
+     * Type of the column. Always null for view columns.
      */
     private String type;
     /**
@@ -59,6 +62,11 @@ public class PgColumn {
      * Comment.
      */
     private String comment;
+    /**
+     * List of privileges defined on the table.
+     */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    private final List<PgColumnPrivilege> privileges = new ArrayList<PgColumnPrivilege>();
 
     /**
      * Creates a new PgColumn object.
@@ -226,6 +234,23 @@ public class PgColumn {
      */
     public String getType() {
         return type;
+    }
+
+    public void addPrivilege(final PgColumnPrivilege privilege) {
+        privileges.add(privilege);
+    }
+
+    public PgColumnPrivilege getPrivilege(final String roleName) {
+        for (PgColumnPrivilege privilege : privileges) {
+            if (privilege.getRoleName().equals(roleName)) {
+                return privilege;
+            }
+        }
+        return null;
+    }
+
+    public List<PgColumnPrivilege> getPrivileges() {
+        return Collections.unmodifiableList(privileges);
     }
 
     /**

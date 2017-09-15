@@ -35,9 +35,11 @@ public class CreateTriggerParser {
         trigger.setName(objectName);
 
         if (parser.expectOptional("BEFORE")) {
-            trigger.setBefore(true);
+            trigger.setEventTimeQualification(PgTrigger.EventTimeQualification.before);
         } else if (parser.expectOptional("AFTER")) {
-            trigger.setBefore(false);
+            trigger.setEventTimeQualification(PgTrigger.EventTimeQualification.after);
+        } else if (parser.expectOptional("INSTEAD OF")) {
+            trigger.setEventTimeQualification(PgTrigger.EventTimeQualification.instead_of);
         }
 
         boolean first = true;
@@ -70,9 +72,9 @@ public class CreateTriggerParser {
 
         parser.expect("ON");
 
-        final String tableName = parser.parseIdentifier();
+        final String relationName = parser.parseIdentifier();
 
-        trigger.setTableName(ParserUtils.getObjectName(tableName));
+        trigger.setRelationName(ParserUtils.getObjectName(relationName));
 
         if (parser.expectOptional("FOR")) {
             parser.expectOptional("EACH");
@@ -100,9 +102,9 @@ public class CreateTriggerParser {
                 || "_slony_denyaccess".equals(trigger.getName()));
 
         if (!ignoreSlonyTrigger) {
-            final PgSchema tableSchema = database.getSchema(
-                    ParserUtils.getSchemaName(tableName, database));
-            tableSchema.getTable(trigger.getTableName()).addTrigger(trigger);
+            final PgSchema schema = database.getSchema(
+                    ParserUtils.getSchemaName(relationName, database));
+            schema.getRelation(trigger.getRelationName()).addTrigger(trigger);
         }
     }
 

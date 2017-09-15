@@ -45,6 +45,10 @@ public class PgDiffTest {
                     {"drop_cluster", false, false, false, false},
                     // Tests scenario where CLUSTER is changed on TABLE.
                     {"modify_cluster", false, false, false, false},
+                    // Tests scenario where EXTENSION is added to TABLE.
+                    {"add_extension", false, false, false, false},
+                    // Tests scenario where EXTENSION is dropped from TABLE.
+                    {"drop_extension", false, false, false, false},
                     // Tests scenario where WITH OIDS is dropped from TABLE.
                     {"drop_with_oids", false, false, false, false},
                     // Tests scenario where INDEX is added.
@@ -72,7 +76,7 @@ public class PgDiffTest {
                     // Tests scenario where NOT NULL constraint is set on COLUMN.
                     {"add_not_null", false, false, false, false},
                     // Tests scenario where NOT NULL constraint is dropped
-                    // from COLUMN.
+                    // from COLUMN.MATERIALIZED
                     {"drop_not_null", false, false, false, false},
                     // Tests scenario where COLUMN is added to TABLE definition.
                     {"add_column", false, false, false, false},
@@ -97,6 +101,12 @@ public class PgDiffTest {
                     // Tests scenario where original and new TABLE contain
                     //different INHERITS.
                     {"modify_inherits", false, false, false, false},
+                    // Add a table with a default value for a column that belongs to an inherited table
+                    {"add_inherits_default_column", false, false, false, false},
+                    // Add a table with a default value for a column that belongs to an inherited table in a different schema
+                    {"add_inherits_schema_default_column", false, false, false, false},
+                    // Tests when a default value is changed for a column that belongs to an inherited table
+                    {"modify_default_value_inherited_column", false, false, false, false},
                     // Tests scenario where SEQUENCE is added.
                     {"add_sequence", false, false, false, false},
                     // Tests scenario where SEQUENCE is dropped.
@@ -171,6 +181,12 @@ public class PgDiffTest {
                     {"drop_view", false, false, false, false},
                     // Tests scenario where VIEW is modified.
                     {"modify_view", false, false, false, false},
+                    // Tests scenario where MATERIALIZED VIEW is added.
+                    {"add_materialized_view", false, false, false, false},
+                    // Tests scenario where MATERIALIZED VIEW is dropped.
+                    {"drop_materialized_view", false, false, false, false},
+                    // Tests scenario where MATERIALIZED VIEW is modified.
+                    {"modify_materialized_view", false, false, false, false},
                     // Tests scenario where --add-defaults is specified.
                     {"add_defaults", true, false, false, false},
                     // Tests scenario where multiple schemas are in the dumps.
@@ -204,7 +220,46 @@ public class PgDiffTest {
                     // Tests adding new sequence that is owned by table
                     {"add_owned_sequence", false, true, false, false},
                     // Tests adding empty table
-                    {"add_empty_table", false, false, false, false}
+                    {"add_empty_table", false, false, false, false},
+                    // Tests view with column names whose query changes
+                    {"view_colnames", false, false, false, false},
+                    // Tests objects with the $ sign in the name
+                    {"add_table_bug102", false, false, false, false},
+                    // Tests scenario where new UNLOGGED TABLE is added.
+                    {"add_unlogged_table", false, false, false, false},
+                    // Tests scenario where UNLOGGED TABLE is dropped.
+                    {"drop_unlogged_table", false, false, false, false},
+                    // Test scenarios where /**/ comments.
+                    {"add_table_issue115", false, false, false, false},
+                    {"add_column_issue134", false, false, false, false},
+                    {"add_column_issue188", false, false, false, false},
+                    {"add_column_issue188", false, false, false, false},
+                    {"view_alias_with_quote", false, false, false, false},
+                    // Tests view triggers (support for 'INSTEAD OF')
+                    //90
+                    {"view_triggers", false, false, false, false},
+                    // Tests privileges
+                    {"grant_on_table_sequence", false, false, false, false},
+                    {"revoke_on_table_sequence", false, false, false, false},
+                    {"grant_on_view", false, false, false, false},
+                    {"revoke_on_view", false, false, false, false},
+                    {"grant_on_columns", false, false, false, false}
+                    // Tests types
+                  , {"add_type", false, false, false, false}
+                  , {"drop_type", false, false, false, false}
+                  , {"alter_type", false, false, false, false}
+                    // Test Foreign Tables
+                  , {"foreign_create_table", false, false, false, false}
+                  , {"foreign_drop_table", false, false, false, false}
+                    //100
+                  , {"foreign_alter_type", false, false, false, false}
+                    // Tests enable/force rls
+                  , {"enable_force_rls", false, false, false, false}
+                  , {"disable_no_force_rls", false, false, false, false}
+                    // Tests policies
+                  , {"create_policies", false, false, false, false}
+                  , {"drop_policies", false, false, false, false}
+                  , {"alter_policies", false, false, false, false}
                 });
     }
     /**

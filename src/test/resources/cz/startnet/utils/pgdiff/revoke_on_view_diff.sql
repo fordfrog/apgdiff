@@ -1,0 +1,1 @@
+REVOKE ALL ON TABLE view1 FROM public;

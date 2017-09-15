@@ -1,0 +1,3 @@
+
+REVOKE ALL ON TABLE view1 FROM public;
+GRANT SELECT, INSERT ON TABLE view1 TO public;
