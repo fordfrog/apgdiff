@@ -251,6 +251,8 @@ public class PgDiffArguments {
                 setIgnoreSlonyTriggers(true);
             } else if ("--ignore-start-with".equals(args[i])) {
                 setIgnoreStartWith(true);
+            } else if ("--ignore-schema-creation".equals(args[i])) {
+                setIgnoreSchemaCreation(true);
             } else if ("--in-charset-name".equals(args[i])) {
                 setInCharsetName(args[i + 1]);
                 i++;
