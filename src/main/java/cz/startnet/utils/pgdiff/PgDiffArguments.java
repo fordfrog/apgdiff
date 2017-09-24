@@ -65,9 +65,12 @@ public class PgDiffArguments {
      * Whether Slony triggers should be ignored.
      */
     private boolean ignoreSlonyTriggers;
-    
     /**
-     * Whether Slony triggers should be ignored.
+     * Whether Schema creation should be ignored.
+     */
+    private boolean ignoreSchemaCreation;    
+    /**
+     * Drop If Exists and Create If Exists where possible
      */
     private boolean useIfExists;
 
@@ -393,6 +396,24 @@ public class PgDiffArguments {
      */
     public void setIgnoreSlonyTriggers(final boolean ignoreSlonyTriggers) {
         this.ignoreSlonyTriggers = ignoreSlonyTriggers;
+    }
+    
+    /**
+     * Getter for {@link #ignoreSchemaCreation}.
+     *
+     * @return {@link #ignoreSchemaCreation}
+     */
+    public boolean isIgnoreSchemaCreation() {
+        return this.ignoreSchemaCreation;
+    }
+    
+    /**
+     * Setter for {@link #ignoreSchemaCreation}.
+     *
+     * @param ignoreSchemaCreation {@link #ignoreSchemaCreation}
+     */
+    public void setIgnoreSchemaCreation(final boolean ignoreSchemaCreation) {
+        this.ignoreSchemaCreation = ignoreSchemaCreation;
     }
     
     /**
