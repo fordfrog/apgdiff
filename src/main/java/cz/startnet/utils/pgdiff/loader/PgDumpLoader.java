@@ -285,7 +285,7 @@ public class PgDumpLoader { //NOPMD
             final boolean ignoreSlonyTriggers, final boolean ignoreSchemaCreation) {
         if (file.equals("-"))
             return loadDatabaseSchema(System.in, charsetName,
-                    outputIgnoredStatements, ignoreSlonyTriggers);
+                    outputIgnoredStatements, ignoreSlonyTriggers, ignoreSchemaCreation);
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(file);
