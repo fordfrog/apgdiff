@@ -68,11 +68,7 @@ public class PgDiffArguments {
     /**
      * Whether Schema creation should be ignored.
      */
-    private boolean ignoreSchemaCreation;    
-    /**
-     * Drop If Exists and Create If Exists where possible
-     */
-    private boolean useIfExists;
+    private boolean ignoreSchemaCreation;
 
     /**
      * Setter for {@link #addDefaults}.
@@ -265,8 +261,6 @@ public class PgDiffArguments {
                 setOutputIgnoredStatements(true);
             } else if ("--version".equals(args[i])) {
                 setVersion(true);
-            } else if ("--drop-if-exists".equals(args[i])) {
-                setUseIfExists(true);    
             } else {
                 writer.print(Resources.getString("ErrorUnknownOption"));
                 writer.print(": ");
@@ -399,7 +393,7 @@ public class PgDiffArguments {
     public void setIgnoreSlonyTriggers(final boolean ignoreSlonyTriggers) {
         this.ignoreSlonyTriggers = ignoreSlonyTriggers;
     }
-    
+
     /**
      * Getter for {@link #ignoreSchemaCreation}.
      *
@@ -412,28 +406,10 @@ public class PgDiffArguments {
     /**
      * Setter for {@link #ignoreSchemaCreation}.
      *
-     * @param ignoreSchemaCreation {@link #ignoreSchemaCreation}
+     * @param ignoreSlonyTriggers {@link #ignoreSchemaCreation}
      */
     public void setIgnoreSchemaCreation(final boolean ignoreSchemaCreation) {
         this.ignoreSchemaCreation = ignoreSchemaCreation;
-    }
-    
-    /**
-     * Getter for {@link #useIfExists}.
-     *
-     * @return {@link #useIfExists}
-     */
-    public boolean isUseIfExists() {
-        return useIfExists;
-    }
-
-    /**
-     * Setter for {@link #useIfExists}.
-     *
-     * @param useIfExists use IF EXISTS IN STATEMENTS
-     */
-    public void setUseIfExists(final boolean useIfExists) {
-        this.useIfExists = useIfExists;
     }
     
     

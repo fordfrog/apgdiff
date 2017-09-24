@@ -68,6 +68,8 @@ public class GrantRevokeParser {
             if (outputIgnoredStatements) {
                 database.addIgnoredStatement(statement);
                 return;
+            } else {
+                return;
             }
         }
         if (privilege != null && "ALL".equalsIgnoreCase(privilege)) {
@@ -192,8 +194,7 @@ public class GrantRevokeParser {
                 }
                 final String objectName = ParserUtils.getObjectName(name);
                 final PgTable table = schema.getTable(objectName);
-                final PgView view = database.getSchema(schemaName).getView(
-                        objectName);
+                final PgView view = schema.getView(objectName);
 
                 if (table != null) {
                     for (String roleName : roles) {
@@ -241,6 +242,7 @@ public class GrantRevokeParser {
                 }
                 final String objectName = ParserUtils.getObjectName(name);
                 final PgTable table = schema.getTable(objectName);
+                final PgView view = schema.getView(objectName);
 
                 if (table != null) {
 
@@ -281,7 +283,47 @@ public class GrantRevokeParser {
                             }
                         }
                     }
-                } else {
+                } else if (view != null) {
+
+                    for (int i = 0; i < privileges.size(); i++) {
+                        String privKey = privileges.get(i);
+                        List<String> privValue = privilegesColumns.get(i);
+
+                        for (String columnName : privValue) {
+                            if (view.containsColumn(columnName)) {
+                                final PgColumn column = view
+                                        .getColumn(columnName);
+                                if (column == null) {
+                                    throw new RuntimeException(
+                                            MessageFormat.format(
+                                                    Resources
+                                                            .getString("CannotFindTableColumn"),
+                                                    columnName,
+                                                    view.getName(), parser
+                                                            .getString()));
+                                }
+                                for (String roleName : roles) {
+                                    PgColumnPrivilege columnPrivilege = column
+                                            .getPrivilege(roleName);
+                                    if (columnPrivilege == null) {
+                                        columnPrivilege = new PgColumnPrivilege(
+                                                roleName);
+                                        column.addPrivilege(columnPrivilege);
+                                    }
+                                    columnPrivilege.setPrivileges(privKey,
+                                            grant, grantOption);
+                                }
+                            } else {
+                                throw new ParserException(
+                                        MessageFormat.format(
+                                                Resources
+                                                        .getString("CannotFindColumnInTable"),
+                                                columnName, view.getName()));
+                            }
+                        }
+                    }
+                } 
+                else {
                     throw new RuntimeException(MessageFormat.format(
                             Resources.getString("CannotFindObject"), name,
                             statement));

@@ -27,14 +27,21 @@ public class PgDiff {
      */
     public static void createDiff(final PrintWriter writer,
             final PgDiffArguments arguments) {
+        // Avoid reading twice from System.in
+        if (arguments.getOldDumpFile().equals("-")
+                && arguments.getNewDumpFile().equals("-"))
+            return;
+
         final PgDatabase oldDatabase = PgDumpLoader.loadDatabaseSchema(
                 arguments.getOldDumpFile(), arguments.getInCharsetName(),
                 arguments.isOutputIgnoredStatements(),
-                arguments.isIgnoreSlonyTriggers());
+                arguments.isIgnoreSlonyTriggers(),
+                arguments.isIgnoreSchemaCreation());
         final PgDatabase newDatabase = PgDumpLoader.loadDatabaseSchema(
                 arguments.getNewDumpFile(), arguments.getInCharsetName(),
                 arguments.isOutputIgnoredStatements(),
-                arguments.isIgnoreSlonyTriggers());
+                arguments.isIgnoreSlonyTriggers(),
+                arguments.isIgnoreSchemaCreation());
 
         diffDatabaseSchemas(writer, arguments, oldDatabase, newDatabase);
     }
@@ -55,11 +62,13 @@ public class PgDiff {
         final PgDatabase oldDatabase = PgDumpLoader.loadDatabaseSchema(
                 oldInputStream, arguments.getInCharsetName(),
                 arguments.isOutputIgnoredStatements(),
-                arguments.isIgnoreSlonyTriggers());
+                arguments.isIgnoreSlonyTriggers(),
+                arguments.isIgnoreSchemaCreation());
         final PgDatabase newDatabase = PgDumpLoader.loadDatabaseSchema(
                 newInputStream, arguments.getInCharsetName(),
                 arguments.isOutputIgnoredStatements(),
-                arguments.isIgnoreSlonyTriggers());
+                arguments.isIgnoreSlonyTriggers(),
+                arguments.isIgnoreSchemaCreation());
 
         diffDatabaseSchemas(writer, arguments, oldDatabase, newDatabase);
     }

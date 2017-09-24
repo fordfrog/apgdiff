@@ -570,6 +570,16 @@ public class PgDiffTables {
                                 + " TO " + tablePrivilege.getRoleName() + ";");
                     }
                 }
+                if (table.hasRLSEnabled() != null && table.hasRLSEnabled()) {
+                    writer.println("ALTER TABLE "
+                            + PgDiffUtils.getQuotedName(table.getName())
+                            + "  ENABLE ROW LEVEL SECURITY;");
+                }
+                if (table.hasRLSForced() != null && table.hasRLSForced()) {
+                    writer.println("ALTER TABLE "
+                            + PgDiffUtils.getQuotedName(table.getName())
+                            + "  FORCE ROW LEVEL SECURITY;");
+                }
 
             }
         }

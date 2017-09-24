@@ -6,6 +6,7 @@
 package cz.startnet.utils.pgdiff;
 
 import cz.startnet.utils.pgdiff.schema.PgColumn;
+import cz.startnet.utils.pgdiff.schema.PgColumnPrivilege;
 import cz.startnet.utils.pgdiff.schema.PgSchema;
 import cz.startnet.utils.pgdiff.schema.PgView;
 import cz.startnet.utils.pgdiff.schema.PgRelationPrivilege;
@@ -219,6 +220,7 @@ public class PgDiffViews {
             }
 
             alterPrivileges(writer, oldView, newView, searchPathHelper);
+            alterPrivilegesColumns(writer, oldView, newView, searchPathHelper);
         }
     }
 
@@ -352,6 +354,86 @@ public class PgDiffViews {
                 }
             }
         }
+    }
+
+    private static void alterPrivilegesColumns(final PrintWriter writer,
+            final PgView oldView, final PgView newView,
+            final SearchPathHelper searchPathHelper) {
+        boolean emptyLinePrinted = false;
+        for (PgColumn newColumn : newView.getColumns()) {
+            final PgColumn oldColumn = oldView.getColumn(newColumn.getName());
+
+            if (oldColumn != null) {
+                for (PgColumnPrivilege oldColumnPrivilege : oldColumn
+                        .getPrivileges()) {
+                    PgColumnPrivilege newColumnPrivilege = newColumn
+                            .getPrivilege(oldColumnPrivilege.getRoleName());
+                    if (newColumnPrivilege == null) {
+                        if (!emptyLinePrinted) {
+                            emptyLinePrinted = true;
+                            writer.println();
+                        }
+                        writer.println("REVOKE ALL ("
+                                + PgDiffUtils.getQuotedName(newColumn.getName())
+                                + ") ON TABLE "
+                                + PgDiffUtils.getQuotedName(newView.getName())
+                                + " FROM " + oldColumnPrivilege.getRoleName()
+                                + ";");
+                    }
+                }
+            }
+            if (newColumn != null) {
+                for (PgColumnPrivilege newColumnPrivilege : newColumn
+                        .getPrivileges()) {
+                    PgColumnPrivilege oldColumnPrivilege = null;
+                    if (oldColumn != null) {
+                        oldColumnPrivilege = oldColumn
+                                .getPrivilege(newColumnPrivilege.getRoleName());
+                    }
+                    if (!newColumnPrivilege.isSimilar(oldColumnPrivilege)) {
+                        if (!emptyLinePrinted) {
+                            emptyLinePrinted = true;
+                            writer.println();
+                        }
+                        writer.println("REVOKE ALL ("
+                                + PgDiffUtils.getQuotedName(newColumn.getName())
+                                + ") ON TABLE "
+                                + PgDiffUtils.getQuotedName(newView.getName())
+                                + " FROM " + newColumnPrivilege.getRoleName()
+                                + ";");
+                        if (!"".equals(newColumnPrivilege.getPrivilegesSQL(
+                                true,
+                                PgDiffUtils.getQuotedName(newColumn.getName())))) {
+                            writer.println("GRANT "
+                                    + newColumnPrivilege.getPrivilegesSQL(true,
+                                            PgDiffUtils.getQuotedName(newColumn
+                                                    .getName()))
+                                    + " ON TABLE "
+                                    + PgDiffUtils.getQuotedName(newView
+                                            .getName()) + " TO "
+                                    + newColumnPrivilege.getRoleName()
+                                    + " WITH GRANT OPTION;");
+                        }
+                        if (!"".equals(newColumnPrivilege.getPrivilegesSQL(
+                                false,
+                                PgDiffUtils.getQuotedName(newColumn.getName())))) {
+                            writer.println("GRANT "
+                                    + newColumnPrivilege.getPrivilegesSQL(
+                                            false, PgDiffUtils
+                                                    .getQuotedName(newColumn
+                                                            .getName()))
+                                    + " ON TABLE "
+                                    + PgDiffUtils.getQuotedName(newView
+                                            .getName()) + " TO "
+                                    + newColumnPrivilege.getRoleName() + ";");
+                        }
+
+                    }
+                }
+            }
+
+        }
+
     }
 
     /**

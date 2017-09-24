@@ -49,6 +49,8 @@ fordfrog@fordfrog.com.
 * Added switch --ignore-slony-triggers which causes that Slony triggers
   _slony_logtrigger and _slony_denyaccess are completely ignored during parsing
   and diffing.
+* Added switch --ignore-schema-creation which removes the need of CREATE SCHEMA
+  declararions in the input files.
 
 #### Fixes
 * Fixed issue with comments not being added on newly created columns.
