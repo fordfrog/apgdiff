@@ -27,6 +27,11 @@ public class PgDiff {
      */
     public static void createDiff(final PrintWriter writer,
             final PgDiffArguments arguments) {
+        // Avoid reading twice from System.in
+        if (arguments.getOldDumpFile().equals("-")
+                && arguments.getNewDumpFile().equals("-"))
+            return;
+
         final PgDatabase oldDatabase = PgDumpLoader.loadDatabaseSchema(
                 arguments.getOldDumpFile(), arguments.getInCharsetName(),
                 arguments.isOutputIgnoredStatements(),
