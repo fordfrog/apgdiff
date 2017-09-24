@@ -1,2 +1,2 @@
 
-DROP SEQUENCE testseq;
+DROP SEQUENCE IF EXISTS testseq;

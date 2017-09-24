@@ -5,6 +5,7 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
+import cz.startnet.utils.pgdiff.PgDiffArguments;
 import cz.startnet.utils.pgdiff.PgDiffUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -129,11 +130,12 @@ public class PgFunction {
     /**
      * Creates and returns SQL for dropping the function.
      *
+     * @param pgDiffArguments object with pgDiff settings
      * @return created SQL
      */
-    public String getDropSQL() {
+    public String getDropSQL(final PgDiffArguments pgDiffArguments) {
         final StringBuilder sbString = new StringBuilder(100);
-        sbString.append("DROP FUNCTION ");
+        sbString.append("DROP FUNCTION " + PgDiffUtils.getDropIfExists(pgDiffArguments.isUseIfExists()));
         sbString.append(name);
         sbString.append('(');
 

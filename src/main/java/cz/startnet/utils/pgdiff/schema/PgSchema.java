@@ -131,11 +131,13 @@ public class PgSchema {
     /**
      * Creates and returns SQL for creation of the schema.
      *
+     * @param useIfExists use IF EXISTS IN STATEMENTS
      * @return created SQL
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(boolean useIfExists) {
         final StringBuilder sbSQL = new StringBuilder(50);
         sbSQL.append("CREATE SCHEMA ");
+        sbSQL.append(PgDiffUtils.getCreateIfNotExists(useIfExists));
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
 
         if (getAuthorization() != null) {
@@ -418,7 +420,7 @@ public class PgSchema {
     /**
      * Returns a list of types
      *
-     * @return types List<PgType>
+     * @return types List of PgType
      */
     public List<PgType> getTypes() {
         return types;

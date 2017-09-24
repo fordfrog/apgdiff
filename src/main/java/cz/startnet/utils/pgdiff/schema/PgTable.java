@@ -77,6 +77,8 @@ public class PgTable extends PgRelation {
      * Creates a new PgTable object.
      *
      * @param name {@link #name}
+     * @param database name of database
+     * @param schema name of schema
      */
     public PgTable(final String name, final PgDatabase database, final PgSchema schema) {
         setName(name);
@@ -123,10 +125,11 @@ public class PgTable extends PgRelation {
      * Creates and returns SQL for creation of the table.
      *
      * @param schema schema of current statement
+     * @param useIfExists use IF EXISTS IN STATEMENTS
      *
      * @return created SQL statement
      */
-    public String getCreationSQL(final PgSchema schema) {
+    public String getCreationSQL(final PgSchema schema,boolean useIfExists) {
         final StringBuilder sbSQL = new StringBuilder(1000);
         sbSQL.append("CREATE ");
         if (isUnlogged()) {
@@ -136,6 +139,7 @@ public class PgTable extends PgRelation {
             sbSQL.append("FOREIGN ");
         }
         sbSQL.append("TABLE ");
+        sbSQL.append(PgDiffUtils.getCreateIfNotExists(useIfExists));
         sbSQL.append(PgDiffUtils.getQuotedName(name));
         sbSQL.append(" (");
         sbSQL.append(System.getProperty("line.separator"));
@@ -252,6 +256,7 @@ public class PgTable extends PgRelation {
     /**
      * Setter for {@link #inherits}.
      *
+     * @param schemaName name of schema
      * @param tableName name of inherited table
      */
     public void addInherits(final String schemaName, final String tableName) {
@@ -433,8 +438,9 @@ public class PgTable extends PgRelation {
      */
     
     @Override
-    public String getDropSQL() {
-        return "DROP " + ((isForeign()) ? "FOREIGN ":"") + getRelationKind() + " " +
+    public String getDropSQL(boolean dropIfExists) {
+        
+        return "DROP " + ((isForeign()) ? "FOREIGN ":"") + getRelationKind() + " " + PgDiffUtils.getDropIfExists(dropIfExists) +
                 PgDiffUtils.getQuotedName(getName()) + ";";
     }
     

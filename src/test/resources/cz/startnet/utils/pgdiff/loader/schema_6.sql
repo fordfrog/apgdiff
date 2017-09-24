@@ -21,7 +21,6 @@ COMMENT ON SCHEMA public IS 'Standard public schema';
 
 CREATE PROCEDURAL LANGUAGE plpgsql;
 
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 SET search_path = public, pg_catalog;
 

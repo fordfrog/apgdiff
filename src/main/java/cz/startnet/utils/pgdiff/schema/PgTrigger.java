@@ -135,11 +135,12 @@ public class PgTrigger {
     /**
      * Creates and returns SQL for creation of trigger.
      *
+     * @param useIfExists use IF EXISTS IN STATEMENTS
      * @return created SQL
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(boolean useIfExists) {
         final StringBuilder sbSQL = new StringBuilder(100);
-        sbSQL.append("CREATE TRIGGER ");
+        sbSQL.append("CREATE TRIGGER ");        
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(System.getProperty("line.separator"));
         sbSQL.append("\t");
@@ -234,7 +235,7 @@ public class PgTrigger {
      * @return created SQL
      */
     public String getDropSQL() {
-        return "DROP TRIGGER " + PgDiffUtils.getQuotedName(getName()) + " ON "
+        return "DROP TRIGGER IF EXISTS " + PgDiffUtils.getQuotedName(getName()) + " ON "
                 + PgDiffUtils.getQuotedName(getRelationName()) + ";";
     }
 

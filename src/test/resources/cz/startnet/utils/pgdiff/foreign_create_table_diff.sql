@@ -1,5 +1,5 @@
 
-CREATE FOREIGN TABLE foreign_to_create (
+CREATE FOREIGN TABLE IF NOT EXISTS foreign_to_create (
 	id bigint
 )SERVER ats
 OPTIONS (

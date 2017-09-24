@@ -368,6 +368,7 @@ public class PgDiffTest {
         arguments.setAddDefaults(addDefaults);
         arguments.setIgnoreFunctionWhitespace(ignoreFunctionWhitespace);
         arguments.setIgnoreStartWith(ignoreStartWith);
+        arguments.setUseIfExists(true);
         PgDiff.createDiff(writer, arguments,
                 PgDiffTest.class.getResourceAsStream(
                 fileNameTemplate + "_original.sql"),

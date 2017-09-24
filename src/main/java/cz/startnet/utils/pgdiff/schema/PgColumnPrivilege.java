@@ -106,6 +106,7 @@ public class PgColumnPrivilege {
      * 
      * @param other
      *            privileges to compare
+     * @return isSimilar
      */
     public boolean isSimilar(final PgColumnPrivilege other) {
         if (other == null) {

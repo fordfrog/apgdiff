@@ -65,9 +65,10 @@ public class PgIndex {
     /**
      * Creates and returns SQL for creation of the index.
      *
+     * @param useIfExists use IF EXISTS IN STATEMENTS
      * @return created SQL
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(boolean useIfExists) {
         final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("CREATE ");
 
@@ -76,6 +77,7 @@ public class PgIndex {
         }
 
         sbSQL.append("INDEX ");
+        sbSQL.append(PgDiffUtils.getCreateIfNotExists(useIfExists));        
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(" ON ");
         sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
@@ -117,10 +119,11 @@ public class PgIndex {
     /**
      * Creates and returns SQL statement for dropping the index.
      *
+     * @param dropIfExists drop object IF EXISTS
      * @return created SQL statement
      */
-    public String getDropSQL() {
-        return "DROP INDEX " + PgDiffUtils.getQuotedName(getName()) + ";";
+    public String getDropSQL(final boolean dropIfExists) {
+        return "DROP INDEX " + PgDiffUtils.getDropIfExists(dropIfExists) + PgDiffUtils.getQuotedName(getName()) + ";";
     }
 
     /**

@@ -26,10 +26,12 @@ public class PgDiffTriggers {
      * @param oldSchema        original schema
      * @param newSchema        new schema
      * @param searchPathHelper search path helper
+     * @param arguments object containing arguments settings
      */
     public static void createTriggers(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final SearchPathHelper searchPathHelper) {
+            final SearchPathHelper searchPathHelper,
+            final PgDiffArguments arguments) {
         for (final PgRelation newRelation : newSchema.getRels()) {
             final PgRelation oldRelation;
 
@@ -43,7 +45,7 @@ public class PgDiffTriggers {
             for (final PgTrigger trigger : getNewTriggers(oldRelation, newRelation)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(trigger.getCreationSQL());
+                writer.println(trigger.getCreationSQL(arguments.isUseIfExists()));
             }
         }
     }
