@@ -1,2 +1,2 @@
 
-DROP VIEW IF EXISTS testview;
+DROP VIEW testview;

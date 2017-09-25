@@ -1,2 +1,2 @@
 
-DROP FUNCTION IF EXISTS power_number("input" integer);
+DROP FUNCTION power_number("input" integer);

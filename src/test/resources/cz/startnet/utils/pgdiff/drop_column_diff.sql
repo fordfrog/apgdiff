@@ -1,3 +1,3 @@
 
 ALTER TABLE testtable
-	DROP COLUMN IF EXISTS field5;
+	DROP COLUMN field5;

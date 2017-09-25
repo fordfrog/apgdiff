@@ -1,4 +1,4 @@
 
-DROP INDEX IF EXISTS testindex;
+DROP INDEX testindex;
 
-CREATE INDEX IF NOT EXISTS testindex ON testtable USING btree (field3);
+CREATE INDEX testindex ON testtable USING btree (field3);
