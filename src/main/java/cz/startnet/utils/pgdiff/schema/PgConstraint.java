@@ -48,16 +48,15 @@ public class PgConstraint {
 
     /**
      * Creates and returns SQL for creation of the constraint.
-     * @param useIfExists use IF EXISTS IN STATEMENTS
+     *
      * @return created SQL
      */
-    public String getCreationSQL(boolean useIfExists) {
+    public String getCreationSQL() {
         final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("ALTER TABLE ");
         sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
         sbSQL.append(System.getProperty("line.separator"));
         sbSQL.append("\tADD CONSTRAINT ");
-        sbSQL.append(PgDiffUtils.getCreateIfNotExists(useIfExists));
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(' ');
         sbSQL.append(getDefinition());
@@ -116,16 +115,15 @@ public class PgConstraint {
 
     /**
      * Creates and returns SQL for dropping the constraint.
-     * @param dropIfExists drop object IF EXISTS
+     *
      * @return created SQL
      */
-    public String getDropSQL(final boolean dropIfExists) {
+    public String getDropSQL() {
         final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("ALTER TABLE ");
         sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
         sbSQL.append(System.getProperty("line.separator"));
         sbSQL.append("\tDROP CONSTRAINT ");
-        sbSQL.append(PgDiffUtils.getDropIfExists(dropIfExists));
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(';');
 

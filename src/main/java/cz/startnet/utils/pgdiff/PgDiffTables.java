@@ -256,7 +256,7 @@ public class PgDiffTables {
             final PgTable newTable, final List<PgColumn> dropDefaultsColumns) {
         for (final PgColumn column : newTable.getColumns()) {
             if (!oldTable.containsColumn(column.getName())) {
-                statements.add("\tADD COLUMN "+ PgDiffUtils.getCreateIfNotExists(arguments.isUseIfExists())
+                statements.add("\tADD COLUMN "
                         + column.getFullDefinition(arguments.isAddDefaults()));
 
                 if (arguments.isAddDefaults() && !column.getNullValue()
@@ -274,13 +274,12 @@ public class PgDiffTables {
      * @param statements list of statements
      * @param oldTable   original table
      * @param newTable   new table
-    * @param arguments object containing arguments settings
      */
     private static void addDropTableColumns(final List<String> statements,
-            final PgTable oldTable, final PgTable newTable, final PgDiffArguments arguments) {
+            final PgTable oldTable, final PgTable newTable) {
         for (final PgColumn column : oldTable.getColumns()) {
             if (!newTable.containsColumn(column.getName())) {
-                statements.add("\tDROP COLUMN " + PgDiffUtils.getDropIfExists(arguments.isUseIfExists()) 
+                statements.add("\tDROP COLUMN "
                         + PgDiffUtils.getQuotedName(column.getName()));
             }
         }
@@ -310,7 +309,7 @@ public class PgDiffTables {
 
             if (!oldColumn.getType().equals(newColumn.getType())) {
                 statements.add("\tALTER COLUMN " + newColumnName + " TYPE "
-                		+ newColumn.getType() + " USING " + newColumnName  + "::" + newColumn.getType() + " /* "
+                        + newColumn.getType() + " /* "
                         + MessageFormat.format(
                         Resources.getString("TypeParameterChange"),
                         newTable.getName(), oldColumn.getType(),
@@ -532,18 +531,16 @@ public class PgDiffTables {
      * @param oldSchema        original schema
      * @param newSchema        new schema
      * @param searchPathHelper search path helper
-     * @param arguments object containing arguments settings
      */
     public static void createTables(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final SearchPathHelper searchPathHelper,
-            final PgDiffArguments arguments) {
+            final SearchPathHelper searchPathHelper) {
         for (final PgTable table : newSchema.getTables()) {
             if (oldSchema == null
                     || !oldSchema.containsTable(table.getName())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(table.getCreationSQL(newSchema,arguments.isUseIfExists()));
+                writer.println(table.getCreationSQL(newSchema));
                 writer.println();
                 if (table.getOwnerTo() != null) {
                     writer.println("ALTER TABLE "
@@ -592,12 +589,10 @@ public class PgDiffTables {
      * @param oldSchema        original schema
      * @param newSchema        new schema
      * @param searchPathHelper search path helper
-     * @param arguments object containing arguments settings
      */
     public static void dropTables(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final SearchPathHelper searchPathHelper,
-            final PgDiffArguments arguments) {
+            final SearchPathHelper searchPathHelper) {
         if (oldSchema == null) {
             return;
         }
@@ -606,7 +601,7 @@ public class PgDiffTables {
             if (!newSchema.containsTable(table.getName())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(table.getDropSQL(arguments.isUseIfExists()));
+                writer.println(table.getDropSQL());
             }
         }
     }
@@ -628,7 +623,7 @@ public class PgDiffTables {
         final List<String> statements = new ArrayList<String>();
         @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<PgColumn> dropDefaultsColumns = new ArrayList<PgColumn>();
-        addDropTableColumns(statements, oldTable, newTable,arguments);
+        addDropTableColumns(statements, oldTable, newTable);
         addCreateTableColumns(
                 statements, arguments, oldTable, newTable, dropDefaultsColumns);
         addModifyTableColumns(

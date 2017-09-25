@@ -68,7 +68,7 @@ public class PgDiffFunctions {
             if (!newSchema.containsFunction(oldFunction.getSignature())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(oldFunction.getDropSQL(arguments));
+                writer.println(oldFunction.getDropSQL());
             }
         }
     }
