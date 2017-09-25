@@ -1,5 +1,5 @@
 
-CREATE TABLE childtable (
+CREATE TABLE IF NOT EXISTS childtable (
 )
 INHERITS (parenttable);
 

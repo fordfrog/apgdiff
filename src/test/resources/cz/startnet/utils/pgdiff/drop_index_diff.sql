@@ -1,2 +1,2 @@
 
-DROP INDEX testindex3;
+DROP INDEX IF EXISTS testindex3;

@@ -1,5 +1,5 @@
 
-CREATE TABLE testtable (
+CREATE TABLE IF NOT EXISTS testtable (
 	field1 polygon
 )
 INHERITS (parenttable);

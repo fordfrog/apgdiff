@@ -284,12 +284,13 @@ public abstract class PgRelation {
     /**
      * Creates and returns SQL statement for dropping the relation.
      *
+     * @param dropIfExists drop object IF EXISTS
      * @return created SQL statement
      */
-    public String getDropSQL() {
-        return "DROP " + getRelationKind() + " " +
+    public String getDropSQL(final boolean dropIfExists) {
+        return "DROP " + getRelationKind() + " " + PgDiffUtils.getDropIfExists(dropIfExists) +
                 PgDiffUtils.getQuotedName(getName()) + ";";
-    }
+}
 
     /**
      * Returns true if table contains given column {@code name}, otherwise

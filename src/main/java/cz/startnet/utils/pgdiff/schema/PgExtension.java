@@ -99,11 +99,12 @@ public class PgExtension {
     /**
      * Returns creation SQL of the function.
      *
+     * @param useIfExists use IF EXISTS IN STATEMENTS
      * @return creation SQL
      */
-    public String getCreationSQL() {
+    public String getCreationSQL(boolean useIfExists) {
         final StringBuilder sbSQL = new StringBuilder();
-        sbSQL.append("CREATE EXTENSION ");
+        sbSQL.append("CREATE EXTENSION ").append(PgDiffUtils.getCreateIfNotExists(useIfExists));
         sbSQL.append(PgDiffUtils.getQuotedName(name));
         if (schema != null) {
             sbSQL.append(" SCHEMA ");
