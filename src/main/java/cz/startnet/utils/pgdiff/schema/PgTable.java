@@ -125,11 +125,10 @@ public class PgTable extends PgRelation {
      * Creates and returns SQL for creation of the table.
      *
      * @param schema schema of current statement
-     * @param useIfExists use IF EXISTS IN STATEMENTS
      *
      * @return created SQL statement
      */
-    public String getCreationSQL(final PgSchema schema,boolean useIfExists) {
+    public String getCreationSQL(final PgSchema schema) {
         final StringBuilder sbSQL = new StringBuilder(1000);
         sbSQL.append("CREATE ");
         if (isUnlogged()) {
@@ -139,7 +138,7 @@ public class PgTable extends PgRelation {
             sbSQL.append("FOREIGN ");
         }
         sbSQL.append("TABLE ");
-        sbSQL.append(PgDiffUtils.getCreateIfNotExists(useIfExists));
+        sbSQL.append(PgDiffUtils.getCreateIfNotExists());
         sbSQL.append(PgDiffUtils.getQuotedName(name));
         sbSQL.append(" (");
         sbSQL.append(System.getProperty("line.separator"));
@@ -438,9 +437,9 @@ public class PgTable extends PgRelation {
      */
     
     @Override
-    public String getDropSQL(boolean dropIfExists) {
+    public String getDropSQL() {
         
-        return "DROP " + ((isForeign()) ? "FOREIGN ":"") + getRelationKind() + " " + PgDiffUtils.getDropIfExists(dropIfExists) +
+        return "DROP " + ((isForeign()) ? "FOREIGN ":"") + getRelationKind() + " " + PgDiffUtils.getDropIfExists() +
                 PgDiffUtils.getQuotedName(getName()) + ";";
     }
     

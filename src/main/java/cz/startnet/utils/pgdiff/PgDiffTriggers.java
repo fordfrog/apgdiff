@@ -55,13 +55,11 @@ public class PgDiffTriggers {
      * @param writer           writer the output should be written to
      * @param oldSchema        original schema
      * @param newSchema        new schema
-     * @param searchPathHelper search path helper
-     * @param arguments object containing arguments settings
+     * @param searchPathHelper search path helper    
      */
     public static void dropTriggers(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final SearchPathHelper searchPathHelper,
-            final PgDiffArguments arguments) {
+            final SearchPathHelper searchPathHelper) {
         for (final PgRelation newRelation : newSchema.getRels()) {
             final PgRelation oldRelation;
 
@@ -76,7 +74,7 @@ public class PgDiffTriggers {
                     getDropTriggers(oldRelation, newRelation)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(trigger.getDropSQL(arguments.isUseIfExists()));
+                writer.println(trigger.getDropSQL());
             }
         }
     }

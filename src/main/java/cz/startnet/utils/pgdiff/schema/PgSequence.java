@@ -108,14 +108,13 @@ public class PgSequence {
     /**
      * Creates and returns SQL statement for creation of the sequence.
      *
-     * @param useIfExists use IF EXISTS IN STATEMENTS
      * @return created SQL statement
      */
-    public String getCreationSQL(boolean useIfExists) {
+    public String getCreationSQL() {
         final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("CREATE SEQUENCE ");
         
-        sbSQL.append(PgDiffUtils.getCreateIfNotExists(useIfExists));
+        sbSQL.append(PgDiffUtils.getCreateIfNotExists());
         
         sbSQL.append(PgDiffUtils.getQuotedName(name));
 
@@ -220,11 +219,10 @@ public class PgSequence {
     /**
      * Creates and returns SQL statement for dropping the sequence.
      *
-     * @param dropIfExists drop object IF EXISTS
      * @return created SQL
      */
-    public String getDropSQL(final boolean dropIfExists) {
-        return "DROP SEQUENCE " + PgDiffUtils.getDropIfExists(dropIfExists) + PgDiffUtils.getQuotedName(getName()) + ";";
+    public String getDropSQL() {
+        return "DROP SEQUENCE " + PgDiffUtils.getDropIfExists() + PgDiffUtils.getQuotedName(getName()) + ";";
     }
 
     /**

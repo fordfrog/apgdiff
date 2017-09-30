@@ -266,7 +266,7 @@ public class PgDiffArguments {
             } else if ("--version".equals(args[i])) {
                 setVersion(true);
             } else if ("--drop-if-exists".equals(args[i])) {
-                setUseIfExists(true);
+               PgDiffUtils.setUseExists(true);
             } else {
                 writer.print(Resources.getString("ErrorUnknownOption"));
                 writer.print(": ");
@@ -417,24 +417,4 @@ public class PgDiffArguments {
     public void setIgnoreSchemaCreation(final boolean ignoreSchemaCreation) {
         this.ignoreSchemaCreation = ignoreSchemaCreation;
     }
-
-    /**
-     * Getter for {@link #useIfExists}.
-     *
-     * @return {@link #useIfExists}
-     */
-    public boolean isUseIfExists() {
-        return useIfExists;
-    }
-
-    /**
-     * Setter for {@link #useIfExists}.
-     *
-     * @param useIfExists use IF EXISTS IN STATEMENTS
-     */
-    public void setUseIfExists(final boolean useIfExists) {
-        this.useIfExists = useIfExists;
-    }
-
-
 }

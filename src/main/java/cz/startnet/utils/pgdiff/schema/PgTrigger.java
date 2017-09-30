@@ -231,11 +231,10 @@ public class PgTrigger {
     /**
      * Creates and returns SQL for dropping the trigger.
      *
-     * @param dropIfExists Use Drop If Exists
      * @return created SQL
      */
-    public String getDropSQL(final boolean dropIfExists) {
-        return "DROP TRIGGER " + PgDiffUtils.getDropIfExists(dropIfExists) + PgDiffUtils.getQuotedName(getName()) + " ON "
+    public String getDropSQL() {
+        return "DROP TRIGGER " + PgDiffUtils.getDropIfExists() + PgDiffUtils.getQuotedName(getName()) + " ON "
                 + PgDiffUtils.getQuotedName(getRelationName()) + ";";
     }
 

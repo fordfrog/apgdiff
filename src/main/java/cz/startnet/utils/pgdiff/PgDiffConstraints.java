@@ -29,12 +29,11 @@ public class PgDiffConstraints {
      *                         processed or any other constraints should be
      *                         processed
      * @param searchPathHelper search path helper
-     * @param arguments object containing arguments settings
      */
     public static void createConstraints(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final boolean primaryKey, final SearchPathHelper searchPathHelper,
-            final PgDiffArguments arguments) {
+            final boolean primaryKey, final SearchPathHelper searchPathHelper
+            ) {
         for (final PgTable newTable : newSchema.getTables()) {
             final PgTable oldTable;
 
@@ -49,7 +48,7 @@ public class PgDiffConstraints {
                     getNewConstraints(oldTable, newTable, primaryKey)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(constraint.getCreationSQL(arguments.isUseIfExists()));
+                writer.println(constraint.getCreationSQL());
             }
         }
     }
@@ -64,12 +63,11 @@ public class PgDiffConstraints {
      *                         processed or any other constraints should be
      *                         processed
      * @param searchPathHelper search path helper
-     * @param arguments object containing arguments settings
      */
     public static void dropConstraints(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final boolean primaryKey, final SearchPathHelper searchPathHelper,
-            final PgDiffArguments arguments) {
+            final boolean primaryKey, final SearchPathHelper searchPathHelper
+            ) {
         for (final PgTable newTable : newSchema.getTables()) {
             final PgTable oldTable;
 
@@ -84,7 +82,7 @@ public class PgDiffConstraints {
                     getDropConstraints(oldTable, newTable, primaryKey)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(constraint.getDropSQL(arguments.isUseIfExists()));
+                writer.println(constraint.getDropSQL());
             }
         }
     }

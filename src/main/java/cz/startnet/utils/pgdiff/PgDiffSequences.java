@@ -25,18 +25,17 @@ public class PgDiffSequences {
      * @param oldSchema        original schema
      * @param newSchema        new schema
      * @param searchPathHelper search path helper
-     * @param arguments object containing arguments settings
      */
     public static void createSequences(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final SearchPathHelper searchPathHelper, final PgDiffArguments arguments) {
+            final SearchPathHelper searchPathHelper) {
         // Add new sequences
         for (final PgSequence sequence : newSchema.getSequences()) {
             if (oldSchema == null
                     || !oldSchema.containsSequence(sequence.getName())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(sequence.getCreationSQL(arguments.isUseIfExists()));
+                writer.println(sequence.getCreationSQL());
 
                 for (PgSequencePrivilege sequencePrivilege : sequence
                         .getPrivileges()) {
@@ -96,11 +95,10 @@ public class PgDiffSequences {
      * @param oldSchema        original schema
      * @param newSchema        new schema
      * @param searchPathHelper search path helper
-     * @param arguments object containing arguments settings
      */
     public static void dropSequences(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final SearchPathHelper searchPathHelper,final PgDiffArguments arguments) {
+            final SearchPathHelper searchPathHelper) {
         if (oldSchema == null) {
             return;
         }
@@ -110,7 +108,7 @@ public class PgDiffSequences {
             if (!newSchema.containsSequence(sequence.getName())) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(sequence.getDropSQL(arguments.isUseIfExists()));
+                writer.println(sequence.getDropSQL());
             }
         }
     }

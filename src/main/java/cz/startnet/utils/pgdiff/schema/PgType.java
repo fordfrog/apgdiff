@@ -134,11 +134,10 @@ public class PgType {
     /**
      * Creates and returns SQL statement for dropping the table.
      *
-     * @param dropIfExists drop object IF EXISTS
      * @return created SQL statement
      */
-    public String getDropSQL(final boolean dropIfExists) {
-        return "DROP TYPE "+ PgDiffUtils.getDropIfExists(dropIfExists) + PgDiffUtils.getQuotedName(getName()) + ";";
+    public String getDropSQL() {
+        return "DROP TYPE "+ PgDiffUtils.getDropIfExists() + PgDiffUtils.getQuotedName(getName()) + ";";
     }
 
     /**

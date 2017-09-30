@@ -72,13 +72,12 @@ public class PgDiffViews {
      * @param writer           writer the output should be written to
      * @param oldSchema        original schema
      * @param newSchema        new schema
-     * @param searchPathHelper search path helper
-     * @param arguments  object containing arguments settings
+     * @param searchPathHelper search path helper     
      */
     public static void dropViews(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final SearchPathHelper searchPathHelper,
-            final PgDiffArguments arguments) {
+            final SearchPathHelper searchPathHelper
+            ) {
         if (oldSchema == null) {
             return;
         }
@@ -89,7 +88,7 @@ public class PgDiffViews {
             if (newView == null || isViewModified(oldView, newView)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(oldView.getDropSQL(arguments.isUseIfExists()));
+                writer.println(oldView.getDropSQL());
             }
         }
     }

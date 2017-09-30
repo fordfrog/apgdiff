@@ -26,12 +26,11 @@ public class PgDiffIndexes {
      * @param oldSchema        original schema
      * @param newSchema        new schema
      * @param searchPathHelper search path helper
-     * @param arguments object containing arguments settings
      */
     public static void createIndexes(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final SearchPathHelper searchPathHelper,
-            final PgDiffArguments arguments) {
+            final SearchPathHelper searchPathHelper
+            ) {
         for (final PgTable newTable : newSchema.getTables()) {
             final String newTableName = newTable.getName();
 
@@ -40,14 +39,14 @@ public class PgDiffIndexes {
                 for (PgIndex index : newTable.getIndexes()) {
                     searchPathHelper.outputSearchPath(writer);
                     writer.println();
-                    writer.println(index.getCreationSQL(arguments.isUseIfExists()));
+                    writer.println(index.getCreationSQL());
                 }
             } else {
                 for (PgIndex index : getNewIndexes(
                         oldSchema.getTable(newTableName), newTable)) {
                     searchPathHelper.outputSearchPath(writer);
                     writer.println();
-                    writer.println(index.getCreationSQL(arguments.isUseIfExists()));
+                    writer.println(index.getCreationSQL());
                 }
             }
         }
@@ -60,11 +59,10 @@ public class PgDiffIndexes {
      * @param oldSchema        original schema
      * @param newSchema        new schema
      * @param searchPathHelper search path helper
-     * @param arguments object containing arguments settings
      */
     public static void dropIndexes(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final SearchPathHelper searchPathHelper,final PgDiffArguments arguments) {
+            final SearchPathHelper searchPathHelper) {
         for (final PgTable newTable : newSchema.getTables()) {
             final String newTableName = newTable.getName();
             final PgTable oldTable;
@@ -79,7 +77,7 @@ public class PgDiffIndexes {
             for (final PgIndex index : getDropIndexes(oldTable, newTable)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(index.getDropSQL(arguments.isUseIfExists()));
+                writer.println(index.getDropSQL());
             }
         }
     }
