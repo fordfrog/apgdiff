@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class PgDiffIndexes {
 
-    /**
+       /**
      * Outputs statements for creation of new indexes.
      *
      * @param writer           writer the output should be written to
@@ -29,8 +29,7 @@ public class PgDiffIndexes {
      */
     public static void createIndexes(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final SearchPathHelper searchPathHelper
-            ) {
+            final SearchPathHelper searchPathHelper) {
         for (final PgTable newTable : newSchema.getTables()) {
             final String newTableName = newTable.getName();
 
@@ -50,7 +49,7 @@ public class PgDiffIndexes {
                 }
             }
         }
-    }
+}
 
     /**
      * Outputs statements for dropping indexes that exist no more.
