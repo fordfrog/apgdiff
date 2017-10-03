@@ -29,7 +29,8 @@ public class PgDiffTriggers {
      */
     public static void createTriggers(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final SearchPathHelper searchPathHelper) {
+            final SearchPathHelper searchPathHelper
+            ) {
         for (final PgRelation newRelation : newSchema.getRels()) {
             final PgRelation oldRelation;
 
@@ -54,7 +55,7 @@ public class PgDiffTriggers {
      * @param writer           writer the output should be written to
      * @param oldSchema        original schema
      * @param newSchema        new schema
-     * @param searchPathHelper search path helper
+     * @param searchPathHelper search path helper    
      */
     public static void dropTriggers(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,

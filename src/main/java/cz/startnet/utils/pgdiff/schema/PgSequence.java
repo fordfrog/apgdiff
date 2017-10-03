@@ -113,6 +113,9 @@ public class PgSequence {
     public String getCreationSQL() {
         final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("CREATE SEQUENCE ");
+        
+        sbSQL.append(PgDiffUtils.getCreateIfNotExists());
+        
         sbSQL.append(PgDiffUtils.getQuotedName(name));
 
         if (startWith != null) {
@@ -219,7 +222,7 @@ public class PgSequence {
      * @return created SQL
      */
     public String getDropSQL() {
-        return "DROP SEQUENCE " + PgDiffUtils.getQuotedName(getName()) + ";";
+        return "DROP SEQUENCE " + PgDiffUtils.getDropIfExists() + PgDiffUtils.getQuotedName(getName()) + ";";
     }
 
     /**

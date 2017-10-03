@@ -9,7 +9,7 @@ CREATE TYPE descr_type AS (
 	amount integer
 );
 
-CREATE TABLE t1 (
+CREATE TABLE IF NOT EXISTS t1 (
 	id integer,
 	descr descr_type
 );

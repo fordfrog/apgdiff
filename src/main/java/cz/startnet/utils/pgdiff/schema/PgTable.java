@@ -77,6 +77,8 @@ public class PgTable extends PgRelation {
      * Creates a new PgTable object.
      *
      * @param name {@link #name}
+     * @param database name of database
+     * @param schema name of schema
      */
     public PgTable(final String name, final PgDatabase database, final PgSchema schema) {
         setName(name);
@@ -136,6 +138,7 @@ public class PgTable extends PgRelation {
             sbSQL.append("FOREIGN ");
         }
         sbSQL.append("TABLE ");
+        sbSQL.append(PgDiffUtils.getCreateIfNotExists());
         sbSQL.append(PgDiffUtils.getQuotedName(name));
         sbSQL.append(" (");
         sbSQL.append(System.getProperty("line.separator"));
@@ -252,6 +255,7 @@ public class PgTable extends PgRelation {
     /**
      * Setter for {@link #inherits}.
      *
+     * @param schemaName name of schema
      * @param tableName name of inherited table
      */
     public void addInherits(final String schemaName, final String tableName) {
@@ -434,7 +438,8 @@ public class PgTable extends PgRelation {
     
     @Override
     public String getDropSQL() {
-        return "DROP " + ((isForeign()) ? "FOREIGN ":"") + getRelationKind() + " " +
+        
+        return "DROP " + ((isForeign()) ? "FOREIGN ":"") + getRelationKind() + " " + PgDiffUtils.getDropIfExists() +
                 PgDiffUtils.getQuotedName(getName()) + ";";
     }
     

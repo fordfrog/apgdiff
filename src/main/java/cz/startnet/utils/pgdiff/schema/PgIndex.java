@@ -76,6 +76,7 @@ public class PgIndex {
         }
 
         sbSQL.append("INDEX ");
+        sbSQL.append(PgDiffUtils.getCreateIfNotExists());        
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(" ON ");
         sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
@@ -120,7 +121,7 @@ public class PgIndex {
      * @return created SQL statement
      */
     public String getDropSQL() {
-        return "DROP INDEX " + PgDiffUtils.getQuotedName(getName()) + ";";
+        return "DROP INDEX " + PgDiffUtils.getDropIfExists() + PgDiffUtils.getQuotedName(getName()) + ";";
     }
 
     /**

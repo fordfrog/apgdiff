@@ -90,8 +90,9 @@ public class PgSequencePrivilege {
 	 * 
 	 * @param other
 	 *            privileges to compare
+         * @return isSimilar
 	 */
-	public boolean isSimilar(final PgSequencePrivilege other) {
+  	public boolean isSimilar(final PgSequencePrivilege other) {
 		if (other == null) {
 			return false;
 		}

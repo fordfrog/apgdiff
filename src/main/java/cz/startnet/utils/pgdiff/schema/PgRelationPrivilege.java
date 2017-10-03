@@ -155,13 +155,14 @@ public class PgRelationPrivilege {
 	 * 
 	 * @param other
 	 *            privileges to compare
+         * @return isSimilar
 	 */
-	public boolean isSimilar(final PgRelationPrivilege other) {
+  	public boolean isSimilar(final PgRelationPrivilege other) {
 		if (other == null) {
 			return false;
 		}
 		if (select != other.select) {
-			return false;
+	 		return false;
 		}
 		if (selectWithGrantOption != other.selectWithGrantOption) {
 			return false;

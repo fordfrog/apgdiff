@@ -1,2 +1,2 @@
 
-DROP FUNCTION return_one();
+DROP FUNCTION IF EXISTS return_one();
