@@ -270,7 +270,9 @@ public class PgDiff {
                     writer.println(" IS NULL;");
                 }
             }
-
+            
+            PgDiffConstraintTriggers.dropConstraintTriggers(
+                    writer, oldSchema, newSchema, searchPathHelper);
             PgDiffTriggers.dropTriggers(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffFunctions.dropFunctions(
@@ -314,6 +316,8 @@ public class PgDiff {
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffTables.createClusters(
                     writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffConstraintTriggers.createConstraintTriggers(
+                    writer, oldSchema, newSchema, searchPathHelper);
             PgDiffTriggers.createTriggers(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffViews.createViews(
@@ -329,6 +333,8 @@ public class PgDiff {
             PgDiffConstraints.alterComments(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffIndexes.alterComments(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffConstraintTriggers.alterComments(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffTriggers.alterComments(
                     writer, oldSchema, newSchema, searchPathHelper);
