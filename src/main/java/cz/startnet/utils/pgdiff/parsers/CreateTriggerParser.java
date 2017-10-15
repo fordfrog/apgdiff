@@ -17,29 +17,39 @@ import cz.startnet.utils.pgdiff.schema.PgTrigger;
 public class CreateTriggerParser {
 
     /**
-     * Parses CREATE TRIGGER statement.
+     * Parses CREATE [CONSTRAINT] TRIGGER statement.
      *
      * @param database            database
-     * @param statement           CREATE TRIGGER statement
+     * @param statement           CREATE [CONSTRAINT] TRIGGER statement
      * @param ignoreSlonyTriggers whether Slony triggers should be ignored
      */
     public static void parse(final PgDatabase database,
             final String statement, final boolean ignoreSlonyTriggers) {
-        final Parser parser = new Parser(statement);
-        parser.expect("CREATE", "TRIGGER");
 
+    	final PgTrigger trigger = new PgTrigger();
+        final Parser parser = new Parser(statement);
+     
+        parser.expect("CREATE");
+        if(parser.expectOptional("CONSTRAINT"))
+        	trigger.setConstraint(true);
+        parser.expect("TRIGGER");
+        
         final String triggerName = parser.parseIdentifier();
         final String objectName = ParserUtils.getObjectName(triggerName);
 
-        final PgTrigger trigger = new PgTrigger();
         trigger.setName(objectName);
-
-        if (parser.expectOptional("BEFORE")) {
-            trigger.setEventTimeQualification(PgTrigger.EventTimeQualification.before);
-        } else if (parser.expectOptional("AFTER")) {
-            trigger.setEventTimeQualification(PgTrigger.EventTimeQualification.after);
-        } else if (parser.expectOptional("INSTEAD OF")) {
-            trigger.setEventTimeQualification(PgTrigger.EventTimeQualification.instead_of);
+        
+        if(trigger.isConstraint()){
+        	parser.expectOptional("AFTER");
+        	trigger.setEventTimeQualification(PgTrigger.EventTimeQualification.after);
+        } else {
+        	if (parser.expectOptional("BEFORE")) {
+        		trigger.setEventTimeQualification(PgTrigger.EventTimeQualification.before);
+        	} else if (parser.expectOptional("AFTER")) {
+        		trigger.setEventTimeQualification(PgTrigger.EventTimeQualification.after);
+        	} else if (parser.expectOptional("INSTEAD OF")) {
+        		trigger.setEventTimeQualification(PgTrigger.EventTimeQualification.instead_of);
+        	}
         }
 
         boolean first = true;
@@ -75,6 +85,19 @@ public class CreateTriggerParser {
         final String relationName = parser.parseIdentifier();
 
         trigger.setRelationName(ParserUtils.getObjectName(relationName));
+        
+        if(trigger.isConstraint()){
+        	if(parser.expectOptional("DEFERRABLE")){
+        		trigger.setDeferrable(true);
+        		if(parser.expectOptional("INITIALLY","DEFERRED")){
+        			trigger.setDeferred(true);
+        		}else{
+        			trigger.setDeferred(false);
+        		}
+        	}else {
+        		trigger.setDeferrable(false);
+        	}
+        }
 
         if (parser.expectOptional("FOR")) {
             parser.expectOptional("EACH");

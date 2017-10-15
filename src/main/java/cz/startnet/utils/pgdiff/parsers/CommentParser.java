@@ -44,8 +44,6 @@ public class CommentParser {
             parseSchema(parser, database);
         } else if (parser.expectOptional("SEQUENCE")) {
             parseSequence(parser, database);
-        } else if (parser.expectOptional("CONSTRAINT","TRIGGER")) {
-                parseConstraintTrigger(parser, database);
         } else if (parser.expectOptional("TRIGGER")) {
             parseTrigger(parser, database);
         } else if (parser.expectOptional("VIEW")) {
@@ -202,32 +200,6 @@ public class CommentParser {
 
         final PgTrigger trigger = database.getSchema(schemaName).
                 getTable(objectName).getTrigger(triggerName);
-
-        parser.expect("IS");
-        trigger.setComment(getComment(parser));
-        parser.expect(";");
-    }
-    
-    /**
-     * Parses COMMENT ON CONSTRAINT TRIGGER.
-     *
-     * @param parser   parser
-     * @param database database
-     */
-    private static void parseConstraintTrigger(final Parser parser,
-            final PgDatabase database) {
-        final String triggerName =
-                ParserUtils.getObjectName(parser.parseIdentifier());
-
-        parser.expect("ON");
-
-        final String tableName = parser.parseIdentifier();
-        final String objectName = ParserUtils.getObjectName(tableName);
-        final String schemaName =
-                ParserUtils.getSchemaName(triggerName, database);
-
-        final PgConstraintTrigger trigger = database.getSchema(schemaName).
-                getTable(objectName).getConstraintTrigger(triggerName);
 
         parser.expect("IS");
         trigger.setComment(getComment(parser));

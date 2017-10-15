@@ -34,11 +34,6 @@ public abstract class PgRelation {
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final List<PgTrigger> triggers = new ArrayList<PgTrigger>();
     /**
-     * List of constraint triggers defined on the table/view.
-     */
-    @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private final List<PgConstraintTrigger> constraintTriggers = new ArrayList<PgConstraintTrigger>();
-    /**
      * Name of the index on which the table/matview is clustered
      */
     private String clusterIndexName;
@@ -197,23 +192,6 @@ public abstract class PgRelation {
 
         return null;
     }
-    
-    /**
-     * Finds constraint trigger according to specified trigger {@code name}.
-     *
-     * @param name name of the constraint trigger to be searched
-     *
-     * @return found trigger or null if no such trigger has been found
-     */
-    public PgConstraintTrigger getConstraintTrigger(final String name) {
-        for (PgConstraintTrigger trigger : constraintTriggers) {
-            if (trigger.getName().equals(name)) {
-                return trigger;
-            }
-        }
-
-        return null;
-    }
 
     /**
      * Getter for {@link #indexes}. The list cannot be modified.
@@ -249,15 +227,6 @@ public abstract class PgRelation {
      */
     public List<PgTrigger> getTriggers() {
         return Collections.unmodifiableList(triggers);
-    }
-    
-    /**
-     * Getter for {@link #constraintTriggers}. The list cannot be modified.
-     *
-     * @return {@link #constraintTriggers}
-     */
-    public List<PgConstraintTrigger> getConstraintTriggers() {
-        return Collections.unmodifiableList(constraintTriggers);
     }
 
     /**
@@ -304,14 +273,6 @@ public abstract class PgRelation {
     public void addTrigger(final PgTrigger trigger) {
         triggers.add(trigger);
     }
-    
-    /* Adds {@code constraintTrigger} to the list of constraint triggers.
-    *
-    * @param constraintTrigger constraintTrigger
-    */
-   public void addConstraintTrigger(final PgConstraintTrigger constraintTrigger) {
-       constraintTriggers.add(constraintTrigger);
-   }
 
     /**
      * Returns relation kind for CREATE/ALTER/DROP commands.
