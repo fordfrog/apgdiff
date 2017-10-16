@@ -91,9 +91,13 @@ public class CreateTriggerParser {
         		trigger.setDeferrable(true);
         		if(parser.expectOptional("INITIALLY","DEFERRED")){
         			trigger.setDeferred(true);
+        		}else if(parser.expectOptional("INITIALLY","IMMEDIATE")){
+        			trigger.setDeferred(false);
         		}else{
         			trigger.setDeferred(false);
         		}
+        	}else if(parser.expectOptional("NOT","DEFERRABLE")){
+        		trigger.setDeferrable(false);
         	}else {
         		trigger.setDeferrable(false);
         	}
