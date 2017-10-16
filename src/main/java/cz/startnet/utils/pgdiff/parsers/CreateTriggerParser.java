@@ -40,7 +40,7 @@ public class CreateTriggerParser {
         trigger.setName(objectName);
         
         if(trigger.isConstraint()){
-        	parser.expectOptional("AFTER");
+        	parser.expect("AFTER");
         	trigger.setEventTimeQualification(PgTrigger.EventTimeQualification.after);
         } else {
         	if (parser.expectOptional("BEFORE")) {
