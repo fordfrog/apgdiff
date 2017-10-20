@@ -85,6 +85,20 @@ public class PgDiffConstraints {
                 writer.println(constraint.getDropSQL());
             }
         }
+        if(oldSchema!=null){
+        	for (final PgTable oldTable : oldSchema.getTables()) {
+        		//oldTable doesn't exit any more -> delete all her constraints
+        		if(newSchema.getTable(oldTable.getName())==null){
+        			// Drop constraints that no more exist
+                    for (final PgConstraint constraint :
+                            getDropConstraints(oldTable, null, primaryKey)) {
+                        searchPathHelper.outputSearchPath(writer);
+                        writer.println();
+                        writer.println(constraint.getDropSQL());
+                    }
+        		}
+        	}
+        }
     }
 
     /**
@@ -105,10 +119,11 @@ public class PgDiffConstraints {
         @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<PgConstraint> list = new ArrayList<PgConstraint>();
 
-        if (newTable != null && oldTable != null) {
+        if (oldTable != null) {
             for (final PgConstraint constraint : oldTable.getConstraints()) {
                 if (constraint.isPrimaryKeyConstraint() == primaryKey
-                        && (!newTable.containsConstraint(constraint.getName())
+                        && (newTable==null 
+                        || !newTable.containsConstraint(constraint.getName())
                         || !newTable.getConstraint(constraint.getName()).equals(
                         constraint))) {
                     list.add(constraint);
