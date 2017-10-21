@@ -38,12 +38,24 @@ public class PgConstraint {
     private String comment;
 
     /**
+     * Flag to test say if this constraint is a renamed object
+     */
+    private boolean wasRenamed;
+
+    /**
+     * String to store the renamed column
+     */
+    private String renamedFrom;
+
+    /**
      * Creates a new PgConstraint object.
      *
      * @param name {@link #name}
      */
     public PgConstraint(String name) {
         this.name = name;
+        this.wasRenamed = false;
+        this.renamedFrom = null;
     }
 
     /**
@@ -60,6 +72,37 @@ public class PgConstraint {
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(' ');
         sbSQL.append(getDefinition());
+        sbSQL.append(';');
+
+        if (comment != null && !comment.isEmpty()) {
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("COMMENT ON CONSTRAINT ");
+            sbSQL.append(PgDiffUtils.getQuotedName(name));
+            sbSQL.append(" ON ");
+            sbSQL.append(PgDiffUtils.getQuotedName(tableName));
+            sbSQL.append(" IS ");
+            sbSQL.append(comment);
+            sbSQL.append(';');
+        }
+
+        return sbSQL.toString();
+    }
+
+    /**
+     * Creates and returns SQL for rename of the constraint.
+     * @return created SQL
+     */
+    public String getRenameSQL() {
+        final StringBuilder sbSQL = new StringBuilder(100);
+        sbSQL.append("ALTER TABLE ");
+        sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
+        sbSQL.append(System.getProperty("line.separator"));
+        sbSQL.append("\tRENAME CONSTRAINT ");
+        sbSQL.append(PgDiffUtils.getDropIfExists());
+        sbSQL.append(PgDiffUtils.getQuotedName(this.renamedFrom));
+        sbSQL.append(" TO ");
+        sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(';');
 
         if (comment != null && !comment.isEmpty()) {
@@ -196,6 +239,39 @@ public class PgConstraint {
         }
 
         return equals;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param object {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    public boolean renamed(final Object object) {
+        this.wasRenamed = false;
+
+        if (this == object) {
+            this.wasRenamed = false;
+        } else if (object instanceof PgConstraint) {
+            final PgConstraint constraint = (PgConstraint) object;
+            this.wasRenamed = definition.equals(constraint.getDefinition())
+                    && !name.equals(constraint.getName())
+                    && tableName.equals(constraint.getTableName());
+            if (this.wasRenamed)
+                this.renamedFrom = constraint.getName();
+        }
+
+        return this.wasRenamed;
+    }
+
+    /**
+     * Returns if constraint was renamed
+     *
+     * @return boolean
+     */
+    public boolean wasRenamed() {
+        return this.wasRenamed;
     }
 
     /**
