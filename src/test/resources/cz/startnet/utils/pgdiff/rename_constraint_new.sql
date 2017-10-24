@@ -19,6 +19,15 @@ SET default_tablespace = '';
 
 SET default_with_oids = false;
 
+CREATE TABLE "addresses"  (
+    "id" SERIAL NOT NULL,
+    "address" TEXT,
+    "created_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    "updated_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    "deleted_at" TIMESTAMP WITHOUT TIME ZONE,
+    "user_id" INTEGER NOT NULL
+);
+
 --
 -- Name: testtable; Type: TABLE; Schema: public; Owner: fordfrog; Tablespace: 
 --
@@ -42,6 +51,7 @@ ALTER TABLE public.testtable OWNER TO fordfrog;
 
 CREATE INDEX testindex ON testtable USING btree (field3);
 
+ALTER TABLE "addresses" ADD CONSTRAINT "addresses_id_pkey" PRIMARY KEY (id);
 
 --
 -- Name: public; Type: ACL; Schema: -; Owner: postgres

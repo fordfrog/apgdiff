@@ -19,6 +19,16 @@ SET default_tablespace = '';
 
 SET default_with_oids = false;
 
+CREATE TABLE "addresses"  (
+    "id" SERIAL NOT NULL,
+    "address" TEXT,
+    "created_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    "updated_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    "deleted_at" TIMESTAMP WITHOUT TIME ZONE,
+    "user_id" INTEGER NOT NULL
+);
+
+
 --
 -- Name: testtable; Type: TABLE; Schema: public; Owner: fordfrog; Tablespace: 
 --
@@ -36,11 +46,16 @@ ALTER TABLE ONLY testtable ALTER COLUMN "full" SET STATISTICS 200;
 
 ALTER TABLE public.testtable OWNER TO fordfrog;
 
+
 --
 -- Name: testindex; Type: INDEX; Schema: public; Owner: fordfrog; Tablespace: 
 --
 
 CREATE INDEX testindex ON testtable USING btree (field3);
+
+
+ALTER TABLE ONLY addresses
+    ADD CONSTRAINT addresses_pkey PRIMARY KEY (id);
 
 
 --
