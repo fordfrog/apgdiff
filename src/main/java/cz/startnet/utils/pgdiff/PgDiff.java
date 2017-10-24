@@ -278,9 +278,9 @@ public class PgDiff {
             PgDiffViews.dropViews(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffConstraints.dropConstraints(
-                    writer, oldSchema, newSchema, true, searchPathHelper);
-            PgDiffConstraints.dropConstraints(
                     writer, oldSchema, newSchema, false, searchPathHelper);
+            PgDiffConstraints.dropConstraints(
+                    writer, oldSchema, newSchema, true, searchPathHelper);
             PgDiffIndexes.dropIndexes(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffTables.dropClusters(
@@ -289,8 +289,9 @@ public class PgDiff {
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffSequences.dropSequences(
                     writer, oldSchema, newSchema, searchPathHelper);
-            PgDiffPolicies.dropPolicies(
-                    writer, oldSchema, newSchema, searchPathHelper);
+            if(!PgDiffUtils.isNoPolicies())
+            	PgDiffPolicies.dropPolicies(
+            		writer, oldSchema, newSchema, searchPathHelper);
             PgDiffSequences.createSequences(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffSequences.alterSequences(
@@ -320,10 +321,12 @@ public class PgDiff {
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffViews.alterViews(
                     writer, oldSchema, newSchema, searchPathHelper);
-            PgDiffPolicies.createPolicies(
+            if(!PgDiffUtils.isNoPolicies()){
+            	PgDiffPolicies.createPolicies(
+            		writer, oldSchema, newSchema, searchPathHelper);
+            	PgDiffPolicies.alterPolicies(
                     writer, oldSchema, newSchema, searchPathHelper);
-            PgDiffPolicies.alterPolicies(
-                    writer, oldSchema, newSchema, searchPathHelper);
+            }
             PgDiffFunctions.alterComments(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffConstraints.alterComments(

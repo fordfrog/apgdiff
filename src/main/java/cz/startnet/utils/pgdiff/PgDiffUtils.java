@@ -480,6 +480,18 @@ public class PgDiffUtils {
      * Determine if use CREATE IF NOT EXISTS OR DROP IF EXISTS where is possible
      */
     private static boolean useIfExists;
+    
+    
+    /**
+     * Determine if no create policies statements
+     */
+    private static boolean noUsePolicies;
+    
+    
+    /**
+     * Determine if no create RLS statements in alter
+     */
+    private static boolean noAlterRLS;
 
     /**
      * If name contains only lower case characters and digits and is not
@@ -564,6 +576,27 @@ public class PgDiffUtils {
     public static void setUseExists(final boolean useExists) {
 
         useIfExists = useExists;
+    }
+    
+    public static void setNoPolicies(final boolean noPolicies) {
+
+        noUsePolicies = noPolicies;
+    }
+    
+    public static void setNoAlterRLS(final boolean noRLS) {
+
+        noAlterRLS = noRLS;
+    }
+    
+    
+    public static boolean isNoPolicies() {
+
+        return noUsePolicies;
+    }
+    
+    public static boolean isNoAlterRLS() {
+
+        return noAlterRLS;
     }
 
     /**

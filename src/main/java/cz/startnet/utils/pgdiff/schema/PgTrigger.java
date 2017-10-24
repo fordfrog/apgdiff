@@ -43,6 +43,27 @@ public class PgTrigger {
             return stringRepresentation.get(eventTimeQualification);
         }
     }
+    
+    /**
+     * Whether the trigger is contraint.
+     */
+    private boolean constraint;
+    
+    /**
+     * This controls whether the constraint can be deferred. 
+     * A constraint that is not deferrable will be checked immediately after every command. 
+     * Checking of constraints that are deferrable can be postponed until the end of the transaction.
+     */
+    
+    private boolean deferrable;
+    
+    /**
+     * If a constraint is deferrable, this clause specifies the default time to check the constraint. 
+     * If the constraint is INITIALLY IMMEDIATE, it is checked after each statement. 
+     * This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction.
+     */
+    
+    private boolean deferred;
 
     /**
      * Function name and arguments that should be fired on the trigger.
@@ -139,14 +160,17 @@ public class PgTrigger {
      */
     public String getCreationSQL() {
         final StringBuilder sbSQL = new StringBuilder(100);
-        sbSQL.append("CREATE TRIGGER ");        
+        sbSQL.append("CREATE");
+        if(isConstraint())
+        	sbSQL.append(" CONSTRAINT");
+        sbSQL.append(" TRIGGER ");
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(System.getProperty("line.separator"));
         sbSQL.append("\t");
         sbSQL.append(EventTimeQualification.toString(getEventTimeQualification()));
 
         boolean firstEvent = true;
-
+        
         if (isOnInsert()) {
             sbSQL.append(" INSERT");
             firstEvent = false;
@@ -197,6 +221,20 @@ public class PgTrigger {
 
         sbSQL.append(" ON ");
         sbSQL.append(PgDiffUtils.getQuotedName(getRelationName()));
+        if(isConstraint()){
+        	sbSQL.append(System.getProperty("line.separator"));
+        	sbSQL.append("\t");
+        	if(isDeferrable()){
+        		sbSQL.append(" DEFERRABLE ");
+        		if(isDeferred()){
+        			sbSQL.append(" INITIALLY DEFERRED ");
+        		}else{
+        			sbSQL.append(" INITIALLY IMMEDIATE ");
+        		}
+        	}else {
+        		sbSQL.append(" NOT DEFERRABLE ");
+        	}
+        }
         sbSQL.append(System.getProperty("line.separator"));
         sbSQL.append("\tFOR EACH ");
         sbSQL.append(isForEachRow() ? "ROW" : "STATEMENT");
@@ -236,6 +274,60 @@ public class PgTrigger {
     public String getDropSQL() {
         return "DROP TRIGGER " + PgDiffUtils.getDropIfExists() + PgDiffUtils.getQuotedName(getName()) + " ON "
                 + PgDiffUtils.getQuotedName(getRelationName()) + ";";
+    }
+    
+    /**
+     * Setter for {@link #constraint}.
+     *
+     * @param constraint {@link #constraint}
+     */
+    public void setConstraint(final boolean constraint) {
+        this.constraint = constraint;
+    }
+
+    /**
+     * Getter for {@link #constraint}.
+     *
+     * @return {@link #constraint}
+     */
+    public boolean isConstraint() {
+        return constraint;
+    }
+    
+    /**
+     * Setter for {@link #deferrable}.
+     *
+     * @param deferrable {@link #deferrable}
+     */
+    public void setDeferrable(final boolean deferrable) {
+        this.deferrable = deferrable;
+    }
+
+    /**
+     * Getter for {@link #deferrable}.
+     *
+     * @return {@link #deferrable}
+     */
+    public boolean isDeferrable() {
+        return deferrable;
+    }
+    
+    /**
+     * Setter for {@link #deferred}.
+     *
+     * @param deferred {@link #deferred}
+     */
+    public void setDeferred(final boolean deferred) {
+        this.deferred = deferred;
+    }
+
+    /**
+     * Getter for {@link #deferred}.
+     *
+     * @return {@link #deferred}
+     */
+    public boolean isDeferred() {
+        return deferred;
     }
 
     /**
@@ -434,7 +526,10 @@ public class PgTrigger {
                     && (onInsert == trigger.isOnInsert())
                     && (onUpdate == trigger.isOnUpdate())
                     && (onTruncate == trigger.isOnTruncate())
-                    && relationName.equals(trigger.getRelationName());
+                    && relationName.equals(trigger.getRelationName())
+                    && constraint == trigger.isConstraint()
+                    && deferrable == trigger.isDeferrable()
+                    && deferred == trigger.isDeferred();
 
             if (equals) {
                 final List<String> sorted1 =
