@@ -96,10 +96,10 @@ public class PgConstraint {
     public String getRenameSQL() {
         final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("ALTER TABLE ");
+        sbSQL.append(PgDiffUtils.getDropIfExists());
         sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
         sbSQL.append(System.getProperty("line.separator"));
         sbSQL.append("\tRENAME CONSTRAINT ");
-        sbSQL.append(PgDiffUtils.getDropIfExists());
         sbSQL.append(PgDiffUtils.getQuotedName(this.renamedFrom));
         sbSQL.append(" TO ");
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
