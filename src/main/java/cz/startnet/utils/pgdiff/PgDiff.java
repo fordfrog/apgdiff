@@ -278,9 +278,9 @@ public class PgDiff {
             PgDiffViews.dropViews(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffConstraints.dropConstraints(
-                    writer, oldSchema, newSchema, true, searchPathHelper);
-            PgDiffConstraints.dropConstraints(
                     writer, oldSchema, newSchema, false, searchPathHelper);
+            PgDiffConstraints.dropConstraints(
+                    writer, oldSchema, newSchema, true, searchPathHelper);
             PgDiffIndexes.dropIndexes(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffTables.dropClusters(
