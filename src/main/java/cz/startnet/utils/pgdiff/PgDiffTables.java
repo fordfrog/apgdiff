@@ -142,7 +142,8 @@ public class PgDiffTables {
             alterOwnerTo(writer, oldTable, newTable, searchPathHelper);
             alterPrivileges(writer, oldTable, newTable, searchPathHelper);
             alterPrivilegesColumns(writer, oldTable, newTable, searchPathHelper);
-            alterRLS(writer, oldTable, newTable, searchPathHelper);
+            if(!PgDiffUtils.isNoAlterRLS())
+            	alterRLS(writer, oldTable, newTable, searchPathHelper);
         }
     }
 

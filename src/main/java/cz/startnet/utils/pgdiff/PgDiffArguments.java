@@ -267,6 +267,10 @@ public class PgDiffArguments {
                 setVersion(true);
             } else if ("--drop-if-exists".equals(args[i])) {
                PgDiffUtils.setUseExists(true);
+            } else if ("--no-policies".equals(args[i])) {
+                PgDiffUtils.setNoPolicies(true);
+            } else if ("--no-alter-row-level-security".equals(args[i])) {
+                PgDiffUtils.setNoAlterRLS(true);
             } else {
                 writer.print(Resources.getString("ErrorUnknownOption"));
                 writer.print(": ");
