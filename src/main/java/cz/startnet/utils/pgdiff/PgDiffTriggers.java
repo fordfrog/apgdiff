@@ -77,6 +77,18 @@ public class PgDiffTriggers {
                 writer.println(trigger.getDropSQL());
             }
         }
+        if(oldSchema!=null){
+        	for (final PgRelation oldRelation : oldSchema.getRels()) {
+        		//oldRelation doesn't exit any more -> delete all her triggers
+        		if(newSchema.getRelation(oldRelation.getName())==null){
+        			for(final PgTrigger trigger : oldRelation.getTriggers()){
+        				searchPathHelper.outputSearchPath(writer);
+        				writer.println();
+        				writer.println(trigger.getDropSQL());
+        			}
+        		}
+        	}
+        }
     }
 
     /**
