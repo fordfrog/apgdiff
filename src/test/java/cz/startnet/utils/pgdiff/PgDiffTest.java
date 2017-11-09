@@ -262,6 +262,8 @@ public class PgDiffTest {
                   , {"alter_policies", false, false, false, false}
                     // Tests grant on new sequence
                   , {"grant_on_new_sequence", false, false, false, false}
+                    // Tests alter view owner
+                  , {"alter_view_owner", false, false, false, false}
                 });
     }
     /**
