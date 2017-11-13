@@ -19,6 +19,10 @@ import cz.startnet.utils.pgdiff.PgDiffUtils;
 public class PgSequence {
 
     /**
+     * Value for AS or null if no value is specified.
+     */
+    private String as;
+    /**
      * Value for CACHE or null if no value is specified.
      */
     private String cache;
@@ -70,6 +74,24 @@ public class PgSequence {
     }
 
     /**
+     * Setter for {@link #as}.
+     *
+     * @param as {@link #as}
+     */
+    public void setAs(final String as) {
+        this.as = as;
+    }
+
+    /**
+     * Getter for {@link #as}.
+     *
+     * @return {@link #as}
+     */
+    public String getAs() {
+        return as;
+    }
+
+    /**
      * Setter for {@link #cache}.
      *
      * @param cache {@link #cache}
@@ -117,6 +139,12 @@ public class PgSequence {
         sbSQL.append(PgDiffUtils.getCreateIfNotExists());
         
         sbSQL.append(PgDiffUtils.getQuotedName(name));
+
+        if (as != null) {
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("\tAS ");
+            sbSQL.append(as);
+        }
 
         if (startWith != null) {
             sbSQL.append(System.getProperty("line.separator"));
