@@ -56,7 +56,6 @@ public class PgConstraint {
         sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
         sbSQL.append(System.getProperty("line.separator"));
         sbSQL.append("\tADD CONSTRAINT ");
-        sbSQL.append(PgDiffUtils.getCreateIfNotExists());
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(' ');
         sbSQL.append(getDefinition());
