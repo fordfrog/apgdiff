@@ -28,6 +28,15 @@ CREATE SEQUENCE alert_alert_id_seq
     CACHE 1;
 
 
+CREATE SEQUENCE sequence_10
+    AS bigint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
 ALTER TABLE public.alert_alert_id_seq OWNER TO fordfrog;
 
 SET default_tablespace = '';

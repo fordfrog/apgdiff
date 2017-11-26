@@ -30,6 +30,14 @@ CREATE TABLE testtable (
     field4 double precision
 );
 
+CREATE SEQUENCE sequence_10
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
 
 ALTER TABLE public.testtable OWNER TO fordfrog;
 
