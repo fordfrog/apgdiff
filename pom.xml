@@ -198,17 +198,6 @@
         </plugins>
     </build>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>stat-scm-sourceforge</id>
-            <url>http://stat-scm.sourceforge.net/maven2</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>stat-scm-sourceforge-snapshot</id>
-            <url>http://stat-scm.sourceforge.net/maven2-snapshots</url>
-        </pluginRepository>
-    </pluginRepositories>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
