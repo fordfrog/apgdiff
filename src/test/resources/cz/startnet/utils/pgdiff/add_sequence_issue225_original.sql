@@ -19,16 +19,6 @@ SET default_tablespace = '';
 
 SET default_with_oids = false;
 
---
--- Name: testtable; Type: TABLE; Schema: public; Owner: fordfrog; Tablespace: 
---
-
-CREATE TABLE testtable (
-    field1 integer,
-    field2 integer,
-    field3 character varying(150) DEFAULT 'none'::character varying,
-    field4 double precision
-);
 
 CREATE SEQUENCE sequence_10
     AS integer
@@ -37,15 +27,6 @@ CREATE SEQUENCE sequence_10
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
-ALTER TABLE public.testtable OWNER TO fordfrog;
-
---
--- Name: testindex; Type: INDEX; Schema: public; Owner: fordfrog; Tablespace: 
---
-
-CREATE INDEX testindex ON testtable USING btree (field3);
 
 
 --
