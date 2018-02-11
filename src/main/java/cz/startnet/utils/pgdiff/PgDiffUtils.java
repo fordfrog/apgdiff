@@ -475,7 +475,7 @@ public class PgDiffUtils {
         "XMLVALIDATE",
         "YEAR",
         "ZONE"};
-    
+
      /**
      * Determine if use CREATE IF NOT EXISTS OR DROP IF EXISTS where is possible
      */
@@ -500,7 +500,7 @@ public class PgDiffUtils {
         for (int i = 0; i < name.length(); i++) {
             final char chr = name.charAt(i);
 
-            if (Character.isUpperCase(chr)) {
+            if (Character.isUpperCase(chr) || Character.isSpaceChar(chr)) {
                 return '"' + name + '"';
             }
         }
@@ -532,7 +532,7 @@ public class PgDiffUtils {
     public static String getQuotedName(final String name) {
         return getQuotedName(name, false);
     }
-    
+
      /**
      * IF useIfExists is true return DROP IF NOT EXISTS
      *
@@ -546,7 +546,7 @@ public class PgDiffUtils {
         }
         return "";
     }
-    
+
      /**
      * IF useIfExists is true return IF NOT EXISTS
      *
