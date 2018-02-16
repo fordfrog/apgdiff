@@ -262,6 +262,8 @@ public class PgDiffTest {
                   , {"create_policies", false, false, false, false}
                   , {"drop_policies", false, false, false, false}
                   , {"alter_policies", false, false, false, false}
+                    // Tests scenario where TRIGGER is enable or disable.
+                  , {"disable_trigger", false, false, false, false},
                 });
     }
     /**
@@ -314,7 +316,7 @@ public class PgDiffTest {
      *
      * @throws FileNotFoundException Thrown if expected diff file was not found.
      * @throws IOException           Thrown if problem occurred while reading
-     *                               expected diff.
+     *                               expected diff.'1   
      */
     @Test(timeout = 1000)
     public void runDiffSameOriginal() throws FileNotFoundException, IOException {

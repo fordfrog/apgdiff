@@ -467,7 +467,7 @@ public class PgTrigger {
     public void setDisable(final boolean disable) {
         this.disable = disable;
     }
-   
+
     @Override
     public boolean equals(final Object object) {
         boolean equals = false;
