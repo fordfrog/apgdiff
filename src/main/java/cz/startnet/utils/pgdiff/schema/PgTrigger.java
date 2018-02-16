@@ -104,11 +104,6 @@ public class PgTrigger {
      */
     private boolean disable;
     
-     /**
-     * Constraint Trigger.
-     */
-    private boolean constraint;
-
     /**
      * Setter for {@link #eventTimeQualification}.
      *
@@ -472,25 +467,7 @@ public class PgTrigger {
     public void setDisable(final boolean disable) {
         this.disable = disable;
     }
-    
-    /**
-     * Getter for {@link #constraint}.
-     *
-     * @return {@link #constraint}
-     */
-    public boolean isConstraint() {
-        return constraint;
-    }
-
-    /**
-     * Setter for {@link #constraint}.
-     *
-     * @param constraint {@link #constraint}
-     */
-    public void setConstraint(final boolean constraint) {
-        this.constraint = constraint;
-    }
-
+   
     @Override
     public boolean equals(final Object object) {
         boolean equals = false;
