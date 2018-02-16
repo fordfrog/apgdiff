@@ -95,6 +95,19 @@ public class PgTrigger {
      * Comment.
      */
     private String comment;
+    /**
+     * Referencing clause.
+     */
+    private String referencing;
+    /**
+     * Disable.
+     */
+    private boolean disable;
+    
+     /**
+     * Constraint Trigger.
+     */
+    private boolean constraint;
 
     /**
      * Setter for {@link #eventTimeQualification}.
@@ -198,6 +211,12 @@ public class PgTrigger {
         sbSQL.append(" ON ");
         sbSQL.append(PgDiffUtils.getQuotedName(getRelationName()));
         sbSQL.append(System.getProperty("line.separator"));
+        
+        if(referencing!=null && !referencing.isEmpty()){
+            sbSQL.append(getReferencing());
+            sbSQL.append(System.getProperty("line.separator"));
+        }
+        
         sbSQL.append("\tFOR EACH ");
         sbSQL.append(isForEachRow() ? "ROW" : "STATEMENT");
 
@@ -224,7 +243,7 @@ public class PgTrigger {
             sbSQL.append(comment);
             sbSQL.append(';');
         }
-
+        
         return sbSQL.toString();
     }
 
@@ -417,6 +436,60 @@ public class PgTrigger {
     public void setWhen(final String when) {
         this.when = when;
     }
+    
+    /**
+     * Getter for {@link #referencing}.
+     *
+     * @return {@link #referencing}
+     */
+    public String getReferencing() {
+        return referencing;
+    }
+
+    /**
+     * Setter for {@link #referencing}.
+     *
+     * @param referencing {@link #referencing}
+     */
+    public void setReferencing(final String referencing) {
+        this.referencing = referencing;
+    }
+    
+    /**
+     * Getter for {@link #disable}.
+     *
+     * @return {@link #disable}
+     */
+    public boolean isDisable() {
+        return disable;
+    }
+
+    /**
+     * Setter for {@link #disable}.
+     *
+     * @param disable {@link #disable}
+     */
+    public void setDisable(final boolean disable) {
+        this.disable = disable;
+    }
+    
+    /**
+     * Getter for {@link #constraint}.
+     *
+     * @return {@link #constraint}
+     */
+    public boolean isConstraint() {
+        return constraint;
+    }
+
+    /**
+     * Setter for {@link #constraint}.
+     *
+     * @param constraint {@link #constraint}
+     */
+    public void setConstraint(final boolean constraint) {
+        this.constraint = constraint;
+    }
 
     @Override
     public boolean equals(final Object object) {
@@ -455,6 +528,33 @@ public class PgTrigger {
     public int hashCode() {
         return (getClass().getName() + "|" + eventTimeQualification + "|" + forEachRow + "|"
                 + function + "|" + name + "|" + onDelete + "|" + onInsert + "|"
-                + onUpdate + "|" + onTruncate + "|" + relationName).hashCode();
+                + onUpdate + "|" + onTruncate + "|" + relationName
+                 + "|" + disable).hashCode();
+    }
+    
+    
+    /**
+     * Creates and returns SQL for creation of trigger.
+     *
+     * @return created SQL
+     */
+    public String getDisableOrEnableSQL() {
+        final StringBuilder sbSQL = new StringBuilder(100);
+
+        
+        sbSQL.append("ALTER TABLE ");
+        sbSQL.append(relationName);
+        if (disable) {
+            sbSQL.append(" DISABLE");
+        } else{
+            sbSQL.append(" ENABLE");
+        }
+
+        sbSQL.append(" TRIGGER ");
+        sbSQL.append(name);
+        sbSQL.append(';');
+        sbSQL.append(System.getProperty("line.separator"));
+
+        return sbSQL.toString();
     }
 }

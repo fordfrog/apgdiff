@@ -316,6 +316,8 @@ public class PgDiff {
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffTriggers.createTriggers(
                     writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffTriggers.disableOrEnableTriggers(
+                       writer, oldSchema, newSchema, searchPathHelper);
             PgDiffViews.createViews(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffViews.alterViews(
