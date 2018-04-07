@@ -45,9 +45,7 @@ public class CreateSequenceParser {
         schema.addSequence(sequence);
 
         while (!parser.expectOptional(";")) {
-            if (parser.expectOptional("AS")) {
-                sequence.setDataType(parser.parseString());
-            } else if (parser.expectOptional("INCREMENT")) {
+            if (parser.expectOptional("INCREMENT")) {
                 parser.expectOptional("BY");
                 sequence.setIncrement(parser.parseString());
             } else if (parser.expectOptional("MINVALUE")) {

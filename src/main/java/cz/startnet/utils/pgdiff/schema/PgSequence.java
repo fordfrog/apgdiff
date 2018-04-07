@@ -59,10 +59,6 @@ public class PgSequence {
      */
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final List<PgSequencePrivilege> privileges = new ArrayList<PgSequencePrivilege>();
-    /**
-     *  Value for AS or null if no value is specified.
-     */
-    private String dataType;
 
     /**
      * Creates a new PgSequence object.
@@ -121,13 +117,6 @@ public class PgSequence {
         sbSQL.append(PgDiffUtils.getCreateIfNotExists());
         
         sbSQL.append(PgDiffUtils.getQuotedName(name));
-        
-        if(dataType!=null){
-            sbSQL.append(System.getProperty("line.separator"));
-            sbSQL.append("\tAS ");
-            sbSQL.append(dataType); 
-
-        }
 
         if (startWith != null) {
             sbSQL.append(System.getProperty("line.separator"));
@@ -359,23 +348,5 @@ public class PgSequence {
 
     public void addPrivilege(final PgSequencePrivilege privilege) {
         privileges.add(privilege);
-    }
-    
-     /**
-     * Getter for {@link #dataType}.
-     *
-     * @return {@link #dataType}
-     */
-    public String getDataType() {
-        return dataType;
-    }
-
-     /**
-     * Setter for {@link #ownedBy}.
-     *
-     * @param dataType {@link #dataType}
-     */
-    public void setDataType(final String dataType) {
-        this.dataType = dataType;
     }
 }
