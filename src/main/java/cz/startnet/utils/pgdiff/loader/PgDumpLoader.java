@@ -249,8 +249,6 @@ public class PgDumpLoader { //NOPMD
             } else if (PATTERN_CREATE_TRIGGER.matcher(statement).matches()) {
                 CreateTriggerParser.parse(
                         database, statement, ignoreSlonyTriggers);
-            } else if ( PATTERN_DISABLE_TRIGGER.matcher(statement).matches()) {
-                CreateTriggerParser.parseDisable(database, statement);
             } else if (PATTERN_CREATE_FUNCTION.matcher(statement).matches()) {
                 CreateFunctionParser.parse(database, statement);
             } else if (PATTERN_CREATE_TYPE.matcher(statement).matches()) {
