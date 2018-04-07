@@ -32,7 +32,12 @@ public abstract class PgRelation {
      * List of triggers defined on the table/view.
      */
     @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private final List<PgTrigger> triggers = new ArrayList<PgTrigger>();
+    private final List<PgTrigger> triggers = new ArrayList<PgTrigger>();    
+    /**
+     * List of rules defined on the table/view.
+     */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    private final List<PgRule> rules = new ArrayList<PgRule>();    
     /**
      * Name of the index on which the table/matview is clustered
      */
@@ -192,7 +197,7 @@ public abstract class PgRelation {
 
         return null;
     }
-
+    
     /**
      * Getter for {@link #indexes}. The list cannot be modified.
      *
@@ -227,6 +232,15 @@ public abstract class PgRelation {
      */
     public List<PgTrigger> getTriggers() {
         return Collections.unmodifiableList(triggers);
+    }
+    
+    /**
+     * Getter for {@link #rules}. The list cannot be modified.
+     *
+     * @return {@link #rules}
+     */
+    public List<PgRule> getRules() {
+        return Collections.unmodifiableList(rules);
     }
 
     /**
@@ -272,6 +286,15 @@ public abstract class PgRelation {
      */
     public void addTrigger(final PgTrigger trigger) {
         triggers.add(trigger);
+    }
+    
+    /**
+     * Adds {@code rule} to the list of rules.
+     *
+     * @param rule rule
+     */
+    public void addRule(final PgRule rule) {
+        rules.add(rule);
     }
 
     /**

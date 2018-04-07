@@ -273,6 +273,7 @@ public class PgDiff {
 
             PgDiffTriggers.dropTriggers(
                     writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffRules.dropRules(writer, oldSchema, newSchema, searchPathHelper);                  
             PgDiffFunctions.dropFunctions(
                     writer, arguments, oldSchema, newSchema, searchPathHelper);
             PgDiffViews.dropViews(
@@ -316,8 +317,11 @@ public class PgDiff {
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffTriggers.createTriggers(
                     writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffTriggers.disableOrEnableTriggers(
+                       writer, oldSchema, newSchema, searchPathHelper);
             PgDiffViews.createViews(
                     writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffRules.createRules(writer, oldSchema, newSchema, searchPathHelper);
             PgDiffViews.alterViews(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffPolicies.createPolicies(
