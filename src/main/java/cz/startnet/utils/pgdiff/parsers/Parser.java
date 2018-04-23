@@ -138,9 +138,13 @@ public final class Parser {
     public String parseIdentifier() {
         String identifier = parseIdentifierInternal();
 
-        if (string.charAt(position) == '.') {
-            position++;
-            identifier += '.' + parseIdentifierInternal();
+        for (int i = 0; i < 2 ; i++) {
+            if (string.charAt(position) == '.') {
+                position++;
+                identifier += '.' + parseIdentifierInternal();
+            } else {
+                break;
+            }
         }
 
         skipWhitespace();
