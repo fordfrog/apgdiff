@@ -8,6 +8,7 @@ package cz.startnet.utils.pgdiff.schema;
 import cz.startnet.utils.pgdiff.PgDiffUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Stores view information.
@@ -27,7 +28,20 @@ public class PgView extends PgRelation {
     /**
      * SQL query of the view.
      */
-    private String query;
+    private String query;    
+    /**
+     * Is this a view with security_barrier?
+     */
+    private String with;
+    /**
+     * Is this a TEMPORARY view?
+     */
+    private boolean temporary;
+    /**
+     * Is this a RECURSIVE view?
+     */
+    private boolean recursive;
+    
 
     /**
      * Creates a new PgView object.
@@ -115,6 +129,12 @@ public class PgView extends PgRelation {
             }
             sbSQL.append(')');
         }
+        
+        if (Objects.nonNull(with) && !with.isEmpty()) {
+            sbSQL.append(" WITH (");
+            sbSQL.append(with);
+            sbSQL.append(")");
+        }
 
         sbSQL.append(" AS");
         sbSQL.append(System.getProperty("line.separator"));
@@ -162,6 +182,60 @@ public class PgView extends PgRelation {
      */
     public boolean isMaterialized() {
         return materialized;
+    }
+    
+    /**
+     * Setter for {@link #with}.
+     *
+     * @param with {@link #with}
+     */
+    public void setWith(String with) {
+        this.with = with;
+    }
+
+    /**
+     * Getter for {@link #with}.
+     *
+     * @return {@link #with}
+     */
+    public String getWith() {
+        return with;
+    }
+    
+    /**
+     * Setter for {@link #temporary}.
+     *
+     * @param temporary {@link #temporary}
+     */
+    public void setTemporary(boolean temporary) {
+        this.temporary = temporary;
+    }
+
+    /**
+     * Getter for {@link #temporary}.
+     *
+     * @return {@link #temporary}
+     */
+    public boolean isTemporary() {
+        return temporary;
+    }
+    
+    /**
+     * Setter for {@link #recursive}.
+     *
+     * @param recursive {@link #recursive}
+     */
+    public void setRecursive(boolean recursive) {
+        this.recursive = recursive;
+    }
+
+    /**
+     * Getter for {@link #recursive}.
+     *
+     * @return {@link #recursive}
+     */
+    public boolean isRecursive() {
+        return recursive;
     }
 
     /**
