@@ -263,6 +263,29 @@ public class AlterRelationParser {
                 }
 
                 column.setStatistics(parser.parseInteger());
+            } else if (parser.expectOptional("NOT NULL")) {
+                if (rel.containsColumn(columnName)) {
+                    final PgColumn column = rel.getColumn(columnName);
+                    if (column == null) {
+                        throw new RuntimeException(MessageFormat.format(
+                                Resources.getString("CannotFindTableColumn"),
+                                columnName, rel.getName(), parser.getString()));
+                    }
+                    column.setNullValue(false);
+                } else if (rel.containsInheritedColumn(columnName)) {
+                    final PgInheritedColumn inheritedColumn = rel.getInheritedColumn(columnName);
+                    if (inheritedColumn == null) {
+                        throw new RuntimeException(MessageFormat.format(
+                                Resources.getString("CannotFindTableColumn"),
+                                columnName, rel.getName(), parser.getString()));
+                    }
+
+                    inheritedColumn.setNullValue(false);
+                } else {
+                    throw new ParserException(MessageFormat.format(
+                            Resources.getString("CannotFindColumnInTable"),
+                            columnName, rel.getName()));
+                }
             } else if (parser.expectOptional("DEFAULT")) {
                 final String defaultValue = parser.getExpression();
 

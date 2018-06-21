@@ -65,6 +65,14 @@ public class PgDiffArguments {
      * Whether Slony triggers should be ignored.
      */
     private boolean ignoreSlonyTriggers;
+    /**
+     * Whether Schema creation should be ignored.
+     */
+    private boolean ignoreSchemaCreation;
+    /**
+     * Drop If Exists and Create If Exists where possible
+     */
+    private boolean useIfExists;
 
     /**
      * Setter for {@link #addDefaults}.
@@ -243,6 +251,8 @@ public class PgDiffArguments {
                 setIgnoreSlonyTriggers(true);
             } else if ("--ignore-start-with".equals(args[i])) {
                 setIgnoreStartWith(true);
+            } else if ("--ignore-schema-creation".equals(args[i])) {
+                setIgnoreSchemaCreation(true);
             } else if ("--in-charset-name".equals(args[i])) {
                 setInCharsetName(args[i + 1]);
                 i++;
@@ -255,6 +265,8 @@ public class PgDiffArguments {
                 setOutputIgnoredStatements(true);
             } else if ("--version".equals(args[i])) {
                 setVersion(true);
+            } else if ("--drop-if-exists".equals(args[i])) {
+               PgDiffUtils.setUseExists(true);
             } else {
                 writer.print(Resources.getString("ErrorUnknownOption"));
                 writer.print(": ");
@@ -386,5 +398,23 @@ public class PgDiffArguments {
      */
     public void setIgnoreSlonyTriggers(final boolean ignoreSlonyTriggers) {
         this.ignoreSlonyTriggers = ignoreSlonyTriggers;
+    }
+
+    /**
+     * Getter for {@link #ignoreSchemaCreation}.
+     *
+     * @return {@link #ignoreSchemaCreation}
+     */
+    public boolean isIgnoreSchemaCreation() {
+        return this.ignoreSchemaCreation;
+    }
+
+    /**
+     * Setter for {@link #ignoreSchemaCreation}.
+     *
+     * @param ignoreSchemaCreation {@link #ignoreSchemaCreation}
+     */
+    public void setIgnoreSchemaCreation(final boolean ignoreSchemaCreation) {
+        this.ignoreSchemaCreation = ignoreSchemaCreation;
     }
 }

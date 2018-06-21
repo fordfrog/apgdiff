@@ -32,7 +32,8 @@ public class PgDiffConstraints {
      */
     public static void createConstraints(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final boolean primaryKey, final SearchPathHelper searchPathHelper) {
+            final boolean primaryKey, final SearchPathHelper searchPathHelper
+            ) {
         for (final PgTable newTable : newSchema.getTables()) {
             final PgTable oldTable;
 
@@ -65,7 +66,8 @@ public class PgDiffConstraints {
      */
     public static void dropConstraints(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
-            final boolean primaryKey, final SearchPathHelper searchPathHelper) {
+            final boolean primaryKey, final SearchPathHelper searchPathHelper
+            ) {
         for (final PgTable newTable : newSchema.getTables()) {
             final PgTable oldTable;
 

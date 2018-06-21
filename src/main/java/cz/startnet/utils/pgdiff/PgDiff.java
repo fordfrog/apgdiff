@@ -27,14 +27,21 @@ public class PgDiff {
      */
     public static void createDiff(final PrintWriter writer,
             final PgDiffArguments arguments) {
+        // Avoid reading twice from System.in
+        if (arguments.getOldDumpFile().equals("-")
+                && arguments.getNewDumpFile().equals("-"))
+            return;
+
         final PgDatabase oldDatabase = PgDumpLoader.loadDatabaseSchema(
                 arguments.getOldDumpFile(), arguments.getInCharsetName(),
                 arguments.isOutputIgnoredStatements(),
-                arguments.isIgnoreSlonyTriggers());
+                arguments.isIgnoreSlonyTriggers(),
+                arguments.isIgnoreSchemaCreation());
         final PgDatabase newDatabase = PgDumpLoader.loadDatabaseSchema(
                 arguments.getNewDumpFile(), arguments.getInCharsetName(),
                 arguments.isOutputIgnoredStatements(),
-                arguments.isIgnoreSlonyTriggers());
+                arguments.isIgnoreSlonyTriggers(),
+                arguments.isIgnoreSchemaCreation());
 
         diffDatabaseSchemas(writer, arguments, oldDatabase, newDatabase);
     }
@@ -55,11 +62,13 @@ public class PgDiff {
         final PgDatabase oldDatabase = PgDumpLoader.loadDatabaseSchema(
                 oldInputStream, arguments.getInCharsetName(),
                 arguments.isOutputIgnoredStatements(),
-                arguments.isIgnoreSlonyTriggers());
+                arguments.isIgnoreSlonyTriggers(),
+                arguments.isIgnoreSchemaCreation());
         final PgDatabase newDatabase = PgDumpLoader.loadDatabaseSchema(
                 newInputStream, arguments.getInCharsetName(),
                 arguments.isOutputIgnoredStatements(),
-                arguments.isIgnoreSlonyTriggers());
+                arguments.isIgnoreSlonyTriggers(),
+                arguments.isIgnoreSchemaCreation());
 
         diffDatabaseSchemas(writer, arguments, oldDatabase, newDatabase);
     }
@@ -81,7 +90,7 @@ public class PgDiff {
         }
     }
     
-    /**
+   /**
      * Creates new extensions.
      *
      * @param writer      writer the output should be written to
@@ -184,13 +193,13 @@ public class PgDiff {
         for (final PgSchema oldSchema : oldDatabase.getSchemas()) {
             if (newDatabase.getSchema(oldSchema.getName()) == null) {
                 writer.println();
-                writer.println("DROP SCHEMA "
+                writer.println("DROP SCHEMA " +PgDiffUtils.getDropIfExists()
                         + PgDiffUtils.getQuotedName(oldSchema.getName())
                         + " CASCADE;");
             }
         }
     }
-    
+
     /**
      * Drops old extensions that do not exist anymore.
      *
@@ -203,7 +212,7 @@ public class PgDiff {
         for (final PgExtension oldExtension : oldDatabase.getExtensions()) {
             if (newDatabase.getExtension(oldExtension.getName()) == null) {
                 writer.println();
-                writer.println("DROP EXTENSION "
+                writer.println("DROP EXTENSION " +PgDiffUtils.getDropIfExists()
                         + PgDiffUtils.getQuotedName(oldExtension.getName())
                         + " CASCADE;");
             }
@@ -282,7 +291,6 @@ public class PgDiff {
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffPolicies.dropPolicies(
                     writer, oldSchema, newSchema, searchPathHelper);
-
             PgDiffSequences.createSequences(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffSequences.alterSequences(
@@ -316,7 +324,6 @@ public class PgDiff {
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffPolicies.alterPolicies(
                     writer, oldSchema, newSchema, searchPathHelper);
-
             PgDiffFunctions.alterComments(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffConstraints.alterComments(

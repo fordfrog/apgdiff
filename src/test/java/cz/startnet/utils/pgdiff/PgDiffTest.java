@@ -264,6 +264,10 @@ public class PgDiffTest {
                   , {"alter_policies", false, false, false, false}
                     // Tests grant on new sequence
                   , {"grant_on_new_sequence", false, false, false, false}
+                    // Tests alter view owner
+                  , {"alter_view_owner", false, false, false, false}
+                  , {"grant_on_table_cols_mixed", false, false, false, false}
+                  , {"grant_on_view_cols_mixed", false, false, false, false}
                 });
     }
     /**
@@ -372,6 +376,7 @@ public class PgDiffTest {
         arguments.setAddDefaults(addDefaults);
         arguments.setIgnoreFunctionWhitespace(ignoreFunctionWhitespace);
         arguments.setIgnoreStartWith(ignoreStartWith);
+        PgDiffUtils.setUseExists(true);
         PgDiff.createDiff(writer, arguments,
                 PgDiffTest.class.getResourceAsStream(
                 fileNameTemplate + "_original.sql"),

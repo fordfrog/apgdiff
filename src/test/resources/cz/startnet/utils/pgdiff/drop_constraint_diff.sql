@@ -1,3 +1,3 @@
 
 ALTER TABLE testtable
-	DROP CONSTRAINT field4check;
+	DROP CONSTRAINT IF EXISTS field4check;

@@ -136,6 +136,7 @@ public class PgSchema {
     public String getCreationSQL() {
         final StringBuilder sbSQL = new StringBuilder(50);
         sbSQL.append("CREATE SCHEMA ");
+        sbSQL.append(PgDiffUtils.getCreateIfNotExists());
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
 
         if (getAuthorization() != null) {
@@ -418,7 +419,7 @@ public class PgSchema {
     /**
      * Returns a list of types
      *
-     * @return types List<PgType>
+     * @return types List of PgType
      */
     public List<PgType> getTypes() {
         return types;

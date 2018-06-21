@@ -104,6 +104,7 @@ public class PgExtension {
     public String getCreationSQL() {
         final StringBuilder sbSQL = new StringBuilder();
         sbSQL.append("CREATE EXTENSION ");
+        sbSQL.append(PgDiffUtils.getCreateIfNotExists());
         sbSQL.append(PgDiffUtils.getQuotedName(name));
         if (schema != null) {
             sbSQL.append(" SCHEMA ");

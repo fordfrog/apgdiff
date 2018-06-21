@@ -287,9 +287,9 @@ public abstract class PgRelation {
      * @return created SQL statement
      */
     public String getDropSQL() {
-        return "DROP " + getRelationKind() + " " +
+        return "DROP " + getRelationKind() + " " + PgDiffUtils.getDropIfExists()+
                 PgDiffUtils.getQuotedName(getName()) + ";";
-    }
+}
 
     /**
      * Returns true if table contains given column {@code name}, otherwise

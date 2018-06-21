@@ -256,7 +256,7 @@ public class PgDiffTables {
             final PgTable newTable, final List<PgColumn> dropDefaultsColumns) {
         for (final PgColumn column : newTable.getColumns()) {
             if (!oldTable.containsColumn(column.getName())) {
-                statements.add("\tADD COLUMN "
+                statements.add("\tADD COLUMN "+ PgDiffUtils.getCreateIfNotExists()
                         + column.getFullDefinition(arguments.isAddDefaults()));
 
                 if (arguments.isAddDefaults() && !column.getNullValue()
@@ -279,7 +279,7 @@ public class PgDiffTables {
             final PgTable oldTable, final PgTable newTable) {
         for (final PgColumn column : oldTable.getColumns()) {
             if (!newTable.containsColumn(column.getName())) {
-                statements.add("\tDROP COLUMN "
+                statements.add("\tDROP COLUMN " + PgDiffUtils.getDropIfExists() 
                         + PgDiffUtils.getQuotedName(column.getName()));
             }
         }
@@ -309,7 +309,7 @@ public class PgDiffTables {
 
             if (!oldColumn.getType().equals(newColumn.getType())) {
                 statements.add("\tALTER COLUMN " + newColumnName + " TYPE "
-                        + newColumn.getType() + " /* "
+                		+ newColumn.getType() + " USING " + newColumnName  + "::" + newColumn.getType() + " /* "
                         + MessageFormat.format(
                         Resources.getString("TypeParameterChange"),
                         newTable.getName(), oldColumn.getType(),
