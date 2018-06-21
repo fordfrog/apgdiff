@@ -143,6 +143,11 @@ public final class Parser {
             identifier += '.' + parseIdentifierInternal();
         }
 
+        if (string.charAt(position) == '.') {
+            position++;
+            identifier += '.' + parseIdentifierInternal();
+        }
+
         skipWhitespace();
 
         return identifier;
