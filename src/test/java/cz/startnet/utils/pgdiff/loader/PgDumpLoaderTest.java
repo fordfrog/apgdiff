@@ -5,12 +5,13 @@
  */
 package cz.startnet.utils.pgdiff.loader;
 
-import java.util.Arrays;
-import java.util.Collection;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Tests for PgDiffLoader class.
@@ -44,7 +45,8 @@ public class PgDumpLoaderTest {
                     {13},
                     {14},
                     {15},
-                    {16}
+                    {16},
+                    {18}
                 });
     }
     /**
