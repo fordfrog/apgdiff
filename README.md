@@ -40,6 +40,8 @@ fordfrog@fordfrog.com.
 * Fixed issue with the $ sign in the object name (Anatoliy Basov)
 * Added French translation. (Jeremy Passeron)
 * Native for OS line endings in resulting diff (Sergej Bonich)
+* Add support for new Postgres schema dump format
+* Support for Postgres 10 CREATE SEQUENCE data type
 
 ### 2012-09-21: Version 2.4
 
