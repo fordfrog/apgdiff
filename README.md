@@ -1,6 +1,6 @@
 # Another PostgreSQL Diff Tool (aka apgdiff)
 
-[![Build Status]](http://travis-ci.org/pascalleclercq/apgdiff)
+[![Build Status](https://secure.travis-ci.org/opensagres/xdocreport.png)](http://travis-ci.org/opensagres/xdocreport)
 
 Another PostgreSQL Diff Tool is free PostgreSQL diff tool that is useful for
 comparison/diffing of database schemas. You can find more information at its
