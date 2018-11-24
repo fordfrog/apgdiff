@@ -33,14 +33,19 @@ public class PgDiffViews {
             final PgSchema oldSchema, final PgSchema newSchema,
             final SearchPathHelper searchPathHelper) {
         for (final PgView newView : newSchema.getViews()) {
+            final PgView oldView = oldSchema.getView(newView.getName());
             if (oldSchema == null
                     || !oldSchema.containsView(newView.getName())
-                    || isViewModified(
-                    oldSchema.getView(newView.getName()), newView)) {
+                    || isViewModified(oldView, newView)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
                 writer.println(newView.getCreationSQL());
-
+                if (newView.getOwnerTo() != null && oldView == null) {
+                    writer.println();
+                    writer.println("ALTER VIEW "
+                            + PgDiffUtils.getQuotedName(newView.getName())
+                            + " OWNER TO " + newView.getOwnerTo() + ";");
+                }
                 for (PgRelationPrivilege viewPrivilege : newView.getPrivileges()) {
                     writer.println("REVOKE ALL ON TABLE "
                             + PgDiffUtils.getQuotedName(newView.getName())
@@ -217,7 +222,12 @@ public class PgDiffViews {
                     writer.println(" IS NULL;");
                 }
             }
-
+            if (oldView.getOwnerTo() != null && !newView.getOwnerTo().equals(oldView.getOwnerTo())) {
+                writer.println();
+                writer.println("ALTER VIEW "
+                        + PgDiffUtils.getQuotedName(newView.getName())
+                        + " OWNER TO " + newView.getOwnerTo() + ";");
+            }
             alterPrivileges(writer, oldView, newView, searchPathHelper);
             alterPrivilegesColumns(writer, oldView, newView, searchPathHelper);
         }

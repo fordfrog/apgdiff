@@ -1,0 +1,8 @@
+CREATE SEQUENCE task_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+GRANT USAGE ON SEQUENCE task_id_seq TO webuser;

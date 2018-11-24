@@ -70,6 +70,7 @@ COMMENT ON VIEW test_view IS 'test view';
 
 COMMENT ON COLUMN test_view.id IS 'view id col';
 
+COMMENT ON COLUMN public.test_view.text IS 'view text col';
 
 ALTER TABLE test ALTER COLUMN id SET DEFAULT nextval('test_id_seq'::regclass);
 

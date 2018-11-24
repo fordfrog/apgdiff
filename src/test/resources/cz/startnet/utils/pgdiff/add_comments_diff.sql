@@ -14,6 +14,8 @@ COMMENT ON VIEW test_view IS 'test view';
 
 COMMENT ON COLUMN test_view.id IS 'view id col';
 
+COMMENT ON COLUMN test_view.text IS 'view text col';
+
 COMMENT ON FUNCTION test_fnc(arg character varying) IS 'test function';
 
 COMMENT ON CONSTRAINT text_check ON test IS 'text check';
