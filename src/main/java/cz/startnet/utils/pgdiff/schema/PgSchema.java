@@ -48,6 +48,12 @@ public class PgSchema {
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final List<PgConstraint> primaryKeys =
             new ArrayList<PgConstraint>();
+   /**
+     * List of rules defined in the schema.
+     */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    private final List<PgRule> rules = new ArrayList<PgRule>();
+    
     /**
      * Name of the schema.
      */
@@ -440,6 +446,43 @@ public class PgSchema {
         }
 
         return null;
+    }
+    
+    /**
+     * Get a list of rules from {@link #rels}.
+     *
+     * @return list of rules
+     */
+    public List<PgRule> getRules() {
+        @SuppressWarnings("CollectionWithoutInitialCapacity")
+        final List<PgRule> list = new ArrayList<PgRule>();
+
+        for (PgRelation rel : rels) {
+            if (rel instanceof PgRule) {
+                list.add((PgRule) rel);
+            }
+        }
+
+        return list;
+    }
+    
+    /**
+     * Returns true if schema contains type with given {@code name}, otherwise
+     * false.
+     *
+     * @param name name of the table
+     *
+     * @return true if schema contains table with given {@code name}, otherwise
+     * false.
+     */
+    public boolean containsRule(final String name) {
+        for (PgRule rule : rules) {
+            if (rule.getName().equals(name)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

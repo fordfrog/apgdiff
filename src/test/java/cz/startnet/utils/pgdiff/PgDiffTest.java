@@ -262,6 +262,8 @@ public class PgDiffTest {
                   , {"create_policies", false, false, false, false}
                   , {"drop_policies", false, false, false, false}
                   , {"alter_policies", false, false, false, false}
+                    // Tests scenario where TRIGGER is enable or disable.
+                  , {"disable_trigger", false, false, false, false},
                 });
     }
     /**
