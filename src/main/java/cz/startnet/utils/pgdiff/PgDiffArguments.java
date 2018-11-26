@@ -69,6 +69,8 @@ public class PgDiffArguments {
      * Whether Schema creation should be ignored.
      */
     private boolean ignoreSchemaCreation;
+    
+    private boolean preferUpdatesOverDefault;
     /**
      * Drop If Exists and Create If Exists where possible
      */
@@ -82,6 +84,14 @@ public class PgDiffArguments {
     public void setAddDefaults(final boolean addDefaults) {
         this.addDefaults = addDefaults;
     }
+    
+    
+    public boolean isPreferUpdatesOverDefault() {
+		return preferUpdatesOverDefault;
+	}
+    public void setPreferUpdatesOverDefault(boolean preferUpdatesOverDefault) {
+		this.preferUpdatesOverDefault = preferUpdatesOverDefault;
+	}
 
     /**
      * Getter for {@link #addDefaults}.
@@ -267,6 +277,8 @@ public class PgDiffArguments {
                 setVersion(true);
             } else if ("--drop-if-exists".equals(args[i])) {
                PgDiffUtils.setUseExists(true);
+            } else if ("--prefer-updates-over-default".equals(args[i])) {
+                setPreferUpdatesOverDefault(true);               
             } else {
                 writer.print(Resources.getString("ErrorUnknownOption"));
                 writer.print(": ");

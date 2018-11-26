@@ -109,7 +109,7 @@ public class PgType {
                     }
 
                     sbSQL.append("\t");
-                    sbSQL.append(column.getFullDefinition(false));
+                    sbSQL.append(column.getFullDefinition(false, false));
                 }
                 sbSQL.append(System.getProperty("line.separator"));
                 sbSQL.append(")");
