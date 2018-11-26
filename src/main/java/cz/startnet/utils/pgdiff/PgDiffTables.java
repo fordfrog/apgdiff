@@ -257,7 +257,7 @@ public class PgDiffTables {
         for (final PgColumn column : newTable.getColumns()) {
             if (!oldTable.containsColumn(column.getName())) {
                 statements.add("\tADD COLUMN "+ PgDiffUtils.getCreateIfNotExists()
-                        + column.getFullDefinition(arguments.isAddDefaults()));
+                        + column.getFullDefinition(arguments.isAddDefaults(), arguments.isPreferUpdatesOverDefault()));
 
                 if (arguments.isAddDefaults() && !column.getNullValue()
                         && (column.getDefaultValue() == null
@@ -295,7 +295,8 @@ public class PgDiffTables {
      * @param dropDefaultsColumns list for storing columns for which default
      *                            value should be dropped
      */
-    private static void addModifyTableColumns(final List<String> statements,
+    private static void addModifyTableColumns(final List<String> uptDateColumnStatements,
+    		final List<String> statements,
             final PgDiffArguments arguments, final PgTable oldTable,
             final PgTable newTable, final List<PgColumn> dropDefaultsColumns) {
         for (final PgColumn newColumn : newTable.getColumns()) {
@@ -323,33 +324,36 @@ public class PgDiffTables {
 
             if (!oldDefault.equals(newDefault)) {
                 if (newDefault.length() == 0) {
-                    statements.add("\tALTER COLUMN " + newColumnName
-                            + " DROP DEFAULT");
+                    statements.add("\tALTER COLUMN " + newColumnName + " DROP DEFAULT");
                 } else {
-                    statements.add("\tALTER COLUMN " + newColumnName
-                            + " SET DEFAULT " + newDefault);
+                	if(arguments.isPreferUpdatesOverDefault()) {
+                		uptDateColumnStatements.add("UPDATE  "+newTable.getName()+" SET "+newColumnName+"="+newDefault+" WHERE "+newColumnName+" is null");
+                    	uptDateColumnStatements.add("ALTER TABLE "+newTable.getName()+ " ALTER COLUMN " + newColumnName + " SET DEFAULT " + newDefault);	
+                	} else {
+                		statements.add("\tALTER COLUMN " + newColumnName + " SET DEFAULT " + newDefault);                		
+                	}
                 }
             }
 
             if (oldColumn.getNullValue() != newColumn.getNullValue()) {
                 if (newColumn.getNullValue()) {
-                    statements.add("\tALTER COLUMN " + newColumnName
-                            + " DROP NOT NULL");
+                    statements.add("\tALTER COLUMN " + newColumnName + " DROP NOT NULL");
                 } else {
                     if (arguments.isAddDefaults()) {
-                        final String defaultValue =
-                                PgColumnUtils.getDefaultValue(
-                                newColumn.getType());
+                        final String defaultValue = PgColumnUtils.getDefaultValue(newColumn.getType());
 
                         if (defaultValue != null) {
-                            statements.add("\tALTER COLUMN " + newColumnName
-                                    + " SET DEFAULT " + defaultValue);
+                        	if(arguments.isPreferUpdatesOverDefault()) {
+                        		uptDateColumnStatements.add("UPDATE  "+newTable.getName()+" SET "+newColumnName+"="+defaultValue+" WHERE "+newColumnName+" is null");
+                            	uptDateColumnStatements.add("ALTER TABLE "+newTable.getName()+ " ALTER COLUMN " + newColumnName + " SET DEFAULT  " + defaultValue);
+                        	} else {
+                        		statements.add("\tALTER COLUMN " + newColumnName + " SET DEFAULT " + defaultValue);
+                        	}
                             dropDefaultsColumns.add(newColumn);
                         }
                     }
 
-                    statements.add("\tALTER COLUMN " + newColumnName
-                            + " SET NOT NULL");
+                    statements.add("\tALTER COLUMN " + newColumnName + " SET NOT NULL");
                 }
             }
         }
@@ -621,17 +625,27 @@ public class PgDiffTables {
             final PgTable newTable, final SearchPathHelper searchPathHelper) {
         @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<String> statements = new ArrayList<String>();
+        
+        final List<String> uptDateColumnStatements = new ArrayList<String>();
+        
         @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<PgColumn> dropDefaultsColumns = new ArrayList<PgColumn>();
         addDropTableColumns(statements, oldTable, newTable);
         addCreateTableColumns(
                 statements, arguments, oldTable, newTable, dropDefaultsColumns);
+        
         addModifyTableColumns(
-                statements, arguments, oldTable, newTable, dropDefaultsColumns);
+        		uptDateColumnStatements, statements, arguments, oldTable, newTable, dropDefaultsColumns);
 
+        if(arguments.isPreferUpdatesOverDefault()) {
+            updateTableDefaulValue(
+            		uptDateColumnStatements, arguments, oldTable, newTable, searchPathHelper);
+        }
+        
+        final String quotedTableName =
+                PgDiffUtils.getQuotedName(newTable.getName());        
         if (!statements.isEmpty()) {
-            final String quotedTableName =
-                    PgDiffUtils.getQuotedName(newTable.getName());
+
             searchPathHelper.outputSearchPath(writer);
             writer.println();
             writer.println("ALTER " + ((newTable.isForeign()) ? "FOREIGN ":"") + "TABLE " + quotedTableName);
@@ -640,6 +654,12 @@ public class PgDiffTables {
                 writer.print(statements.get(i));
                 writer.println((i + 1) < statements.size() ? "," : ";");
             }
+        }   
+        
+            for (int i = 0; i < uptDateColumnStatements.size(); i++) {
+            	writer.print(uptDateColumnStatements.get(i));
+            	writer.println(";");
+			}
 
             if (!dropDefaultsColumns.isEmpty()) {
                 writer.println();
@@ -654,7 +674,7 @@ public class PgDiffTables {
                             (i + 1) < dropDefaultsColumns.size() ? "," : ";");
                 }
             }
-        }
+        
     }
 
     private static void alterPrivilegesColumns(final PrintWriter writer,
@@ -919,6 +939,45 @@ public class PgDiffTables {
         }
     }
 
+//    public static void handleDefaultsValue(PrintWriter writer, PgDiffArguments arguments, PgSchema oldSchema,
+//            PgSchema newSchema, SearchPathHelper searchPathHelper) {
+//        for (final PgTable newTable : newSchema.getTables()) {
+//            if (oldSchema == null
+//                    || !oldSchema.containsTable(newTable.getName())) {
+//                continue;
+//            }
+//
+//            final PgTable oldTable = oldSchema.getTable(newTable.getName());
+//            updateTableDefaulValue(
+//                    writer, arguments, oldTable, newTable, searchPathHelper);
+//            
+//        }
+//        
+//    }
+
+    
+    
+    private static void updateTableDefaulValue(List<String> statements, PgDiffArguments arguments, PgTable oldTable,
+            PgTable newTable, SearchPathHelper searchPathHelper) {
+        
+        for (final PgColumn column : newTable.getColumns()) {
+            final String quotedTableName = PgDiffUtils.getQuotedName(newTable.getName());
+            if (!oldTable.containsColumn(column.getName())) {
+                if(column.hasDefaultValue()) {
+                    statements.add("UPDATE  "+quotedTableName+" SET "+column.getName()+"="+column.getDefaultValue()+" WHERE "+column.getName()+" is null");
+                    statements.add("ALTER  TABLE "+quotedTableName+" ALTER  COLUMN  "+column.getName()+" SET DEFAULT "+column.getDefaultValue());
+                } else if(!column.getNullValue() && arguments.isAddDefaults()) {
+                    final String defaultColValue = PgColumnUtils.getDefaultValue(column.getType());
+                    statements.add("UPDATE  "+quotedTableName+" SET "+column.getName()+"="+defaultColValue+" WHERE "+column.getName()+" is null");
+                    statements.add("ALTER  TABLE "+quotedTableName+" ALTER  COLUMN "+column.getName()+" SET DEFAULT "+defaultColValue);
+                }
+                if (!column.getNullValue()) {
+                    statements.add("ALTER  TABLE "+quotedTableName+" ALTER  COLUMN "+column.getName()+" SET NOT NULL");
+                }
+            }
+        }
+    }
+    
     /**
      * Creates a new instance of PgDiffTables.
      */

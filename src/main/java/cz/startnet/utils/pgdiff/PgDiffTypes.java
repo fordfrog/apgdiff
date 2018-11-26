@@ -65,7 +65,7 @@ public class PgDiffTypes {
         for (final PgColumn column : newType.getColumns()) {
             if (!oldType.containsColumn(column.getName())) {
                 statements.add("\tADD ATTRIBUTE "
-                        + column.getFullDefinition(arguments.isAddDefaults()));
+                        + column.getFullDefinition(arguments.isAddDefaults(), !arguments.isPreferUpdatesOverDefault()));
 
                 if (arguments.isAddDefaults() && !column.getNullValue()
                         && (column.getDefaultValue() == null

@@ -121,28 +121,31 @@ public class PgColumn {
      *
      * @return full definition of the column
      */
-    public String getFullDefinition(final boolean addDefaults) {
+    public String getFullDefinition(final boolean addDefaults, final boolean preferUpdatesOverDefault) {
         final StringBuilder sbDefinition = new StringBuilder(100);
         sbDefinition.append(PgDiffUtils.getQuotedName(name));
         sbDefinition.append(' ');
         sbDefinition.append(type);
 
-        if (defaultValue != null && !defaultValue.isEmpty()) {
-            sbDefinition.append(" DEFAULT ");
-            sbDefinition.append(defaultValue);
-        } else if (!nullValue && addDefaults) {
-            final String defaultColValue = PgColumnUtils.getDefaultValue(type);
-
-            if (defaultColValue != null) {
+        if(!preferUpdatesOverDefault) {
+            if (defaultValue != null && !defaultValue.isEmpty()) {
                 sbDefinition.append(" DEFAULT ");
-                sbDefinition.append(defaultColValue);
+                sbDefinition.append(defaultValue);
+            } else if (!nullValue && addDefaults) {
+                final String defaultColValue = PgColumnUtils.getDefaultValue(type);
+
+                if (defaultColValue != null) {
+                    sbDefinition.append(" DEFAULT ");
+                    sbDefinition.append(defaultColValue);
+                }
             }
-        }
 
-        if (!nullValue) {
-            sbDefinition.append(" NOT NULL");
-        }
+            if (!nullValue) {
+                sbDefinition.append(" NOT NULL");
+            }
 
+        }
+       
         return sbDefinition.toString();
     }
 
@@ -284,4 +287,8 @@ public class PgColumn {
 
         setType(string);
     }
+
+	public boolean hasDefaultValue() {
+		return getDefaultValue() != null && !getDefaultValue().isEmpty();
+	}
 }
