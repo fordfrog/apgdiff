@@ -201,4 +201,63 @@ public class PgDiffTriggers {
      */
     private PgDiffTriggers() {
     }
+    
+    /**
+     * Returns list of triggers that should be enable or disable.
+     *
+     * @param oldRelation original relation
+     * @param newRelation new relation
+     *
+     * @return list of triggers that should be added
+     */
+    private static List<PgTrigger> getEnablerOrDisableTriggers(final PgRelation oldRelation,
+            final PgRelation newRelation) {
+        @SuppressWarnings("CollectionWithoutInitialCapacity")
+        final List<PgTrigger> list = new ArrayList<PgTrigger>();
+
+        if (newRelation != null)  {
+    
+                for (final PgTrigger newTrigger : newRelation.getTriggers()) {
+                    
+                   PgTrigger oldTrigger = oldRelation.getTrigger(newTrigger.getName());
+                    if ((newTrigger.isDisable() && oldTrigger==null) || 
+                           (oldTrigger!=null && oldTrigger.isDisable()!=newTrigger.isDisable())) {
+                        list.add(newTrigger);
+                    }
+                }
+            
+        }
+
+        return list;
+    }
+    
+    /**
+     * Outputs statements for disable or enable triggers.
+     *
+     * @param writer           writer the output should be written to
+     * @param oldSchema        original schema
+     * @param newSchema        new schema
+     * @param searchPathHelper search path helper
+     */
+    public static void disableOrEnableTriggers(final PrintWriter writer,
+            final PgSchema oldSchema, final PgSchema newSchema,
+            final SearchPathHelper searchPathHelper
+            ) {
+        for (final PgRelation newRelation : newSchema.getRels()) {
+            final PgRelation oldRelation;
+
+            if (oldSchema == null) {
+                oldRelation = null;
+            } else {
+                oldRelation = oldSchema.getRelation(newRelation.getName());
+            }
+
+            // Add new triggers
+            for (final PgTrigger trigger : getEnablerOrDisableTriggers(oldRelation, newRelation)) {
+                searchPathHelper.outputSearchPath(writer);
+                writer.println();
+                writer.println(trigger.getDisableOrEnableSQL());
+            }
+        }
+    }
 }

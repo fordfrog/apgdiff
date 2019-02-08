@@ -32,10 +32,22 @@ public class CreateViewParser {
 
         parser.expect("CREATE");
         parser.expectOptional("OR", "REPLACE");
-        final boolean materialized = parser.expectOptional("MATERIALIZED");
+        final boolean materialized = parser.expectOptional("MATERIALIZED");        
+        final boolean temporary = parser.expectOptional("TEMPORARY");
+        final boolean recursive = parser.expectOptional("RECURSIVE");
+        
         parser.expect("VIEW");
 
         final String viewName = parser.parseIdentifier();
+
+        StringBuilder with = new StringBuilder();
+        if (parser.expectOptional("WITH")) {
+            parser.expect("(");
+            while (!parser.expectOptional(")")) {
+                with.append(parser.getExpression());
+
+            }
+        }
 
         final boolean columnsExist = parser.expectOptional("(");
         final List<String> columnNames = new ArrayList<String>(10);
@@ -54,6 +66,9 @@ public class CreateViewParser {
 
         final PgView view = new PgView(ParserUtils.getObjectName(viewName));
         view.setMaterialized(materialized);
+        view.setTemporary(temporary);
+        view.setRecursive(recursive);
+        view.setWith(with.toString());
         view.setDeclaredColumnNames(columnNames);
         view.setQuery(query);
 

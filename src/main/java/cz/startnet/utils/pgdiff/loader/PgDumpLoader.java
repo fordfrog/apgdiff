@@ -20,6 +20,7 @@ import cz.startnet.utils.pgdiff.parsers.CreateTriggerParser;
 import cz.startnet.utils.pgdiff.parsers.CreateViewParser;
 import cz.startnet.utils.pgdiff.parsers.GrantRevokeParser;
 import cz.startnet.utils.pgdiff.parsers.CreatePolicyParser;
+import cz.startnet.utils.pgdiff.parsers.CreateRuleParser;
 import cz.startnet.utils.pgdiff.schema.PgDatabase;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -169,6 +170,20 @@ public class PgDumpLoader { //NOPMD
     private static final Pattern PATTERN_CREATE_POLICY = Pattern.compile(
             "^CREATE[\\s]+POLICY[\\s]+.*$",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    
+    /**
+     * Pattern for testing whether it is CREATE POLICY statement.
+     */
+    private static final Pattern PATTERN_DISABLE_TRIGGER = Pattern.compile(
+           "ALTER\\s+TABLE+\\s+\\w+.+\\w+\\s+DISABLE+\\s+TRIGGER+\\s+\\w+.*$",
+            Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    /**
+     * Pattern for testing whether it is CREATE RULE  statement.
+     */
+    private static final Pattern PATTERN_CREATE_RULE = Pattern.compile(
+            "^CREATE[\\s]+RULE[\\s]+.*$",
+            Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    
     /**
     /**
      * Storage of unprocessed line part.
@@ -218,10 +233,11 @@ public class PgDumpLoader { //NOPMD
                 database.setDefaultSchema(matcher.group(1));
             } else if (PATTERN_CREATE_TABLE.matcher(statement).matches()) {
                 CreateTableParser.parse(database, statement, ignoreSchemaCreation);
-            } else if (PATTERN_ALTER_TABLE.matcher(statement).matches()
-                    || PATTERN_ALTER_VIEW.matcher(statement).matches()) {
-                AlterRelationParser.parse(
-                        database, statement, outputIgnoredStatements);
+            } else if ((PATTERN_ALTER_TABLE.matcher(statement).matches()
+                    || PATTERN_ALTER_VIEW.matcher(statement).matches())
+                    && !PATTERN_DISABLE_TRIGGER.matcher(statement).matches()) {
+                    AlterRelationParser.parse(
+                        database, statement, outputIgnoredStatements); 
             } else if (PATTERN_CREATE_SEQUENCE.matcher(statement).matches()) {
                 CreateSequenceParser.parse(database, statement);
             } else if (PATTERN_ALTER_SEQUENCE.matcher(statement).matches()) {
@@ -234,6 +250,8 @@ public class PgDumpLoader { //NOPMD
             } else if (PATTERN_CREATE_TRIGGER.matcher(statement).matches()) {
                 CreateTriggerParser.parse(
                         database, statement, ignoreSlonyTriggers);
+            } else if ( PATTERN_DISABLE_TRIGGER.matcher(statement).matches()) {
+                CreateTriggerParser.parseDisable(database, statement);
             } else if (PATTERN_CREATE_FUNCTION.matcher(statement).matches()) {
                 CreateFunctionParser.parse(database, statement);
             } else if (PATTERN_CREATE_TYPE.matcher(statement).matches()) {
@@ -252,9 +270,10 @@ public class PgDumpLoader { //NOPMD
                 GrantRevokeParser.parse(database, statement,
                         outputIgnoredStatements);
             } else if (PATTERN_CREATE_POLICY.matcher(statement).matches()) {
-                CreatePolicyParser.parse(database, statement);
-                // we just ignore these statements
-            } else if (outputIgnoredStatements) {
+                CreatePolicyParser.parse(database, statement);               
+            } else if (PATTERN_CREATE_RULE.matcher(statement).matches()) {
+                CreateRuleParser.parse(database, statement);
+            }  else if (outputIgnoredStatements) {
                 database.addIgnoredStatement(statement);
             } else {
                 // these statements are ignored if outputIgnoredStatements

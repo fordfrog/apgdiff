@@ -37,7 +37,7 @@ ALTER TABLE public.testtable OWNER TO fordfrog;
 -- Name: testview; Type: VIEW; Schema: public; Owner: fordfrog
 --
 
-CREATE VIEW testview AS
+CREATE VIEW testview WITH (security_barrier) AS
     SELECT testtable.id, testtable.name FROM testtable;
 
 

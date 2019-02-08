@@ -101,6 +101,8 @@ public class PgDiffTest {
                     // Tests scenario where original and new TABLE contain
                     //different INHERITS.
                     {"modify_inherits", false, false, false, false},
+                    // Alter default value of a inherited column
+                    {"alter_inherited_column", false, false, false, false},
                     // Add a table with a default value for a column that belongs to an inherited table
                     {"add_inherits_default_column", false, false, false, false},
                     // Add a table with a default value for a column that belongs to an inherited table in a different schema
@@ -262,6 +264,14 @@ public class PgDiffTest {
                   , {"create_policies", false, false, false, false}
                   , {"drop_policies", false, false, false, false}
                   , {"alter_policies", false, false, false, false}
+                    // Tests scenario where TRIGGER is enable or disable.
+                  , {"disable_trigger", false, false, false, false}
+                            // Tests grant on new sequence
+                  , {"grant_on_new_sequence", false, false, false, false}
+                    // Tests alter view owner
+                  , {"alter_view_owner", false, false, false, false}
+                  , {"grant_on_table_cols_mixed", false, false, false, false}
+                  , {"grant_on_view_cols_mixed", false, false, false, false}
                 });
     }
     /**
