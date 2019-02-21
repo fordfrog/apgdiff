@@ -7,9 +7,27 @@ file it at https://github.com/fordfrog/apgdiff/issues. If you for some reason
 need to contact author of this application, you can email him at
 fordfrog@fordfrog.com.
 
+This repo is mainly unmaintained. But if you found a bug and create a pull request chances are good that it will be merged.
+
 ## Changelog
 
-### Version 2.5 (not released yet)
+### Version 2.6
+
+#### New Features 
+* PostgresSQL 10 Support
+* Update dependencies to development with Java 11
+* Add security barrier and another options to Views
+* Add support to Create/Drop Rule
+* Triggers: Rerencing,Enable,Disable
+* use using column::type to cast the type of column
+
+#### Fixes
+* Fix GRANT SEQUENCE, ALTER VIEW OWNER, GRANT(cols) errors
+
+#### Tasks Done
+* Remove SourceForge repository
+
+### Version 2.5
 
 #### New Features
 * MATERIALIZED VIEW support in PostgreSQL 9.3 (Marti Raudsepp)
@@ -40,6 +58,8 @@ fordfrog@fordfrog.com.
 * Fixed issue with the $ sign in the object name (Anatoliy Basov)
 * Added French translation. (Jeremy Passeron)
 * Native for OS line endings in resulting diff (Sergej Bonich)
+* Add support for new Postgres schema dump format
+* Support for Postgres 10 CREATE SEQUENCE data type
 
 ### 2012-09-21: Version 2.4
 
