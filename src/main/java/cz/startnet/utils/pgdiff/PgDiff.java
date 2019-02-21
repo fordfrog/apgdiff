@@ -277,6 +277,8 @@ public class PgDiff {
                     writer, oldSchema, newSchema, searchPathHelper);                  
             PgDiffFunctions.dropFunctions(
                     writer, arguments, oldSchema, newSchema, searchPathHelper);
+            PgDiffProcedures.dropPocedures(
+                    writer, arguments, oldSchema, newSchema, searchPathHelper);
             PgDiffViews.dropViews(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffConstraints.dropConstraints(
@@ -308,6 +310,8 @@ public class PgDiff {
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffFunctions.createFunctions(
                     writer, arguments, oldSchema, newSchema, searchPathHelper);
+            PgDiffProcedures.createProducedures(
+                    writer, arguments, oldSchema, newSchema, searchPathHelper);
             PgDiffConstraints.createConstraints(
                     writer, oldSchema, newSchema, true, searchPathHelper);
             PgDiffConstraints.createConstraints(
@@ -330,6 +334,8 @@ public class PgDiff {
             PgDiffPolicies.alterPolicies(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffFunctions.alterComments(
+                    writer, oldSchema, newSchema, searchPathHelper);
+            PgDiffProcedures.alterComments(
                     writer, oldSchema, newSchema, searchPathHelper);
             PgDiffConstraints.alterComments(
                     writer, oldSchema, newSchema, searchPathHelper);

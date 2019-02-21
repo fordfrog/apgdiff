@@ -22,6 +22,11 @@ public class PgSchema {
      */
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final List<PgFunction> functions = new ArrayList<PgFunction>();
+     /**
+     * List of procedures defined in the schema.
+     */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    private final List<PgProcedure> procedures = new ArrayList<PgProcedure>();     
     /**
      * List of sequences defined in the schema.
      */
@@ -189,6 +194,32 @@ public class PgSchema {
      */
     public List<PgFunction> getFunctions() {
         return Collections.unmodifiableList(functions);
+    }
+    
+    /**
+     * Finds procedure according to specified procedure {@code signature}.
+     *
+     * @param signature signature of the procedure to be searched
+     *
+     * @return found procedure or null if no such procedure has been found
+     */
+    public PgProcedure getProcedure(final String signature) {
+        for (PgProcedure procedure : procedures) {
+            if (procedure.getSignature().equals(signature)) {
+                return procedure;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Getter for {@link #procedures}. The list cannot be modified.
+     *
+     * @return {@link #procedures}
+     */
+    public List<PgProcedure> getProcedures() {
+        return Collections.unmodifiableList(procedures);
     }
 
     /**
@@ -394,6 +425,15 @@ public class PgSchema {
     public void addFunction(final PgFunction function) {
         functions.add(function);
     }
+    
+    /**
+     * Adds {@code procedure} to the list of procedures.
+     *
+     * @param procedure procedure
+     */
+    public void addProcedure(final PgProcedure procedure) {
+        procedures.add(procedure);
+    }
 
     /**
      * Adds {@code sequence} to the list of sequences.
@@ -516,6 +556,25 @@ public class PgSchema {
     public boolean containsFunction(final String signature) {
         for (PgFunction function : functions) {
             if (function.getSignature().equals(signature)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    /**
+     * Returns true if schema contains procedure with given {@code signature},
+     * otherwise false.
+     *
+     * @param signature signature of the procedure
+     *
+     * @return true if schema contains procedure with given {@code signature},
+     *         otherwise false
+     */
+    public boolean containsProcedure(final String signature) {
+        for (PgProcedure procedure : procedures) {
+            if (procedure.getSignature().equals(signature)) {
                 return true;
             }
         }
