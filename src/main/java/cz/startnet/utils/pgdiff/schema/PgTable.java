@@ -265,6 +265,11 @@ public class PgTable extends PgRelation {
           PgInheritedColumn inheritedColumn = new PgInheritedColumn(column);
           inheritedColumns.add(inheritedColumn);
         }
+
+        for( PgInheritedColumn column : inheritedTable.getInheritedColumns() ) {
+          PgInheritedColumn inheritedColumn = new PgInheritedColumn(column.getInheritedColumn());
+          inheritedColumns.add(inheritedColumn);
+        }
     }
 
     /**

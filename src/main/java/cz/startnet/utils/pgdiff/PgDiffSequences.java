@@ -39,13 +39,13 @@ public class PgDiffSequences {
 
                 for (PgSequencePrivilege sequencePrivilege : sequence
                         .getPrivileges()) {
-                    writer.println("REVOKE ALL ON TABLE "
+                    writer.println("REVOKE ALL ON SEQUENCE "
                             + PgDiffUtils.getQuotedName(sequence.getName())
                             + " FROM " + sequencePrivilege.getRoleName() + ";");
                     if (!"".equals(sequencePrivilege.getPrivilegesSQL(true))) {
                         writer.println("GRANT "
                                 + sequencePrivilege.getPrivilegesSQL(true)
-                                + " ON TABLE "
+                                + " ON SEQUENCE "
                                 + PgDiffUtils.getQuotedName(sequence.getName())
                                 + " TO " + sequencePrivilege.getRoleName()
                                 + " WITH GRANT OPTION;");
@@ -53,7 +53,7 @@ public class PgDiffSequences {
                     if (!"".equals(sequencePrivilege.getPrivilegesSQL(false))) {
                         writer.println("GRANT "
                                 + sequencePrivilege.getPrivilegesSQL(false)
-                                + " ON TABLE "
+                                + " ON SEQUENCE "
                                 + PgDiffUtils.getQuotedName(sequence.getName())
                                 + " TO " + sequencePrivilege.getRoleName()
                                 + ";");
@@ -140,10 +140,20 @@ public class PgDiffSequences {
             }
 
             sbSQL.setLength(0);
+            
+            final String oldDataType=oldSequence.getDataType();
+            final String newDataType=newSequence.getDataType();
+            
+            if (newDataType != null
+                    && !newDataType.equals(oldDataType)) {
+                sbSQL.append(System.getProperty("line.separator"));
+                sbSQL.append("\tAS ");
+                sbSQL.append(newDataType);
+            }
 
             final String oldIncrement = oldSequence.getIncrement();
             final String newIncrement = newSequence.getIncrement();
-
+            
             if (newIncrement != null
                     && !newIncrement.equals(oldIncrement)) {
                 sbSQL.append(System.getProperty("line.separator"));

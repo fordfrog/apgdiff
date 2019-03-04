@@ -46,7 +46,7 @@ public class CreateSequenceParser {
 
         while (!parser.expectOptional(";")) {
             if (parser.expectOptional("AS")) {
-                sequence.setAs(parser.parseString());
+                sequence.setDataType(parser.parseString());
             } else if (parser.expectOptional("INCREMENT")) {
                 parser.expectOptional("BY");
                 sequence.setIncrement(parser.parseString());

@@ -3,10 +3,8 @@
 --
 
 SET client_encoding = 'UTF8';
-SET standard_conforming_strings = off;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
-SET escape_string_warning = off;
 
 --
 -- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: postgres
@@ -21,32 +19,14 @@ SET default_tablespace = '';
 
 SET default_with_oids = false;
 
---
--- Name: testtable; Type: TABLE; Schema: public; Owner: fordfrog; Tablespace: 
---
 
-CREATE TABLE testtable (
-    id bigint,
-    name character varying(30)
-);
-
-
-ALTER TABLE public.testtable OWNER TO fordfrog;
-
---
--- Name: testview; Type: VIEW; Schema: public; Owner: fordfrog
---
-
-CREATE VIEW testview WITH (security_barrier) AS
-    SELECT testtable.id, testtable.name FROM testtable;
-
-
-ALTER TABLE public.testview OWNER TO fordfrog;
-
---
--- Data for Name: testtable; Type: TABLE DATA; Schema: public; Owner: fordfrog
---
-
+CREATE SEQUENCE sequence_10
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 
 --
