@@ -261,25 +261,25 @@ public class PgColumn {
     public void parseDefinition(final String definition) {
         String string = definition;
 
-        Matcher matcher = PATTERN_NOT_NULL.matcher(string);
+        Matcher matcher = PATTERN_DEFAULT.matcher(string);
+
+        if (matcher.matches()) {
+            string = matcher.group(1).trim();
+            setDefaultValue(matcher.group(2).trim());
+        }
+
+        matcher = PATTERN_NOT_NULL.matcher(string);
 
         if (matcher.matches()) {
             string = matcher.group(1).trim();
             setNullValue(false);
         } else {
-            matcher = PATTERN_NULL.matcher(string);
+        	  matcher = PATTERN_NULL.matcher(string);
 
             if (matcher.matches()) {
                 string = matcher.group(1).trim();
                 setNullValue(true);
             }
-        }
-
-        matcher = PATTERN_DEFAULT.matcher(string);
-
-        if (matcher.matches()) {
-            string = matcher.group(1).trim();
-            setDefaultValue(matcher.group(2).trim());
         }
 
         setType(string);
