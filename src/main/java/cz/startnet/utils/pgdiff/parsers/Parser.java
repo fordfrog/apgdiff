@@ -102,7 +102,8 @@ public final class Parser {
      * @return true if whole sequence was found, otherwise false
      */
     public boolean expectOptional(final String... words) {
-        final boolean found = expect(words[0], true);
+        final int oldPosition = position;
+        boolean found = expect(words[0], true);
 
         if (!found) {
             return false;
@@ -110,7 +111,11 @@ public final class Parser {
 
         for (int i = 1; i < words.length; i++) {
             skipWhitespace();
-            expect(words[i]);
+            found = expect(words[i], true);
+            if (!found) {
+                position = oldPosition;
+                return false;
+            }
         }
 
         return true;
