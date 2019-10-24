@@ -279,6 +279,11 @@ public final class Parser {
             final String result;
 
             try {
+                if (endPos >= string.length())
+                {
+                    //try to fix StringIndexOutOfBoundsException
+                    endPos = string.lastIndexOf('\'');
+                }
                 result = string.substring(position, endPos + 1);
             } catch (final Throwable ex) {
                 throw new RuntimeException("Failed to get substring: " + string
