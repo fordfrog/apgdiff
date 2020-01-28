@@ -5,6 +5,7 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
+import cz.startnet.utils.pgdiff.parsers.ParserException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -135,8 +136,15 @@ public class PgDatabase {
      * Adds {@code schema} to the lists of schemas.
      *
      * @param schema schema
+     * @throws ParserException Thrown if schema was already added to the database.
      */
     public void addSchema(final PgSchema schema) {
+        for (PgSchema existingSchema : schemas) {
+            if (existingSchema.getName().equals(schema.getName())) {
+                throw new ParserException(
+                    "Schema '" + schema.getName() + "' already added to database");
+            }
+        }
         schemas.add(schema);
     }
 
