@@ -23,6 +23,7 @@ This repo is mainly unmaintained. But if you found a bug and create a pull reque
 
 #### Fixes
 * Fix GRANT SEQUENCE, ALTER VIEW OWNER, GRANT(cols) errors
+* Add support for CREATE SCHEMA IF NOT EXISTS (Mikko Ahonen)
 
 #### Tasks Done
 * Remove SourceForge repository
