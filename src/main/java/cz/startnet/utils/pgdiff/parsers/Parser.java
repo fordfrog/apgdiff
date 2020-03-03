@@ -110,7 +110,7 @@ public final class Parser {
 
         for (int i = 1; i < words.length; i++) {
             skipWhitespace();
-            expect(words[i]);
+            expect(words[i], true);
         }
 
         return true;

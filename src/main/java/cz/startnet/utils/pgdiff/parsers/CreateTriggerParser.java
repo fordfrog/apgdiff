@@ -107,11 +107,7 @@ public class CreateTriggerParser {
         parser.expect("EXECUTE", "PROCEDURE");
         trigger.setFunction(parser.getRest());
 
-        final boolean ignoreSlonyTrigger = ignoreSlonyTriggers
-                && ("_slony_logtrigger".equals(trigger.getName())
-                || "_slony_denyaccess".equals(trigger.getName()));
-
-        if (!ignoreSlonyTrigger) {
+        if (!ignoreSlonyTrigger(trigger.getName(), ignoreSlonyTriggers)) {
             final PgSchema schema = database.getSchema(
                     ParserUtils.getSchemaName(relationName, database));
             schema.getRelation(trigger.getRelationName()).addTrigger(trigger);
@@ -138,7 +134,7 @@ public class CreateTriggerParser {
     }
     
      public static void parseDisable(final PgDatabase database,
-            final String statement) {
+            final String statement, final boolean ignoreSlonyTriggers) {
         final Parser parser = new Parser(statement);
         parser.expect("ALTER", "TABLE");
 
@@ -150,9 +146,19 @@ public class CreateTriggerParser {
         trigger.setName(objectName);
         
         trigger.setRelationName(ParserUtils.getObjectName(tableName));
-        
-         final PgSchema schema = database.getSchema(
+
+        if (!ignoreSlonyTrigger(trigger.getName(), ignoreSlonyTriggers)) {
+            final PgSchema schema = database.getSchema(
                     ParserUtils.getSchemaName(tableName, database));
             schema.getRelation(trigger.getRelationName()).getTrigger(objectName).setDisable(true);
+        }
+     }
+     private static boolean ignoreSlonyTrigger(String trigger, Boolean ignore) {
+        return ignore && (
+                "_slony_logtrigger".equals(trigger) ||
+                "_slony_denyaccess".equals(trigger) ||
+                "_slony_truncatedeny".equals(trigger) ||
+                "_slony_truncatetrigger".equals(trigger)
+        );
      }
 }
