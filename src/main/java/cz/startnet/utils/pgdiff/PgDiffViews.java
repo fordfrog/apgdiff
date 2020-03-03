@@ -33,7 +33,15 @@ public class PgDiffViews {
             final PgSchema oldSchema, final PgSchema newSchema,
             final SearchPathHelper searchPathHelper) {
         for (final PgView newView : newSchema.getViews()) {
-            final PgView oldView = oldSchema.getView(newView.getName());
+        	PgView oldView;
+        	if (oldSchema != null)
+        	{
+        		oldView = oldSchema.getView(newView.getName());
+        	}
+        	else
+        	{
+        		oldView = null;
+        	}
             if (oldSchema == null
                     || !oldSchema.containsView(newView.getName())
                     || isViewModified(oldView, newView)) {
