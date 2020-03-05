@@ -33,15 +33,7 @@ public class PgDiffViews {
             final PgSchema oldSchema, final PgSchema newSchema,
             final SearchPathHelper searchPathHelper) {
         for (final PgView newView : newSchema.getViews()) {
-        	PgView oldView;
-        	if (oldSchema != null)
-        	{
-        		oldView = oldSchema.getView(newView.getName());
-        	}
-        	else
-        	{
-        		oldView = null;
-        	}
+            PgView oldView = (oldSchema == null ? null : oldSchema.getView(newView.getName()));
             if (oldSchema == null
                     || !oldSchema.containsView(newView.getName())
                     || isViewModified(oldView, newView)) {
@@ -85,7 +77,7 @@ public class PgDiffViews {
      * @param writer           writer the output should be written to
      * @param oldSchema        original schema
      * @param newSchema        new schema
-     * @param searchPathHelper search path helper   
+     * @param searchPathHelper search path helper
      */
     public static void dropViews(final PrintWriter writer,
             final PgSchema oldSchema, final PgSchema newSchema,
