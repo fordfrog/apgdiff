@@ -80,10 +80,10 @@ public class CreateTriggerParser {
         if (parser.expectOptional(referencing)) {            
              trigger.setReferencing("\t"+referencing);             
 
-            while( !parser.getSubString(parser.getPosition()-5, parser.getPosition()-4).equals(System.getProperty("line.separator"))){ 
+             while(parser.getSubString(parser.getPosition(), parser.getPosition()+3).equals("NEW") ||
+                     parser.getSubString(parser.getPosition(), parser.getPosition()+3).equals("OLD") ){
                 parseReferencing(parser,trigger);
-               
-            } 
+            }
         }
 
         if (parser.expectOptional("FOR")) {
