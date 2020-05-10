@@ -177,6 +177,7 @@ public class PgDiffTest {
                     {"drop_trigger", false, false, false, false},
                     // Tests scenario where TRIGGER is modified.
                     {"modify_trigger", false, false, false, false},
+                    {"create_trigger_postgres12", false, false, false, false},
                     // Tests scenario where VIEW is added.
                     {"add_view", false, false, false, false},
                     // Tests scenario where VIEW is dropped.
