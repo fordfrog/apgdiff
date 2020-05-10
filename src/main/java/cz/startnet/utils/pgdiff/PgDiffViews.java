@@ -13,6 +13,7 @@ import cz.startnet.utils.pgdiff.schema.PgRelationPrivilege;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Diffs views.
@@ -33,7 +34,12 @@ public class PgDiffViews {
             final PgSchema oldSchema, final PgSchema newSchema,
             final SearchPathHelper searchPathHelper) {
         for (final PgView newView : newSchema.getViews()) {
-            final PgView oldView = oldSchema.getView(newView.getName());
+            PgView oldView = null;
+            
+            if(Objects.nonNull(oldSchema)){
+               oldView=oldSchema.getView(newView.getName());
+             }
+             
             if (oldSchema == null
                     || !oldSchema.containsView(newView.getName())
                     || isViewModified(oldView, newView)) {

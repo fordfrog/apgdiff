@@ -60,7 +60,7 @@ public class CreateRuleParser {
 
         rule.setQuery(query);
 
-        final String schemaName = ParserUtils.getSchemaName(ruleName, database);
+        final String schemaName = ParserUtils.getSchemaName(relationName, database);
         final PgSchema schema = database.getSchema(schemaName);
 
         if (schema == null) {

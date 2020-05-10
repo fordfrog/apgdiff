@@ -184,7 +184,7 @@ public class PgDumpLoader { //NOPMD
      * Pattern for testing whether it is CREATE POLICY statement.
      */
     private static final Pattern PATTERN_DISABLE_TRIGGER = Pattern.compile(
-           "ALTER\\s+TABLE+\\s+\\w+.+\\w+\\s+DISABLE+\\s+TRIGGER+\\s+\\w+.*$",
+           "ALTER\\s+TABLE+\\s+\"?\\w+\"?.+\"?\\w+\"?\\s+DISABLE+\\s+TRIGGER+\\s+\\w+.*$",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /**
      * Pattern for testing whether it is CREATE RULE  statement.
