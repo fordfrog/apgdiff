@@ -6,5 +6,5 @@ CREATE TABLE IF NOT EXISTS "procedureresult$Operation" (
 
 ALTER TABLE "procedureresult$Operation" OWNER TO fordfrog;
 
-ALTER TABLE "procedureresult$Operation"
+ALTER TABLE IF EXISTS "procedureresult$Operation"
 	ADD CONSTRAINT IF NOT EXISTS $1 FOREIGN KEY (result_id) REFERENCES testtable(field1) ON UPDATE RESTRICT ON DELETE RESTRICT;

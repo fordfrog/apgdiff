@@ -53,6 +53,7 @@ public class PgConstraint {
     public String getCreationSQL() {
         final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("ALTER TABLE ");
+        sbSQL.append(PgDiffUtils.getDropIfExists());
         sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
         sbSQL.append(System.getProperty("line.separator"));
         sbSQL.append("\tADD CONSTRAINT ");
@@ -120,6 +121,7 @@ public class PgConstraint {
     public String getDropSQL() {
         final StringBuilder sbSQL = new StringBuilder(100);
         sbSQL.append("ALTER TABLE ");
+        sbSQL.append(PgDiffUtils.getDropIfExists());
         sbSQL.append(PgDiffUtils.getQuotedName(getTableName()));
         sbSQL.append(System.getProperty("line.separator"));
         sbSQL.append("\tDROP CONSTRAINT ");
