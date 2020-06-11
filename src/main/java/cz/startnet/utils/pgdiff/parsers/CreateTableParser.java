@@ -82,7 +82,9 @@ public class CreateTableParser {
         }
 
         while (!parser.expectOptional(";")) {
-            if (parser.expectOptional("INHERITS")) {
+            if (parser.expectOptional("PARTITION","BY")) {
+                table.setPartionBy("PARTITION BY "+parser.getExpression());
+            } else if (parser.expectOptional("INHERITS")) {
                 parseInherits(database, parser, table);
             } else if (parser.expectOptional("WITHOUT")) {
                 table.setWith("OIDS=false");            

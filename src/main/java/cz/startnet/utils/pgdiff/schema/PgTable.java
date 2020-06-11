@@ -72,6 +72,12 @@ public class PgTable extends PgRelation {
      * PgSchema
      */
     private final PgSchema schema;
+    
+    /**
+     * Partion By 
+     */
+    
+    private String partitionBy;
 
     /**
      * Creates a new PgTable object.
@@ -162,6 +168,11 @@ public class PgTable extends PgRelation {
 
             sbSQL.append(System.getProperty("line.separator"));
             sbSQL.append(")");
+        }
+        
+        if(partitionBy!=null && !partitionBy.isEmpty()){
+            sbSQL.append(" ");
+            sbSQL.append(partitionBy);            
         }
 
         if (inherits != null && !inherits.isEmpty()) {
@@ -496,5 +507,13 @@ public class PgTable extends PgRelation {
 
     public List<PgPolicy> getPolicies() {
         return Collections.unmodifiableList(policies);
+    }
+    
+    public void setPartionBy(String partitionBy){
+    	this.partitionBy = partitionBy;
+    }
+    
+    public String getPartionBy(){
+    	return partitionBy;
     }
 }

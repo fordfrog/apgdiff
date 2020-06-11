@@ -230,6 +230,8 @@ public class PgDiffTest {
                     {"view_colnames", false, false, false, false},
                     // Tests objects with the $ sign in the name
                     {"add_table_bug102", false, false, false, false},
+                    // Tests objects with the PARTITION BY
+                    {"add_table_partition_by", false, false, false, false},
                     // Tests scenario where new UNLOGGED TABLE is added.
                     {"add_unlogged_table", false, false, false, false},
                     // Tests scenario where UNLOGGED TABLE is dropped.
