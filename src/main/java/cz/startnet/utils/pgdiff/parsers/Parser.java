@@ -102,7 +102,8 @@ public final class Parser {
      * @return true if whole sequence was found, otherwise false
      */
     public boolean expectOptional(final String... words) {
-        final boolean found = expect(words[0], true);
+        final int oldPosition = position;
+        boolean found = expect(words[0], true);
 
         if (!found) {
             return false;
@@ -110,7 +111,11 @@ public final class Parser {
 
         for (int i = 1; i < words.length; i++) {
             skipWhitespace();
-            expect(words[i]);
+            found = expect(words[i], true);
+            if (!found) {
+                position = oldPosition;
+                return false;
+            }
         }
 
         return true;
@@ -249,7 +254,7 @@ public final class Parser {
      *
      * @return parsed string, if quoted then including quotes
      */
-    public String parseString() {
+        public String parseString() {
         final boolean quoted = string.charAt(position) == '\'';
 
         if (quoted) {
@@ -274,6 +279,11 @@ public final class Parser {
             final String result;
 
             try {
+                if (endPos >= string.length())
+                {
+                    //try to fix StringIndexOutOfBoundsException
+                    endPos = string.lastIndexOf('\'');
+                }
                 result = string.substring(position, endPos + 1);
             } catch (final Throwable ex) {
                 throw new RuntimeException("Failed to get substring: " + string
