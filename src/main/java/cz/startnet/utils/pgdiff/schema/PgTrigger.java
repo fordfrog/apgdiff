@@ -45,6 +45,10 @@ public class PgTrigger {
     }
 
     /**
+     * Function type definition : FUNCTION | PROCEDURE
+     */
+    private String procedureWord;
+    /**
      * Function name and arguments that should be fired on the trigger.
      */
     private String function;
@@ -223,7 +227,9 @@ public class PgTrigger {
         }
 
         sbSQL.append(System.getProperty("line.separator"));
-        sbSQL.append("\tEXECUTE PROCEDURE ");
+        sbSQL.append("\tEXECUTE ");
+        sbSQL.append(getProcedureWord());
+        sbSQL.append(' ');
         sbSQL.append(getFunction());
         sbSQL.append(';');
 
@@ -268,6 +274,24 @@ public class PgTrigger {
      */
     public boolean isForEachRow() {
         return forEachRow;
+    }
+
+    /**
+     * Setter for {@link #procedureWord}.
+     *
+     * @param procedureWord {@link #procedureWord}
+     */
+    public void setProcedureWord(final String procedureWord) {
+        this.procedureWord = procedureWord;
+    }
+
+    /**
+     * Getter for {@link #procedureWord}.
+     *
+     * @return {@link #procedureWord}
+     */
+    public String getProcedureWord() {
+        return procedureWord;
     }
 
     /**
