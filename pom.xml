@@ -20,7 +20,7 @@
     <groupId>cz.startnet</groupId>
     <artifactId>apgdiff</artifactId>
     <name>Another PostgreSQL Diff Tool</name>
-    <version>2.6.0-SNAPSHOT</version>
+    <version>2.6.1-SNAPSHOT</version>
     <description>Simple PostgreSQL diff tool that is useful for schema upgrades. The tool compares two schema dump files and creates output file that is (after some hand-made modifications) suitable for upgrade of old schema.</description>
 
     <url>http://www.apgdiff.com/</url>
@@ -115,8 +115,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <showDeprecation>true</showDeprecation>
                     <debug>false</debug>
@@ -181,6 +181,7 @@
                             <head>To do something:</head>
                         </tag>
                     </tags>
+                    <source>8</source>
                 </configuration>
             </plugin>
             <plugin>
@@ -281,7 +282,7 @@
                 <version>3.13.0</version>
                 <configuration>
                     <sourceEncoding>utf-8</sourceEncoding>
-                    <targetJdk>1.6</targetJdk>
+                    <targetJdk>1.8</targetJdk>
                 </configuration>
             </plugin>
             <plugin>
