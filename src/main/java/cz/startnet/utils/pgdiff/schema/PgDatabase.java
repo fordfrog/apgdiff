@@ -5,9 +5,11 @@
  */
 package cz.startnet.utils.pgdiff.schema;
 
+import cz.startnet.utils.pgdiff.parsers.ParserException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Stores database information.
@@ -135,9 +137,16 @@ public class PgDatabase {
      * Adds {@code schema} to the lists of schemas.
      *
      * @param schema schema
+     * @throws ParserException Thrown if schema was already added to the database.
      */
     public void addSchema(final PgSchema schema) {
-        schemas.add(schema);
+        if (Objects.nonNull(schemas) && !schemas.isEmpty()) {
+            if (!schemas.contains(schema)) {
+                schemas.add(schema);
+            }
+        } else {
+            schemas.add(schema);
+        }
     }
 
     /**
