@@ -137,14 +137,12 @@ public class PgDatabase {
      * Adds {@code schema} to the lists of schemas.
      *
      * @param schema schema
-     * @throws ParserException Thrown if schema was already added to the database.
      */
     public void addSchema(final PgSchema schema) {
-        if (Objects.nonNull(schemas) && !schemas.isEmpty()) {
-            if (!schemas.contains(schema)) {
-                schemas.add(schema);
-            }
-        } else {
+
+        if (schemas.isEmpty()) {
+            schemas.add(schema);
+        } else if (!schemas.stream().filter(o -> o.getName().equals(schema.getName())).findFirst().isPresent()) {
             schemas.add(schema);
         }
     }
