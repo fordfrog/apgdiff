@@ -161,7 +161,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <id>attach-javadoc</id>
@@ -172,6 +172,8 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <show>private</show>
                     <tags>
                         <tag>
@@ -256,7 +258,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.0</version>
                 <configuration>
                     <minmemory>128m</minmemory>
                     <maxmemory>512</maxmemory>
