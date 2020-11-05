@@ -172,10 +172,10 @@ public class PgDumpLoader { //NOPMD
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     
     /**
-     * Pattern for testing whether it is CREATE POLICY statement.
+     * Pattern for testing whether it is a DISABLE TRIGGER statement.
      */
     private static final Pattern PATTERN_DISABLE_TRIGGER = Pattern.compile(
-           "ALTER\\s+TABLE+\\s+\\w+.+\\w+\\s+DISABLE+\\s+TRIGGER+\\s+\\w+.*$",
+           "ALTER\\s+TABLE+\\s+\"?\\w+\"?.+\"?\\w+\"?\\s+DISABLE+\\s+TRIGGER+\\s+\\w+.*$",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /**
      * Pattern for testing whether it is CREATE RULE  statement.
@@ -251,7 +251,7 @@ public class PgDumpLoader { //NOPMD
                 CreateTriggerParser.parse(
                         database, statement, ignoreSlonyTriggers);
             } else if ( PATTERN_DISABLE_TRIGGER.matcher(statement).matches()) {
-                CreateTriggerParser.parseDisable(database, statement);
+                CreateTriggerParser.parseDisable(database, statement, ignoreSlonyTriggers);
             } else if (PATTERN_CREATE_FUNCTION.matcher(statement).matches()) {
                 CreateFunctionParser.parse(database, statement);
             } else if (PATTERN_CREATE_TYPE.matcher(statement).matches()) {

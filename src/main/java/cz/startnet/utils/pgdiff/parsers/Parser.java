@@ -96,26 +96,22 @@ public final class Parser {
 
     /**
      * Checks whether string contains at current position sequence of the words.
+     * Only advance position if all words are found.
      *
      * @param words array of words
      *
      * @return true if whole sequence was found, otherwise false
      */
     public boolean expectOptional(final String... words) {
-        final boolean found = expect(words[0], true);
-
-        if (!found) {
-            return false;
+        int startpos = position;
+        for (int i = 0; i < words.length; i++) {
+            if (!expect(words[i], true)) {
+                position = startpos;
+                return false;
+            }
         }
-
-        for (int i = 1; i < words.length; i++) {
-            skipWhitespace();
-            expect(words[i]);
-        }
-
         return true;
     }
-
     /**
      * Moves position in the string to next non-whitespace string.
      */
