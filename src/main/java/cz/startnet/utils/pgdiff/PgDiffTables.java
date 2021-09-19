@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Diffs tables.
@@ -250,20 +251,28 @@ public class PgDiffTables {
      * @param newTable            new table
      * @param dropDefaultsColumns list for storing columns for which default
      *                            value should be dropped
+     * @param generatedColumns list for storing generated columns
      */
     private static void addCreateTableColumns(final List<String> statements,
             final PgDiffArguments arguments, final PgTable oldTable,
-            final PgTable newTable, final List<PgColumn> dropDefaultsColumns) {
+            final PgTable newTable, final List<PgColumn> dropDefaultsColumns,
+            final List<PgColumn> generatedColumns
+            ) {
         for (final PgColumn column : newTable.getColumns()) {
             if (!oldTable.containsColumn(column.getName())) {
                 statements.add("\tADD COLUMN "+ PgDiffUtils.getCreateIfNotExists()
                         + column.getFullDefinition(arguments.isAddDefaults()));
-
+                                
                 if (arguments.isAddDefaults() && !column.getNullValue()
                         && (column.getDefaultValue() == null
                         || column.getDefaultValue().isEmpty())) {
                     dropDefaultsColumns.add(column);
                 }
+                
+                if (Objects.nonNull(column.getGenerated())){
+                   
+                    generatedColumns.add(column);
+                }    
             }
         }
     }
@@ -315,7 +324,7 @@ public class PgDiffTables {
                         newTable.getName(), oldColumn.getType(),
                         newColumn.getType()) + " */");
             }
-
+            
             final String oldDefault = (oldColumn.getDefaultValue() == null) ? ""
                     : oldColumn.getDefaultValue();
             final String newDefault = (newColumn.getDefaultValue() == null) ? ""
@@ -623,9 +632,10 @@ public class PgDiffTables {
         final List<String> statements = new ArrayList<String>();
         @SuppressWarnings("CollectionWithoutInitialCapacity")
         final List<PgColumn> dropDefaultsColumns = new ArrayList<PgColumn>();
+        final List<PgColumn> generatedColumns = new ArrayList<PgColumn>();
         addDropTableColumns(statements, oldTable, newTable);
         addCreateTableColumns(
-                statements, arguments, oldTable, newTable, dropDefaultsColumns);
+                statements, arguments, oldTable, newTable, dropDefaultsColumns,generatedColumns);
         addModifyTableColumns(
                 statements, arguments, oldTable, newTable, dropDefaultsColumns);
 
@@ -653,6 +663,15 @@ public class PgDiffTables {
                     writer.println(
                             (i + 1) < dropDefaultsColumns.size() ? "," : ";");
                 }
+            }
+            
+            for (int i = 0; i < generatedColumns.size(); i++) {
+                writer.println();
+                writer.print("ALTER TABLE ");
+                writer.println(newTable.getName());
+                writer.println("\tALTER COLUMN " + PgDiffUtils.getQuotedName(
+                        generatedColumns.get(i).getName()) + " " + generatedColumns.get(i).getGenerated() +";");
+               
             }
         }
     }
