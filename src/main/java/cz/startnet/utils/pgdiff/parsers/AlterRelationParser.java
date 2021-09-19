@@ -339,6 +339,9 @@ public class AlterRelationParser {
             } else {
                 parser.throwUnsupportedCommand();
             }
+        } else if(parser.expectOptional("ADD GENERATED")){
+            PgColumn column = rel.getColumn(columnName);
+            column.setGenerated("ADD GENERATED " +parser.getExpression());          
         } else {
             parser.throwUnsupportedCommand();
         }

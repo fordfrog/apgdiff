@@ -28,7 +28,8 @@ public class CreateSequenceParser {
             final String statement) {
         final Parser parser = new Parser(statement);
         parser.expect("CREATE", "SEQUENCE");
-
+        parser.expectOptional("IF", "NOT", "EXISTS");
+        
         final String sequenceName = parser.parseIdentifier();
         final PgSequence sequence =
                 new PgSequence(ParserUtils.getObjectName(sequenceName));
