@@ -108,14 +108,13 @@ public class CreateTriggerParser {
         }
 
         parser.expect("EXECUTE");
-
-        if (parser.expectOptional("PROCEDURE")) {
-            trigger.setFunction(parser.getRest());
-        } else if (parser.expectOptional("FUNCTION")) {
-            trigger.setFunction(parser.getRest());
+        if (parser.expectOptional("PROCEDURE")) {           
+        } else if (parser.expectOptional("FUNCTION")) {           
         } else {
             parser.throwUnsupportedCommand();
         }
+        
+        trigger.setFunction(parser.getRest());
 
         final boolean ignoreSlonyTrigger = ignoreSlonyTriggers
                 && ("_slony_logtrigger".equals(trigger.getName())
