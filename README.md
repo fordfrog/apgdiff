@@ -17,6 +17,7 @@ This repo is mainly unmaintained. But if you found a bug and create a pull reque
 * Initial Support to PARTITION BY on Create Table jalissonmello
 * Initial suport to identity column. #277 jalissonmello
 * Support Postgresql 12 -Add support for FUNCTION in CREATE TRIGGER #273 alexander-smyslov
+* Add supports for CREATE SEQUENCE IF NOT EXISTS and CREATE INDEX IF NOT EXISTS. UltramanJack
 #### Fixes
 * Fix incorrect disable trigger parsing of quoted identifiers. Bugfixes #271 marcus-kempe
 * fix for null pointer exception #270 marco44
