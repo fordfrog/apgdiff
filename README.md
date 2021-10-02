@@ -11,6 +11,20 @@ This repo is mainly unmaintained. But if you found a bug and create a pull reque
 
 ## Changelog
 
+### Version 2.6.1
+
+#### New Features
+* Initial Support to PARTITION BY on Create Table jalissonmello
+* Initial suport to identity column. #277 jalissonmello
+* Support Postgresql 12 -Add support for FUNCTION in CREATE TRIGGER #273 alexander-smyslov
+#### Fixes
+* Fix incorrect disable trigger parsing of quoted identifiers. Bugfixes #271 marcus-kempe
+* fix for null pointer exception #270 marco44
+* Fix issue where rule parsing was throwing # 269-marcus-kempe
+* fixed some crashes #257 d1maxa
+* Error on disable/enable trigger on trigger that dont exists on old schema.
+* Drop and Add constraint if table exists, issue #252
+
 ### Version 2.6
 
 #### New Features 
