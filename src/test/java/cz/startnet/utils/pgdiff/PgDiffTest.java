@@ -275,7 +275,8 @@ public class PgDiffTest {
                   , {"alter_view_owner", false, false, false, false}
                   , {"grant_on_table_cols_mixed", false, false, false, false}
                   , {"grant_on_view_cols_mixed", false, false, false, false}
-                  , {"create_schema_no_change_table", false, false, false, false}      
+                  , {"create_schema_no_change_table", false, false, false, false}
+                  , {"add_table_identity_sequence",false,false,false,false}      
                 });
     }
     /**
