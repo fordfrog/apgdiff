@@ -80,9 +80,12 @@ public class CreateTriggerParser {
         if (parser.expectOptional(referencing)) {            
              trigger.setReferencing("\t"+referencing);             
 
-            while( !parser.getSubString(parser.getPosition()-5, parser.getPosition()-4).equals(System.getProperty("line.separator"))){ 
+            while (true) {
+                String nextword = parser.getSubString(parser.getPosition(), parser.getPosition() + 3);
+                if (!(nextword.equals("OLD") || nextword.equals("NEW"))) {
+                    break;
+                }
                 parseReferencing(parser,trigger);
-               
             } 
         }
 
@@ -105,14 +108,14 @@ public class CreateTriggerParser {
         }
 
         parser.expect("EXECUTE");
-        if(parser.expectOptional("PROCEDURE")){
-        }
-        else if (parser.expectOptional("FUNCTION")){
-        }
-        else {
+
+        if (parser.expectOptional("PROCEDURE")) {
+            trigger.setFunction(parser.getRest());
+        } else if (parser.expectOptional("FUNCTION")) {
+            trigger.setFunction(parser.getRest());
+        } else {
             parser.throwUnsupportedCommand();
         }
-        trigger.setFunction(parser.getRest());
 
         final boolean ignoreSlonyTrigger = ignoreSlonyTriggers
                 && ("_slony_logtrigger".equals(trigger.getName())

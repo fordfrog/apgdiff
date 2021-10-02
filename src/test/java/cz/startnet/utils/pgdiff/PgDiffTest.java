@@ -277,6 +277,10 @@ public class PgDiffTest {
                   , {"grant_on_view_cols_mixed", false, false, false, false}
                   , {"create_schema_no_change_table", false, false, false, false}
                   , {"add_table_identity_sequence",false,false,false,false}      
+                    // Test create trigger in PostgreSQL v12
+                  , {"add_trigger_function_postgres12", false, false, false, false}
+                    // Test create trigger with referencing tables
+                  , {"add_trigger_with_referencing_tables", false, false, false, false}
                 });
     }
     /**
