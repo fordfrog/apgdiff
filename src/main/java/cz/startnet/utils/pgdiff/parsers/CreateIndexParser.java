@@ -31,7 +31,7 @@ public class CreateIndexParser {
         final boolean unique = parser.expectOptional("UNIQUE");
 
         parser.expect("INDEX");
-         if (parser.expectOptional("CONCURRENTLY"));
+        parser.expectOptional("CONCURRENTLY");
         parser.expectOptional("IF", "NOT", "EXISTS");
         
         final String indexName =
