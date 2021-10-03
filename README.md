@@ -11,7 +11,7 @@ This repo is mainly unmaintained. But if you found a bug and create a pull reque
 
 ## Changelog
 
-### Version 2.6.1
+### Version 2.7.0
 
 #### New Features
 * Initial Support to PARTITION BY on Create Table jalissonmello
