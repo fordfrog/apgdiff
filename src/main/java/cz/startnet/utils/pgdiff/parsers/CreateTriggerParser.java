@@ -108,9 +108,8 @@ public class CreateTriggerParser {
         }
 
         parser.expect("EXECUTE");
-        if (parser.expectOptional("PROCEDURE")) {           
-        } else if (parser.expectOptional("FUNCTION")) {           
-        } else {
+        if (!parser.expectOptional("PROCEDURE") &&
+            !parser.expectOptional("FUNCTION")) {          
             parser.throwUnsupportedCommand();
         }
         
