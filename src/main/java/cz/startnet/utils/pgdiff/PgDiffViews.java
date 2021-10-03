@@ -36,9 +36,9 @@ public class PgDiffViews {
         for (final PgView newView : newSchema.getViews()) {
             PgView oldView = null;
             
-            if(Objects.nonNull(oldSchema)){
-               oldView=oldSchema.getView(newView.getName());
-             }
+            if (Objects.nonNull(oldSchema)) {
+                oldView = oldSchema.getView(newView.getName());
+            }
              
             if (oldSchema == null
                     || !oldSchema.containsView(newView.getName())
