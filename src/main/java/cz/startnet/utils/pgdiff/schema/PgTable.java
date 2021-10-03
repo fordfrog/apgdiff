@@ -75,8 +75,7 @@ public class PgTable extends PgRelation {
     
     /**
      * Partion By 
-     */
-    
+     */    
     private String partitionBy;
 
     /**

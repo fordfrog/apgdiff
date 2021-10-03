@@ -254,7 +254,7 @@ public final class Parser {
      *
      * @return parsed string, if quoted then including quotes
      */
-        public String parseString() {
+     public String parseString() {
         final boolean quoted = string.charAt(position) == '\'';
 
         if (quoted) {
