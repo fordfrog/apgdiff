@@ -53,8 +53,13 @@ public class AlterSequenceParser {
         }
 
         while (!parser.expectOptional(";")) {
-
-            if (parser.expectOptional("OWNED", "BY")) {
+            if (parser.expectOptional("OWNER", "TO")) {
+                if (parser.expectOptional("NONE")) {
+                    sequence.setOwnedBy(null);
+                } else {
+                    sequence.setOwnedBy(parser.getExpression());
+                }
+            } else if (parser.expectOptional("OWNED", "BY")) {
                 if (parser.expectOptional("NONE")) {
                     sequence.setOwnedBy(null);
                 } else {
