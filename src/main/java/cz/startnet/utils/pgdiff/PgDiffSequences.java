@@ -85,6 +85,15 @@ public class PgDiffSequences {
                 writer.println();
                 writer.println(sequence.getOwnedBySQL());
             }
+
+            if ((oldSchema == null
+                || !oldSchema.containsSequence(sequence.getName()))
+                && sequence.getOwnerTo() != null
+                && !sequence.getOwnerTo().isEmpty()) {
+                searchPathHelper.outputSearchPath(writer);
+                writer.println();
+                writer.println(sequence.getOwnerToSQL());
+            }
         }
     }
 
