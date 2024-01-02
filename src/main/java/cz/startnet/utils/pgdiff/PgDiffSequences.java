@@ -236,6 +236,14 @@ public class PgDiffSequences {
                 sbSQL.append(newOwnedBy);
             }
 
+            final String oldOwnerTo = oldSequence.getOwnerTo();
+            final String newOwnerTo = newSequence.getOwnerTo();
+
+            if (newOwnerTo != null && !newOwnerTo.equals(oldOwnerTo)) {
+                sbSQL.append(" OWNER TO ");
+                sbSQL.append(newOwnerTo);
+            }
+
             if (sbSQL.length() > 0) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();

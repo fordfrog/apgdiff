@@ -273,6 +273,7 @@ public class PgDiffTest {
                   , {"grant_on_new_sequence", false, false, false, false}
                     // Tests alter view owner
                   , {"alter_view_owner", false, false, false, false}
+                  , {"alter_sequence_owner", false, false, false, false}
                   , {"grant_on_table_cols_mixed", false, false, false, false}
                   , {"grant_on_view_cols_mixed", false, false, false, false}
                   , {"create_schema_no_change_table", false, false, false, false}
