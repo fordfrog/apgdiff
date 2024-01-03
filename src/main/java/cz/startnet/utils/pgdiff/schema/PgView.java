@@ -96,6 +96,7 @@ public class PgView extends PgRelation {
      *
      * @return relation kind
      */
+    @Override
     public String getRelationKind() {
         if (materialized)
             return "MATERIALIZED VIEW";
@@ -263,6 +264,7 @@ public class PgView extends PgRelation {
      *
      * @return found column or null if no such column has been found
      */
+    @Override
     public PgColumn getColumn(final String name) {
         PgColumn col = super.getColumn(name);
         if (col == null && !declareColumnNames) {
@@ -284,6 +286,7 @@ public class PgView extends PgRelation {
      *
      * @return true if table contains given column {@code name}, otherwise false
      */
+    @Override
     public boolean containsColumn(final String name) {
         return true;
     }

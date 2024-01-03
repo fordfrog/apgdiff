@@ -33,7 +33,7 @@ public class PgTable extends PgRelation {
      * List of names of inherited tables.
      */
     @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private final List<Pair<String,String>> inherits = new ArrayList<Pair<String,String>>();
+    private final List<Pair<String, String>> inherits = new ArrayList<Pair<String, String>>();
     /**
      * WITH clause. If value is null then it is not set, otherwise can be set to
      * OIDS=true, OIDS=false, or storage parameters can be set.
@@ -122,6 +122,7 @@ public class PgTable extends PgRelation {
      *
      * @return relation kind
      */
+    @Override
     public String getRelationKind() {
         return "TABLE";
     }
@@ -180,14 +181,14 @@ public class PgTable extends PgRelation {
 
             first = true;
 
-            for (final Pair<String,String> inheritPair : inherits) {
+            for (final Pair<String, String> inheritPair : inherits) {
                 if (first) {
                     first = false;
                 } else {
                     sbSQL.append(", ");
                 }
                 String inheritTableName = null;
-                if(schema.getName().equals(inheritPair.getL())){
+                if (schema.getName().equals(inheritPair.getL())) {
                     inheritTableName = inheritPair.getR();
                 } else {
                     inheritTableName = String.format("%s.%s", inheritPair.getL(), inheritPair.getR());
@@ -219,7 +220,7 @@ public class PgTable extends PgRelation {
             sbSQL.append("SERVER ");
             sbSQL.append(getForeignServer());
         }
-        
+
         if (tablespace != null && !tablespace.isEmpty()) {
             sbSQL.append(System.getProperty("line.separator"));
             sbSQL.append("TABLESPACE ");
@@ -230,7 +231,7 @@ public class PgTable extends PgRelation {
 
         //Inherited column default override
         for (PgInheritedColumn column : getInheritedColumns()) {
-            if(column.getDefaultValue() != null){
+            if (column.getDefaultValue() != null) {
                 sbSQL.append(System.getProperty("line.separator"));
                 sbSQL.append(System.getProperty("line.separator"));
                 sbSQL.append("ALTER TABLE ONLY ");
@@ -271,9 +272,9 @@ public class PgTable extends PgRelation {
     public void addInherits(final String schemaName, final String tableName) {
         inherits.add(new Pair<String, String>(schemaName, tableName));
         final PgTable inheritedTable = database.getSchema(schemaName).getTable(tableName);
-        for( PgColumn column : inheritedTable.getColumns() ) {
-          PgInheritedColumn inheritedColumn = new PgInheritedColumn(column);
-          inheritedColumns.add(inheritedColumn);
+        for (PgColumn column : inheritedTable.getColumns()) {
+            PgInheritedColumn inheritedColumn = new PgInheritedColumn(column);
+            inheritedColumns.add(inheritedColumn);
         }
 
         for( PgInheritedColumn column : inheritedTable.getInheritedColumns() ) {
@@ -287,7 +288,7 @@ public class PgTable extends PgRelation {
      *
      * @return {@link #inherits}
      */
-    public List<Pair<String,String>> getInherits() {
+    public List<Pair<String, String>> getInherits() {
         return Collections.unmodifiableList(inherits);
     }
 
@@ -314,6 +315,7 @@ public class PgTable extends PgRelation {
      *
      * @return {@link #tablespace}
      */
+    @Override
     public String getTablespace() {
         return tablespace;
     }
@@ -323,6 +325,7 @@ public class PgTable extends PgRelation {
      *
      * @param tablespace {@link #tablespace}
      */
+    @Override
     public void setTablespace(final String tablespace) {
         this.tablespace = tablespace;
     }
@@ -332,6 +335,7 @@ public class PgTable extends PgRelation {
      *
      * @param column column
      */
+    @Override
     public void addColumn(final PgColumn column) {
         columns.add(column);
     }
@@ -353,6 +357,7 @@ public class PgTable extends PgRelation {
      * @return found inheritedColumn or null if no such inheritedColumn
      * has been found
      */
+    @Override
     public PgInheritedColumn getInheritedColumn(final String name) {
         if (inherits != null && !inherits.isEmpty()) {
             for (PgInheritedColumn inheritedColumn : inheritedColumns) {
@@ -391,6 +396,7 @@ public class PgTable extends PgRelation {
      * @return true if table contains given inheritedColumn {@code name},
      * otherwise false
      */
+    @Override
     public boolean containsInheritedColumn(final String name) {
         if (inherits != null && !inherits.isEmpty()) {
             for (PgInheritedColumn inheritedColumn : inheritedColumns) {
@@ -446,18 +452,18 @@ public class PgTable extends PgRelation {
     public void setUnlogged(boolean unlogged) {
         this.unlogged = unlogged;
     }
-    
+
     /**
      * Foreign Tables
      */
-    
+
     @Override
     public String getDropSQL() {
-        
+
         return "DROP " + ((isForeign()) ? "FOREIGN ":"") + getRelationKind() + " " + PgDiffUtils.getDropIfExists() +
                 PgDiffUtils.getQuotedName(getName()) + ";";
     }
-    
+
     public boolean isForeign() {
         return foreign;
     }
@@ -465,13 +471,13 @@ public class PgTable extends PgRelation {
     public void setForeign(boolean foreign) {
         this.foreign = foreign;
     }
-    
-    public void setForeignServer(String server){
-    	foreignServer = server;
+
+    public void setForeignServer(String server) {
+        foreignServer = server;
     }
-    
-    public String getForeignServer(){
-    	return foreignServer;
+
+    public String getForeignServer() {
+        return foreignServer;
     }
 
     public Boolean hasRLSEnabled() {
