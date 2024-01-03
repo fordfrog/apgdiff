@@ -26,6 +26,9 @@ public class CreateSchemaParser {
         final Parser parser = new Parser(statement);
         parser.expect("CREATE", "SCHEMA");
 
+        // Optional IF NOT EXISTS, irrelevant for our purposes
+        parser.expectOptional("IF", "NOT", "EXISTS");
+
         if (parser.expectOptional("AUTHORIZATION")) {
             final PgSchema schema = new PgSchema(
                     ParserUtils.getObjectName(parser.parseIdentifier()));
