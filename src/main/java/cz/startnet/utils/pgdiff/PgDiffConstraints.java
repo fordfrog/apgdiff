@@ -48,7 +48,10 @@ public class PgDiffConstraints {
                     getNewConstraints(oldTable, newTable, primaryKey)) {
                 searchPathHelper.outputSearchPath(writer);
                 writer.println();
-                writer.println(constraint.getCreationSQL());
+                if (constraint.wasRenamed())
+                    writer.println(constraint.getRenameSQL());
+                else
+                    writer.println(constraint.getCreationSQL());
             }
         }
     }
@@ -110,13 +113,37 @@ public class PgDiffConstraints {
                 if (constraint.isPrimaryKeyConstraint() == primaryKey
                         && (!newTable.containsConstraint(constraint.getName())
                         || !newTable.getConstraint(constraint.getName()).equals(
-                        constraint))) {
+                        constraint))
+                        && !foundARename(constraint, newTable, primaryKey)) {
                     list.add(constraint);
                 }
             }
         }
 
         return list;
+    }
+
+    /**
+     * Returns true of a constraint can be found that it was renamed
+     *
+     * @param oldTable	original Table
+     * @param newTable	new table
+     * @param oldName	old constraint name
+     * @return boolean
+     */
+    private static boolean foundARename(PgConstraint constraint,
+            PgTable searchTable,
+            boolean primaryKey)
+    {
+        if (constraint != null && searchTable != null) {
+            for (final PgConstraint search_constraint : searchTable.getConstraints()) {
+                if (constraint.renamed(search_constraint) &&
+                        constraint.isPrimaryKeyConstraint() == primaryKey) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -145,7 +172,8 @@ public class PgDiffConstraints {
             } else {
                 for (final PgConstraint constraint :
                         newTable.getConstraints()) {
-                    if ((constraint.isPrimaryKeyConstraint() == primaryKey)
+                    if (foundARename(constraint, oldTable, primaryKey)
+                            || (constraint.isPrimaryKeyConstraint() == primaryKey)
                             && (!oldTable.containsConstraint(
                             constraint.getName())
                             || !oldTable.getConstraint(constraint.getName()).
