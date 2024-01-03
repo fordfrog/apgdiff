@@ -50,6 +50,11 @@ public class PgSequence {
      * Column the sequence is owned by.
      */
     private String ownedBy;
+
+    /** 
+     * Column the sequencie is ownerTo.
+     */
+    private String ownerTo;
     /**
      * Comment.
      */
@@ -210,6 +215,28 @@ public class PgSequence {
     }
 
     /**
+     * Creates and returns SQL statement for modification "OWNER TO" parameter.
+     *
+     * @return created SQL statement
+     */
+    public String getOwnerToSQL() {
+        final StringBuilder sbSQL = new StringBuilder(100);
+
+        sbSQL.append("ALTER SEQUENCE ");
+        sbSQL.append(PgDiffUtils.getQuotedName(name));
+
+        if (ownerTo != null && !ownerTo.isEmpty()) {
+            sbSQL.append(System.getProperty("line.separator"));
+            sbSQL.append("\tOWNER TO ");
+            sbSQL.append(ownerTo);
+        }
+
+        sbSQL.append(';');
+
+        return sbSQL.toString();
+    }
+
+    /**
      * Setter for {@link #cycle}.
      *
      * @param cycle {@link #cycle}
@@ -342,6 +369,14 @@ public class PgSequence {
      */
     public void setOwnedBy(final String ownedBy) {
         this.ownedBy = ownedBy;
+    }
+
+    public String getOwnerTo() {
+        return ownerTo;
+    }
+
+    public void setOwnerTo(final String ownerTo) {
+        this.ownerTo = ownerTo;
     }
 
     public List<PgSequencePrivilege> getPrivileges() {

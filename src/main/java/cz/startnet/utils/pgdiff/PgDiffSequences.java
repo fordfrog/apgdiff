@@ -85,6 +85,15 @@ public class PgDiffSequences {
                 writer.println();
                 writer.println(sequence.getOwnedBySQL());
             }
+
+            if ((oldSchema == null
+                || !oldSchema.containsSequence(sequence.getName()))
+                && sequence.getOwnerTo() != null
+                && !sequence.getOwnerTo().isEmpty()) {
+                searchPathHelper.outputSearchPath(writer);
+                writer.println();
+                writer.println(sequence.getOwnerToSQL());
+            }
         }
     }
 
@@ -225,6 +234,14 @@ public class PgDiffSequences {
                 sbSQL.append(System.getProperty("line.separator"));
                 sbSQL.append("\tOWNED BY ");
                 sbSQL.append(newOwnedBy);
+            }
+
+            final String oldOwnerTo = oldSequence.getOwnerTo();
+            final String newOwnerTo = newSequence.getOwnerTo();
+
+            if (newOwnerTo != null && !newOwnerTo.equals(oldOwnerTo)) {
+                sbSQL.append(" OWNER TO ");
+                sbSQL.append(newOwnerTo);
             }
 
             if (sbSQL.length() > 0) {
